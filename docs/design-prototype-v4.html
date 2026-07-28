@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>REM ERP v4</title>
+  <title>REM ERP v4.1 — Module Suite</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,161 +16,182 @@
     ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
     .app-shell{display:flex;height:100vh}
     #sidebar{width:72px;min-width:72px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;z-index:50}
-    .sidebar-logo{height:48px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #f0f0f0}
-    .sidebar-logo svg{width:24px;height:24px;color:#2F80ED}
-    .sidebar-nav{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;overflow-y:auto}
-    .sidebar-item{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;position:relative;color:#666;transition:all .15s;overflow:visible}
+    .sidebar-logo{height:44px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #f0f0f0}
+    .sidebar-logo svg{width:22px;height:22px;color:#2F80ED}
+    .sidebar-scroll{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0;overflow-y:auto;overflow-x:visible}
+    .s-grp-sep{width:28px;height:1px;background:#e8e8e8;margin:4px 0}
+    .sidebar-item{position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;color:#666;transition:all .15s;margin:1px 0;overflow:visible}
     .sidebar-item:hover{background:#f0f4ff;color:#2F80ED}
     .sidebar-item.active{background:#eef3ff;color:#2F80ED}
-    .sidebar-item.active::before{content:'';position:absolute;left:-12px;top:8px;bottom:8px;width:4px;background:#2F80ED;border-radius:0 3px 3px 0}
-    .sidebar-item svg{width:20px;height:20px;stroke-width:1.5}
-    .sidebar-item[data-tip]:hover::after{content:attr(data-tip);position:fixed;left:92px;top:auto;transform:none;background:#1f2937;color:#fff;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;white-space:nowrap;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none}
-    .sidebar-nav{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;overflow-y:auto;overflow-x:visible}
-    .sidebar-bottom{padding:8px 0;border-top:1px solid #f0f0f0;display:flex;flex-direction:column;align-items:center;gap:2px}
+    .sidebar-item.active::before{content:'';position:absolute;left:-4px;top:8px;bottom:8px;width:3px;background:#2F80ED;border-radius:0 3px 3px 0}
+    .sidebar-item svg{width:19px;height:19px;stroke-width:1.5}
+    .sidebar-item.has-children::after{content:'▸';position:absolute;right:3px;bottom:3px;font-size:7px;color:#999;line-height:1;opacity:.6}
+    .sidebar-item[data-tip]:hover::after{content:attr(data-tip);position:fixed;left:88px;top:auto;transform:none;background:#1f2937;color:#fff;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;white-space:nowrap;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none}
+    .sidebar-bottom{padding:6px 0;border-top:1px solid #f0f0f0;display:flex;flex-direction:column;align-items:center;gap:1px}
+    .badge-dot{position:absolute;top:3px;right:3px;width:6px;height:6px;background:#e53935;border-radius:50%;border:1.5px solid #fff}
     .main-area{flex:1;display:flex;flex-direction:column;min-width:0}
-    .top-bar{height:48px;min-height:48px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 20px;gap:24px}
-    .app-brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;color:#333;white-space:nowrap}
-    .app-brand .badge{font-size:10px;color:#999;font-weight:400}
-    .top-nav{display:flex;align-items:center;gap:4px;flex:1;overflow-x:auto}
-    .top-nav-item{padding:6px 14px;font-size:13px;font-weight:500;color:#666;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .15s}
+    .top-bar{height:44px;min-height:44px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 16px;gap:16px}
+    .app-brand{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;color:#333;white-space:nowrap}
+    .app-brand .badge{font-size:9px;color:#999;font-weight:400}
+    .top-nav{display:flex;align-items:center;gap:0;flex:1;overflow-x:auto}
+    .top-nav-item{padding:5px 12px;font-size:12px;font-weight:500;color:#666;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .15s;margin-right:1px}
     .top-nav-item:hover{background:#f0f4ff;color:#2F80ED}
-    .top-nav-item.active{color:#2F80ED;background:#eef3ff;position:relative}
-    .top-nav-item.active::after{content:'';position:absolute;bottom:-12px;left:8px;right:8px;height:2px;background:#2F80ED;border-radius:1px}
-    .top-actions{display:flex;align-items:center;gap:8px}
-    .top-actions .icon-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#666;transition:all .15s}
+    .top-nav-item.active{color:#2F80ED;background:#eef3ff}
+    .top-nav-item.badge-new::after{content:'NEW';font-size:8px;background:#e53935;color:#fff;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:super;font-weight:700;letter-spacing:.3px}
+    .top-actions{display:flex;align-items:center;gap:6px}
+    .top-actions .icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#666;transition:all .15s}
     .top-actions .icon-btn:hover{background:#f0f0f0;color:#333}
-    .top-actions .icon-btn svg{width:18px;height:18px}
-    .top-actions .user-avatar{width:28px;height:28px;border-radius:6px;background:#2F80ED;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;cursor:pointer}
-    .notif-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;background:#e53935;border-radius:50%;border:1.5px solid #fff}
-    .content{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
-    .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .toolbar .filter-btn{padding:6px 12px;font-size:12px;font-weight:500;border:1px solid #e0e0e0;border-radius:6px;background:#fff;color:#333;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;white-space:nowrap}
+    .top-actions .icon-btn svg{width:16px;height:16px}
+    .top-actions .user-avatar{width:26px;height:26px;border-radius:6px;background:#2F80ED;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:600;cursor:pointer}
+    .notif-dot{position:absolute;top:3px;right:3px;width:6px;height:6px;background:#e53935;border-radius:50%;border:1.5px solid #fff}
+    .content{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+    .toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .toolbar .filter-btn{padding:5px 10px;font-size:11px;font-weight:500;border:1px solid #e0e0e0;border-radius:6px;background:#fff;color:#333;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:3px;white-space:nowrap}
     .toolbar .filter-btn:hover{border-color:#2F80ED;color:#2F80ED}
     .toolbar .filter-btn.active{background:#2F80ED;color:#fff;border-color:#2F80ED}
-    .toolbar .search-box{display:flex;align-items:center;border:1px solid #e0e0e0;border-radius:6px;padding:0 10px;background:#fff;flex:1;max-width:280px}
-    .toolbar .search-box input{border:none;outline:none;font-size:12px;padding:6px 8px;width:100%;background:transparent}
+    .toolbar .search-box{display:flex;align-items:center;border:1px solid #e0e0e0;border-radius:6px;padding:0 8px;background:#fff;flex:1;max-width:240px}
+    .toolbar .search-box input{border:none;outline:none;font-size:11px;padding:5px 6px;width:100%;background:transparent}
     .toolbar .search-box input::placeholder{color:#999}
-    .toolbar .search-box svg{width:14px;height:14px;color:#999}
+    .toolbar .search-box svg{width:13px;height:13px;color:#999}
     .toolbar .spacer{flex:1}
-    .toolbar .action-btn{padding:6px 14px;font-size:12px;font-weight:500;border-radius:6px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;white-space:nowrap}
+    .toolbar .action-btn{padding:5px 12px;font-size:11px;font-weight:500;border-radius:6px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:3px;white-space:nowrap}
     .toolbar .action-btn.primary{background:#2F80ED;color:#fff;border:none}
     .toolbar .action-btn.primary:hover{background:#2568c9}
     .toolbar .action-btn.secondary{background:#fff;color:#333;border:1px solid #e0e0e0}
     .toolbar .action-btn.secondary:hover{border-color:#2F80ED;color:#2F80ED}
-    .toolbar .action-btn svg{width:14px;height:14px}
-    .toolbar select{padding:6px 28px 6px 10px;font-size:12px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;color:#333;cursor:pointer}
+    .toolbar .action-btn svg{width:13px;height:13px}
+    .toolbar select{padding:5px 26px 5px 8px;font-size:11px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;color:#333;cursor:pointer}
     .card{background:#fff;border-radius:8px;border:1px solid #e8e8e8;overflow:hidden}
-    .card-header{padding:10px 14px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
-    .card-header h3{font-size:13px;font-weight:600;color:#333}
-    .card-body{padding:14px}
+    .card-header{padding:8px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+    .card-header h3{font-size:12px;font-weight:600;color:#333}
+    .card-body{padding:12px}
     .table-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:12px}
-    thead th{padding:8px 12px;text-align:left;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0;white-space:nowrap;background:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
-    tbody td{padding:7px 12px;border-bottom:1px solid #f2f2f2;color:#333;white-space:nowrap}
+    table{width:100%;border-collapse:collapse;font-size:11px}
+    thead th{padding:7px 10px;text-align:left;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0;white-space:nowrap;background:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+    tbody td{padding:6px 10px;border-bottom:1px solid #f2f2f2;color:#333;white-space:nowrap}
     tbody tr:hover{background:#f8faff}
     table .num{text-align:right}
-    .badge-status{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block}
+    .badge-status{padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600;display:inline-block}
     .badge-active{background:#e8f5e9;color:#2e7d32}
     .badge-pending{background:#fff3e0;color:#e65100}
     .badge-closed{background:#f5f5f5;color:#757575}
     .badge-reserved{background:#e3f2fd;color:#1565c0}
     .badge-sold{background:#fce4ec;color:#c62828}
-    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
-    .stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:12px 14px}
-    .stat-card .label{font-size:11px;color:#888;font-weight:500}
-    .stat-card .value{font-size:20px;font-weight:700;color:#333;margin-top:2px}
-    .stat-card .trend{font-size:11px;color:#2e7d32;margin-top:2px}
-    .form-input{padding:7px 10px;font-size:12px;border:1px solid #e0e0e0;border-radius:6px;outline:none;width:100%;background:#fff}
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+    .stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px 12px}
+    .stat-card .label{font-size:10px;color:#888;font-weight:500}
+    .stat-card .value{font-size:18px;font-weight:700;color:#333;margin-top:2px}
+    .stat-card .trend{font-size:10px;color:#2e7d32;margin-top:2px}
+    .form-input{padding:6px 8px;font-size:11px;border:1px solid #e0e0e0;border-radius:6px;outline:none;width:100%;background:#fff}
     .form-input:focus{border-color:#2F80ED;box-shadow:0 0 0 2px rgba(47,128,237,.1)}
-    .form-label{font-size:12px;font-weight:500;color:#555;margin-bottom:4px;display:block}
-    .form-group{margin-bottom:10px}
-    .toggle{width:28px;height:16px;border-radius:8px;background:#ddd;cursor:pointer;position:relative;transition:all .2s;display:inline-block}
+    .form-label{font-size:11px;font-weight:500;color:#555;margin-bottom:3px;display:block}
+    .form-group{margin-bottom:8px}
+    .toggle{width:26px;height:14px;border-radius:7px;background:#ddd;cursor:pointer;position:relative;transition:all .2s;display:inline-block}
     .toggle.on{background:#2F80ED}
-    .toggle::after{content:'';width:12px;height:12px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:all .2s;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+    .toggle::after{content:'';width:10px;height:10px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:all .2s;box-shadow:0 1px 2px rgba(0,0,0,.1)}
     .toggle.on::after{left:14px}
-    .page-title{font-size:16px;font-weight:700;color:#222}
-    .page-subtitle{font-size:12px;color:#888;margin-bottom:12px}
+    .page-title{font-size:15px;font-weight:700;color:#222}
+    .page-subtitle{font-size:11px;color:#888;margin-bottom:10px}
     .tabs{display:flex;gap:2px;background:#f5f5f5;border-radius:6px;padding:2px}
-    .tab{padding:5px 12px;font-size:11px;font-weight:500;border-radius:5px;cursor:pointer;color:#666;transition:all .15s}
+    .tab{padding:4px 10px;font-size:10px;font-weight:500;border-radius:5px;cursor:pointer;color:#666;transition:all .15s}
     .tab.active{background:#fff;color:#333;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-    .dashboard-quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-    .quick-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px}
+    .dashboard-quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+    .quick-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
     .quick-card:hover{border-color:#2F80ED;box-shadow:0 2px 8px rgba(47,128,237,.08)}
-    .quick-card .icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center}
-    .quick-card .icon svg{width:18px;height:18px}
-    .quick-card .info .title{font-size:12px;font-weight:600;color:#333}
-    .quick-card .info .count{font-size:11px;color:#888}
-    .plot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:3px}
-    .plot-cell{aspect-ratio:1;border-radius:4px;cursor:pointer;font-size:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600}
+    .quick-card .icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .quick-card .icon svg{width:16px;height:16px}
+    .quick-card .info .title{font-size:11px;font-weight:600;color:#333}
+    .quick-card .info .count{font-size:10px;color:#888}
+    .plot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:2px}
+    .plot-cell{aspect-ratio:1;border-radius:3px;cursor:pointer;font-size:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600}
     .plot-available{background:#4caf50}
     .plot-sold{background:#e53935}
     .plot-reserved{background:#1e88e5}
     .plot-not-acquired{background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 6px);border:1px dashed #ccc;color:#999}
-    .content-footer{margin-top:auto;padding:8px 0 0;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#888}
-    .content-footer .breadcrumb{display:flex;align-items:center;gap:4px;color:#999;font-size:11px}
+    .content-footer{margin-top:auto;padding:6px 0 0;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#888}
+    .content-footer .breadcrumb{display:flex;align-items:center;gap:3px;color:#999;font-size:10px}
     .content-footer .breadcrumb span{color:#666}
     .slide-out{position:fixed;inset:0;z-index:100;display:none}
     .slide-out.active{display:flex}
     .slide-out .backdrop{flex:1;background:rgba(0,0,0,.2)}
-    .slide-out .panel{width:400px;max-width:90vw;background:#fff;height:100%;box-shadow:-4px 0 20px rgba(0,0,0,.1);display:flex;flex-direction:column;animation:slideIn .25s ease-out}
+    .slide-out .panel{width:380px;max-width:90vw;background:#fff;height:100%;box-shadow:-4px 0 20px rgba(0,0,0,.1);display:flex;flex-direction:column;animation:slideIn .25s ease-out}
     @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     .fade-in{animation:fadeIn .2s ease-out}
     .hidden{display:none!important}
     .progress-bar{height:4px;background:#e0e0e0;border-radius:2px;overflow:hidden}
     .progress-bar .fill{height:100%;border-radius:2px;transition:width .3s}
-    .kanban-col{min-width:240px;flex:1;display:flex;flex-direction:column;background:#f8f9fa;border-radius:8px;border:1px solid #e8e8e8}
-    .kanban-card{padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:6px}
+    .kanban-col{min-width:220px;flex:1;display:flex;flex-direction:column;background:#f8f9fa;border-radius:8px;border:1px solid #e8e8e8}
+    .kanban-card{padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:5px}
     .kanban-card:hover{border-color:#2F80ED;box-shadow:0 1px 4px rgba(47,128,237,.1)}
     .toast-container{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
-    .toast{padding:10px 16px;border-radius:8px;font-size:12px;font-weight:500;color:#fff;animation:fadeIn .2s ease-out}
+    .toast{padding:8px 14px;border-radius:8px;font-size:11px;font-weight:500;color:#fff;animation:fadeIn .2s ease-out}
     .toast.success{background:#2e7d32}
     .toast.error{background:#c62828}
     .toast.info{background:#1565c0}
     html.dark{filter:invert(1) hue-rotate(180deg);background:#0b0c11}
     html.dark img,html.dark canvas,html.dark svg,html.dark .sidebar-item[data-tip]:hover::after{filter:invert(1) hue-rotate(180deg)}
-    .lead-panel{width:480px;max-width:95vw;background:#fff;height:100%;box-shadow:-4px 0 20px rgba(0,0,0,.1);display:flex;flex-direction:column;animation:slideIn .25s ease-out}
+    .lead-panel{width:460px;max-width:95vw;background:#fff;height:100%;box-shadow:-4px 0 20px rgba(0,0,0,.1);display:flex;flex-direction:column;animation:slideIn .25s ease-out}
     .lead-header{background:#fff;border-bottom:1px solid #e8e8e8}
-    .lead-info-row{display:flex;gap:6px;flex-wrap:wrap}
-    .lead-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase}
+    .lead-info-row{display:flex;gap:5px;flex-wrap:wrap}
+    .lead-badge{padding:2px 7px;border-radius:4px;font-size:9px;font-weight:600;text-transform:uppercase}
     .lead-tabs{display:flex;border-bottom:1px solid #e8e8e8;background:#fafafa}
-    .lead-tab{padding:10px 16px;font-size:12px;font-weight:500;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+    .lead-tab{padding:8px 14px;font-size:11px;font-weight:500;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
     .lead-tab:hover{color:#2F80ED}
     .lead-tab.active{color:#2F80ED;border-bottom-color:#2F80ED}
-    .lead-body{flex:1;overflow-y:auto;padding:16px;background:#f8f9fa}
-    .lead-footer{padding:12px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:8px}
-    .lead-foot-btn{flex:1;padding:8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid #e0e0e0;background:#fff;color:#333}
+    .lead-body{flex:1;overflow-y:auto;padding:14px;background:#f8f9fa}
+    .lead-footer{padding:10px 14px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px}
+    .lead-foot-btn{flex:1;padding:7px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:3px;border:1px solid #e0e0e0;background:#fff;color:#333}
     .lead-foot-btn:hover{border-color:#2F80ED;color:#2F80ED}
     .lead-foot-btn.primary{background:#2F80ED;color:#fff;border-color:#2F80ED}
     .lead-foot-btn.primary:hover{background:#2568c9}
     .lead-foot-btn.success{background:#2e7d32;color:#fff;border-color:#2e7d32}
     .lead-foot-btn.success:hover{background:#1b5e20}
-    .installment-item{padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .installment-item{padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
     .installment-item:hover{border-color:#2F80ED}
-    .doc-item{padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;align-items:center;gap:10px;margin-bottom:6px;cursor:pointer}
+    .doc-item{padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;align-items:center;gap:8px;margin-bottom:5px;cursor:pointer}
     .doc-item:hover{border-color:#2F80ED}
-    .activity-item{padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:6px}
+    .activity-item{padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:5px}
     .activity-item:hover{border-color:#2F80ED}
-    .verif-item{padding:8px 12px;border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-    .lead-avatar{width:44px;height:44px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+    .verif-item{padding:6px 10px;border-radius:6px;font-size:11px;display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+    .lead-avatar{width:40px;height:40px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+    .group-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+    .group-card{padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all .15s}
+    .group-card:hover{border-color:#2F80ED;box-shadow:0 2px 8px rgba(47,128,237,.08)}
+    .group-card h4{font-size:12px;font-weight:600;color:#222;margin-bottom:6px}
+    .group-card .g-mods{font-size:10px;color:#888}
+    .group-card .g-mods span{display:inline-block;padding:1px 6px;background:#f0f4ff;color:#1565c0;border-radius:4px;margin:2px;font-size:9px}
   </style>
 </head>
 <body>
 <div class="app-shell">
+  <!-- SIDEBAR: 8 Groups with separators -->
   <div id="sidebar">
     <div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
-    <div class="sidebar-nav" id="sidebarNav">
-      <div class="sidebar-item active" data-tip="Dashboard" onclick="switchModule('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></div>
-      <div class="sidebar-item" data-tip="CRM" onclick="switchModule('crm')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-      <div class="sidebar-item" data-tip="Land" onclick="switchModule('land_mgmt')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 22V2l20 20H2z"/><path d="M22 2v20H2"/></svg></div>
-      <div class="sidebar-item" data-tip="Plots" onclick="switchModule('plots')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
-      <div class="sidebar-item" data-tip="Projects" onclick="switchModule('projects')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
-      <div class="sidebar-item" data-tip="Bookings" onclick="switchModule('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-      <div class="sidebar-item" data-tip="Finance" onclick="switchModule('finance')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="M12 6v12"/></svg></div>
-      <div class="sidebar-item" data-tip="Stock" onclick="switchModule('stock')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg></div>
-      <div class="sidebar-item" data-tip="HR" onclick="switchModule('hr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-      <div class="sidebar-item" data-tip="Tasks" onclick="switchModule('tasks')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-      <div class="sidebar-item" data-tip="Settings" onclick="switchModule('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></div>
+    <div class="sidebar-scroll" id="sidebarNav">
+      <!-- G1: Executive -->
+      <div class="sidebar-item active" data-tip="Executive" onclick="switchGroup('executive')" id="s_executive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G2: Sales & CRM -->
+      <div class="sidebar-item has-children" data-tip="Sales & CRM" onclick="switchGroup('sales_crm')" id="s_sales_crm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G3: Land & Projects -->
+      <div class="sidebar-item has-children" data-tip="Land & Projects" onclick="switchGroup('land_projects')" id="s_land_projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 22V2l20 20H2z"/><path d="M22 2v20H2"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G4: Bookings & Customer -->
+      <div class="sidebar-item has-children" data-tip="Bookings & Customer" onclick="switchGroup('bookings_customer')" id="s_bookings_customer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G5: Construction -->
+      <div class="sidebar-item has-children" data-tip="Construction" onclick="switchGroup('construction')" id="s_construction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G6: Finance & Admin -->
+      <div class="sidebar-item has-children" data-tip="Finance & Admin" onclick="switchGroup('finance_admin')" id="s_finance_admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="M12 6v12"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G7: Collaboration -->
+      <div class="sidebar-item has-children" data-tip="Collaboration" onclick="switchGroup('collaboration')" id="s_collaboration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G8: System -->
+      <div class="sidebar-item" data-tip="System" onclick="switchGroup('system')" id="s_system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></div>
     </div>
     <div class="sidebar-bottom">
       <div class="sidebar-item" data-tip="Fullscreen" onclick="toggleFullScreen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></div>
@@ -180,21 +201,8 @@
   </div>
   <div class="main-area">
     <div class="top-bar">
-      <div class="app-brand"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F80ED" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> REM ERP <span class="badge">v4</span></div>
-      <div class="top-nav" id="topNav">
-        <div class="top-nav-item active" onclick="switchModule('dashboard')">Dashboard</div>
-        <div class="top-nav-item" onclick="switchModule('crm')">Sales &amp; CRM</div>
-        <div class="top-nav-item" onclick="switchModule('land_mgmt')">Land</div>
-        <div class="top-nav-item" onclick="switchModule('plots')">Plots</div>
-        <div class="top-nav-item" onclick="switchModule('projects')">Projects</div>
-        <div class="top-nav-item" onclick="switchModule('bookings')">Bookings</div>
-        <div class="top-nav-item" onclick="switchModule('finance')">Finance</div>
-        <div class="top-nav-item" onclick="switchModule('stock')">Stock</div>
-        <div class="top-nav-item" onclick="switchModule('hr')">HR</div>
-        <div class="top-nav-item" onclick="switchModule('tasks')">Tasks</div>
-        <div class="top-nav-item" onclick="switchModule('settings')">Settings</div>
-        <div class="top-nav-item" onclick="switchModule('more')">All</div>
-      </div>
+      <div class="app-brand"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2F80ED" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> REM ERP <span class="badge">v4.1</span></div>
+      <div class="top-nav" id="topNav"></div>
       <div class="top-actions" style="position:relative">
         <div class="icon-btn" onclick="toggleGlobalSearch()" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
         <div class="icon-btn" onclick="toggleNotifications()" title="Notifications" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
@@ -202,44 +210,44 @@
       </div>
     </div>
     <div class="content" id="mainContent"></div>
-    <div style="height:32px;min-height:32px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 14px;font-size:11px;color:#888;justify-content:space-between">
-      <div class="breadcrumb">REM ERP <span>›</span> <span id="footerModName">Dashboard</span></div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <button onclick="changeZoom(-10)" style="padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;color:#555">−</button>
-        <span id="zoomLabel" onclick="resetZoom()" style="cursor:pointer;font-weight:600;min-width:36px;text-align:center;font-size:11px">100%</span>
-        <button onclick="changeZoom(10)" style="padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;color:#555">+</button>
+    <div style="height:28px;min-height:28px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 12px;font-size:10px;color:#888;justify-content:space-between">
+      <div class="breadcrumb">REM ERP <span>›</span> <span id="footerGroup">Executive</span> <span>›</span> <span id="footerModName">Dashboard</span></div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <button onclick="changeZoom(-10)" style="padding:1px 5px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:10px;color:#555">−</button>
+        <span id="zoomLabel" onclick="resetZoom()" style="cursor:pointer;font-weight:600;min-width:32px;text-align:center;font-size:10px">100%</span>
+        <button onclick="changeZoom(10)" style="padding:1px 5px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:10px;color:#555">+</button>
         <span style="color:#e0e0e0">|</span>
-        <button onclick="toggleFullScreen()" style="padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:10px;color:#555" title="Fullscreen">⛶</button>
+        <button onclick="toggleFullScreen()" style="padding:1px 5px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:9px;color:#555" title="Fullscreen">⛶</button>
       </div>
     </div>
   </div>
 </div>
 
-<div id="globalSearchPanel" class="slide-out"><div class="backdrop" onclick="toggleGlobalSearch()"></div><div class="panel" style="padding:16px">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-    <input id="globalSearchInput" placeholder="Search leads, plots, projects, contacts..." onkeyup="globalSearch()" style="flex:1;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none"/>
+<div id="globalSearchPanel" class="slide-out"><div class="backdrop" onclick="toggleGlobalSearch()"></div><div class="panel" style="padding:14px">
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+    <input id="globalSearchInput" placeholder="Search leads, plots, projects, contacts..." onkeyup="globalSearch()" style="flex:1;padding:7px 10px;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;outline:none"/>
     <div class="icon-btn" onclick="toggleGlobalSearch()">✕</div>
   </div>
   <div id="globalSearchResults" style="flex:1;overflow-y:auto"></div>
 </div></div>
 
 <div id="notifPanel" class="slide-out"><div class="backdrop" onclick="toggleNotifications()"></div><div class="panel">
-  <div style="padding:14px 16px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:600">Notifications</span></div>
-  <div style="flex:1;overflow-y:auto;padding:8px">
-    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0"><div style="font-size:12px;font-weight:500">PO-24-089 Requires Approval</div><div style="font-size:11px;color:#888">Shah Cement • ৳5,50,000 • 2h ago</div></div>
-    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0"><div style="font-size:12px;font-weight:500">Payment Received</div><div style="font-size:11px;color:#888">Dr. Rubina Ali • ৳2,00,000 • 5h ago</div></div>
-    <div style="padding:10px 12px"><div style="font-size:12px;font-weight:500">Lead Status Changed</div><div style="font-size:11px;color:#888">Syed Rahman → Hot • 1d ago</div></div>
+  <div style="padding:12px 14px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600">Notifications</span></div>
+  <div style="flex:1;overflow-y:auto;padding:6px;">
+    <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0"><div style="font-size:11px;font-weight:500">PO-24-089 Requires Approval</div><div style="font-size:10px;color:#888">Shah Cement • ৳5,50,000 • 2h ago</div></div>
+    <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0"><div style="font-size:11px;font-weight:500">Payment Received</div><div style="font-size:10px;color:#888">Dr. Rubina Ali • ৳2,00,000 • 5h ago</div></div>
+    <div style="padding:8px 10px"><div style="font-size:11px;font-weight:500">Lead Status Changed</div><div style="font-size:10px;color:#888">Syed Rahman → Hot • 1d ago</div></div>
   </div>
 </div></div>
 
 <div id="roleMenuPanel" class="slide-out"><div class="backdrop" onclick="toggleRoleMenu()"></div><div class="panel">
-  <div style="padding:14px 16px;border-bottom:1px solid #e8e8e8"><span style="font-size:14px;font-weight:600">Switch Role</span></div>
-  <div style="flex:1;overflow-y:auto;padding:12px">
-    <div style="margin-bottom:8px;font-size:11px;color:#888">Current: <span id="roleDisplay" style="font-weight:600;color:#2F80ED">Super Admin</span></div>
-    <div onclick="setRole('Super Admin')" class="role-opt" data-role="Super Admin" style="padding:10px 12px;border-radius:6px;cursor:pointer;margin-bottom:4px;background:#eef3ff;font-weight:500;font-size:13px">Super Admin</div>
-    <div onclick="setRole('Sales Agent')" class="role-opt" data-role="Sales Agent" style="padding:10px 12px;border-radius:6px;cursor:pointer;margin-bottom:4px;font-size:13px">Sales Agent</div>
-    <div onclick="setRole('Site Engineer')" class="role-opt" data-role="Site Engineer" style="padding:10px 12px;border-radius:6px;cursor:pointer;margin-bottom:4px;font-size:13px">Site Engineer</div>
-    <div onclick="setRole('Finance')" class="role-opt" data-role="Finance" style="padding:10px 12px;border-radius:6px;cursor:pointer;margin-bottom:4px;font-size:13px">Finance</div>
+  <div style="padding:12px 14px;border-bottom:1px solid #e8e8e8"><span style="font-size:13px;font-weight:600">Switch Role</span></div>
+  <div style="flex:1;overflow-y:auto;padding:10px">
+    <div style="margin-bottom:6px;font-size:10px;color:#888">Current: <span id="roleDisplay" style="font-weight:600;color:#2F80ED">Super Admin</span></div>
+    <div onclick="setRole('Super Admin')" class="role-opt" data-role="Super Admin" style="padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:3px;background:#eef3ff;font-weight:500;font-size:12px">Super Admin</div>
+    <div onclick="setRole('Sales Agent')" class="role-opt" data-role="Sales Agent" style="padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px">Sales Agent</div>
+    <div onclick="setRole('Site Engineer')" class="role-opt" data-role="Site Engineer" style="padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px">Site Engineer</div>
+    <div onclick="setRole('Finance')" class="role-opt" data-role="Finance" style="padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px">Finance</div>
   </div>
 </div></div>
 
@@ -248,6 +256,19 @@
 <div id="crudModal" class="modal-overlay"><div class="modal-box" id="crudFormContent"></div></div>
 
 <script>
+// ═══ GROUP DEFINITIONS ═══
+const GROUPS = {
+  executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'}] },
+  sales_crm:     { label:'Sales & CRM',   icon:'👥', mods:[{id:'crm',          label:'CRM & Leads'},{id:'sales_marketing',label:'Sales & Marketing'},{id:'dues_recovery',label:'Dues & Recovery'},{id:'contacts',label:'Contact Book'}] },
+  land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
+  bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
+  construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
+  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
+  collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'bi_reports',label:'BI Reports',badge:true},{id:'notifications_page',label:'Notifications'}] },
+  system:        { label:'System',       icon:'⚙️', mods:[{id:'settings',     label:'Settings'}] }
+};
+const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','collaboration','system'];
+
 // ═══ DATA ═══
 const mockLeads = [
   {id:1,name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Facebook',value:'৳1.5 Cr',lastContact:'2h ago',paymentStatus:'Up to Date',
@@ -255,25 +276,13 @@ const mockLeads = [
    documents:[{name:'NID_Front.jpg',type:'ID Document'},{name:'Application_Form.pdf',type:'Application'}],
    activities:[{type:'Call',user:'Iftekhar',date:'Today, 10:30 AM',text:'Discussed plot location and pricing.'},{type:'Note',user:'System',date:'Yesterday, 4:00 PM',text:'Lead created via Facebook Ad campaign.'}]},
   {id:2,name:'Dr. Rubina Ali',phone:'+1 415 555 0198',email:'rubina@example.com',property:'Jolshiri - Apt 4B',status:'Site Visit',priority:'Medium',type:'NRB',source:'Referral',value:'৳2.2 Cr',lastContact:'1d ago',paymentStatus:'Pending',
-   installments:[{date:'Oct 15, 2024',amount:'৳2,00,000',status:'Paid'}],
-   documents:[],
-   activities:[{type:'Meeting',user:'Hasanul Banna',date:'Yesterday, 2:00 PM',text:'Site visit scheduled for Saturday. Client confirmed.'}]},
+   installments:[{date:'Oct 15, 2024',amount:'৳2,00,000',status:'Paid'}],documents:[],activities:[{type:'Meeting',user:'Hasanul Banna',date:'Yesterday, 2:00 PM',text:'Site visit scheduled for Saturday. Client confirmed.'}]},
   {id:3,name:'Ahasan Habib',phone:'+880 1819 111111',email:'ahasan@example.com',property:'Muktodhara - 3 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Walk-in',value:'৳95 Lac',lastContact:'3h ago',paymentStatus:'Overdue',
-   installments:[{date:'Sep 10, 2024',amount:'৳1,00,000',status:'Overdue'}],
-   documents:[{name:'Trade_License.pdf',type:'Business Doc'}],
-   activities:[{type:'Call',user:'Sales Team',date:'Today, 9:00 AM',text:'Negotiated price down to 92 Lac. Client thinking.'}]},
+   installments:[{date:'Sep 10, 2024',amount:'৳1,00,000',status:'Overdue'}],documents:[{name:'Trade_License.pdf',type:'Business Doc'}],activities:[{type:'Call',user:'Sales Team',date:'Today, 9:00 AM',text:'Negotiated price down to 92 Lac. Client thinking.'}]},
   {id:4,name:'Kamrul Hasan',phone:'+880 1912 222222',email:'kamrul@example.com',property:'Jolshiri - Apt 9A',status:'Booked',priority:'Low',type:'Local',source:'Website',value:'৳1.8 Cr',lastContact:'5d ago',paymentStatus:'Up to Date',
-   installments:[{date:'Sep 20, 2024',amount:'৳10,00,000',status:'Paid'}],
-   documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'NID_Copy.pdf',type:'ID Document'}],
-   activities:[{type:'Note',user:'System',date:'Sep 20, 2024',text:'Booking confirmed. Unit 9A allocated.'}]},
-  {id:5,name:'Syed Rahman',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'NRB',source:'Facebook',value:'৳1.5 Cr',lastContact:'10m ago',paymentStatus:'Pending',
-   installments:[],
-   documents:[],
-   activities:[]},
-  {id:6,name:'Fatima Begum',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳85 Lac',lastContact:'2d ago',paymentStatus:'Up to Date',
-   installments:[],
-   documents:[],
-   activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]}
+   installments:[{date:'Sep 20, 2024',amount:'৳10,00,000',status:'Paid'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'NID_Copy.pdf',type:'ID Document'}],activities:[{type:'Note',user:'System',date:'Sep 20, 2024',text:'Booking confirmed. Unit 9A allocated.'}]},
+  {id:5,name:'Syed Rahman',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'NRB',source:'Facebook',value:'৳1.5 Cr',lastContact:'10m ago',paymentStatus:'Pending',installments:[],documents:[],activities:[]},
+  {id:6,name:'Fatima Begum',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳85 Lac',lastContact:'2d ago',paymentStatus:'Up to Date',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]}
 ];
 const mockProjects = [
   {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
@@ -288,7 +297,8 @@ const mockPlots = [
 const mockBookings = [
   {id:'BKG-101',client:'Kamrul Hasan',date:'Sep 20, 2024',property:'Jolshiri Abason',unit:'Apt 9A',price:'৳1.8 Cr',advance:'৳10,00,000',status:'Confirmed',type:'Flat'},
   {id:'BKG-102',client:'Dr. Rubina Ali',date:'Oct 15, 2024',property:'Jolshiri Abason',unit:'Apt 4B',price:'৳2.2 Cr',advance:'৳2,00,000',status:'Pending Review',type:'Flat'},
-  {id:'BKG-103',client:'Tariqul Islam',date:'Nov 1, 2024',property:'Muktodhara',unit:'Plot M-103',price:'৳46.0L',advance:'৳11,50,000',status:'Confirmed',type:'Plot'}
+  {id:'BKG-103',client:'Tariqul Islam',date:'Nov 1, 2024',property:'Muktodhara',unit:'Plot M-103',price:'৳46.0L',advance:'৳11,50,000',status:'Confirmed',type:'Plot'},
+  {id:'BKG-104',client:'Fatima Begum',date:'Nov 5, 2024',property:'Green Valley',unit:'Plot G-22',price:'৳32.0L',advance:'৳8,00,000',status:'Pending Review',type:'Plot'}
 ];
 const mockInventory = [
   {id:1,site:'Muktodhara',item:'BSRM Steel 500W',quantity:'45 Tons',status:'Adequate',reorder:20},
@@ -318,31 +328,26 @@ const mockTasks = [
   {id:7,title:'Review Q3 Financials',status:'Review',priority:'High'},
   {id:8,title:'Vendor payment (Shah Cement)',status:'Done',priority:'Low'}
 ];
-// SALES & MARKETING
 const mockCampaigns = [
   {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:'Tk 1,50,000',leads:45,conversions:8,roi:'320%',status:'Active'},
   {id:'CAM-002',name:'Jolshiri Launch Event',channel:'On-site Event',budget:'Tk 3,00,000',leads:78,conversions:12,roi:'450%',status:'Completed'},
   {id:'CAM-003',name:'Billboard - Dhaka EPZ',channel:'Billboard',budget:'Tk 2,40,000',leads:22,conversions:3,roi:'180%',status:'Active'},
   {id:'CAM-004',name:'Referral Program Q3',channel:'Referral',budget:'Tk 50,000',leads:15,conversions:5,roi:'520%',status:'Active'},
-  {id:'CAM-005',name:'Newspaper Ad - Prothom Alo',channel:'Print',budget:'Tk 1,80,000',leads:30,conversions:4,roi:'210%',status:'Completed'},
+  {id:'CAM-005',name:'Newspaper Ad - Prothom Alo',channel:'Print',budget:'Tk 1,80,000',leads:30,conversions:4,roi:'210%',status:'Completed'}
 ];
-// DUES & RECOVERY
 const mockDues = [
   {id:'BKG-008',customer:'Dr. Rubina Ali',project:'Jolshiri Abason',unit:'Apt 4B',totalPrice:'Tk 65,00,000',paid:'Tk 55,00,000',due:'Tk 10,00,000',dueDate:'2026-06-30',daysOverdue:28,status:'Overdue',bucket:'30 Days'},
   {id:'BKG-012',customer:'Md. Taher Uddin',project:'Muktodhara Green Park',unit:'Plot 17',totalPrice:'Tk 28,00,000',paid:'Tk 20,00,000',due:'Tk 8,00,000',dueDate:'2026-07-15',daysOverdue:13,status:'Overdue',bucket:'15 Days'},
   {id:'BKG-015',customer:'Engr. Salahuddin',project:'Muktodhara Green Park',unit:'Plot 22',totalPrice:'Tk 32,00,000',paid:'Tk 24,00,000',due:'Tk 8,00,000',dueDate:'2026-05-15',daysOverdue:74,status:'Critical',bucket:'60+ Days'},
-  {id:'BKG-010',customer:'Mrs. Jahanara Begum',project:'Jolshiri Abason',unit:'Apt 3C',totalPrice:'Tk 58,00,000',paid:'Tk 48,00,000',due:'Tk 10,00,000',dueDate:'2026-08-15',daysOverdue:-18,status:'Upcoming',bucket:'Future'},
+  {id:'BKG-010',customer:'Mrs. Jahanara Begum',project:'Jolshiri Abason',unit:'Apt 3C',totalPrice:'Tk 58,00,000',paid:'Tk 48,00,000',due:'Tk 10,00,000',dueDate:'2026-08-15',daysOverdue:-18,status:'Upcoming',bucket:'Future'}
 ];
-// CRM STATE
-let crmTab='leads';
-
 const mockEmployees = [
-  {name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',status:'active'},
-  {name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',status:'active'},
-  {name:'Nazma Akhter',designation:'Accountant',dept:'Finance',phone:'01755557777',status:'active'},
-  {name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',status:'active'},
-  {name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',status:'active'},
-  {name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',status:'active'}
+  {id:1,name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',status:'active'},
+  {id:2,name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',status:'active'},
+  {id:3,name:'Nazma Akhter',designation:'Accountant',dept:'Finance',phone:'01755557777',status:'active'},
+  {id:4,name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',status:'active'},
+  {id:5,name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',status:'active'},
+  {id:6,name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',status:'active'}
 ];
 const mockUsers = [
   {name:'MD Hasanul Banna',email:'banna@mars.com',role:'Super Admin',dept:'Management',status:'Active',initials:'HB'},
@@ -407,33 +412,392 @@ const mockCompliance = [
   {id:2,name:'Environmental Clearance',project:'Jolshiri',type:'Environmental',due:'2025-03-20',status:'Pending'},
   {id:3,name:'Fire Safety Certificate',project:'Jolshiri',type:'Safety',due:'2025-02-01',status:'Compliant'}
 ];
+// NEW MODULE DATA
+const mockBOQ = [
+  {id:'BOQ-001',project:'Muktodhara Green Park',item:'Earthwork Excavation',qty:'2500',unit:'CFT',rate:'৳8',total:'৳20,000',status:'Approved'},
+  {id:'BOQ-002',project:'Muktodhara Green Park',item:'Brickwork 5"',qty:'15000',unit:'Pcs',rate:'৳12',total:'৳1,80,000',status:'Approved'},
+  {id:'BOQ-003',project:'Jolshiri Abason',item:'Reinforced Concrete (1:1.5:3)',qty:'400',unit:'CFT',rate:'৳5,500',total:'৳22,00,000',status:'Draft'},
+  {id:'BOQ-004',project:'Jolshiri Abason',item:'Plastering (12mm)',qty:'8500',unit:'SFT',rate:'৳35',total:'৳2,97,500',status:'Pending Review'},
+  {id:'BOQ-005',project:'Muktodhara Green Park',item:'Sanitary Fittings',qty:'20',unit:'Set',rate:'৳12,000',total:'৳2,40,000',status:'Draft'}
+];
+const mockVariations = [
+  {id:'VO-001',project:'Muktodhara Green Park',title:'Widening of Drainage',status:'Approved',impact:'+৳1,50,000',originator:'Site Engineer',date:'2024-09-15',schedule:'+7 days'},
+  {id:'VO-002',project:'Jolshiri Abason',title:'Additional Parking Level',status:'Pending Review',impact:'+৳8,00,000',originator:'Architect',date:'2024-10-20',schedule:'+21 days'},
+  {id:'VO-003',project:'Muktodhara Green Park',title:'Premium Flooring Upgrade',status:'Draft',impact:'+৳3,20,000',originator:'Client',date:'2024-10-25',schedule:'+14 days'}
+];
+const mockCustomers = [
+  {id:'CUS-001',name:'Kamrul Hasan',property:'Jolshiri Abason - 9A',status:'Active',dues:'৳8,00,000',nextDue:'2024-12-15',payments:3},
+  {id:'CUS-002',name:'Dr. Rubina Ali',property:'Jolshiri Abason - 4B',status:'Active',dues:'৳20,00,000',nextDue:'2024-11-30',payments:1},
+  {id:'CUS-003',name:'Tariqul Islam',property:'Muktodhara - M-103',status:'Active',dues:'৳34,50,000',nextDue:'2025-01-15',payments:2},
+  {id:'CUS-004',name:'Engr. Salahuddin',property:'Muktodhara - M-22',status:'Overdue',dues:'৳8,00,000',nextDue:'2024-10-15',payments:4}
+];
+const mockHandover = [
+  {id:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',status:'Inspection Pending',date:'2025-01-15',snags:3,'pos_date':'2024-12-20'},
+  {id:'HND-002',unit:'Muktodhara - Plot M-103',customer:'Tariqul Islam',status:'Handover Scheduled',date:'2025-02-01',snags:0,'pos_date':'2025-01-25'},
+  {id:'HND-003',unit:'Jolshiri - Apt 4B',customer:'Dr. Rubina Ali',status:'Construction Ongoing',date:'2025-06-30',snags:0,'pos_date':null}
+];
+const mockWorkspaceChat = [
+  {sender:'MD Hasanul Banna',msg:'Invoice INV-24-001 has been approved.',time:'10:32 AM',role:'Director'},
+  {sender:'Iftekhar Ahmad',msg:'Updated the CRM pipeline. 3 new leads added today.',time:'10:28 AM',role:'Admin'},
+  {sender:'Rofiqul Islam',msg:'Jolshiri site progress — plastering 60% complete.',time:'9:45 AM',role:'Engineer'},
+  {sender:'Shamim Reza',msg:'Client Dr. Rubina Ali confirmed site visit tomorrow at 11 AM.',time:'9:30 AM',role:'Sales'},
+  {sender:'Nazma Akhter',msg:'PO-24-089 payment processed. Awaiting confirmation.',time:'9:15 AM',role:'Finance'}
+];
+const mockBIReports = [
+  {name:'Monthly Sales Overview',type:'Chart',period:'Oct 2024',updated:'2024-10-28',status:'Auto'},
+  {name:'Lead Conversion Funnel',type:'Funnel',period:'Q3 2024',updated:'2024-10-01',status:'Auto'},
+  {name:'Project Budget vs Actual',type:'Bar Chart',period:'Ongoing',updated:'2024-10-27',status:'Manual'},
+  {name:'Cash Flow Forecast',type:'Line Chart',period:'Nov 2024',updated:'2024-10-25',status:'Auto'},
+  {name:'Installment Collection Efficiency',type:'Gauge',period:'Oct 2024',updated:'2024-10-28',status:'Auto'}
+];
+const mockKnowledgeBase = [
+  {title:'Land Acquisition Process',category:'Land Acquisition',updated:'2024-10-15',author:'Legal Team'},
+  {title:'Sales Commission Policy v3',category:'Sales',updated:'2024-09-20',author:'HR'},
+  {title:'VAT Calculation Guide',category:'Finance',updated:'2024-10-01',author:'Accounts'},
+  {title:'QC Checklist — Concrete Works',category:'Procurement',updated:'2024-08-15',author:'Quality Team'},
+  {title:'Employee Onboarding Checklist',category:'HR',updated:'2024-10-10',author:'HR'}
+];
 
-let currentModule='dashboard', currentRole='Super Admin', landTab='identification', stockTab='inventory', settingsTab='users', projectsTab='land', crmView='list';
+let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
+let landTab = 'identification', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list';
 
-// ═══ NAV ═══
-function switchModule(mod){
-  const n={land:'land_mgmt',plots:'land_mgmt',crm:'crm',more:'more'}; const r=n[mod]||mod; currentModule=r;
-  document.querySelectorAll('#sidebarNav .sidebar-item').forEach(e=>e.classList.remove('active'));
-  const m={dashboard:0,crm:1,land_mgmt:2,plots:3,projects:4,bookings:5,finance:6,stock:7,hr:8,tasks:9,settings:10};
-  const i=m[r]; if(i!==undefined){const s=document.querySelectorAll('#sidebarNav .sidebar-item');if(s[i])s[i].classList.add('active')}
-  document.querySelectorAll('#topNav .top-nav-item').forEach(e=>e.classList.remove('active'));
-  const t={dashboard:0,crm:1,land_mgmt:2,plots:3,projects:4,bookings:5,finance:6,stock:7,hr:8,tasks:10,settings:10,more:11};
-  const ti=t[r]!==undefined?t[r]:0; const ts=document.querySelectorAll('#topNav .top-nav-item'); if(ts[ti])ts[ti].classList.add('active');
-  render(r);
+// ═══ GROUP & TOP BAR NAV ═══
+function switchGroup(group) {
+  currentGroup = group;
+  // Update sidebar active
+  document.querySelectorAll('#sidebarNav .sidebar-item').forEach(e => e.classList.remove('active'));
+  const el = document.getElementById('s_' + group);
+  if (el) el.classList.add('active');
+  // Update top bar
+  const grp = GROUPS[group];
+  document.getElementById('footerGroup').textContent = grp.label;
+  const nav = document.getElementById('topNav');
+  nav.innerHTML = grp.mods.map((m, i) =>
+    `<div class="top-nav-item ${i===0?'active':''} ${m.badge?'badge-new':''}" onclick="switchModule('${m.id}')">${m.label}</div>`
+  ).join('');
+  // Switch to first module
+  if (grp.mods.length > 0) switchModule(grp.mods[0].id);
 }
-function render(mod){
-  const el=document.getElementById('mainContent');
-  const names={dashboard:'Dashboard',crm:'Sales & CRM',land_mgmt:'Land Acquisition',plots:'Plots',projects:'Projects',bookings:'Bookings',finance:'Finance',stock:'Stock',hr:'HR',tasks:'Tasks',settings:'Settings',more:'All Modules'};
-  document.getElementById('footerModName').textContent=names[mod]||mod;
-  switch(mod){
-    case'dashboard':renderDashboard(el);break; case'crm':renderCRM(el);break; case'land_mgmt':renderLandMgmt(el);break;
-    case'plots':renderPlots(el);break; case'projects':renderProjects(el);break; case'bookings':renderBookings(el);break;
-    case'finance':renderFinance(el);break; case'stock':renderStock(el);break; case'hr':renderHR(el);break;
-    case'tasks':renderTasks(el);break; case'settings':renderSettings(el);break; case'more':renderMore(el);break;
-    default:renderDashboard(el);
+
+function switchModule(mod) {
+  currentModule = mod;
+  // Update top bar active
+  document.querySelectorAll('#topNav .top-nav-item').forEach(e => e.classList.remove('active'));
+  const items = document.querySelectorAll('#topNav .top-nav-item');
+  const grp = GROUPS[currentGroup];
+  const idx = grp.mods.findIndex(m => m.id === mod);
+  if (idx >= 0 && items[idx]) items[idx].classList.add('active');
+  // Footer
+  const names = {}; grp.mods.forEach(m => { names[m.id] = m.label; });
+  document.getElementById('footerModName').textContent = names[mod] || mod;
+  // Render
+  const el = document.getElementById('mainContent');
+  switch(mod) {
+    case 'dashboard': renderDashboard(el); break;
+    case 'crm': renderCRM(el); break;
+    case 'sales_marketing': renderSalesMarketing(el); break;
+    case 'dues_recovery': renderDues(el); break;
+    case 'contacts': renderSubTable(el, 'contacts', mockContacts, ['Name','Role','Phone','Company'], ['name','role','phone','company'], 'Contact Book'); break;
+    case 'land_mgmt': renderLandMgmt(el); break;
+    case 'plots': renderPlots(el); break;
+    case 'projects': renderProjects(el); break;
+    case 'compliance': renderSubTable(el, 'compliance', mockCompliance, ['Name','Type','Due','Status'], ['name','type','due','status'], 'Compliance'); break;
+    case 'bookings': renderBookings(el); break;
+    case 'customer_portal': renderCustomerPortal(el); break;
+    case 'handover': renderHandover(el); break;
+    case 'contractors': renderSubTable(el, 'contractors', mockContractors, ['Name','Type','Rating','Status'], ['name','type','rating','status'], 'Contractors'); break;
+    case 'boq': renderBOQ(el); break;
+    case 'variation_orders': renderVariations(el); break;
+    case 'equipment': renderSubTable(el, 'equipment', mockEquipment, ['Name','Model','Site','Status'], ['name','model','site','status'], 'Equipment'); break;
+    case 'labor': renderSubTable(el, 'labor', mockLabor, ['Name','Count','Site','Status'], ['name','count','site','status'], 'Labor Management'); break;
+    case 'qc': renderSubTable(el, 'qc', mockQC, ['Project','Item','Result','Inspector'], ['project','item','result','inspector'], 'QC & Inspection'); break;
+    case 'designs': renderSubTable(el, 'designs', mockDesigns, ['Name','Type','Version','Status'], ['name','type','version','status'], 'Design Management'); break;
+    case 'finance': renderFinance(el); break;
+    case 'stock': renderStock(el); break;
+    case 'hr': renderHR(el); break;
+    case 'documents': renderSubTable(el, 'documents', mockDocuments, ['Title','Type','Property','Status'], ['title','type','property','status'], 'Data Vault'); break;
+    case 'knowledge_base': renderKB(el); break;
+    case 'tasks': renderTasks(el); break;
+    case 'workspace': renderWorkspace(el); break;
+    case 'bi_reports': renderBIReports(el); break;
+    case 'notifications_page': renderNotificationsPage(el); break;
+    case 'settings': renderSettings(el); break;
+    default: renderDashboard(el);
   }
 }
-function renderModule(){render(currentModule)}
+
+function renderModule() { switchModule(currentModule); }// ═══ RENDER FUNCTIONS ═══
+function renderDashboard(el){
+  const a=mockPlots.filter(p=>p.status==='available').length, s=mockPlots.filter(p=>p.status==='sold').length, r=mockPlots.filter(p=>p.status==='reserved').length;
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v4.1 · Role: ${currentRole} · 26 Modules</div>
+    <div class="stats-row" style="margin-bottom:12px">${[
+      ['Available Plots',a,'#4caf50','+2 this month'],['Sold Plots',s,'#e53935',''],['Reserved',r,'#1e88e5',''],
+      ['Revenue','৳12.5Cr','','+18%'],['Active Bookings',mockBookings.filter(b=>b.status==='Confirmed').length,'',''],['Hot Leads',mockLeads.filter(l=>l.priority==='High').length,'','+3 this week']
+    ].map(([l,v,c,t])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div>${t?`<div class="trend">${t}</div>`:''}</div>`).join('')}</div>
+    <div class="dashboard-quick" style="margin-bottom:12px">${[
+      ['CRM & Leads',`${mockLeads.length} leads`,'crm','#fff3e0','#e65100'],
+      ['Bookings',`${mockBookings.length} active`,'bookings','#e3f2fd','#1565c0'],
+      ['Finance',`${mockTransactions.length} txns`,'finance','#fce4ec','#c62828'],
+      ['Employees',`${mockEmployees.length} staff`,'hr','#f3e5f5','#7b1fa2'],['Projects',`${mockProjects.length} active`,'projects','#e0f2f1','#00695c']
+    ].map(([t,c,m,bg,cl])=>`<div class="quick-card" onclick="switchModule('${m}')"><div class="icon" style="background:${bg};color:${cl}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div class="info"><div class="title">${t}</div><div class="count">${c}</div></div></div>`).join('')}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="card"><div class="card-header"><h3>Recent Bookings</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockBookings.map(b=>`<tr><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td class="num">${b.price}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+      <div class="card"><div class="card-header"><h3>Hot Leads</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Property</th><th>Source</th><th>Status</th></tr></thead><tbody>${mockLeads.filter(l=>l.priority==='High').slice(0,4).map(l=>`<tr><td style="font-weight:500">${l.name}</td><td>${l.property}</td><td>${l.source}</td><td><span class="badge-status badge-pending">${l.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    </div>
+    <div class="card" style="margin-top:10px"><div class="card-header"><h3>Project Progress</h3></div><div class="card-body">${mockProjects.map(p=>`<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:500">${p.name}</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div><div style="font-size:9px;color:#888">${p.status} · ${p.budget}</div></div>`).join('')}</div></div>
+    <div class="content-footer"><div class="breadcrumb">Dashboard <span>›</span> Overview</div></div></div>`;
+}
+
+function renderCRM(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">CRM &amp; Leads</div><div class="page-subtitle">${mockLeads.length} total · ${mockLeads.filter(l=>l.priority==='High').length} hot · ${mockLeads.filter(l=>l.status==='New Inquiry').length} new</div>
+    <div class="stats-row" style="margin-bottom:8px">${[
+      ['Total',mockLeads.length,''],['Hot',mockLeads.filter(l=>l.priority==='High').length,'#c62828'],['Warm',mockLeads.filter(l=>l.priority==='Medium').length,'#e65100'],
+      ['New',mockLeads.filter(l=>l.status==='New Inquiry').length,''],['Booked',mockLeads.filter(l=>l.status==='Booked').length,'#2e7d32']
+    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <div class="tabs"><div class="tab ${crmView==='list'?'active':''}" onclick="crmView='list';renderModule()">List</div><div class="tab ${crmView==='kanban'?'active':''}" onclick="crmView='kanban';renderModule()">Pipeline</div></div>
+      <select id="crmFStatus" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px" onchange="renderModule()"><option value="">All Status</option><option>New Inquiry</option><option>Site Visit</option><option>Negotiation</option><option>Booked</option></select>
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="crudLead()">+ Add Lead</button>
+    </div>
+    ${crmView==='list'?`
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Status</th><th></th></tr></thead><tbody>${mockLeads.filter(l=>{const f=document.getElementById('crmFStatus');return !f||!f.value||l.status===f.value}).map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="padding:4px 4px 4px 10px;width:28px"><div style="width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${leadGetInitials(l.name)}</div></td><td style="font-weight:500">${l.name}</td><td>${l.phone}</td><td>${l.property}</td><td><span style="display:inline-flex;align-items:center;gap:2px"><span style="width:5px;height:5px;border-radius:50%;background:${leadBadgeColor(l.source)}"></span>${l.source}</span></td><td style="font-weight:500;color:#2e7d32">${l.value}</td><td><span class="badge-status ${l.status==='Booked'?'badge-active':l.status==='New Inquiry'?'badge-pending':'badge-reserved'}">${l.status}</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span> ${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:10px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</td></tr>`).join('')}</tbody></table></div></div></div>
+    `:`<div style="display:flex;gap:10px;overflow-x:auto;flex:1;min-height:280px">${['New Inquiry','Site Visit','Negotiation','Booked'].map(st=>{const items=mockLeads.filter(l=>l.status===st);return `<div class="kanban-col"><div style="padding:6px 8px;font-size:10px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>${st}</span><span style="background:#e0e0e0;border-radius:10px;padding:0 6px;font-size:9px">${items.length}</span></div><div style="flex:1;overflow-y:auto;padding:4px 6px">${items.map(l=>`<div class="kanban-card" onclick="openLead(${l.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:11px;font-weight:600">${l.name}</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span><span style="color:#e53935;cursor:pointer;font-size:9px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span></div></div><div style="font-size:10px;color:#888;margin-top:2px">${l.property}</div><div style="font-size:10px;color:#888">${l.value} · ${l.source}</div><div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap"><span class="badge-status ${l.priority==='High'?'badge-sold':l.priority==='Medium'?'badge-pending':'badge-closed'}">${l.priority}</span><span class="badge-status ${l.type==='NRB'?'badge-reserved':'badge-closed'}">${l.type}</span>${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600;padding:1px 5px;background:#e8f5e9;border-radius:4px" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</div></div>`).join('')}</div></div>`}).join('')}</div>`}
+    <div class="content-footer"><div class="breadcrumb">CRM <span>›</span> ${crmView==='list'?'List':'Pipeline'}</div></div></div>`;
+}
+
+function renderSalesMarketing(el){
+  const act=mockCampaigns.filter(function(c){return c.status==="Active"}).length;
+  const tL=mockCampaigns.reduce(function(s,c){return s+c.leads},0);
+  const tC=mockCampaigns.reduce(function(s,c){return s+c.conversions},0);
+  var h="<div class=\"fade-in\"><div class=\"page-title\">Sales & Marketing</div><div class=\"page-subtitle\">"+mockCampaigns.length+" campaigns</div>";
+  h+="<div class=\"stats-row\" style=\"margin-bottom:8px\">";
+  [["Campaigns",mockCampaigns.length,""],["Active",act,"#2e7d32"],["Total Leads",tL,"#1565c0"],["Conversions",tC,"#e65100"]].forEach(function(s){
+    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
+    if(s[2])h+=" style=\"color:"+s[2]+"\"";
+    h+=">"+s[1]+"</div></div>";
+  });
+  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Campaigns</h3><button class=\"action-btn primary\" onclick=\"showToast('New campaign form coming soon','info')\" style=\"padding:4px 8px;font-size:10px\">+ New</button></div>";
+  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Leads</th><th>Conv.</th><th>Rate</th><th>ROI</th><th>Status</th></tr></thead><tbody>";
+  mockCampaigns.forEach(function(c){
+    var roiP=parseInt(c.roi);
+    var roiCol=roiP>=300?"#2e7d32":roiP>=200?"#e65100":"#c62828";
+    h+="<tr><td style=\"font-weight:500\">"+c.name+"<div style=\"font-size:9px;color:#888\">"+c.id+"</div></td>";
+    h+="<td><span style=\"padding:2px 7px;border-radius:4px;font-size:9px;background:#f0f4ff;color:#1565c0\">"+c.channel+"</span></td>";
+    h+="<td>"+c.budget+"</td><td style=\"color:#1565c0;font-weight:600\">"+c.leads+"</td>";
+    h+="<td style=\"color:#2e7d32;font-weight:600\">"+c.conversions+"</td>";
+    h+="<td>"+(c.leads>0?Math.round(c.conversions/c.leads*100):0)+"%</td>";
+    h+="<td style=\"color:"+roiCol+";font-weight:600\">"+c.roi+"</td>";
+    h+="<td><span class=\"badge-status "+(c.status==="Active"?"badge-active":"badge-closed")+"\">"+c.status+"</span></td></tr>";
+  });
+  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">Sales & Marketing <span>›</span> Campaigns</div></div></div>";
+  el.innerHTML=h;
+}
+
+function renderDues(el){
+  var crit=mockDues.filter(function(d){return d.status==="Critical"}).length;
+  var over=mockDues.filter(function(d){return d.status==="Overdue"}).length;
+  var tot=mockDues.reduce(function(s,d){return s+parseInt(d.due.replace(/[^0-9]/g,""))},0);
+  var h="<div class=\"fade-in\"><div class=\"page-title\">Dues & Recovery</div><div class=\"page-subtitle\">"+mockDues.length+" accounts</div>";
+  h+="<div class=\"stats-row\" style=\"margin-bottom:8px\">";
+  [["Total Dues",mockDues.length,""],["Critical",crit,"#c62828"],["Overdue",over,"#e65100"],["Due Amount","Tk "+tot.toLocaleString(),""]].forEach(function(s){
+    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
+    if(s[2])h+=" style=\"color:"+s[2]+"\"";
+    h+=">"+s[1]+"</div></div>";
+  });
+  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Dues Tracker</h3>";
+  h+="<div style=\"display:flex;gap:5px\"><button class=\"action-btn secondary\" onclick=\"showToast('Export coming soon','info')\" style=\"padding:3px 7px;font-size:9px\">Export</button>";
+  h+="<button class=\"action-btn primary\" onclick=\"showToast('Sending reminders...','info')\" style=\"padding:3px 7px;font-size:9px\">Send Reminders</button></div></div>";
+  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Customer</th><th>Project/Unit</th><th>Total</th><th>Paid</th><th>Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Status</th></tr></thead><tbody>";
+  mockDues.forEach(function(d){
+    var odCol=d.daysOverdue>0?"#c62828":"#2e7d32";
+    var bCl=d.bucket==="60+ Days"?"badge-sold":d.bucket==="30 Days"?"badge-sold":d.bucket==="15 Days"?"badge-pending":"badge-active";
+    var sCl=d.status==="Critical"?"badge-sold":d.status==="Overdue"?"badge-pending":"badge-active";
+    h+="<tr><td style=\"font-weight:500\">"+d.customer+"<div style=\"font-size:9px;color:#888\">"+d.id+"</div></td>";
+    h+="<td>"+d.project+"<br><span style=\"font-size:9px;color:#888\">"+d.unit+"</span></td>";
+    h+="<td>"+d.totalPrice+"</td><td style=\"color:#2e7d32\">"+d.paid+"</td>";
+    h+="<td style=\"color:#c62828;font-weight:600\">"+d.due+"</td><td style=\"font-size:10px\">"+d.dueDate+"</td>";
+    h+="<td style=\"color:"+odCol+";font-weight:600\">"+(d.daysOverdue>0?d.daysOverdue+"d":"On track")+"</td>";
+    h+="<td><span class=\"badge-status "+bCl+"\">"+d.bucket+"</span></td>";
+    h+="<td><span class=\"badge-status "+sCl+"\">"+d.status+"</span></td></tr>";
+  });
+  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">Dues <span>›</span> Recovery</div></div></div>";
+  el.innerHTML=h;
+}
+
+function renderPlots(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Plots & Layout</div><div class="page-subtitle">Land / Plotting layout management</div>
+    <div class="stats-row" style="margin-bottom:10px">${[
+      ['Available',mockPlots.filter(p=>p.status==='available').length,'#4caf50'],['Sold',mockPlots.filter(p=>p.status==='sold').length,'#e53935'],
+      ['Reserved',mockPlots.filter(p=>p.status==='reserved').length,'#1e88e5'],['Not Acquired',mockPlots.filter(p=>p.status==='not_acquired').length,'#999']
+    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value" style="color:${c}">${v}</div></div>`).join('')}</div>
+    <div class="card"><div class="card-body">
+      <div style="display:flex;gap:14px;margin-bottom:10px;font-size:10px">${[
+        ['Available','#4caf50'],['Sold','#e53935'],['Reserved','#1e88e5'],
+        ['Not Acquired','repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)']
+      ].map(([l,b])=>`<span><span style="display:inline-block;width:10px;height:10px;background:${b};border-radius:2px;vertical-align:middle;margin-right:3px${l==='Not Acquired'?';border:1px dashed #ccc':''}"></span>${l}</span>`).join('')}</div>
+      <div class="plot-grid">${mockPlots.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`}).join('')}</div>
+    </div></div>
+    <div class="card" style="margin-top:10px"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${mockPlots.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Plots <span>›</span> Layout</div></div></div>`;
+}
+
+function renderLandMgmt(el){
+  const stages=['identification','feasibility','legal','acquisition','planning'];
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Land Acquisition</div><div class="page-subtitle">${mockLandProposals.length} proposals across 6 stages</div>
+    <div class="toolbar" style="margin-bottom:6px">${stages.map(s=>`<button class="filter-btn ${landTab===s?'active':''}" onclick="landTab='${s}';renderModule()">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}<div class="spacer"></div><button class="action-btn primary">+ New Proposal</button></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Price</th><th>Risk</th><th>ROI</th><th>Status</th></tr></thead><tbody>${mockLandProposals.filter(p=>p.stage===landTab).length===0?'<tr><td colspan="7" style="text-align:center;color:#999;padding:18px">None in this stage</td></tr>':mockLandProposals.filter(p=>p.stage===landTab).map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.name}</td><td>${p.area}</td><td>${p.price}</td><td><span class="badge-status ${p.risk==='Low'?'badge-active':p.risk==='Medium'?'badge-pending':'badge-sold'}">${p.risk}</span></td><td style="color:#2e7d32;font-weight:600">${p.roi}</td><td><span class="badge-status badge-pending">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Land <span>›</span> ${landTab}</div></div></div>`;
+}
+
+function renderProjects(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active projects</div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn primary" onclick="crudProject()">+ New Project</button></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
+      <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><div style="font-size:12px;font-weight:600">${p.name}</div><div style="font-size:10px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
+      <div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:10px"><span>Progress</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div></div>
+      <div style="font-size:10px;color:#666;display:flex;gap:10px"><span>${p.budget}</span><span>${p.manager}</span>${p.plots?`<span>${p.plots} plots</span>`:''}${p.units?`<span>${p.units} units</span>`:''}</div>
+      <div style="margin-top:5px;display:flex;gap:5px"><span class="badge-status badge-active">${p.stats.sold} sold</span><span class="badge-status badge-reserved">${p.stats.reserved} reserved</span><span class="badge-status badge-closed">${p.stats.available} avail</span></div>
+    </div></div>`).join('')}</div>
+    <div class="content-footer"><div class="breadcrumb">Projects <span>›</span> ${projectsTab}</div></div></div>`;
+}
+
+function renderBookings(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Bookings</div><div class="page-subtitle">${mockBookings.length} bookings · ${mockBookings.filter(b=>b.status==='Confirmed').length} confirmed</div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudBooking()">+ New Booking</button></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Status</th></tr></thead><tbody>${mockBookings.map(b=>`<tr style="cursor:pointer" onclick="openBooking('${b.id}')"><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td>${b.unit}</td><td class="num">${b.price}</td><td class="num">${b.advance}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Bookings <span>›</span> All</div></div></div>`;
+}
+
+function renderCustomerPortal(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Customer Portal</div><div class="page-subtitle">${mockCustomers.length} active customers</div>
+    <div class="stats-row" style="margin-bottom:8px">${[
+      ['Total Customers',mockCustomers.length,''],['Active',mockCustomers.filter(c=>c.status==='Active').length,'#2e7d32'],
+      ['Overdue',mockCustomers.filter(c=>c.status==='Overdue').length,'#c62828'],['Total Collection','৳1.2 Cr','#1565c0']
+    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
+    <div class="card"><div class="card-header"><h3>Customer Accounts</h3><button class="action-btn primary" onclick="showToast('Send bulk notification coming soon','info')" style="padding:3px 7px;font-size:9px">Notify All</button></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Property</th><th>Status</th><th class="num">Dues</th><th>Next Due</th><th>Payments</th></tr></thead><tbody>${mockCustomers.map(c=>`<tr><td style="font-weight:500">${c.id}</td><td>${c.name}</td><td>${c.property}</td><td><span class="badge-status ${c.status==='Active'?'badge-active':'badge-sold'}">${c.status}</span></td><td class="num" style="color:#c62828;font-weight:600">${c.dues}</td><td style="font-size:10px">${c.nextDue}</td><td style="text-align:center;font-weight:600">${c.payments}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Customer Portal <span>›</span> Accounts</div></div></div>`;
+}
+
+function renderHandover(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Handover & Post-Sales</div><div class="page-subtitle">${mockHandover.length} units</div>
+    <div class="card"><div class="card-header"><h3>Handover Pipeline</h3></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Unit</th><th>Customer</th><th>Status</th><th>Est. Date</th><th>Snags</th><th>POS Date</th></tr></thead><tbody>${mockHandover.map(h=>`<tr><td style="font-weight:500">${h.unit}</td><td>${h.customer}</td><td><span class="badge-status ${h.status==='Handover Scheduled'?'badge-active':h.status==='Inspection Pending'?'badge-pending':'badge-reserved'}">${h.status}</span></td><td>${h.date}</td><td style="text-align:center;font-weight:600;color:${h.snags>0?'#c62828':'#2e7d32'}">${h.snags}</td><td>${h.pos_date||'—'}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Handover <span>›</span> Pipeline</div></div></div>`;
+}
+
+function renderBOQ(el){
+  const apps=mockBOQ.filter(b=>b.status==='Approved').length;
+  el.innerHTML=`<div class="fade-in"><div class="page-title">BOQ & Cost Control</div><div class="page-subtitle">${mockBOQ.length} items · ${apps} approved</div>
+    <div class="toolbar" style="margin-bottom:6px"><button class="action-btn primary" onclick="showToast('New BOQ item coming soon','info')">+ Add Item</button><div class="spacer"></div><span style="font-size:10px;color:#888">Total: ${mockBOQ.reduce((s,i)=>s+parseInt(i.total.replace(/[^0-9]/g,'')),0).toLocaleString()} ৳</span></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>BOQ ID</th><th>Project</th><th>Item</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>${mockBOQ.map(b=>`<tr><td style="font-weight:500">${b.id}</td><td>${b.project}</td><td>${b.item}</td><td class="num">${b.qty}</td><td>${b.unit}</td><td class="num">${b.rate}</td><td class="num" style="font-weight:600;color:#2e7d32">${b.total}</td><td><span class="badge-status ${b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">BOQ <span>›</span> Cost Control</div></div></div>`;
+}
+
+function renderVariations(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Variation Orders</div><div class="page-subtitle">${mockVariations.length} changes tracked</div>
+    <div class="card"><div class="card-header"><h3>Variation Register</h3><button class="action-btn primary" onclick="showToast('New variation form coming soon','info')" style="padding:3px 7px;font-size:9px">+ New VO</button></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>VO ID</th><th>Project</th><th>Title</th><th>Status</th><th>Cost Impact</th><th>Schedule</th><th>Originator</th></tr></thead><tbody>${mockVariations.map(v=>`<tr><td style="font-weight:500">${v.id}</td><td>${v.project}</td><td>${v.title}</td><td><span class="badge-status ${v.status==='Approved'?'badge-active':v.status==='Pending Review'?'badge-pending':'badge-closed'}">${v.status}</span></td><td style="color:#c62828;font-weight:600">${v.impact}</td><td style="color:#e65100;font-size:10px">${v.schedule}</td><td style="font-size:10px">${v.originator}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Variations <span>›</span> Register</div></div></div>`;
+}
+
+function renderKB(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Knowledge Base</div><div class="page-subtitle">${mockKnowledgeBase.length} articles</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><div class="search-box" style="max-width:100%;flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search knowledge base..." style="font-size:11px"/></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Article</th><th>Category</th><th>Updated</th><th>Author</th></tr></thead><tbody>${mockKnowledgeBase.map(k=>`<tr><td style="font-weight:500;cursor:pointer;color:#2F80ED">${k.title}</td><td><span class="badge-status badge-reserved">${k.category}</span></td><td style="font-size:10px">${k.updated}</td><td style="font-size:10px">${k.author}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Knowledge Base <span>›</span> Articles</div></div></div>`;
+}
+
+function renderWorkspace(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Team Workspace</div><div class="page-subtitle">Team collaboration & chat</div>
+    <div style="display:flex;gap:12px;flex:1">
+      <div style="width:200px;flex-shrink:0">
+        <div class="card"><div class="card-header"><h3>Team</h3></div><div class="card-body" style="padding:8px">${[
+          ['MD Hasanul Banna','Director','#2F80ED','online'],['Iftekhar Ahmad','Admin','#2e7d32','online'],
+          ['Shamim Reza','Sales','#2e7d32','online'],['Nazma Akhter','Finance','#999','away'],
+          ['Rofiqul Islam','Engineer','#2e7d32','online'],['Tanvir Ahmed','Engineer','#999','away']
+        ].map(([n,r,c,s])=>`<div style="padding:5px 6px;display:flex;align-items:center;gap:6px;border-radius:4px;margin-bottom:2px"><div style="width:6px;height:6px;border-radius:50%;background:${s==='online'?'#4caf50':'#999'}"></div><div><div style="font-size:10px;font-weight:500">${n}</div><div style="font-size:8px;color:#888">${r}</div></div></div>`).join('')}</div></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div class="card" style="flex:1;display:flex;flex-direction:column"><div class="card-header"><h3>#general</h3></div>
+        <div style="flex:1;overflow-y:auto;padding:10px">${mockWorkspaceChat.map(w=>`<div style="display:flex;gap:8px;margin-bottom:8px"><div style="width:28px;height:28px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${w.sender.split(' ').map(w=>w[0]).join('').slice(0,2)}</div><div><div style="font-size:10px"><span style="font-weight:600">${w.sender}</span> <span style="color:#999">${w.role} · ${w.time}</span></div><div style="font-size:11px;color:#333;margin-top:2px">${w.msg}</div></div></div>`).join('')}</div>
+        <div style="padding:8px;border-top:1px solid #e8e8e8;display:flex;gap:6px"><input placeholder="Type a message..." style="flex:1;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px;outline:none"/><button class="action-btn primary" onclick="showToast('Message sent!','info')" style="padding:5px 10px">Send</button></div></div>
+      </div>
+    </div>
+    <div class="content-footer"><div class="breadcrumb">Workspace <span>›</span> #general</div></div></div>`;
+}
+
+function renderBIReports(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">BI & Reports</div><div class="page-subtitle">${mockBIReports.length} reports · Real-time analytics</div>
+    <div class="stats-row" style="margin-bottom:8px">${[
+      ['Reports',mockBIReports.length,''],['Auto Reports',mockBIReports.filter(r=>r.status==='Auto').length,'#2e7d32'],['Charts Available','6','#1565c0']
+    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
+    <div class="card"><div class="card-header"><h3>Reports Dashboard</h3><button class="action-btn primary" onclick="showToast('Generate new report coming soon','info')" style="padding:3px 7px;font-size:9px">+ New</button></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Report Name</th><th>Type</th><th>Period</th><th>Updated</th><th>Status</th></tr></thead><tbody>${mockBIReports.map(r=>`<tr><td style="font-weight:500;cursor:pointer;color:#2F80ED">${r.name}</td><td><span class="badge-status badge-reserved">${r.type}</span></td><td>${r.period}</td><td style="font-size:10px">${r.updated}</td><td><span class="badge-status ${r.status==='Auto'?'badge-active':'badge-pending'}">${r.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">BI <span>›</span> Reports</div></div></div>`;
+}
+
+function renderNotificationsPage(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Notifications</div><div class="page-subtitle">System-wide activity feed</div>
+    <div class="card"><div class="card-body" style="padding:0"><div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#fff3e0;display:flex;align-items:center;justify-content:center">📋</div><div><div style="font-size:11px;font-weight:500">PO-24-089 Requires Approval</div><div style="font-size:9px;color:#888">Shah Cement • Tk 5,50,000 • 2 hours ago</div></div></div>
+    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#e8f5e9;display:flex;align-items:center;justify-content:center">💰</div><div><div style="font-size:11px;font-weight:500">Payment Received — Dr. Rubina Ali</div><div style="font-size:9px;color:#888">Tk 2,00,000 • Booking installment • 5h ago</div></div></div>
+    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#e3f2fd;display:flex;align-items:center;justify-content:center">🔥</div><div><div style="font-size:11px;font-weight:500">Lead Status Changed</div><div style="font-size:9px;color:#888">Syed Rahman → Hot • 1 day ago</div></div></div>
+    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#fce4ec;display:flex;align-items:center;justify-content:center">⚠️</div><div><div style="font-size:11px;font-weight:500">Stock Alert — Shah Cement</div><div style="font-size:9px;color:#888">150 Bags remaining • Reorder at 500 • 1 day ago</div></div></div>
+    <div style="padding:10px 12px;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#f3e5f5;display:flex;align-items:center;justify-content:center">📅</div><div><div style="font-size:11px;font-weight:500">Site Visit Reminder</div><div style="font-size:9px;color:#888">Dr. Rubina Ali at Jolshiri • Tomorrow 11:00 AM</div></div></div>
+    </div></div>
+    <div class="content-footer"><div class="breadcrumb">Notifications <span>›</span> All</div></div></div>`;
+}
+
+function renderSubTable(el, mod, items, headers, fields, title){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">${title}</div><div class="page-subtitle">${items.length} records</div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${items.map(i=>`<tr>${fields.map(f=>`<td>${i[f]||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">${title} <span>›</span> List</div></div></div>`;
+}
+
+function renderFinance(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Finance</div><div class="page-subtitle">${mockTransactions.length} transactions</div>
+    <div class="stats-row" style="margin-bottom:10px">${[
+      ['Inflows',mockTransactions.filter(t=>t.type==='Inflow').length,'#2e7d32'],
+      ['Outflows',mockTransactions.filter(t=>t.type==='Outflow').length,'#c62828'],
+      ['Total',mockTransactions.length,'']
+    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
+    <div class="card"><div class="card-header"><h3>Transactions</h3><button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockTransactions.map(t=>`<tr style="cursor:pointer" onclick="openTransaction('${t.id}')"><td style="font-weight:500">${t.id}</td><td>${t.desc}</td><td><span class="badge-status ${t.type==='Inflow'?'badge-active':'badge-sold'}">${t.type}</span></td><td class="num" style="font-weight:600;color:${t.type==='Inflow'?'#2e7d32':'#c62828'}">${t.amount}</td><td><span class="badge-status ${t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved'}">${t.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">Finance <span>›</span> Transactions</div></div></div>`;
+}
+
+function renderStock(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Stock & Procurement</div><div class="page-subtitle">Inventory and purchase orders</div>
+    <div class="toolbar" style="margin-bottom:6px"><button class="filter-btn ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';renderModule()">Inventory</button><button class="filter-btn ${stockTab==='po'?'active':''}" onclick="stockTab='po';renderModule()">Purchase Orders</button><div class="spacer"></div><button class="action-btn primary" onclick="stockTab==='inventory'?crudStockItem():crudPO()">+ New</button></div>
+    ${stockTab==='inventory'?`
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th>Quantity</th><th>Status</th><th>Reorder</th></tr></thead><tbody>${mockInventory.map(i=>`<tr style="cursor:pointer" onclick="openStockItem(${i.id})"><td style="font-weight:500">${i.item}</td><td>${i.site}</td><td>${i.quantity}</td><td><span class="badge-status ${i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold'}">${i.status}</span></td><td>${i.reorder}</td></tr>`).join('')}</tbody></table></div></div></div>
+    `:`<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Vendor</th><th>Items</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockPOs.map(p=>`<tr style="cursor:pointer" onclick="openPO('${p.id}')"><td style="font-weight:500">${p.id}</td><td>${p.vendor}</td><td>${p.items}</td><td class="num">${p.amount}</td><td><span class="badge-status ${p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending'}">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>`}
+    <div class="content-footer"><div class="breadcrumb">Stock <span>›</span> ${stockTab==='inventory'?'Inventory':'PO'}</div></div></div>`;
+}
+
+function renderHR(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Human Resources</div><div class="page-subtitle">${mockEmployees.length} employees</div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${mockEmployees.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="content-footer"><div class="breadcrumb">HR <span>›</span> All Staff</div></div></div>`;
+}
+
+function renderTasks(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Task Management</div><div class="page-subtitle">${mockTasks.length} tasks</div>
+    <div style="display:flex;gap:10px;flex:1;min-height:280px;overflow-x:auto">${['To Do','In Progress','Review','Done'].map(st=>{const t=mockTasks.filter(x=>x.status===st);return `<div class="kanban-col"><div style="padding:6px 8px;font-size:10px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>${st}</span><span style="background:#e0e0e0;border-radius:10px;padding:0 5px;font-size:9px">${t.length}</span></div><div style="flex:1;overflow-y:auto;padding:4px 6px">${t.map(x=>`<div class="kanban-card"><div style="display:flex;align-items:center;gap:5px;margin-bottom:3px"><span style="width:6px;height:6px;border-radius:50%;background:${x.priority==='High'?'#e53935':x.priority==='Medium'?'#ff9800':'#999'}"></span><span style="font-size:11px;font-weight:500">${x.title}</span></div><div style="font-size:9px;color:#888">#${x.id} · ${x.priority}</div></div>`).join('')}</div></div>`}).join('')}</div>
+    <div class="card" style="margin-top:10px"><div class="card-header"><h3>Quick Add</h3></div><div class="card-body" style="display:flex;gap:6px"><input id="newTaskInput" placeholder="Task title..." style="flex:1;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px"/><select id="newTaskStatus" style="padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px"><option>To Do</option><option>In Progress</option><option>Review</option><option>Done</option></select><button class="action-btn primary" onclick="addTask()">Add</button></div></div>
+    <div class="content-footer"><div class="breadcrumb">Tasks <span>›</span> Board</div></div></div>`;
+}
+function addTask(){const i=document.getElementById('newTaskInput'),s=document.getElementById('newTaskStatus');if(!i.value.trim())return;mockTasks.push({id:Date.now(),title:i.value.trim(),status:s.value,priority:'Medium'});i.value='';renderTasks();showToast('Task added!');}
+
+function renderSettings(el){
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Settings</div><div class="page-subtitle">Configuration & administration</div>
+    <div class="toolbar" style="margin-bottom:6px"><button class="filter-btn ${settingsTab==='users'?'active':''}" onclick="settingsTab='users';renderModule()">Users</button><button class="filter-btn ${settingsTab==='roles'?'active':''}" onclick="settingsTab='roles';renderModule()">Roles</button><button class="filter-btn ${settingsTab==='company'?'active':''}" onclick="settingsTab='company';renderModule()">Company</button></div>
+    ${settingsTab==='users'?`<div class="card"><div class="card-header"><h3>Users</h3><button class="action-btn primary" onclick="showToast('User creation form coming soon','info')">+ Add User</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Dept</th><th>Status</th></tr></thead><tbody>${mockUsers.map(u=>`<tr><td style="font-weight:500">${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.dept}</td><td><span class="badge-status badge-active">${u.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>`:settingsTab==='roles'?`<div class="card"><div class="card-header"><h3>Roles</h3></div><div class="card-body"><div style="font-size:12px;font-weight:600;margin-bottom:6px">Current: ${currentRole}</div><div style="font-size:11px;color:#666">Switch roles from the sidebar shield icon. Permission levels: Super Admin, Sales Agent, Site Engineer, Finance.</div></div></div>`:`<div class="card"><div class="card-header"><h3>Company</h3></div><div class="card-body"><div class="stats-row"><div class="stat-card"><div class="label">Name</div><div class="value" style="font-size:13px">Mars Constech Ltd.</div></div><div class="stat-card"><div class="label">License</div><div class="value" style="font-size:13px">TRADE-2024-xxx</div></div><div class="stat-card"><div class="label">Modules</div><div class="value" style="font-size:13px">26 Active</div></div></div></div></div>`}
+    <div class="content-footer"><div class="breadcrumb">Settings <span>›</span> ${settingsTab}</div></div></div>`;
+}
+
+// ═══ TOAST, SEARCH, THEME, ROLE, ZOOM ═══
 function showToast(msg,t='success'){const c=document.getElementById('toastContainer');const d=document.createElement('div');d.className='toast '+t;d.textContent=msg;c.appendChild(d);setTimeout(()=>d.remove(),3000)}
 function toggleGlobalSearch(){document.getElementById('globalSearchPanel').classList.toggle('active')}
 function toggleNotifications(){document.getElementById('notifPanel').classList.toggle('active')}
@@ -442,7 +806,7 @@ function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remo
 function setRole(role){
   currentRole=role; document.getElementById('roleDisplay').textContent=role;
   document.querySelectorAll('.role-opt').forEach(e=>{e.style.background=e.dataset.role===role?'#eef3ff':'transparent';e.style.fontWeight=e.dataset.role===role?'600':'400'});
-  document.getElementById('roleBtn').setAttribute('data-tip','Role: '+role); toggleRoleMenu(); showToast('Switched to '+role,'info'); render(currentModule);
+  document.getElementById('roleBtn').setAttribute('data-tip','Role: '+role); toggleRoleMenu(); showToast('Switched to '+role,'info'); renderModule();
 }
 function toggleDarkMode(){
   const is=document.documentElement.classList.toggle('dark');
@@ -454,6 +818,7 @@ let currentZoom=100;
 function changeZoom(d){currentZoom+=d;if(currentZoom<60)currentZoom=60;if(currentZoom>150)currentZoom=150;document.getElementById('mainContent').style.zoom=currentZoom+'%';document.getElementById('zoomLabel').textContent=currentZoom+'%'}
 function resetZoom(){currentZoom=100;document.getElementById('mainContent').style.zoom='';document.getElementById('zoomLabel').textContent='100%'}
 function toggleFullScreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen()}else{if(document.exitFullscreen)document.exitFullscreen()}}
+
 function leadBadgeColor(v){return{hot:'#c62828',warm:'#e65100',cold:'#888','New Inquiry':'#1565c0','Site Visit':'#ff9800',Negotiation:'#e65100',Booked:'#2e7d32',Local:'#1565c0',NRB:'#7b1fa2',Facebook:'#1877f2',Referral:'#00897b','Walk-in':'#ff8f00',Website:'#1565c0',Agent:'#2F80ED'}[v]||'#888'}
 function leadGetInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
 function openLead(id){openLeadPanel(id,'profile')}
@@ -466,96 +831,80 @@ function openLeadPanel(leadId,tab){
   const tabLabels=['Profile','Installments','Documents','Activities'];
   let tabContent='';
   if(tab==='profile'){
-    tabContent=`
-      <div class="stats-row" style="grid-template-columns:1fr 1fr">
-        <div class="stat-card"><div class="label">Phone</div><div style="font-size:13px;font-weight:600;margin-top:2px">${l.phone||'—'}</div></div>
-        <div class="stat-card"><div class="label">Email</div><div style="font-size:13px;font-weight:600;margin-top:2px">${l.email||'—'}</div></div>
-      </div>
-      <div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:8px">
-        <div class="stat-card"><div class="label">Target Value</div><div style="font-size:18px;font-weight:700;color:#2e7d32;margin-top:2px">${l.value}</div></div>
-        <div class="stat-card"><div class="label">Payment Status</div><div style="font-size:13px;font-weight:600;margin-top:2px;color:${l.paymentStatus==='Up to Date'?'#2e7d32':l.paymentStatus==='Overdue'?'#c62828':'#e65100'}">${l.paymentStatus}</div></div>
-      </div>
-      <div style="margin-top:14px">
-        <h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px;display:flex;align-items:center;gap:6px">📋 Upcoming Actions</h3>
-        <div style="padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;align-items:flex-start;gap:8px">
-          <input type="checkbox" style="margin-top:2px;accent-color:#2F80ED"/>
-          <div><div style="font-size:12px;font-weight:500">Send updated Plot Map for Block B</div><div style="font-size:11px;color:#e53935;margin-top:2px">Due today at 4:00 PM</div></div>
-        </div>
-      </div>
-      <div style="margin-top:14px">
-        <h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px;display:flex;align-items:center;gap:6px">✅ Verification Status</h3>
-        <div class="verif-item" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9"><span style="display:flex;align-items:center;gap:6px">✓ NID Uploaded</span><span style="font-size:10px;font-weight:600;cursor:pointer">View</span></div>
-        <div class="verif-item" style="background:#fff3e0;color:#e65100;border:1px solid #ffe0b2"><span style="display:flex;align-items:center;gap:6px">⚠ Booking Money Pending</span><span style="font-size:10px;font-weight:600;cursor:pointer">Send Reminder</span></div>
-      </div>`;
+    tabContent='' +
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr">' +
+        '<div class="stat-card"><div class="label">Phone</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(l.phone||'—')+'</div></div>' +
+        '<div class="stat-card"><div class="label">Email</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(l.email||'—')+'</div></div>' +
+      '</div>' +
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:6px">' +
+        '<div class="stat-card"><div class="label">Target Value</div><div style="font-size:16px;font-weight:700;color:#2e7d32;margin-top:2px">'+(l.value||'—')+'</div></div>' +
+        '<div class="stat-card"><div class="label">Payment Status</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:'+(l.paymentStatus==='Up to Date'?'#2e7d32':l.paymentStatus==='Overdue'?'#c62828':'#e65100')+'">'+(l.paymentStatus||'—')+'</div></div>' +
+      '</div>' +
+      '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:4px">📋 Upcoming Actions</h3>' +
+      '<div style="padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;align-items:flex-start;gap:6px">' +
+      '<input type="checkbox" style="margin-top:2px;accent-color:#2F80ED"/>' +
+      '<div><div style="font-size:11px;font-weight:500">Send updated Plot Map for Block B</div><div style="font-size:10px;color:#e53935;margin-top:2px">Due today at 4:00 PM</div></div></div></div>' +
+      '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:4px">✅ Verification Status</h3>' +
+      '<div class="verif-item" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9"><span style="display:flex;align-items:center;gap:4px">✓ NID Uploaded</span><span style="font-size:9px;font-weight:600;cursor:pointer">View</span></div>' +
+      '<div class="verif-item" style="background:#fff3e0;color:#e65100;border:1px solid #ffe0b2"><span style="display:flex;align-items:center;gap:4px">⚠ Booking Money Pending</span><span style="font-size:9px;font-weight:600;cursor:pointer">Send Reminder</span></div></div>';
   }else if(tab==='installments'){
-    tabContent=`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <h3 style="font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">💰 Payment Schedule</h3>
-        <button onclick="openAddLeadInstallment(${l.id})" style="padding:5px 10px;background:#2F80ED;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer">+ Add Entry</button>
-      </div>
-      ${l.installments&&l.installments.length>0?l.installments.map(i=>`<div class="installment-item"><div><div style="font-size:13px;font-weight:600">${i.amount}</div><div style="font-size:11px;color:#888;margin-top:2px">${i.date}</div></div><span style="padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;background:${i.status==='Paid'?'#e8f5e9':i.status==='Overdue'?'#fce4ec':'#fff3e0'};color:${i.status==='Paid'?'#2e7d32':i.status==='Overdue'?'#c62828':'#e65100'};border:1px solid ${i.status==='Paid'?'#c8e6c9':i.status==='Overdue'?'#f8bbd0':'#ffe0b2'}">${i.status}</span></div>`).join(''):`<div style="text-align:center;padding:30px;color:#999;font-size:12px;border:2px dashed #e0e0e0;border-radius:8px">No payment entries yet.</div>`}`;
+    var instHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="font-size:11px;font-weight:600;color:#555;display:flex;align-items:center;gap:4px">💰 Payment Schedule</h3><button onclick="openAddLeadInstallment('+l.id+')" style="padding:4px 8px;background:#2F80ED;color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer">+ Add Entry</button></div>';
+    if(l.installments && l.installments.length > 0) {
+      for(var ii=0; ii<l.installments.length; ii++){
+        var inst = l.installments[ii];
+        var iStCol = inst.status==='Paid'?'#e8f5e9':inst.status==='Overdue'?'#fce4ec':'#fff3e0';
+        var iStTx = inst.status==='Paid'?'#2e7d32':inst.status==='Overdue'?'#c62828':'#e65100';
+        var iStBd = inst.status==='Paid'?'#c8e6c9':inst.status==='Overdue'?'#f8bbd0':'#ffe0b2';
+        instHTML += '<div class="installment-item"><div><div style="font-size:12px;font-weight:600">'+inst.amount+'</div><div style="font-size:10px;color:#888;margin-top:2px">'+inst.date+'</div></div><span style="padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600;background:'+iStCol+';color:'+iStTx+';border:1px solid '+iStBd+'">'+inst.status+'</span></div>';
+      }
+    } else {
+      instHTML += '<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No payment entries yet.</div>';
+    }
+    tabContent = instHTML;
   }else if(tab==='documents'){
-    tabContent=`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <h3 style="font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">📄 Attached Documents</h3>
-        <button onclick="showToast('Upload feature coming soon','info')" style="padding:5px 10px;background:#2F80ED;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer">+ Upload</button>
-      </div>
-      ${l.documents&&l.documents.length>0?l.documents.map(d=>`<div class="doc-item"><div style="width:32px;height:32px;border-radius:6px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;color:#2F80ED;font-size:14px">📄</div><div style="flex:1"><div style="font-size:12px;font-weight:500">${d.name}</div><div style="font-size:10px;color:#888">${d.type}</div></div><span style="color:#2F80ED;font-size:11px;cursor:pointer">👁</span><span style="color:#888;font-size:11px;cursor:pointer">⬇</span></div>`).join(''):`<div style="text-align:center;padding:30px;color:#999;font-size:12px;border:2px dashed #e0e0e0;border-radius:8px">No documents uploaded yet.</div>`}`;
+    var docHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="font-size:11px;font-weight:600;color:#555;display:flex;align-items:center;gap:4px">📄 Attached Documents</h3><button onclick="showToast(\'Upload feature coming soon\',\'info\')" style="padding:4px 8px;background:#2F80ED;color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer">+ Upload</button></div>';
+    if(l.documents && l.documents.length > 0) {
+      for(var di=0; di<l.documents.length; di++){
+        var d = l.documents[di];
+        docHTML += '<div class="doc-item"><div style="width:28px;height:28px;border-radius:6px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;color:#2F80ED;font-size:12px">📄</div><div style="flex:1"><div style="font-size:11px;font-weight:500">'+d.name+'</div><div style="font-size:9px;color:#888">'+d.type+'</div></div><span style="color:#2F80ED;font-size:10px;cursor:pointer">👁</span><span style="color:#888;font-size:10px;cursor:pointer">⬇</span></div>';
+      }
+    } else {
+      docHTML += '<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No documents uploaded yet.</div>';
+    }
+    tabContent = docHTML;
   }else if(tab==='activities'){
     if(!l.activities)l.activities=[];
-    const actsHTML=l.activities.map(a=>`<div class="activity-item"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px"><span style="color:#2F80ED">${a.type==='Call'?'📞':a.type==='Meeting'?'👥':'📝'}</span>${a.type} <span style="font-weight:400;color:#888">by ${a.user}</span></span><span style="font-size:10px;color:#999">${a.date}</span></div><div style="font-size:12px;color:#555">${a.text}</div></div>`).join('');
-    tabContent=`
-      <h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:6px">📊 Activity Log</h3>
-      <div style="padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:10px">
-        <div style="display:flex;gap:6px;margin-bottom:6px">
-          <select id="leadActType" style="padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;outline:none"><option value="Call">📞 Call</option><option value="Meeting">👥 Meeting</option><option value="Note">📝 Note</option></select>
-        </div>
-        <div style="display:flex;gap:6px">
-          <input id="leadActText" placeholder="Log details (e.g. Spoke about pricing...)" style="flex:1;padding:6px 10px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;outline:none"/>
-          <button onclick="addLeadActivity(${l.id})" style="padding:6px 12px;background:#2F80ED;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Log</button>
-        </div>
-      </div>
-      <div>${actsHTML||'<div style="text-align:center;padding:30px;color:#999;font-size:12px;border:2px dashed #e0e0e0;border-radius:8px">No activities logged yet.</div>'}</div>`;
+    var actHTML = '<h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:8px;display:flex;align-items:center;gap:4px">📊 Activity Log</h3>';
+    actHTML += '<div style="padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:8px">';
+    actHTML += '<div style="display:flex;gap:5px;margin-bottom:5px"><select id="leadActType" style="padding:4px 6px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none"><option value="Call">📞 Call</option><option value="Meeting">👥 Meeting</option><option value="Note">📝 Note</option></select></div>';
+    actHTML += '<div style="display:flex;gap:5px"><input id="leadActText" placeholder="Log details..." style="flex:1;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none"/>';
+    actHTML += '<button onclick="addLeadActivity('+l.id+')" style="padding:5px 10px;background:#2F80ED;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:10px;font-weight:600">Log</button></div></div>';
+    if(l.activities.length > 0) {
+      for(var ai=0; ai<l.activities.length; ai++){
+        var a = l.activities[ai];
+        actHTML += '<div class="activity-item"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px"><span style="color:#2F80ED">'+(a.type==='Call'?'📞':a.type==='Meeting'?'👥':'📝')+'</span>'+a.type+' <span style="font-weight:400;color:#888">by '+a.user+'</span></span><span style="font-size:9px;color:#999">'+a.date+'</span></div><div style="font-size:11px;color:#555">'+a.text+'</div></div>';
+      }
+    } else {
+      actHTML += '<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No activities logged yet.</div>';
+    }
+    tabContent = actHTML;
   }
-  content.innerHTML=`
-    <div class="lead-header" style="padding:14px 16px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div style="display:flex;gap:12px;align-items:center">
-          <div class="lead-avatar">${leadGetInitials(l.name)}</div>
-          <div>
-            <div class="lead-info-row" style="margin-bottom:4px">
-              <span class="lead-badge" style="background:${leadBadgeColor(l.type)}15;color:${leadBadgeColor(l.type)};border:1px solid ${leadBadgeColor(l.type)}">${l.type}</span>
-              <span class="lead-badge" style="background:${leadBadgeColor(l.status)}15;color:${leadBadgeColor(l.status)};border:1px solid ${leadBadgeColor(l.status)}">${l.status}</span>
-              <span class="lead-badge" style="background:${leadBadgeColor(l.source)}15;color:${leadBadgeColor(l.source)};border:1px solid ${leadBadgeColor(l.source)}">${l.source}</span>
-            </div>
-            <div style="font-size:15px;font-weight:700;color:#222">${l.name}</div>
-            <div style="font-size:12px;color:#2F80ED;margin-top:2px">${l.property}</div>
-          </div>
-        </div>
-        <span onclick="closeLeadPanel()" style="cursor:pointer;color:#999;font-size:18px;padding:4px">✕</span>
-      </div>
-    </div>
-    <div class="lead-tabs">${tabs.map((t,i)=>`<div class="lead-tab ${t===tab?'active':''}" onclick="openLeadPanel(${l.id},'${t}')">${tabLabels[i]}</div>`).join('')}</div>
-    <div class="lead-body">${tabContent}</div>
-    <div class="lead-footer">
-      <button class="lead-foot-btn" onclick="showToast('PDF export coming soon','info')">⬇ PDF</button>
-      <button class="lead-foot-btn" onclick="showToast('Email feature coming soon','info')">✉ Email</button>
-      <button class="lead-foot-btn primary" onclick="showToast('Dialing ${l.phone}...','info')">📞 Call</button>
-      ${isClient?`<button class="lead-foot-btn success" onclick="openAddLeadInstallment(${l.id})">💰 Collect</button>`:`<button class="lead-foot-btn success" onclick="convertLeadToBooking(${l.id})">📌 Book</button>`}
-    </div>`;
-  if(container.classList.contains('active')){container.classList.add('active')}
+  content.innerHTML='<div class="lead-header" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;gap:10px;align-items:center"><div class="lead-avatar">'+leadGetInitials(l.name)+'</div><div><div class="lead-info-row" style="margin-bottom:3px"><span class="lead-badge" style="background:'+leadBadgeColor(l.type)+'15;color:'+leadBadgeColor(l.type)+';border:1px solid '+leadBadgeColor(l.type)+'">'+l.type+'</span><span class="lead-badge" style="background:'+leadBadgeColor(l.status)+'15;color:'+leadBadgeColor(l.status)+';border:1px solid '+leadBadgeColor(l.status)+'">'+l.status+'</span><span class="lead-badge" style="background:'+leadBadgeColor(l.source)+'15;color:'+leadBadgeColor(l.source)+';border:1px solid '+leadBadgeColor(l.source)+'">'+l.source+'</span></div><div style="font-size:14px;font-weight:700;color:#222">'+l.name+'</div><div style="font-size:11px;color:#2F80ED;margin-top:1px">'+l.property+'</div></div></div><span onclick="closeLeadPanel()" style="cursor:pointer;color:#999;font-size:16px;padding:3px">✕</span></div></div>';
+  content.innerHTML+='<div class="lead-tabs">'+tabs.map(function(t,i){return '<div class="lead-tab '+(t===tab?'active':'')+'" onclick="openLeadPanel('+l.id+',\''+t+'\')">'+tabLabels[i]+'</div>';}).join('')+'</div>';
+  content.innerHTML+='<div class="lead-body">'+tabContent+'</div>';
+  content.innerHTML+='<div class="lead-footer"><button class="lead-foot-btn" onclick="showToast(\'PDF export coming soon\',\'info\')">⬇ PDF</button><button class="lead-foot-btn" onclick="showToast(\'Email feature coming soon\',\'info\')">✉ Email</button><button class="lead-foot-btn primary" onclick="showToast(\'Dialing '+l.phone+'...\',\'info\')">📞 Call</button>'+(isClient?'<button class="lead-foot-btn success" onclick="openAddLeadInstallment('+l.id+')">💰 Collect</button>':'<button class="lead-foot-btn success" onclick="convertLeadToBooking('+l.id+')">📌 Book</button>')+'</div>';
   container.classList.add('active');
-  setTimeout(()=>{const el=document.querySelector('#leadActText');if(el)el.focus()},400);
+  setTimeout(function(){var e=document.querySelector('#leadActText');if(e)e.focus()},400);
 }
-function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remove('active')}
+
 function addLeadActivity(id){
   const l=mockLeads.find(x=>x.id===id);if(!l)return;
   const type=document.getElementById('leadActType').value;
   const text=document.getElementById('leadActText').value;
   if(!text.trim())return;
   if(!l.activities)l.activities=[];
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+', '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const d=new Date();
+  const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+', '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   l.activities.unshift({type,user:'You',date:dateStr,text:text.trim()});
   document.getElementById('leadActText').value='';
   openLeadPanel(id,'activities');
@@ -575,347 +924,113 @@ function openAddLeadInstallment(id){
 function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.findIndex(x=>x.id===id);if(i>-1){mockLeads.splice(i,1);closeLeadPanel();renderModule();showToast('Deleted','info')}}
 function convertLeadToBooking(id){
   const l=mockLeads.find(x=>x.id===id);if(!l)return;
-  if(!confirm(`Convert ${l.name} to booking?`))return;
-  addItem(mockBookings,{id:'BKG-'+(100+mockBookings.length+1),client:l.name,property:l.property.split('-')[0].trim(),unit:l.property.split('-')[1]||'—',price:l.value,advance:'৳0',status:'Pending Review',type:'Plot'});
-  l.status='Booked';
-  l.priority='Low';
+  if(!confirm('Convert '+l.name+' to booking?'))return;
+  mockBookings.push({id:'BKG-'+(100+mockBookings.length+1),client:l.name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:l.property.split('-')[0].trim(),unit:l.property.split('-')[1]||'—',price:l.value,advance:'৳0',status:'Pending Review',type:'Plot'});
+  l.status='Booked';l.priority='Low';
   if(!l.activities)l.activities=[];
   l.activities.push({type:'Note',user:'System',date:'Just now',text:'Converted to booking.'});
-  closeLeadPanel();
-  renderModule();
-  showToast('Converted to booking!');
+  closeLeadPanel();renderModule();showToast('Converted to booking!');
 }
 function globalSearch(){
   const q=document.getElementById('globalSearchInput').value.toLowerCase();
   const c=document.getElementById('globalSearchResults');
-  if(!q){c.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:13px">Type to search...</div>';return}
+  if(!q){c.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:12px">Type to search...</div>';return}
   const res=[];
-  mockLeads.forEach(l=>{if(l.name.toLowerCase().includes(q))res.push({title:l.name,sub:l.property+' · '+l.status,mod:'crm',color:'#e3f2fd'})});
-  mockPlots.forEach(p=>{if(p.id.toLowerCase().includes(q))res.push({title:p.id,sub:p.type+' · '+p.status,mod:'plots',color:'#e8f5e9'})});
-  mockProjects.forEach(p=>{if(p.name.toLowerCase().includes(q))res.push({title:p.name,sub:p.location+' · '+p.status,mod:'projects',color:'#fff3e0'})});
-  mockContacts.forEach(c=>{if(c.name.toLowerCase().includes(q))res.push({title:c.name,sub:c.role+' · '+c.company,mod:'more',color:'#f3e5f5'})});
-  if(res.length===0)c.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:13px">No results</div>';
-  else c.innerHTML=res.slice(0,20).map(r=>`<div onclick="switchModule('${r.mod}')" style="padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:6px;cursor:pointer;margin-bottom:4px;background:#f8f9fa"><div style="width:32px;height:32px;border-radius:6px;background:${r.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">${r.title[0]}</div><div><div style="font-size:13px;font-weight:500">${r.title}</div><div style="font-size:11px;color:#888">${r.sub}</div></div></div>`).join('');
+  mockLeads.forEach(l=>{if(l.name.toLowerCase().includes(q))res.push({title:l.name,sub:l.property+' · '+l.status,color:'#e3f2fd',mod:'crm'})});
+  mockPlots.forEach(p=>{if(p.id.toLowerCase().includes(q))res.push({title:p.id,sub:p.type+' · '+p.status,color:'#e8f5e9',mod:'plots'})});
+  mockProjects.forEach(p=>{if(p.name.toLowerCase().includes(q))res.push({title:p.name,sub:p.location+' · '+p.status,color:'#fff3e0',mod:'projects'})});
+  mockContacts.forEach(c=>{if(c.name.toLowerCase().includes(q))res.push({title:c.name,sub:c.role+' · '+c.company,color:'#f3e5f5',mod:'contacts'})});
+  if(res.length===0)c.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:12px">No results</div>';
+  else c.innerHTML=res.slice(0,20).map(function(r){return '<div onclick="switchGroup(\''+GROUPS_LOOKUP[r.mod]+'\');setTimeout(function(){switchModule(\''+r.mod+'\')},50)" style="padding:8px 10px;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;margin-bottom:3px;background:#f8f9fa"><div style="width:28px;height:28px;border-radius:6px;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">'+r.title[0]+'</div><div><div style="font-size:12px;font-weight:500">'+r.title+'</div><div style="font-size:10px;color:#888">'+r.sub+'</div></div></div>';}).join('');
 }
+const GROUPS_LOOKUP = {dashboard:'executive',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'finance_admin',documents:'finance_admin',knowledge_base:'finance_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
 
 // ═══ CRUD ═══
 function openModal(title,body,onSave){
   const c=document.getElementById('crudFormContent');
-  c.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-size:15px;font-weight:700">${title}</h3><span onclick="closeModal()" style="cursor:pointer;color:#999;font-size:18px">✕</span></div>${body}<div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end"><button onclick="closeModal()" style="padding:8px 16px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;font-weight:500;color:#555">Cancel</button><button onclick="saveModal()" id="crudSaveBtn" style="padding:8px 16px;border:none;border-radius:6px;background:#2F80ED;color:#fff;cursor:pointer;font-size:12px;font-weight:600">Save</button></div>`;
+  c.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="font-size:14px;font-weight:700">'+title+'</h3><span onclick="closeModal()" style="cursor:pointer;color:#999;font-size:16px">✕</span></div>'+body+'<div style="display:flex;gap:6px;margin-top:14px;justify-content:flex-end"><button onclick="closeModal()" style="padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;font-weight:500;color:#555">Cancel</button><button onclick="saveModal()" id="crudSaveBtn" style="padding:6px 14px;border:none;border-radius:6px;background:#2F80ED;color:#fff;cursor:pointer;font-size:11px;font-weight:600">Save</button></div>';
   window._crudOnSave=onSave; document.getElementById('crudModal').classList.add('active');
 }
 function closeModal(){document.getElementById('crudModal').classList.remove('active')}
 function saveModal(){if(window._crudOnSave){window._crudOnSave();closeModal()}}
 function g(id){const e=document.getElementById(id);return e?e.value:''}
-function inputField(l,id,v,p){return'<div class="form-group"><label class="form-label">'+l+'</label><input class="form-input" id="'+id+'" value="'+(v||'')+'" placeholder="'+(p||'')+'"/></div>'}
-function selectField(l,id,v,ops){return'<div class="form-group"><label class="form-label">'+l+'</label><select class="form-input" id="'+id+'">'+ops.map(o=>'<option value="'+o+'"'+(v===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'}
-function nextId(a){return Math.max(0,...a.map(i=>i.id||0))+1}
+function inputField(l,id,v,p){return '<div class="form-group"><label class="form-label">'+l+'</label><input class="form-input" id="'+id+'" value="'+(v||'')+'" placeholder="'+(p||'')+'"/></div>'}
+function selectField(l,id,v,ops){return '<div class="form-group"><label class="form-label">'+l+'</label><select class="form-input" id="'+id+'">'+ops.map(function(o){return '<option value="'+o+'"'+(v===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'}
+function nextId(a){return Math.max(0,...a.map(function(i){return i.id||0}))+1}
 function addItem(a,i){a.push(i);showToast('Created');renderModule()}
-function updateItem(a,id,u){const i=a.findIndex(x=>x.id===id);if(i>-1){a[i]={...a[i],...u};showToast('Updated','info');renderModule()}}
-function deleteItem(a,id,l){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(x=>x.id===id);if(i>-1){a.splice(i,1);showToast('Deleted','info');renderModule()}}
-function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',inputField('Name','f_name',l.name)+inputField('Phone','f_phone',l.phone)+inputField('Email','f_email',l.email)+inputField('Property','f_prop',l.property)+selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'])+selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'])+selectField('Priority','f_priority',l.priority,['High','Medium','Low'])+inputField('Value','f_value',l.value),()=>{const d={id:l.id,name:g('f_name'),phone:g('f_phone'),email:g('f_email'),property:g('f_prop'),source:g('f_source'),status:g('f_status'),priority:g('f_priority'),value:g('f_value'),type:l.type,lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d):updateItem(mockLeads,l.id,d)})}
-function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',inputField('Name','f_name',p.name)+inputField('Location','f_loc',p.location)+selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed'])+inputField('Budget','f_budget',p.budget)+inputField('Manager','f_mgr',p.manager)+selectField('Type','f_type',p.type,['land','flat'])+inputField('Plots/Units','f_total',p.plots||p.units||''),()=>{const d={...p,name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')};if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d):updateItem(mockProjects,p.id,d)})}
-function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',inputField('Client','f_client',b.client)+inputField('Property','f_prop',b.property)+inputField('Unit','f_unit',b.unit)+inputField('Price','f_price',b.price)+inputField('Advance','f_adv',b.advance)+selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),()=>{const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,{id:nextId(mockBookings),...d,type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}):updateItem(mockBookings,b.id,d)})}
-function crudEmployee(item){const n=!item;const e=n?{name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',inputField('Name','f_name',e.name)+inputField('Designation','f_desig',e.designation)+selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT'])+inputField('Phone','f_phone',e.phone),()=>{const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,{...d,id:nextId(mockEmployees)}):updateItem(mockEmployees,e.id,{...d,status:e.status})})}
-function crudStockItem(item){const n=!item;const i=n?{site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',inputField('Name','f_item',i.item)+selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate'])+inputField('Quantity','f_qty',i.quantity)+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder','f_reorder',i.reorder),()=>{const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,{...d,id:nextId(mockInventory)}):updateItem(mockInventory,i.id,d)})}
-function crudTransaction(){openModal('New Transaction','<div class="form-group"><label class="form-label">Description</label><input class="form-input" id="f_desc"/></div>'+selectField('Type','f_type','Inflow',['Inflow','Outflow'])+inputField('Amount','f_amt')+selectField('Status','f_stat','Received',['Received','Pending','Paid']),()=>{addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:g('f_type'),amount:g('f_amt'),status:g('f_stat'),project:'—'})})}
-function crudPO(item){const n=!item;const p=n?{vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',inputField('Vendor','f_vendor',p.vendor)+inputField('Items','f_items',p.items)+inputField('Amount','f_amt',p.amount)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled']),()=>{const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,{id:'PO-'+(24+Math.floor(Math.random()*100)),...d}):updateItem(mockPOs,p.id,d)})}
-function renderDashboard(el){
-  const a=mockPlots.filter(p=>p.status==='available').length, s=mockPlots.filter(p=>p.status==='sold').length, r=mockPlots.filter(p=>p.status==='reserved').length;
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP · Role: ${currentRole}</div>
-    <div class="stats-row" style="margin-bottom:14px">${[
-      ['Available Plots',a,'#4caf50','+2 this month'],['Sold Plots',s,'#e53935',''],['Reserved',r,'#1e88e5',''],
-      ['Revenue','৳12.5Cr','','+18%'],['Active Bookings',mockBookings.filter(b=>b.status==='Confirmed').length,'',''],['Hot Leads',mockLeads.filter(l=>l.priority==='High').length,'','+3 this week']
-    ].map(([l,v,c,t])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div>${t?`<div class="trend">${t}</div>`:''}</div>`).join('')}</div>
-    <div class="dashboard-quick" style="margin-bottom:14px">${[
-      ['Plot Inventory',`${mockPlots.length} plots`,'plots','#e8f5e9','#2e7d32'],['CRM / Leads',`${mockLeads.length} leads`,'crm','#fff3e0','#e65100'],
-      ['Bookings',`${mockBookings.length} active`,'bookings','#e3f2fd','#1565c0'],['Finance',`${mockTransactions.length} txns`,'finance','#fce4ec','#c62828'],
-      ['Employees',`${mockEmployees.length} staff`,'hr','#f3e5f5','#7b1fa2'],['Projects',`${mockProjects.length} active`,'projects','#e0f2f1','#00695c']
-    ].map(([t,c,m,bg,cl])=>`<div class="quick-card" onclick="switchModule('${m}')"><div class="icon" style="background:${bg};color:${cl}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div class="info"><div class="title">${t}</div><div class="count">${c}</div></div></div>`).join('')}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="card"><div class="card-header"><h3>Recent Bookings</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockBookings.map(b=>`<tr><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td class="num">${b.price}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
-      <div class="card"><div class="card-header"><h3>Hot Leads</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Property</th><th>Source</th><th>Status</th></tr></thead><tbody>${mockLeads.filter(l=>l.priority==='High').slice(0,4).map(l=>`<tr><td style="font-weight:500">${l.name}</td><td>${l.property}</td><td>${l.source}</td><td><span class="badge-status badge-pending">${l.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
-    </div>
-    <div class="card" style="margin-top:12px"><div class="card-header"><h3>Project Progress</h3></div><div class="card-body">${mockProjects.map(p=>`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="font-weight:500">${p.name}</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div><div style="font-size:10px;color:#888">${p.status} · ${p.budget}</div></div>`).join('')}</div></div>
-    <div class="content-footer"><div class="breadcrumb">Dashboard <span>›</span> Overview</div></div></div>`;
-}
+function updateItem(a,id,u){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);showToast('Updated','info');renderModule()}}
+function deleteItem(a,id,l){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);showToast('Deleted','info');renderModule()}}
+function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',inputField('Name','f_name',l.name)+inputField('Phone','f_phone',l.phone)+inputField('Email','f_email',l.email)+inputField('Property','f_prop',l.property)+selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'])+selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'])+selectField('Priority','f_priority',l.priority,['High','Medium','Low'])+inputField('Value','f_value',l.value),function(){const d={id:l.id,name:g('f_name'),phone:g('f_phone'),email:g('f_email'),property:g('f_prop'),source:g('f_source'),status:g('f_status'),priority:g('f_priority'),value:g('f_value'),type:l.type,lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d):updateItem(mockLeads,l.id,d)})}
+function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',inputField('Name','f_name',p.name)+inputField('Location','f_loc',p.location)+selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed'])+inputField('Budget','f_budget',p.budget)+inputField('Manager','f_mgr',p.manager)+selectField('Type','f_type',p.type,['land','flat'])+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d):updateItem(mockProjects,p.id,d)})}
+function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',inputField('Client','f_client',b.client)+inputField('Property','f_prop',b.property)+inputField('Unit','f_unit',b.unit)+inputField('Price','f_price',b.price)+inputField('Advance','f_adv',b.advance)+selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d)):updateItem(mockBookings,b.id,d)})}
+function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',inputField('Name','f_name',e.name)+inputField('Designation','f_desig',e.designation)+selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT'])+inputField('Phone','f_phone',e.phone),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d)):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}))})}
+function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',inputField('Name','f_item',i.item)+selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate'])+inputField('Quantity','f_qty',i.quantity)+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder','f_reorder',i.reorder),function(){const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d)):updateItem(mockInventory,i.id,d)})}
+function crudTransaction(){openModal('New Transaction','<div class="form-group"><label class="form-label">Description</label><input class="form-input" id="f_desc"/></div>'+selectField('Type','f_type','Inflow',['Inflow','Outflow'])+inputField('Amount','f_amt')+selectField('Status','f_stat','Received',['Received','Pending','Paid']),function(){addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:g('f_type'),amount:g('f_amt'),status:g('f_stat'),project:'—'})})}
+function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',inputField('Vendor','f_vendor',p.vendor)+inputField('Items','f_items',p.items)+inputField('Amount','f_amt',p.amount)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled']),function(){const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*100))},d)):updateItem(mockPOs,p.id,d)})}
 
-function renderCRM(el){
-  if(crmTab==="sales_marketing"){renderSalesMarketing(el);return}
-  if(crmTab==="dues"){renderDues(el);return}
-  el.innerHTML=`<div class="fade-in"><div class="page-title">CRM &amp; Leads</div><div class="page-subtitle">${mockLeads.length} total · ${mockLeads.filter(l=>l.priority==='High').length} hot · ${mockLeads.filter(l=>l.status==='New Inquiry').length} new</div>
-    <div class="stats-row" style="margin-bottom:10px">${[
-      ['Total',mockLeads.length,''],['Hot',mockLeads.filter(l=>l.priority==='High').length,'#c62828'],['Warm',mockLeads.filter(l=>l.priority==='Medium').length,'#e65100'],
-      ['New',mockLeads.filter(l=>l.status==='New Inquiry').length,''],['Booked',mockLeads.filter(l=>l.status==='Booked').length,'#2e7d32']
-    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
-    <div class="toolbar" style="margin-bottom:8px">
-<div class="tabs"><div class="tab ${crmTab==='leads'?'active':''}" onclick="crmTab='leads';renderModule()">CRM &amp; Leads</div><div class="tab ${crmTab==='sales_marketing'?'active':''}" onclick="crmTab='sales_marketing';renderModule()">Sales &amp; Marketing</div><div class="tab ${crmTab==='dues'?'active':''}" onclick="crmTab='dues';renderModule()">Dues &amp; Recovery</div></div>
-      <div class="spacer"></div>
-    </div>
-    <div class="toolbar" style="margin-bottom:8px">
-      <div class="tabs"><div class="tab ${crmView==='list'?'active':''}" onclick="crmView='list';renderModule()">List</div><div class="tab ${crmView==='kanban'?'active':''}" onclick="crmView='kanban';renderModule()">Pipeline</div></div>
-      <select id="crmFStatus" style="padding:4px 8px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px" onchange="renderModule()"><option value="">All Status</option><option>New Inquiry</option><option>Site Visit</option><option>Negotiation</option><option>Booked</option></select>
-      <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudLead()">+ Add Lead</button>
-    </div>
-    ${crmView==='list'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Status</th><th></th></tr></thead><tbody>${mockLeads.filter(l=>{const f=document.getElementById('crmFStatus');return !f||!f.value||l.status===f.value}).map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="padding:4px 4px 4px 12px;width:32px"><div style="width:26px;height:26px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">${leadGetInitials(l.name)}</div></td><td style="font-weight:500">${l.name}</td><td>${l.phone}</td><td>${l.property}</td><td><span style="display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${leadBadgeColor(l.source)}"></span>${l.source}</span></td><td style="font-weight:500;color:#2e7d32">${l.value}</td><td><span class="badge-status ${l.status==='Booked'?'badge-active':l.status==='New Inquiry'?'badge-pending':'badge-reserved'}">${l.status}</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:12px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:12px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span> ${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:11px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</td></tr>`).join('')}</tbody></table></div></div></div>
-    `:`<div style="display:flex;gap:12px;overflow-x:auto;flex:1;min-height:300px">${['New Inquiry','Site Visit','Negotiation','Booked'].map(st=>{const items=mockLeads.filter(l=>l.status===st);return `<div class="kanban-col"><div style="padding:8px 10px;font-size:11px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>${st}</span><span style="background:#e0e0e0;border-radius:10px;padding:0 8px;font-size:10px">${items.length}</span></div><div style="flex:1;overflow-y:auto;padding:4px 8px">${items.map(l=>`<div class="kanban-card" onclick="openLead(${l.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:12px;font-weight:600">${l.name}</div><div style="display:flex;gap:3px"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span></div></div><div style="font-size:11px;color:#888;margin-top:2px">${l.property}</div><div style="font-size:11px;color:#888">${l.value} · ${l.source}</div><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap"><span class="badge-status ${l.priority==='High'?'badge-hot':l.priority==='Medium'?'badge-warm':'badge-cold'}">${l.priority}</span><span class="badge-status ${l.type==='NRB'?'badge-reserved':'badge-closed'}">${l.type}</span>${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:10px;font-weight:600;padding:1px 6px;background:#e8f5e9;border-radius:4px" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</div></div>`).join('')}</div></div>`}).join('')}</div>`}
-    <div class="content-footer"><div class="breadcrumb">CRM <span>›</span> ${crmView==='list'?'List':'Pipeline'}</div></div></div>`;
-}
-
-function renderSalesMarketing(el){
-  const act=mockCampaigns.filter(function(c){return c.status==="Active"}).length;
-  const tL=mockCampaigns.reduce(function(s,c){return s+c.leads},0);
-  const tC=mockCampaigns.reduce(function(s,c){return s+c.conversions},0);
-  var h="<div class=\"fade-in\"><div class=\"page-title\">Sales & Marketing</div><div class=\"page-subtitle\">"+mockCampaigns.length+" campaigns</div>";
-  h+="<div class=\"stats-row\" style=\"margin-bottom:10px\">";
-  [["Campaigns",mockCampaigns.length,""],["Active",act,"#2e7d32"],["Total Leads",tL,"#1565c0"],["Conversions",tC,"#e65100"]].forEach(function(s){
-    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
-    if(s[2])h+=" style=\"color:"+s[2]+"\"";
-    h+=">"+s[1]+"</div></div>";
-  });
-  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Campaigns</h3><button class=\"action-btn primary\" onclick=\"showToast(\'New campaign form coming soon\',\'info\')\" style=\"padding:4px 10px;font-size:11px\">+ New</button></div>";
-  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Leads</th><th>Conv.</th><th>Rate</th><th>ROI</th><th>Status</th></tr></thead><tbody>";
-  mockCampaigns.forEach(function(c){
-    var roiP=parseInt(c.roi);
-    var roiCol=roiP>=300?"#2e7d32":roiP>=200?"#e65100":"#c62828";
-    h+="<tr><td style=\"font-weight:500\">"+c.name+"<div style=\"font-size:10px;color:#888\">"+c.id+"</div></td>";
-    h+="<td><span style=\"padding:2px 8px;border-radius:4px;font-size:10px;background:#f0f4ff;color:#1565c0\">"+c.channel+"</span></td>";
-    h+="<td>"+c.budget+"</td><td style=\"color:#1565c0;font-weight:600\">"+c.leads+"</td>";
-    h+="<td style=\"color:#2e7d32;font-weight:600\">"+c.conversions+"</td>";
-    h+="<td>"+(c.leads>0?Math.round(c.conversions/c.leads*100):0)+"%</td>";
-    h+="<td style=\"color:"+roiCol+";font-weight:600\">"+c.roi+"</td>";
-    h+="<td><span class=\"badge-status "+(c.status==="Active"?"badge-active":"badge-closed")+"\">"+c.status+"</span></td></tr>";
-  });
-  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">CRM <span>\u203a</span> Sales & Marketing</div></div></div>";
-  el.innerHTML=h;
-}
-function renderDues(el){
-  var crit=mockDues.filter(function(d){return d.status==="Critical"}).length;
-  var over=mockDues.filter(function(d){return d.status==="Overdue"}).length;
-  var tot=mockDues.reduce(function(s,d){return s+parseInt(d.due.replace(/[^0-9]/g,""))},0);
-  var h="<div class=\"fade-in\"><div class=\"page-title\">Dues & Recovery</div><div class=\"page-subtitle\">"+mockDues.length+" accounts</div>";
-  h+="<div class=\"stats-row\" style=\"margin-bottom:10px\">";
-  [["Total Dues",mockDues.length,""],["Critical",crit,"#c62828"],["Overdue",over,"#e65100"],["Due Amount","Tk "+tot.toLocaleString(),""]].forEach(function(s){
-    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
-    if(s[2])h+=" style=\"color:"+s[2]+"\"";
-    h+=">"+s[1]+"</div></div>";
-  });
-  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Dues Tracker</h3>";
-  h+="<div style=\"display:flex;gap:6px\"><button class=\"action-btn secondary\" onclick=\"showToast(\'Export coming soon\',\'info\')\" style=\"padding:4px 8px;font-size:10px\">Export</button>";
-  h+="<button class=\"action-btn primary\" onclick=\"showToast(\'Sending reminders...\',\'info\')\" style=\"padding:4px 8px;font-size:10px\">Send Reminders</button></div></div>";
-  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Customer</th><th>Project/Unit</th><th>Total</th><th>Paid</th><th>Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Status</th></tr></thead><tbody>";
-  mockDues.forEach(function(d){
-    var odCol=d.daysOverdue>0?"#c62828":"#2e7d32";
-    var bCl=d.bucket==="60+ Days"?"badge-sold":d.bucket==="30 Days"?"badge-hot":d.bucket==="15 Days"?"badge-pending":"badge-active";
-    var sCl=d.status==="Critical"?"badge-sold":d.status==="Overdue"?"badge-hot":"badge-active";
-    h+="<tr><td style=\"font-weight:500\">"+d.customer+"<div style=\"font-size:10px;color:#888\">"+d.id+"</div></td>";
-    h+="<td>"+d.project+"<br><span style=\"font-size:10px;color:#888\">"+d.unit+"</span></td>";
-    h+="<td>"+d.totalPrice+"</td><td style=\"color:#2e7d32\">"+d.paid+"</td>";
-    h+="<td style=\"color:#c62828;font-weight:600\">"+d.due+"</td><td style=\"font-size:11px\">"+d.dueDate+"</td>";
-    h+="<td style=\"color:"+odCol+";font-weight:600\">"+(d.daysOverdue>0?d.daysOverdue+"d":"On track")+"</td>";
-    h+="<td><span class=\"badge-status "+bCl+"\">"+d.bucket+"</span></td>";
-    h+="<td><span class=\"badge-status "+sCl+"\">"+d.status+"</span></td></tr>";
-  });
-  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">CRM <span>\u203a</span> Dues & Recovery</div></div></div>";
-  el.innerHTML=h;
-}
-function renderPlots(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Land &amp; Plots</div><div class="page-subtitle">View and manage plot inventory</div>
-    <div class="stats-row" style="margin-bottom:12px">${[
-      ['Available',mockPlots.filter(p=>p.status==='available').length,'#4caf50'],['Sold',mockPlots.filter(p=>p.status==='sold').length,'#e53935'],
-      ['Reserved',mockPlots.filter(p=>p.status==='reserved').length,'#1e88e5'],['Not Acquired',mockPlots.filter(p=>p.status==='not_acquired').length,'#999']
-    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value" style="color:${c}">${v}</div></div>`).join('')}</div>
-    <div class="card"><div class="card-body">
-      <div style="display:flex;gap:16px;margin-bottom:12px;font-size:11px">${[
-        ['Available','#4caf50'],['Sold','#e53935'],['Reserved','#1e88e5'],
-        ['Not Acquired','repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)']
-      ].map(([l,b])=>`<span><span style="display:inline-block;width:12px;height:12px;background:${b};border-radius:3px;vertical-align:middle;margin-right:4px${l==='Not Acquired'?';border:1px dashed #ccc':''}"></span>${l}</span>`).join('')}</div>
-      <div class="plot-grid">${mockPlots.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`}).join('')}</div>
-    </div></div>
-    <div class="card" style="margin-top:12px"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${mockPlots.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table></div></div></div>
-    <div class="content-footer"><div class="breadcrumb">Plots <span>›</span> Layout</div></div></div>`;
-}
-
-function renderLandMgmt(el){
-  const stages=['identification','feasibility','legal','acquisition','planning'];
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Land Acquisition</div><div class="page-subtitle">Pipeline: ${mockLandProposals.length} proposals</div>
-    <div class="toolbar" style="margin-bottom:8px">${stages.map(s=>`<button class="filter-btn ${landTab===s?'active':''}" onclick="landTab='${s}';renderModule()">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}<div class="spacer"></div><button class="action-btn primary">+ New Proposal</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Price</th><th>Risk</th><th>ROI</th><th>Status</th></tr></thead><tbody>${mockLandProposals.filter(p=>p.stage===landTab).length===0?'<tr><td colspan="7" style="text-align:center;color:#999;padding:20px">None in this stage</td></tr>':mockLandProposals.filter(p=>p.stage===landTab).map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.name}</td><td>${p.area}</td><td>${p.price}</td><td><span class="badge-status ${p.risk==='Low'?'badge-active':p.risk==='Medium'?'badge-pending':'badge-sold'}">${p.risk}</span></td><td style="color:#2e7d32;font-weight:600">${p.roi}</td><td><span class="badge-status badge-pending">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
-    <div class="content-footer"><div class="breadcrumb">Land <span>›</span> ${landTab}</div></div></div>`;
-}
-
-function renderProjects(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active</div>
-    <div class="toolbar" style="margin-bottom:8px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn primary" onclick="crudProject()">+ New Project</button></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">${mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
-      <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:13px;font-weight:600">${p.name}</div><div style="font-size:11px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
-      <div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px"><span>Progress</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div></div>
-      <div style="font-size:11px;color:#666;display:flex;gap:12px"><span>${p.budget}</span><span>${p.manager}</span>${p.plots?`<span>${p.plots} plots</span>`:''}${p.units?`<span>${p.units} units</span>`:''}</div>
-      <div style="margin-top:6px;display:flex;gap:6px"><span class="badge-status badge-active">${p.stats.sold} sold</span><span class="badge-status badge-reserved">${p.stats.reserved} reserved</span><span class="badge-status badge-closed">${p.stats.available} avail</span></div>
-    </div></div>`).join('')}</div>
-    <div class="content-footer"><div class="breadcrumb">Projects <span>›</span> ${projectsTab}</div></div></div>`;
-}
-
-function renderBookings(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Bookings</div><div class="page-subtitle">${mockBookings.length} bookings</div>
-    <div class="toolbar" style="margin-bottom:8px"><div class="spacer"></div><button class="action-btn primary" onclick="crudBooking()">+ New Booking</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Status</th></tr></thead><tbody>${mockBookings.map(b=>`<tr style="cursor:pointer" onclick="openBooking('${b.id}')"><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td>${b.unit}</td><td class="num">${b.price}</td><td class="num">${b.advance}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
-    <div class="content-footer"><div class="breadcrumb">Bookings <span>›</span> All</div></div></div>`;
-}
-
-function renderFinance(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Finance</div><div class="page-subtitle">${mockTransactions.length} transactions</div>
-    <div class="stats-row" style="margin-bottom:12px">${[
-      ['Inflows',mockTransactions.filter(t=>t.type==='Inflow').length,'#2e7d32'],
-      ['Outflows',mockTransactions.filter(t=>t.type==='Outflow').length,'#c62828'],
-      ['Total',mockTransactions.length,'']
-    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
-    <div class="card"><div class="card-header"><h3>Transactions</h3><button class="action-btn primary" onclick="crudTransaction()" style="padding:4px 10px;font-size:11px">+ Add</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockTransactions.map(t=>`<tr style="cursor:pointer" onclick="openTransaction('${t.id}')"><td style="font-weight:500">${t.id}</td><td>${t.desc}</td><td><span class="badge-status ${t.type==='Inflow'?'badge-active':'badge-sold'}">${t.type}</span></td><td class="num" style="font-weight:600;color:${t.type==='Inflow'?'#2e7d32':'#c62828'}">${t.amount}</td><td><span class="badge-status ${t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved'}">${t.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
-    <div class="content-footer"><div class="breadcrumb">Finance <span>›</span> Transactions</div></div></div>`;
-}
-
-function renderStock(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Stock &amp; Procurement</div><div class="page-subtitle">Inventory and purchase orders</div>
-    <div class="toolbar" style="margin-bottom:8px"><button class="filter-btn ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';renderModule()">Inventory</button><button class="filter-btn ${stockTab==='po'?'active':''}" onclick="stockTab='po';renderModule()">Purchase Orders</button><div class="spacer"></div><button class="action-btn primary" onclick="stockTab==='inventory'?crudStockItem():crudPO()">+ New</button></div>
-    ${stockTab==='inventory'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th>Quantity</th><th>Status</th><th>Reorder</th></tr></thead><tbody>${mockInventory.map(i=>`<tr style="cursor:pointer" onclick="openStockItem(${i.id})"><td style="font-weight:500">${i.item}</td><td>${i.site}</td><td>${i.quantity}</td><td><span class="badge-status ${i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold'}">${i.status}</span></td><td>${i.reorder}</td></tr>`).join('')}</tbody></table></div></div></div>
-    `:`<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Vendor</th><th>Items</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockPOs.map(p=>`<tr style="cursor:pointer" onclick="openPO('${p.id}')"><td style="font-weight:500">${p.id}</td><td>${p.vendor}</td><td>${p.items}</td><td class="num">${p.amount}</td><td><span class="badge-status ${p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending'}">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>`}
-    <div class="content-footer"><div class="breadcrumb">Stock <span>›</span> ${stockTab==='inventory'?'Inventory':'PO'}</div></div></div>`;
-}
-
-function renderHR(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Human Resources</div><div class="page-subtitle">${mockEmployees.length} employees</div>
-    <div class="toolbar" style="margin-bottom:8px"><div class="spacer"></div><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${mockEmployees.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
-    <div class="content-footer"><div class="breadcrumb">HR <span>›</span> All Staff</div></div></div>`;
-}
-
-function renderTasks(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Task Management</div><div class="page-subtitle">${mockTasks.length} tasks</div>
-    <div style="display:flex;gap:12px;flex:1;min-height:300px;overflow-x:auto">${['To Do','In Progress','Review','Done'].map(st=>{const t=mockTasks.filter(x=>x.status===st);return `<div class="kanban-col"><div style="padding:8px 10px;font-size:11px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>${st}</span><span style="background:#e0e0e0;border-radius:10px;padding:0 6px;font-size:10px">${t.length}</span></div><div style="flex:1;overflow-y:auto;padding:4px 8px">${t.map(x=>`<div class="kanban-card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="width:7px;height:7px;border-radius:50%;background:${x.priority==='High'?'#e53935':x.priority==='Medium'?'#ff9800':'#999'}"></span><span style="font-size:12px;font-weight:500">${x.title}</span></div><div style="font-size:10px;color:#888">#${x.id} · ${x.priority}</div></div>`).join('')}</div></div>`}).join('')}</div>
-    <div class="card" style="margin-top:12px"><div class="card-header"><h3>Quick Add</h3></div><div class="card-body" style="display:flex;gap:8px"><input id="newTaskInput" placeholder="Task title..." style="flex:1;padding:7px 10px;border:1px solid #e0e0e0;border-radius:6px;font-size:12px"/><select id="newTaskStatus" style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:6px;font-size:12px"><option>To Do</option><option>In Progress</option><option>Review</option><option>Done</option></select><button class="action-btn primary" onclick="addTask()">Add</button></div></div>
-    <div class="content-footer"><div class="breadcrumb">Tasks <span>›</span> Board</div></div></div>`;
-}
-function addTask(){const i=document.getElementById('newTaskInput'),s=document.getElementById('newTaskStatus');if(!i.value.trim())return;mockTasks.push({id:Date.now(),title:i.value.trim(),status:s.value,priority:'Medium'});i.value='';renderTasks();showToast('Task added!');}
-
-function renderSettings(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Settings</div><div class="page-subtitle">Configuration</div>
-    <div class="toolbar" style="margin-bottom:8px"><button class="filter-btn ${settingsTab==='users'?'active':''}" onclick="settingsTab='users';renderModule()">Users</button><button class="filter-btn ${settingsTab==='roles'?'active':''}" onclick="settingsTab='roles';renderModule()">Roles</button><button class="filter-btn ${settingsTab==='company'?'active':''}" onclick="settingsTab='company';renderModule()">Company</button></div>
-    ${settingsTab==='users'?`<div class="card"><div class="card-header"><h3>Users</h3><button class="action-btn primary" onclick="showToast('User creation form coming soon','info')">+ Add User</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Dept</th><th>Status</th></tr></thead><tbody>${mockUsers.map(u=>`<tr><td style="font-weight:500">${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.dept}</td><td><span class="badge-status badge-active">${u.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>`:settingsTab==='roles'?`<div class="card"><div class="card-header"><h3>Roles</h3></div><div class="card-body"><div style="font-size:13px;font-weight:600;margin-bottom:8px">Current: ${currentRole}</div><div style="font-size:12px;color:#666">Switch roles from the sidebar shield icon.</div></div></div>`:`<div class="card"><div class="card-header"><h3>Company</h3></div><div class="card-body"><div class="stats-row"><div class="stat-card"><div class="label">Name</div><div class="value" style="font-size:14px">Mars Constech Ltd.</div></div><div class="stat-card"><div class="label">License</div><div class="value" style="font-size:14px">TRADE-2024-xxx</div></div></div></div></div>`}
-    <div class="content-footer"><div class="breadcrumb">Settings <span>›</span> ${settingsTab}</div></div></div>`;
-}
-
-function renderMore(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">All Modules</div><div class="page-subtitle">Complete system overview</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-      <div class="quick-card" onclick="switchModule('tasks')"><div class="icon" style="background:#e8f5e9;color:#2e7d32"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/></svg></div><div class="info"><div class="title">Tasks</div><div class="count">Kanban board</div></div></div>
-      <div class="quick-card" onclick="renderSub('contacts')"><div class="icon" style="background:#fff3e0;color:#e65100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/></svg></div><div class="info"><div class="title">Contacts</div><div class="count">${mockContacts.length}</div></div></div>
-      <div class="quick-card" onclick="renderSub('documents')"><div class="icon" style="background:#e3f2fd;color:#1565c0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><div class="info"><div class="title">Documents</div><div class="count">${mockDocuments.length}</div></div></div>
-      <div class="quick-card" onclick="renderSub('contractors')"><div class="icon" style="background:#fce4ec;color:#c62828"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div><div class="info"><div class="title">Contractors</div><div class="count">${mockContractors.length}</div></div></div>
-      <div class="quick-card" onclick="renderSub('equipment')"><div class="icon" style="background:#f3e5f5;color:#7b1fa2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/></svg></div><div class="info"><div class="title">Equipment</div><div class="count">${mockEquipment.length}</div></div></div>
-      <div class="quick-card" onclick="renderSub('labor')"><div class="icon" style="background:#e0f2f1;color:#00695c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="info"><div class="title">Labor</div><div class="count">${mockLabor.length} crews</div></div></div>
-      <div class="quick-card" onclick="renderSub('qc')"><div class="icon" style="background:#e8f5e9;color:#2e7d32"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/></svg></div><div class="info"><div class="title">QC &amp; Inspection</div><div class="count">${mockQC.length} reports</div></div></div>
-      <div class="quick-card" onclick="renderSub('designs')"><div class="icon" style="background:#fff3e0;color:#e65100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><div class="info"><div class="title">Designs</div><div class="count">${mockDesigns.length}</div></div></div>
-      <div class="quick-card" onclick="renderSub('compliance')"><div class="icon" style="background:#fce4ec;color:#c62828"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="info"><div class="title">Compliance</div><div class="count">${mockCompliance.length}</div></div></div>
-    </div>
-    <div class="content-footer"><div class="breadcrumb">All <span>›</span> Modules</div></div></div>`;
-}
-
-function renderSub(mod){
-  const el=document.getElementById('mainContent');
-  const data={contacts:mockContacts,documents:mockDocuments,contractors:mockContractors,equipment:mockEquipment,labor:mockLabor,qc:mockQC,designs:mockDesigns,compliance:mockCompliance};
-  const headers={contacts:['Name','Role','Phone','Company'],documents:['Title','Type','Property','Status'],contractors:['Name','Type','Rating','Status'],equipment:['Name','Model','Site','Status'],labor:['Name','Count','Site','Status'],qc:['Project','Item','Result','Inspector'],designs:['Name','Type','Version','Status'],compliance:['Name','Type','Due','Status']};
-  const fields={contacts:['name','role','phone','company'],documents:['title','type','property','status'],contractors:['name','type','rating','status'],equipment:['name','model','site','status'],labor:['name','count','site','status'],qc:['project','item','result','inspector'],designs:['name','type','version','status'],compliance:['name','type','due','status']};
-  const titles={contacts:'Contacts',documents:'Data Vault',contractors:'Contractors',equipment:'Equipment',labor:'Labor Management',qc:'QC & Inspection',designs:'Design Management',compliance:'Compliance'};
-  const items=data[mod]||[];
-  el.innerHTML=`<div class="fade-in"><div class="page-title">${titles[mod]||mod}</div><div class="page-subtitle">${items.length} records</div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr>${(headers[mod]||[]).map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${items.map(i=>`<tr>${(fields[mod]||[]).map(f=>`<td>${i[f]||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div></div>
-    <div class="content-footer"><div class="breadcrumb">${titles[mod]||mod} <span>›</span> List</div></div></div>`;
-}
-
-
-// ═══ DETAIL PANEL HELPERS ═══
+// ═══ DETAIL PANELS ═══
 function showDetailPanel(title, bodyHTML, footerHTML) {
   const c = document.getElementById('leadPanelContent');
   const c2 = document.getElementById('leadSlideOut');
-  c.innerHTML = `<div style="padding:14px 16px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;background:#fafafa"><span style="font-size:14px;font-weight:600">${title}</span><span onclick="closeLeadPanel()" style="cursor:pointer;color:#999;font-size:18px">✕</span></div><div style="flex:1;overflow-y:auto;padding:16px;background:#f8f9fa">${bodyHTML}</div>${footerHTML||''}`;
+  c.innerHTML = '<div style="padding:12px 14px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;background:#fafafa"><span style="font-size:13px;font-weight:600">'+title+'</span><span onclick="closeLeadPanel()" style="cursor:pointer;color:#999;font-size:16px">✕</span></div><div style="flex:1;overflow-y:auto;padding:14px;background:#f8f9fa">'+bodyHTML+'</div>'+(footerHTML||'');
   c2.classList.add('active');
 }
+function detailStatRow(items){return '<div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">'+items.map(function(x){return '<div class="stat-card"><div class="label">'+x[0]+'</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(x[1]||'—')+'</div></div>';}).join('')+'</div>';}
 
-function detailStatRow(items){
-  return `<div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">${items.map(([l,v])=>`<div class="stat-card"><div class="label">${l}</div><div style="font-size:13px;font-weight:600;margin-top:2px">${v||'—'}</div></div>`).join('')}</div>`;
-}
-
-// ─── Projects Detail ───
 function openProject(id){
-  const p=mockProjects.find(x=>x.id===id);if(!p)return;
-  const progressColor=p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935';
+  const p=mockProjects.find(function(x){return x.id===id});if(!p)return;
   showDetailPanel('Project: '+p.name,
     detailStatRow([['ID',p.id],['Location',p.location],['Status',p.status],['Manager',p.manager],['Budget',p.budget],['Type',p.type]])+
-    `<div style="margin-top:12px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Progress</h3><div class="progress-bar" style="height:8px"><div class="fill" style="width:${p.progress}%;background:${progressColor};height:8px;border-radius:4px"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:4px"><span>${p.progress}% complete</span><span style="color:${progressColor};font-weight:600">${p.progress>60?'On Track':p.progress>30?'Needs Attention':'At Risk'}</span></div></div>`+
-    `<div style="margin-top:12px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Unit Status</h3>`+detailStatRow([['Sold',p.stats.sold],['Reserved',p.stats.reserved],['Available',p.stats.available],['Total',p.plots||p.units||0]])+'</div>',
-    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudProject(mockProjects.find(x=>x.id==='${p.id}'));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel();switchModule('bookings')">📋 View Bookings</button></div>`
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Progress</h3><div class="progress-bar" style="height:8px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935')+';height:8px;border-radius:4px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:3px"><span>'+p.progress+'% complete</span><span style="color:'+(p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935')+';font-weight:600">'+(p.progress>60?'On Track':p.progress>30?'Needs Attention':'At Risk')+'</span></div></div>'+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Unit Status</h3>'+detailStatRow([['Sold',p.stats.sold],['Reserved',p.stats.reserved],['Available',p.stats.available],['Total',p.plots||p.units||0]])+'</div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudProject(mockProjects.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel();switchModule(\'bookings\')">📋 View Bookings</button></div>'
   );
 }
-
-// ─── Booking Detail ───
 function openBooking(id){
-  const b=mockBookings.find(x=>x.id===id);if(!b)return;
+  const b=mockBookings.find(function(x){return x.id===id});if(!b)return;
   showDetailPanel('Booking: '+b.id,
     detailStatRow([['Client',b.client],['Property',b.property],['Unit',b.unit],['Date',b.date],['Type',b.type],['Status',b.status]])+
-    `<div style="margin-top:14px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Payment Summary</h3>`+
-    detailStatRow([['Total Price',b.price],['Advance Paid',b.advance],['Due',b.price+' - '+b.advance]])+'</div>'+
-    `<div style="margin-top:14px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Payment Schedule</h3><div style="padding:12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:12px">Schedule details will appear here after downpayment.</div></div>`,
-    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudBooking(mockBookings.find(x=>x.id==='${b.id}'));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn success">📄 Receipt</button></div>`
+    '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Summary</h3>'+detailStatRow([['Total Price',b.price],['Advance Paid',b.advance],['Due',b.price+' - '+b.advance]])+'</div>'+
+    '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Schedule</h3><div style="padding:10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px">Schedule details will appear here after downpayment.</div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudBooking(mockBookings.find(function(x){return x.id===\''+b.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn success">📄 Receipt</button></div>'
   );
 }
-
-// ─── Transaction Detail ───
 function openTransaction(id){
-  const t=mockTransactions.find(x=>x.id===id);if(!t)return;
-  const isInflow=t.type==='Inflow';
+  const t=mockTransactions.find(function(x){return x.id===id});if(!t)return;
   showDetailPanel('Transaction: '+t.id,
     detailStatRow([['ID',t.id],['Date',t.date],['Description',t.desc],['Client/Vendor',t.client||t.vendor||'—'],['Project',t.project||'—'],['Type',t.type],['Status',t.status]])+
-    `<div style="margin-top:14px;text-align:center;padding:20px;background:#fff;border:1px solid #e8e8e8;border-radius:8px"><div style="font-size:28px;font-weight:700;color:${isInflow?'#2e7d32':'#c62828'}">${t.amount}</div><div style="font-size:11px;color:#888;margin-top:4px">${isInflow?'Inflow (Received)':'Outflow (Payment)'}</div></div>`,
-    `<div class="lead-footer"><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+    '<div style="margin-top:12px;text-align:center;padding:18px;background:#fff;border:1px solid #e8e8e8;border-radius:8px"><div style="font-size:24px;font-weight:700;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.amount+'</div><div style="font-size:10px;color:#888;margin-top:3px">'+(t.type==='Inflow'?'Inflow (Received)':'Outflow (Payment)')+'</div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
-
-// ─── Stock Item Detail ───
 function openStockItem(id){
-  const i=mockInventory.find(x=>x.id===id);if(!i)return;
+  const i=mockInventory.find(function(x){return x.id===id});if(!i)return;
   const statusColor=i.status==='Adequate'?'#2e7d32':i.status==='Warning'?'#e65100':'#c62828';
-  const reorderStatus=i.reorder>0?`Reorder at ${i.reorder}`:'No reorder point';
   showDetailPanel('Stock: '+i.item,
     detailStatRow([['Item',i.item],['Site',i.site],['Quantity',i.quantity],['Status',i.status],['Reorder Level',i.reorder||'None']])+
-    `<div style="margin-top:14px"><div style="padding:12px;border-radius:6px;background:${statusColor}15;border:1px solid ${statusColor}"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600;color:${statusColor}">${i.status}</span><span style="font-size:11px;color:#666">${reorderStatus}</span></div><div style="margin-top:8px;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:${i.status==='Adequate'?'75':i.status==='Warning'?'40':'15'}%;background:${statusColor};border-radius:3px;transition:width .3s"></div></div></div></div>`,
-    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudStockItem(mockInventory.find(x=>x.id===${i.id}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+    '<div style="margin-top:12px"><div style="padding:10px;border-radius:6px;background:'+statusColor+'15;border:1px solid '+statusColor+'"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:600;color:'+statusColor+'">'+i.status+'</span><span style="font-size:10px;color:#666">'+(i.reorder>0?'Reorder at '+i.reorder:'No reorder point')+'</span></div><div style="margin-top:6px;height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+(i.status==='Adequate'?'75':i.status==='Warning'?'40':'15')+'%;background:'+statusColor+';border-radius:3px;transition:width .3s"></div></div></div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudStockItem(mockInventory.find(function(x){return x.id==='+i.id+'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
-
-// ─── PO Detail ───
 function openPO(id){
-  const p=mockPOs.find(x=>x.id===id);if(!p)return;
+  const p=mockPOs.find(function(x){return x.id===id});if(!p)return;
   showDetailPanel('Purchase Order: '+p.id,
     detailStatRow([['PO ID',p.id],['Date',p.date],['Vendor',p.vendor],['Items',p.items],['Amount',p.amount],['Site',p.site],['Status',p.status]]),
-    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudPO(mockPOs.find(x=>x.id==='${p.id}'));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudPO(mockPOs.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
-
-// ─── Employee Detail ───
 function openEmployee(id){
-  const e=mockEmployees.find(x=>x.id===id);if(!e)return;
+  const e=mockEmployees.find(function(x){return x.id===id});if(!e)return;
   showDetailPanel(e.name,
-    `<div style="text-align:center;padding:20px"><div style="width:56px;height:56px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 12px">${leadGetInitials(e.name)}</div><div style="font-size:16px;font-weight:700">${e.name}</div><div style="font-size:12px;color:#2F80ED">${e.designation||'Staff'}</div></div>`+
-    detailStatRow([['Department',e.dept],['Phone',e.phone],['Email',e.email||'—'],['Status',e.status],['Join Date',e.joinDate||'—'],['ID',e.id]])+
-    `<div style="margin-top:14px"><div class="verif-item" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9"><span>✓ Active Employee</span><span style="font-size:10px;font-weight:600;cursor:pointer">View Profile</span></div></div>`,
-    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudEmployee(mockEmployees.find(x=>x.id===${e.id}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+    '<div style="text-align:center;padding:18px"><div style="width:50px;height:50px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin:0 auto 10px">'+leadGetInitials(e.name)+'</div><div style="font-size:14px;font-weight:700">'+e.name+'</div><div style="font-size:11px;color:#2F80ED">'+e.designation+'</div></div>'+
+    detailStatRow([['Department',e.dept],['Phone',e.phone],['Email',e.email||'—'],['Status',e.status],['ID',e.id]])+
+    '<div style="margin-top:12px"><div class="verif-item" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9"><span>✓ Active Employee</span><span style="font-size:9px;font-weight:600;cursor:pointer">View Profile</span></div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudEmployee(mockEmployees.find(function(x){return x.id==='+e.id+'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
 
-render('dashboard');
+// ═══ INIT ═══
+switchGroup('executive');
 </script>
 </body>
 </html>
