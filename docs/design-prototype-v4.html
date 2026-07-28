@@ -19,12 +19,13 @@
     .sidebar-logo{height:48px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #f0f0f0}
     .sidebar-logo svg{width:24px;height:24px;color:#2F80ED}
     .sidebar-nav{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;overflow-y:auto}
-    .sidebar-item{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;position:relative;color:#666;transition:all .15s}
+    .sidebar-item{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;position:relative;color:#666;transition:all .15s;overflow:visible}
     .sidebar-item:hover{background:#f0f4ff;color:#2F80ED}
     .sidebar-item.active{background:#eef3ff;color:#2F80ED}
     .sidebar-item.active::before{content:'';position:absolute;left:-12px;top:8px;bottom:8px;width:4px;background:#2F80ED;border-radius:0 3px 3px 0}
     .sidebar-item svg{width:20px;height:20px;stroke-width:1.5}
-    .sidebar-item[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:100%;margin-left:10px;top:50%;transform:translateY(-50%);background:#1f2937;color:#fff;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:500;white-space:nowrap;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .sidebar-item[data-tip]:hover::after{content:attr(data-tip);position:fixed;left:92px;top:auto;transform:none;background:#1f2937;color:#fff;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;white-space:nowrap;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none}
+    .sidebar-nav{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;overflow-y:auto;overflow-x:visible}
     .sidebar-bottom{padding:8px 0;border-top:1px solid #f0f0f0;display:flex;flex-direction:column;align-items:center;gap:2px}
     .main-area{flex:1;display:flex;flex-direction:column;min-width:0}
     .top-bar{height:48px;min-height:48px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 20px;gap:24px}
