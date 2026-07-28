@@ -189,4 +189,107 @@ REM_ERP/
 
 ---
 
-**Next Steps:** Choose backend/frontend stack, set up the database schema, and begin iterative module development.
+## Future Enhancements & Roadmap
+
+### ✅ Features Present in Design (Not Yet Documented)
+
+These features already exist in the REM_V93 prototype but aren't in the core feature list above — ready to be built:
+
+| Feature | Module | Description |
+|---------|--------|-------------|
+| **Drag-and-Drop Layout Builder** | Projects | Interactive plot/layout designer with minimap — drag units onto blocks |
+| **Journal Vouchers (JVs)** | Finance | Double-entry accounting journal entries with auto-balancing (Debit = Credit) |
+| **SMS Gateway Integration** | Settings | Bulk SMS provider config, payment receipt SMS, lead assignment alerts |
+| **Email Notification Templates** | Settings | Customizable automated system emails with template editor |
+| **Invoice Template Designer** | Finance | Custom invoice layout (logo, fields, styling) with save/load |
+| **Kanban Task Board** | Tasks | Internal task kanban with drag-and-drop between To Do → In Progress → Done |
+| **Contacts CSV Import** | Contacts | Bulk import contacts from CSV with field mapping |
+| **Per-Document Audit Trail** | Vault | Track who viewed/downloaded each document with timestamps |
+| **Bulk Actions** | Multiple | Bulk delete/suspend users, bulk delete leads |
+| **Feasibility Scorecard** | Land | Auto-score proposals based on location, price, legal status |
+| **Custom Checklists** | Land | Configurable checklists for feasibility, legal vetting, acquisition stages |
+| **Legal Opinion Log** | Land | Unalterable trail of lawyer remarks and legal opinions |
+| **Layout PDF Export** | Projects | Download plot/layout designs as PDF |
+| **Activity Logging per Lead** | CRM | Track all communications, calls, meetings per lead |
+| **Multi-Project Type Toggle** | Dashboard | Toggle between Land/Flat project views |
+
+### 🚀 Phase 1 — Core Modules (MVP)
+
+| Priority | Module | Key Deliverables |
+|----------|--------|-----------------|
+| P0 | **Auth & RBAC** | JWT auth, role-based access (Super Admin, Admin, Sales, Finance, Site Engineer, Client view) |
+| P0 | **Dashboard** | KPI cards, revenue chart, activity feed, task widget |
+| P0 | **CRM** | Kanban pipeline, lead CRUD, details slide-out, filters |
+| P0 | **Land Acquisition** | 6-stage workflow, proposal CRUD, owner management |
+| P0 | **Project Management** | Both land/flat types, unit/plot grid, lifecycle stages |
+| P0 | **Bookings** | Booking CRUD, installment schedules, payment tracking |
+
+### 🚀 Phase 2 — Operations & Finance
+
+| Priority | Module | Key Deliverables |
+|----------|--------|-----------------|
+| P1 | **Accounts & Finance** | Ledger, payments, expenses, bank accounts, JVs, budgets |
+| P1 | **Stock & Procurement** | Inventory, POs, suppliers, approval workflow, stock alerts |
+| P1 | **Contacts** | Contact CRUD, CSV import, types, search |
+| P1 | **Data Vault** | Document upload, categories, per-project vault, audit trail |
+| P1 | **Invoice Templates** | Customizable invoice design, auto-generation from bookings |
+
+### 🚀 Phase 3 — Collaboration & Intelligence
+
+| Priority | Module | Key Deliverables |
+|----------|--------|-----------------|
+| P2 | **Team Workspace** | Chat, member status, task assignment |
+| P2 | **Task Management** | Personal tasks, kanban board, dashboard widget |
+| P2 | **Knowledge Base** | Articles, categories, search, rich content |
+| P2 | **Notifications** | Real-time notifications, bell icon, dropdown, auto-email |
+| P2 | **Activity Log** | System-wide audit trail, per-document tracking |
+
+### 🚀 Phase 4 — Advanced Features & Integrations
+
+| Priority | Feature | Description |
+|----------|---------|-------------|
+| P3 | **Contract Management** | Sales agreements, supplier contracts, contractor agreements, auto-renewal alerts |
+| P3 | **HR & Payroll** | Employee records, attendance, leave management, salary processing, tax calculation |
+| P3 | **Payment Gateway Integration** | SSLCommerz, bKash, Nagad for online payments and auto-reconciliation |
+| P3 | **WhatsApp Business API** | Automated lead follow-ups, booking confirmations, payment reminders |
+| P3 | **Client Portal** | Self-service: view booking status, payment history, download documents |
+| P3 | **Vendor Portal** | Vendor login to view POs, submit invoices, track payments |
+| P3 | **Webhook System** | Trigger external actions (Slack, Zapier) on system events |
+
+### 🚀 Phase 5 — Analytics & Automation
+
+| Priority | Feature | Description |
+|----------|---------|-------------|
+| P4 | **Automated Workflows** | Rule-based triggers: auto-assign leads, send reminders, escalate approvals |
+| P4 | **Bank Reconciliation** | Upload bank statements, auto-match transactions, flag discrepancies |
+| P4 | **Profitability Reports** | Per-project P&L, margin analysis, budget vs actual variance |
+| P4 | **Calendar View** | Gantt timeline for projects, milestone calendar, meeting scheduler |
+| P4 | **Asset Management** | Track company vehicles, equipment, office assets with depreciation |
+| P4 | **Meeting Management** | Schedule meetings, agenda, minutes, action item tracking |
+| P4 | **Legal Case Tracker** | Track active litigation, case status, court dates, legal expenses |
+| P4 | **Custom Fields** | User-definable fields per module for flexible data capture |
+| P4 | **Language Localization** | Bangla/English toggle, currency formatting, date localization |
+
+### 🛠️ Technical Enhancements
+
+| Area | Enhancement |
+|------|-------------|
+| **Performance** | Caching (Redis), pagination, lazy loading, DB indexing |
+| **Security** | 2FA, IP whitelisting, session management, data encryption at rest |
+| **Mobile** | Progressive Web App (PWA) or React Native companion app |
+| **Data** | Automated daily backups, point-in-time recovery, data retention policies |
+| **API** | RESTful public API for third-party integrations, rate limiting |
+| **Infrastructure** | Docker containerization, CI/CD pipelines, staging/production environments |
+| **Monitoring** | Error tracking (Sentry), performance monitoring, uptime alerts |
+
+---
+
+## Next Steps
+
+1. **Choose stack** — Recommending Django + DRF (backend) + React + Tailwind (frontend)
+2. **Design database schema** — ERD for all 13+ modules
+3. **Set up project structure** — Multi-app Django project
+4. **Implement Phase 0** — Auth, base templates, RBAC
+5. **Iterate** — Build modules per priority
+
+The REM_V93 design prototype provides a complete interactive blueprint — each screen, modal, slide-out panel, and workflow is already mapped out in the HTML.
