@@ -436,7 +436,7 @@ let currentZoom=100;
 function changeZoom(d){currentZoom+=d;if(currentZoom<60)currentZoom=60;if(currentZoom>150)currentZoom=150;document.getElementById('mainContent').style.zoom=currentZoom+'%';document.getElementById('zoomLabel').textContent=currentZoom+'%'}
 function resetZoom(){currentZoom=100;document.getElementById('mainContent').style.zoom='';document.getElementById('zoomLabel').textContent='100%'}
 function toggleFullScreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen()}else{if(document.exitFullscreen)document.exitFullscreen()}}
-function leadBadgeColor(v){return{v:'Hot':'#c62828','Warm':'#e65100','Cold':'#888','New Inquiry':'#1565c0','Site Visit':'#ff9800','Negotiation':'#e65100','Booked':'#2e7d32','Local':'#1565c0','NRB':'#7b1fa2','Facebook':'#1877f2','Referral':'#00897b','Walk-in':'#ff8f00','Website':'#1565c0','Agent':'#2F80ED'}[v]||'#888'}
+function leadBadgeColor(v){return{hot:'#c62828',warm:'#e65100',cold:'#888','New Inquiry':'#1565c0','Site Visit':'#ff9800',Negotiation:'#e65100',Booked:'#2e7d32',Local:'#1565c0',NRB:'#7b1fa2',Facebook:'#1877f2',Referral:'#00897b','Walk-in':'#ff8f00',Website:'#1565c0',Agent:'#2F80ED'}[v]||'#888'}
 function leadGetInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
 function openLead(id){openLeadPanel(id,'profile')}
 function openLeadPanel(leadId,tab){
