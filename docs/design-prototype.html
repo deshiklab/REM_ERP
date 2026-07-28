@@ -562,6 +562,94 @@
             { id: 'settings', label: 'System Settings', icon: 'settings' },
         ];
 
+        const menuGroups = [
+            {
+                label: 'Executive & Overview',
+                icon: 'layout-dashboard',
+                items: [
+                    { id: 'dashboard', label: 'Executive Dashboard', icon: 'layout-dashboard' },
+                    { id: 'bi_reports', label: 'BI & Reports', icon: 'bar-chart-3' },
+                ]
+            },
+            {
+                label: 'Sales & CRM',
+                icon: 'users',
+                items: [
+                    { id: 'crm', label: 'CRM & Leads', icon: 'users' },
+                    { id: 'sales_marketing', label: 'Sales & Marketing', icon: 'megaphone' },
+                    { id: 'dues', label: 'Dues & Recovery', icon: 'alert-triangle' },
+                ]
+            },
+            {
+                label: 'Land & Projects',
+                icon: 'map',
+                items: [
+                    { id: 'land_mgmt', label: 'Land Acquisition', icon: 'map' },
+                    { id: 'layout_planning', label: 'Layout & Planning', icon: 'grid-3x3' },
+                    { id: 'design_mgmt', label: 'Design Management', icon: 'ruler' },
+                    { id: 'projects', label: 'Project Management', icon: 'hard-hat' },
+                ]
+            },
+            {
+                label: 'Bookings & Post-Sales',
+                icon: 'bookmark',
+                items: [
+                    { id: 'bookings', label: 'Flat & Plot Booking', icon: 'bookmark' },
+                    { id: 'customer_portal', label: 'Customer Portal', icon: 'globe' },
+                    { id: 'handover', label: 'Handover & Post-Sales', icon: 'key-round' },
+                ]
+            },
+            {
+                label: 'Finance & Accounts',
+                icon: 'wallet',
+                items: [
+                    { id: 'finance', label: 'Accounts & Finance', icon: 'wallet' },
+                    { id: 'boq', label: 'BOQ & Cost Control', icon: 'calculator' },
+                ]
+            },
+            {
+                label: 'Procurement & Operations',
+                icon: 'package',
+                items: [
+                    { id: 'stock', label: 'Stock & Procurement', icon: 'package' },
+                    { id: 'contractors', label: 'Contractors', icon: 'hard-hat' },
+                    { id: 'equipment', label: 'Equipment Tracking', icon: 'tractor' },
+                    { id: 'labor', label: 'Labor Management', icon: 'users-2' },
+                    { id: 'quality', label: 'QC & Inspection', icon: 'clipboard-check' },
+                    { id: 'variation_orders', label: 'Variation Orders', icon: 'git-merge' },
+                ]
+            },
+            {
+                label: 'Compliance & Admin',
+                icon: 'shield',
+                items: [
+                    { id: 'compliance', label: 'Regulatory Compliance', icon: 'shield' },
+                    { id: 'vault', label: 'Data Vault', icon: 'file-lock' },
+                    { id: 'knowledge_base', label: 'Knowledge Base', icon: 'library' },
+                    { id: 'contacts', label: 'Contact Book', icon: 'contact-2' },
+                    { id: 'settings', label: 'System Settings', icon: 'settings' },
+                ]
+            },
+            {
+                label: 'Communication & Tasks',
+                icon: 'message-square',
+                items: [
+                    { id: 'tasks', label: 'Task Management', icon: 'kanban-square' },
+                    { id: 'chat', label: 'Team Workspace', icon: 'message-square' },
+                ]
+            }
+        ];
+
+        let expandedGroups = {};
+        menuGroups.forEach(g => { expandedGroups[g.label] = false; });
+        // Auto-expand the initial active tab's group on load
+        const initialGroup = getGroupForTab('dashboard');
+        if (initialGroup) expandedGroups[initialGroup.label] = true;
+
+        function getGroupForTab(tabId) {
+            return menuGroups.find(g => g.items.some(i => i.id === tabId));
+        }
+
         let activeTab = 'dashboard';
         let isSidebarOpen = false;
         let projectListTab = 'land'; // 'land' or 'flat'
@@ -813,6 +901,12 @@
 
         function setActiveTab(tabId) {
             activeTab = tabId;
+            // Auto-expand the parent group when a tab is activated
+            menuGroups.forEach(g => {
+                if (g.items.some(i => i.id === tabId)) {
+                    expandedGroups[g.label] = true;
+                }
+            });
             if(window.innerWidth < 768) toggleSidebar();
             renderSidebar(); renderTopbarIcons(); renderContent();
         }
@@ -827,42 +921,55 @@
             renderContent();
         }
 
+        function toggleGroup(label) {
+            expandedGroups[label] = !expandedGroups[label];
+            renderSidebar();
+        }
+
         function renderSidebar() {
             const nav = document.getElementById('sidebar-nav');
-            nav.innerHTML = menuItems.map(item => {
-                const isActive = activeTab === item.id;
-                const activeClasses = isActive ? 'bg-[#3b4a40] text-white shadow-lg shadow-[#3b4a40]/20' : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200';
-                const iconColor = isActive ? 'text-[#b5bca1]' : '';
-                return `<button onclick="setActiveTab('${item.id}')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${activeClasses}">
-                            <i data-lucide="${item.icon}" class="w-[18px] h-[18px] ${iconColor}"></i> ${item.label}
-                        </button>`;
+            nav.innerHTML = menuGroups.map(group => {
+                const isExpanded = expandedGroups[group.label];
+                const hasActive = group.items.some(i => activeTab === i.id);
+                return `
+                    <div class="mb-0.5">
+                        <button onclick="toggleGroup('${group.label}')" 
+                            class="w-full flex items-center justify-between px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${hasActive ? 'text-[#b5bca1]' : 'text-gray-500'} hover:text-gray-200 hover:bg-gray-800/50 transition-all">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="${group.icon}" class="w-3.5 h-3.5"></i> ${group.label}
+                            </span>
+                            <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+                        </button>
+                        <div class="${isExpanded ? '' : 'hidden'} space-y-0.5 mt-0.5">
+                            ${group.items.map(item => {
+                                const isActive = activeTab === item.id;
+                                const activeClasses = isActive ? 'bg-[#3b4a40] text-white shadow-sm' : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200';
+                                return `<button onclick="setActiveTab('${item.id}')" class="w-full flex items-center gap-3 pl-7 pr-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeClasses}">
+                                    <i data-lucide="${item.icon}" class="w-4 h-4 ${isActive ? 'text-[#b5bca1]' : ''}"></i> ${item.label}
+                                </button>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
             }).join('');
+            setTimeout(() => lucide.createIcons(), 10);
         }
 
         function renderTopbarIcons() {
             const container = document.getElementById('topbar-icons');
             if (!container) return;
-            
-            container.innerHTML = menuItems.map(item => {
+            // Show key quick-access modules in topbar
+            const quickModules = ['dashboard', 'crm', 'projects', 'bookings', 'finance', 'stock', 'layout_planning', 'compliance', 'settings'];
+            container.innerHTML = quickModules.map(id => {
+                const item = menuItems.find(m => m.id === id);
+                if (!item) return '';
                 const isActive = activeTab === item.id;
                 const activeClasses = isActive ? 'bg-[#3b4a40] text-white' : 'text-gray-500 hover:bg-[#f4f3ee] hover:text-[#1a1f1c]';
                 return `<button onclick="setActiveTab('${item.id}')" data-tooltip="${item.label}" class="p-2 rounded-lg transition-colors ${activeClasses}">
                             <i data-lucide="${item.icon}" class="w-5 h-5"></i>
                         </button>`;
             }).join('');
-        }
-
-        function renderTopbarIcons() {
-            const container = document.getElementById('topbar-icons');
-            if (!container) return;
-            
-            container.innerHTML = menuItems.map(item => {
-                const isActive = activeTab === item.id;
-                const activeClasses = isActive ? 'bg-[#3b4a40] text-white' : 'text-gray-500 hover:bg-[#f4f3ee] hover:text-[#1a1f1c]';
-                return `<button onclick="setActiveTab('${item.id}')" data-tooltip="${item.label}" class="p-2 rounded-lg transition-colors ${activeClasses}">
-                            <i data-lucide="${item.icon}" class="w-5 h-5"></i>
-                        </button>`;
-            }).join('');
+            setTimeout(() => lucide.createIcons(), 10);
         }
 
         function renderContent() {
