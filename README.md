@@ -259,16 +259,64 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Building Completion Certificate** — Track final certificate application and status
 - **Worker Safety Compliance** — Safety equipment log, accident register, compliance reports
 
-### 25. Advanced Reporting & Business Intelligence
-- **Interactive Dashboard Builder** — Drag-and-drop charts/KPIs configurable per user role
-- **Project Health Scorecard** — RAG status (Red/Amber/Green) across schedule, cost, quality, safety
-- **Cash Flow Forecasting** — Projected installments inflow vs contractor/expense outflow
-- **Sales Funnel Analytics** — Conversion rates at each pipeline stage with trend analysis
-- **Comparative Land Analysis** — Price/sqft, location score, ROI projection across proposals
-- **Drill-Down Reports** — From dashboard KPI → list view → detail view in 2 clicks
-- **Scheduled Report Emails** — Auto-generate and email reports on configurable schedules
-- **Custom Report Builder** — User-defined report dimensions, measures, filters, and export formats (PDF, Excel, CSV)
-- **Power BI / Metabase Integration** — Direct database connection for external BI tools
+## Tech Stack Options
+
+| Layer | Option 1 | Option 2 |
+|-------|----------|----------|
+| Backend | FastAPI (async, per-service) | Django + DRF |
+| Frontend | Next.js + Micro-Frontends | Single SPA |
+| Database | PostgreSQL 16 (per-service) | Schema-per-tenant |
+| Auth | JWT + OAuth2 + RBAC | Keycloak / Auth0 |
+| Gateway | Kong / Traefik | Custom FastAPI Gateway |
+| Queue | RabbitMQ / Redis Streams | Kafka |
+| Cache | Redis 7 | - |
+| Container | Docker + Kubernetes | Docker Compose |
+| Monitoring | Prometheus + Grafana | SigNoz |
+
+---
+
+## 🏗 Architecture: Microservice + Module-as-a-Product
+
+The system is designed like **Odoo ERP** — each module is an independent microservice that can run standalone or as part of a suite. Clients subscribe module-by-module. Permissions control access at button, menu, and model level.
+
+### Core Architecture Principles
+
+1. **Each module = a separate service** with its own database, API, and frontend
+2. **API Gateway** routes `/api/{module}/*` → correct service, handles auth + tenant
+3. **Event Bus** (RabbitMQ/Redis Streams) for inter-service communication
+4. **Micro-Frontends** — each module has its own frontend micro-app, loaded dynamically
+5. **Shared Services**: Auth, Notifications, Contacts, Settings — always available
+
+### Standalone Module Example: CRM Bundle
+
+```bash
+docker compose up auth-db redis gateway auth-svc crm-svc
+```
+
+This starts CRM with its own DB, API, and frontend — completely independent. No Projects, Finance, or Land modules needed.
+
+### Client Subscription Tiers
+
+| Bundle | Modules | Target Client |
+|--------|---------|---------------|
+| **A: Real Estate CRM** | Auth, CRM, Contacts, Tasks, Notifications, Settings | Brokerages, resellers |
+| **B: Land & Development** | A + Land Acquisition, Project Mgmt, Compliance | Developers |
+| **C: Sales & Customer** | A+B + Bookings, Sales/Marketing, Dues, Portal | Full-service developers |
+| **D: Construction Ops** | B + Contractors, BOQ, VOs, Equipment, Labor, QC, Handover | Construction companies |
+| **E: Finance & Admin** | A+B+C + Finance, Stock, Vault, Knowledge Base | Full ERP |
+| **F: BI & Insights** | Any bundle + BI Reports, Workspace | Analytics-focused |
+
+### Permission System
+
+Three-layer access control enforced at API Gateway level:
+
+```
+Layer 1 → Module Access    (tenant subscription check)
+Layer 2 → Menu Access      (role-based visible menus)
+Layer 3 → Button Access    (create/edit/delete/approve per action)
+```
+
+See **[docs/architecture.md](docs/architecture.md)** for the full deep dive.
 
 ---
 
@@ -276,44 +324,41 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 
 ```
 REM_ERP/
-├── backend/
-│   ├── apps/
-│   │   ├── dashboard/
-│   │   ├── crm/
-│   │   ├── land_acquisition/
-│   │   ├── projects/
-│   │   ├── bookings/
-│   │   ├── finance/
-│   │   ├── procurement/
-│   │   ├── contacts/
-│   │   ├── tasks/
-│   │   ├── workspace/
-│   │   ├── vault/
-│   │   ├── knowledge_base/
-│   │   ├── settings/
-│   │   ├── contractors/
-│   │   ├── boq/
-│   │   ├── variations/
-│   │   ├── equipment/
-│   │   ├── labor/
-│   │   ├── quality/
-│   │   ├── sales_marketing/
-│   │   ├── recovery/
-│   │   ├── customer_portal/
-│   │   ├── handover/
-│   │   ├── compliance/
-│   │   └── reports/
-│   ├── config/
-│   ├── middleware/
-│   └── requirements.txt
+├── gateway/                    # API Gateway
+├── shared/                     # Shared libraries, SDKs
+├── services/                   # Microservices
+│   ├── auth/                   # Auth service (standalone)
+│   ├── crm/                    # CRM & Leads
+│   ├── land_acquisition/       # Land Acquisition
+│   ├── projects/               # Project Management
+│   ├── bookings/               # Flat & Plot Booking
+│   ├── finance/                # Accounts & Finance
+│   ├── stock/                  # Stock & Procurement
+│   ├── contractors/            # Contractor Management
+│   ├── boq/                    # BOQ & Cost Control
+│   ├── equipment/              # Equipment Tracking
+│   ├── labor/                  # Labor Management
+│   ├── quality/                # QC & Inspection
+│   ├── sales/                  # Sales & Marketing
+│   ├── dues/                   # Dues & Recovery
+│   ├── portal/                 # Customer Portal
+│   ├── handover/               # Handover & Post-Sales
+│   ├── compliance/             # Regulatory Compliance
+│   ├── bi/                     # BI & Reports
+│   ├── notifications/          # Notification Service
+│   ├── contacts/               # Contact Book
+│   ├── tasks/                  # Task Management
+│   ├── workspace/              # Team Workspace / Chat
+│   ├── vault/                  # Data Vault / Documents
+│   ├── knowledge_base/         # Knowledge Base
+│   └── settings/               # System Settings
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── store/
-│   │   └── api/
-│   └── package.json
+│   ├── shell/                  # Host app (auth, nav, layout)
+│   └── mfe-*/                  # Per-module micro-frontends
+├── k8s/                        # Kubernetes manifests
 └── docs/
+    ├── architecture.md         # Full architecture document
+    └── design-prototype.html   # Interactive prototype (25 modules)
 ```
 
 ---
