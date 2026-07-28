@@ -67,6 +67,12 @@
 
         /* Custom Reusable Tooltip */
         [data-tooltip] { position: relative; }
+
+        /* Role switcher buttons */
+        .role-btn { cursor: pointer; }
+        .role-btn-active { background-color: #b5bca1 !important; color: #1a1f1c !important; border-color: #b5bca1 !important; }
+        .role-btn-inactive { background-color: transparent !important; color: #9ca3af !important; border-color: #4b5563 !important; }
+        .role-btn-inactive:hover { background-color: rgba(255,255,255,0.05) !important; color: #e5e7eb !important; }
         [data-tooltip]:before {
             content: attr(data-tooltip);
             position: absolute;
@@ -108,7 +114,141 @@
         html.dark img, html.dark canvas, html.dark [data-tooltip]::before {
             filter: invert(1) hue-rotate(180deg);
         }
-        
+
+        /* ── Global Search Dropdown ── */
+        .global-search-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background-color 0.12s ease;
+            border-bottom: 1px solid #f0efe9;
+        }
+        .global-search-item:last-child { border-bottom: none; }
+        .global-search-item:hover { background-color: #f4f3ee; }
+        .global-search-item .gs-badge {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .global-search-item .gs-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1f1c;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .global-search-item .gs-sub {
+            font-size: 11px;
+            color: #9ca3af;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+        }
+        .global-search-item mark { background: #d4e0d8; color: #1a1f1c; border-radius: 2px; padding: 0 1px; }
+        .global-search-header {
+            padding: 6px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #9ca3af;
+            background: #fafaf8;
+            border-bottom: 1px solid #f0efe9;
+        }
+        .global-search-empty {
+            padding: 24px 14px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+        #global-search-dropdown::-webkit-scrollbar { width: 4px; }
+        #global-search-dropdown::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 4px; }
+
+        /* ── Context Menu for Plot Grid ── */
+        .plot-context-menu {
+            position: fixed;
+            z-index: 9999;
+            background: #ffffff;
+            border: 1px solid #e2e0d8;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.05);
+            padding: 4px;
+            min-width: 190px;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95) translateY(-4px);
+            transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.15s;
+            transform-origin: top left;
+            pointer-events: none;
+        }
+        .plot-context-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+        .plot-context-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1f1c;
+            cursor: pointer;
+            transition: background 0.12s ease;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .plot-context-menu-item:hover {
+            background: #f4f3ee;
+        }
+        .plot-context-menu-item.danger {
+            color: #dc2626;
+        }
+        .plot-context-menu-item.danger:hover {
+            background: #fef2f2;
+        }
+        .plot-context-menu-item .ctx-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #3b4a40;
+        }
+        .plot-context-menu-item.danger .ctx-icon {
+            color: #dc2626;
+        }
+        .plot-context-menu-separator {
+            height: 1px;
+            background: #e2e0d8;
+            margin: 3px 8px;
+        }
+        .plot-context-menu-header {
+            padding: 6px 12px 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9ca3af;
+        }
+
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -137,13 +277,23 @@
                 <div class="w-10 h-10 rounded-full bg-[#b5bca1] text-[#1a1f1c] flex items-center justify-center font-bold shadow-inner shrink-0">
                     HB
                 </div>
-                <div class="overflow-hidden">
+                <div class="overflow-hidden flex-1 min-w-0">
                     <p class="text-sm font-semibold text-white truncate">MD Hasanul Banna</p>
-                    <p class="text-[10px] text-[#b5bca1] truncate uppercase tracking-wider mt-0.5">CEO & DMD</p>
+                    <p id="profile-role-label" class="text-[10px] text-[#b5bca1] truncate uppercase tracking-wider mt-0.5">Super Admin</p>
                 </div>
+                <i data-lucide="chevron-up" class="w-3.5 h-3.5 text-gray-500 shrink-0"></i>
             </div>
             <!-- Profile Menu -->
             <div id="profile-menu" class="absolute bottom-full mb-2 left-4 right-4 bg-gray-900/80 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg hidden p-2">
+                <div class="px-3 py-2 border-b border-gray-700 mb-2">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Switch Role</p>
+                    <div class="flex flex-wrap gap-1 mt-1.5">
+                        <button onclick="setRole('Super Admin')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Super Admin">Super Admin</button>
+                        <button onclick="setRole('Sales Agent')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Sales Agent">Sales Agent</button>
+                        <button onclick="setRole('Site Engineer')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Site Engineer">Site Engineer</button>
+                        <button onclick="setRole('Finance')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Finance">Finance</button>
+                    </div>
+                </div>
                 <button onclick="openMyProfileModal()" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-700/50 hover:text-white transition-colors">
                     <i data-lucide="user-circle" class="w-4 h-4"></i> My Profile
                 </button>
@@ -153,6 +303,11 @@
             </div>
         </div>
     </aside>
+
+    <!-- Plot Context Menu -->
+    <div id="plotContextMenu" class="plot-context-menu">
+        <div id="plotContextMenuContent"></div>
+    </div>
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
@@ -165,9 +320,10 @@
                 <div id="topbar-icons" class="hidden md:flex items-center gap-1 border-l border-gray-200 ml-2 pl-2">
                     <!-- Icons will be injected here by JS -->
                 </div>
-                <div class="relative hidden md:block">
+                <div class="relative hidden md:block" id="global-search-container">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-[18px] h-[18px]"></i>
-                    <input type="text" placeholder="Search properties, leads, documents..." class="pl-10 pr-4 py-2 w-80 bg-[#f4f3ee] border-none rounded-full text-sm focus:ring-2 focus:ring-[#3b4a40] outline-none transition-all" />
+                    <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="Search properties, leads, documents..." class="pl-10 pr-4 py-2 w-80 bg-[#f4f3ee] border-none rounded-full text-sm focus:ring-2 focus:ring-[#3b4a40] outline-none transition-all" autocomplete="off" />
+                    <div id="global-search-dropdown" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-[#e2e0d8] hidden overflow-hidden z-[100] max-h-[70vh] overflow-y-auto"></div>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -403,7 +559,71 @@
 
     <script>
         // --- MOCK DATA ---
-        const mockKPIs = { revenue: { current: '৳ 45.2 Cr', target: '৳ 50 Cr', progress: 90 }, leads: { local: 145, nrb: 38, total: 183 }, budget: { status: 'Under Budget', variance: '৳ 1.2 Cr', isGood: true } };
+        // --- LIVE KPI CALCULATIONS ---
+        function calculateKPIs() {
+            function parseBDT(str) {
+                if (!str) return 0;
+                let s = str.replace(/[+৳,\s]/g, '').trim();
+                if (s.includes('Cr')) return parseFloat(s.replace('Cr', '').trim()) * 1e7;
+                if (s.includes('Lac')) return parseFloat(s.replace('Lac', '').trim()) * 1e5;
+                return parseFloat(s) || 0;
+            }
+            function formatBDT(num) {
+                if (num >= 1e7) return '৳ ' + (num / 1e7).toFixed(1) + ' Cr';
+                if (num >= 1e5) return '৳ ' + (num / 1e5).toFixed(1) + ' Lac';
+                return '৳ ' + num.toLocaleString('en-IN');
+            }
+
+            // Revenue from actual inflows in transactions
+            let inflowTotal = 0;
+            mockTransactions.forEach(t => {
+                if (t.type === 'Inflow') inflowTotal += parseBDT(t.amount);
+            });
+
+            // Pipeline value from all leads
+            let leadValueTotal = 0;
+            mockLeads.forEach(l => { leadValueTotal += parseBDT(l.value); });
+
+            // Actual booking revenue
+            let bookingRevenue = 0;
+            mockBookings.forEach(b => { bookingRevenue += parseBDT(b.price); });
+
+            // Use inflow + booking revenue as current, pipeline as target
+            let revenueCurrent = inflowTotal + bookingRevenue;
+            let revenueTarget = leadValueTotal + bookingRevenue;
+
+            // Leads breakdown
+            let totalLeads = mockLeads.length;
+            let localLeads = mockLeads.filter(l => l.type === 'Local').length;
+            let nrbLeads = mockLeads.filter(l => l.type === 'NRB').length;
+
+            // Project budget & progress
+            let totalBudget = 0, totalProgress = 0;
+            mockProjects.forEach(p => {
+                totalBudget += parseBDT(p.budget);
+                totalProgress += p.progress;
+            });
+            let avgProgress = mockProjects.length > 0 ? Math.round(totalProgress / mockProjects.length) : 0;
+            let budgetStatus = avgProgress >= 40 ? 'Under Budget' : 'On Track';
+            let budgetVariance = '৳ ' + ((totalBudget * 0.05) / 1e7).toFixed(1) + ' Cr';
+
+            // Task completion
+            let totalTasks = mockTasks.length;
+            let completedTasks = mockTasks.filter(t => t.done).length;
+
+            return {
+                revenue: {
+                    current: formatBDT(revenueCurrent),
+                    target: formatBDT(revenueTarget),
+                    progress: revenueTarget > 0 ? Math.min(100, Math.round((revenueCurrent / revenueTarget) * 100)) : 0,
+                    rawCurrent: revenueCurrent,
+                    rawTarget: revenueTarget
+                },
+                leads: { total: totalLeads, local: localLeads, nrb: nrbLeads },
+                budget: { status: budgetStatus, variance: budgetVariance, isGood: avgProgress >= 40, avgProgress: avgProgress },
+                tasks: { total: totalTasks, completed: completedTasks, completionRate: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0 }
+            };
+        }
         let mockTasks = [
             { id: 1, title: 'Call Tariqul Islam regarding Muktodhara plot', done: false },
             { id: 2, title: 'Review PO-24-089 for Shah Cement', done: false },
@@ -640,6 +860,16 @@
             }
         ];
 
+        // ── Role definitions ──
+        const roleGroups = {
+            'Super Admin': menuGroups.map(g => g.label), // all groups
+            'Sales Agent': ['Executive & Overview', 'Sales & CRM', 'Bookings & Post-Sales'],
+            'Site Engineer': ['Executive & Overview', 'Land & Projects', 'Procurement & Operations', 'Communication & Tasks'],
+            'Finance': ['Executive & Overview', 'Finance & Accounts', 'Bookings & Post-Sales'],
+        };
+
+        let currentRole = 'Super Admin';
+
         let expandedGroups = {};
         menuGroups.forEach(g => { expandedGroups[g.label] = false; });
         // Auto-expand the initial active tab's group on load
@@ -748,6 +978,12 @@
             renderContent(); 
             lucide.createIcons(); 
             updateZoom();
+            // Initialize role switcher buttons — Super Admin is default
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.toggle('role-btn-active', btn.dataset.role === 'Super Admin');
+                btn.classList.toggle('role-btn-inactive', btn.dataset.role !== 'Super Admin');
+            });
+            document.getElementById('profile-role-label').textContent = 'Super Admin';
             
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
@@ -839,11 +1075,6 @@
             }
         }
 
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profile-menu');
-            menu.classList.toggle('hidden');
-        }
-
         function changeZoom(delta) {
             currentZoomLevel += delta;
             if (currentZoomLevel < 80) currentZoomLevel = 80;
@@ -902,12 +1133,41 @@
         function setActiveTab(tabId) {
             activeTab = tabId;
             // Auto-expand the parent group when a tab is activated
+            const allowed = roleGroups[currentRole] || [];
             menuGroups.forEach(g => {
-                if (g.items.some(i => i.id === tabId)) {
+                if (g.items.some(i => i.id === tabId) && allowed.includes(g.label)) {
                     expandedGroups[g.label] = true;
                 }
             });
             if(window.innerWidth < 768) toggleSidebar();
+            renderSidebar(); renderTopbarIcons(); renderContent();
+        }
+
+        function setRole(role) {
+            currentRole = role;
+            const label = document.getElementById('profile-role-label');
+            if (label) label.textContent = role;
+
+            // Update active role button styling
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                const isActive = btn.dataset.role === role;
+                btn.classList.toggle('role-btn-active', isActive);
+                btn.classList.toggle('role-btn-inactive', !isActive);
+            });
+
+            // Re-render sidebar with the new role filter
+            const allowed = roleGroups[role] || [];
+            // Collapse groups not in the new role
+            Object.keys(expandedGroups).forEach(key => {
+                if (!allowed.includes(key)) expandedGroups[key] = false;
+            });
+            // If active tab's group is no longer visible, switch to first available
+            const visibleGroups = menuGroups.filter(g => allowed.includes(g.label));
+            const stillVisible = visibleGroups.some(g => g.items.some(i => i.id === activeTab));
+            if (!stillVisible && visibleGroups.length > 0 && visibleGroups[0].items.length > 0) {
+                setActiveTab(visibleGroups[0].items[0].id);
+                return;
+            }
             renderSidebar(); renderTopbarIcons(); renderContent();
         }
         
@@ -928,7 +1188,9 @@
 
         function renderSidebar() {
             const nav = document.getElementById('sidebar-nav');
-            nav.innerHTML = menuGroups.map(group => {
+            const allowed = roleGroups[currentRole] || [];
+            const visibleGroups = menuGroups.filter(g => allowed.includes(g.label));
+            nav.innerHTML = visibleGroups.map(group => {
                 const isExpanded = expandedGroups[group.label];
                 const hasActive = group.items.some(i => activeTab === i.id);
                 return `
@@ -972,37 +1234,242 @@
             setTimeout(() => lucide.createIcons(), 10);
         }
 
+        // ── GLOBAL SEARCH ──
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+        function highlightMatch(text, query) {
+            const escaped = escapeHtml(String(text));
+            const q = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            if (!q) return escaped;
+            return escaped.replace(new RegExp('(' + q + ')', 'gi'), '<mark>$1</mark>');
+        }
+        const __globalSearchData = [
+            {
+                module: 'Leads',
+                tabId: 'crm',
+                color: 'bg-blue-100 text-blue-700',
+                items: () => mockLeads.map(l => ({
+                    title: l.name,
+                    sub: l.property + ' · ' + l.status,
+                    matchFields: [l.name, l.property, l.phone, l.status, l.source],
+                    action: () => { setActiveTab('crm'); /* Focus item would need more context */ }
+                }))
+            },
+            {
+                module: 'Plots',
+                tabId: 'layout_planning',
+                color: 'bg-emerald-100 text-emerald-700',
+                items: () => mockPlots.map(p => ({
+                    title: p.id,
+                    sub: p.type + ' · ' + p.status,
+                    matchFields: [p.id, p.type, p.status],
+                    action: () => { setActiveTab('layout_planning'); }
+                }))
+            },
+            {
+                module: 'Projects',
+                tabId: 'projects',
+                color: 'bg-amber-100 text-amber-700',
+                items: () => mockProjects.map(p => ({
+                    title: p.name,
+                    sub: p.location + ' · ' + p.status + ' · ' + p.budget,
+                    matchFields: [p.name, p.location, p.status, p.manager],
+                    action: () => { setActiveTab('projects'); }
+                }))
+            },
+            {
+                module: 'Contacts',
+                tabId: 'contacts',
+                color: 'bg-purple-100 text-purple-700',
+                items: () => mockContacts.map(c => ({
+                    title: c.name,
+                    sub: c.role + ' · ' + c.phone + (c.company !== 'N/A' ? ' · ' + c.company : ''),
+                    matchFields: [c.name, c.role, c.phone, c.email, c.company === 'N/A' ? '' : c.company],
+                    action: () => { setActiveTab('contacts'); }
+                }))
+            },
+            {
+                module: 'Documents',
+                tabId: 'vault',
+                color: 'bg-rose-100 text-rose-700',
+                items: () => mockDocuments.map(d => ({
+                    title: d.title,
+                    sub: d.type + ' · ' + d.property + ' · ' + d.status,
+                    matchFields: [d.title, d.type, d.property, d.status],
+                    action: () => { setActiveTab('vault'); }
+                }))
+            }
+        ];
+        function handleGlobalSearch(e) {
+            const input = document.getElementById('global-search-input');
+            const dropdown = document.getElementById('global-search-dropdown');
+            if (!input || !dropdown) return;
+            const query = input.value.trim();
+            if (!query || query.length < 1) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            const ql = query.toLowerCase();
+            let html = '';
+            let hasAny = false;
+            const allMatchFields = (obj, fields) => fields.some(f => String(f || '').toLowerCase().includes(ql));
+            __globalSearchData.forEach(section => {
+                const matched = section.items().filter(item => allMatchFields(item, item.matchFields));
+                if (matched.length === 0) return;
+                hasAny = true;
+                html += `<div class="global-search-header">${escapeHtml(section.module)} (${matched.length})</div>`;
+                matched.forEach(item => {
+                    const titleHtml = highlightMatch(item.title, query);
+                    const subHtml = highlightMatch(item.sub, query);
+                    html += `<div class="global-search-item" data-action="${escapeHtml(section.module)}">
+                        <span class="gs-badge ${section.color}">${escapeHtml(section.module)}</span>
+                        <span class="gs-title">${titleHtml}</span>
+                        <span class="gs-sub">${subHtml}</span>
+                    </div>`;
+                });
+            });
+            if (!hasAny) {
+                html = `<div class="global-search-empty">No results found for “${escapeHtml(query)}”</div>`;
+            }
+            dropdown.innerHTML = html;
+            dropdown.classList.remove('hidden');
+            // Attach click handlers
+            Array.from(dropdown.children).forEach(el => {
+                if (el.classList.contains('global-search-item')) {
+                    const moduleLabel = el.getAttribute('data-action');
+                    const idx = Array.from(dropdown.querySelectorAll('.global-search-item')).indexOf(el);
+                    let globalIdx = 0;
+                    for (const section of __globalSearchData) {
+                        const matched = section.items().filter(item => allMatchFields(item, item.matchFields));
+                        for (let i = 0; i < matched.length; i++) {
+                            if (globalIdx === idx) {
+                                el.addEventListener('click', function(e) {
+                                    e.stopPropagation();
+                                    matched[i].action();
+                                    dropdown.classList.add('hidden');
+                                    input.value = '';
+                                });
+                            }
+                            globalIdx++;
+                        }
+                    }
+                }
+            });
+        }
+        // Close global search dropdown on Escape or outside click
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('global-search-container');
+            const dropdown = document.getElementById('global-search-dropdown');
+            if (container && dropdown && !container.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dropdown = document.getElementById('global-search-dropdown');
+                if (dropdown) dropdown.classList.add('hidden');
+            }
+        });
+
+        // ── Breadcrumb Helpers ──
+        function getBreadcrumbHTML() {
+            const tabToLabel = {
+                dashboard: 'Executive Dashboard', bi_reports: 'BI & Reports',
+                crm: 'CRM & Leads', sales_marketing: 'Sales & Marketing', dues: 'Dues & Recovery',
+                land_mgmt: 'Land Acquisition', layout_planning: 'Layout & Planning',
+                design_mgmt: 'Design Management', projects: 'Project Management',
+                bookings: 'Flat & Plot Booking', customer_portal: 'Customer Portal', handover: 'Handover & Post-Sales',
+                finance: 'Accounts & Finance', boq: 'BOQ & Cost Control',
+                stock: 'Stock & Procurement', contractors: 'Contractors', equipment: 'Equipment Tracking',
+                labor: 'Labor Management', quality: 'QC & Inspection', variation_orders: 'Variation Orders',
+                compliance: 'Regulatory Compliance', vault: 'Data Vault', knowledge_base: 'Knowledge Base',
+                contacts: 'Contact Book', settings: 'System Settings', tasks: 'Task Management', chat: 'Team Workspace'
+            };
+            const tabToGroup = {};
+            menuGroups.forEach(g => { g.items.forEach(i => { tabToGroup[i.id] = g.label; }); });
+            const crumbs = [];
+            const group = tabToGroup[activeTab];
+            if (group) crumbs.push(group);
+            const label = tabToLabel[activeTab] || activeTab.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+            if (label) crumbs.push(label);
+            // Deeper context
+            if (activeTab === 'layout_planning') {
+                const proj = mockLayoutProjects.find(p => p.id === gLayoutActiveId);
+                if (proj) crumbs.push(proj.name);
+                if (gLayoutSelectedPlot) crumbs.push('Plot ' + gLayoutSelectedPlot);
+            } else if (activeTab === 'land_mgmt') {
+                const s = { identification:'Identification', feasibility:'Feasibility', legal:'Legal Vetting', acquisition:'Acquisition', planning:'Planning' };
+                if (s[landMgmtActiveTab]) crumbs.push(s[landMgmtActiveTab]);
+            }
+            if (crumbs.length === 0) return '';
+            return `<div class="flex items-center gap-0.5 mb-4 text-xs tracking-wide bg-white/70 backdrop-blur-sm px-4 py-2 rounded-xl border border-[#e2e0d8] shadow-sm">
+                <i data-lucide="house" class="w-3 h-3 text-gray-400 mr-1"></i>
+                ${crumbs.map((c,i) => {
+                    const isLast = i === crumbs.length - 1;
+                    return `<span class="${isLast ? 'text-[#1a1f1c] font-bold' : 'text-gray-500'} text-xs">${c}</span>${!isLast ? '<span class="text-gray-300 text-xs mx-1.5">›</span>' : ''}`;
+                }).join('')}
+            </div>`;
+        }
+
+        // ── Cross-Module Navigation Helpers ──
+        function openCrmForCustomer(customerName) {
+            closeUniversalModal();
+            setActiveTab('crm');
+            showToast('👤 CRM opened for "' + customerName + '"', 'success');
+        }
+        function openBookingForPlot(plotId) {
+            closeUniversalModal();
+            setActiveTab('bookings');
+            showToast('📋 Bookings opened — Plot ' + plotId, 'success');
+        }
+        function openLayoutForProject(projectName) {
+            // Find the layout that matches the given project name
+            const layout = mockLayoutProjects.find(p => p.name === projectName);
+            if (layout) {
+                closeUniversalModal();
+                gLayoutActiveId = layout.id;
+                gLayoutSelectedPlot = null;
+                setActiveTab('layout_planning');
+            } else {
+                showToast('No layout grid found for ' + projectName, 'error');
+            }
+        }
+
         function renderContent() {
             const mainContent = document.getElementById('main-content');
+            const bc = getBreadcrumbHTML();
             switch(activeTab) {
-                case 'dashboard': mainContent.innerHTML = getDashboardHTML(); break;
-                case 'crm': mainContent.innerHTML = getCRMHTML(); break;
-                case 'land_mgmt': mainContent.innerHTML = getLandMgmtHTML(); break;
-                case 'projects': mainContent.innerHTML = getProjectsHTML(); break;
-                case 'bookings': mainContent.innerHTML = getBookingsHTML(); break;
-                case 'finance': mainContent.innerHTML = getFinanceHTML(); break;
-                case 'stock': mainContent.innerHTML = getStockHTML(); break;
-                case 'contacts': mainContent.innerHTML = getContactsHTML(); break;
-                case 'tasks': mainContent.innerHTML = getTasksHTML(); break;
-                case 'chat': mainContent.innerHTML = getChatHTML(); break;
-                case 'vault': mainContent.innerHTML = getVaultHTML(); break;
-                case 'knowledge_base': mainContent.innerHTML = getKnowledgeBaseHTML(); break;
-                case 'contractors': mainContent.innerHTML = getContractorsHTML(); break;
-                case 'boq': mainContent.innerHTML = getBOQHTML(); break;
-                case 'variation_orders': mainContent.innerHTML = getVariationOrdersHTML(); break;
-                case 'equipment': mainContent.innerHTML = getEquipmentHTML(); break;
-                case 'labor': mainContent.innerHTML = getLaborHTML(); break;
-                case 'quality': mainContent.innerHTML = getQualityHTML(); break;
-                case 'sales_marketing': mainContent.innerHTML = getSalesMarketingHTML(); break;
-                case 'dues': mainContent.innerHTML = getDuesHTML(); break;
-                case 'customer_portal': mainContent.innerHTML = getCustomerPortalHTML(); break;
-                case 'handover': mainContent.innerHTML = getHandoverHTML(); break;
-                case 'compliance': mainContent.innerHTML = getComplianceHTML(); break;
-                case 'bi_reports': mainContent.innerHTML = getBIReportsHTML(); break;
-                case 'layout_planning': mainContent.innerHTML = getLayoutPlanningHTML(); break;
-                case 'design_mgmt': mainContent.innerHTML = getDesignMgmtHTML(); break;
-                case 'settings': mainContent.innerHTML = getSettingsHTML(); break;
-                default: mainContent.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center animate-fade-in"><h2 class="text-2xl font-bold text-[#1a1f1c]">Module Under Construction</h2></div>`;
+                case 'dashboard': mainContent.innerHTML = bc + getDashboardHTML(); break;
+                case 'crm': mainContent.innerHTML = bc + getCRMHTML(); break;
+                case 'land_mgmt': mainContent.innerHTML = bc + getLandMgmtHTML(); break;
+                case 'projects': mainContent.innerHTML = bc + getProjectsHTML(); break;
+                case 'bookings': mainContent.innerHTML = bc + getBookingsHTML(); break;
+                case 'finance': mainContent.innerHTML = bc + getFinanceHTML(); break;
+                case 'stock': mainContent.innerHTML = bc + getStockHTML(); break;
+                case 'contacts': mainContent.innerHTML = bc + getContactsHTML(); break;
+                case 'tasks': mainContent.innerHTML = bc + getTasksHTML(); break;
+                case 'chat': mainContent.innerHTML = bc + getChatHTML(); break;
+                case 'vault': mainContent.innerHTML = bc + getVaultHTML(); break;
+                case 'knowledge_base': mainContent.innerHTML = bc + getKnowledgeBaseHTML(); break;
+                case 'contractors': mainContent.innerHTML = bc + getContractorsHTML(); break;
+                case 'boq': mainContent.innerHTML = bc + getBOQHTML(); break;
+                case 'variation_orders': mainContent.innerHTML = bc + getVariationOrdersHTML(); break;
+                case 'equipment': mainContent.innerHTML = bc + getEquipmentHTML(); break;
+                case 'labor': mainContent.innerHTML = bc + getLaborHTML(); break;
+                case 'quality': mainContent.innerHTML = bc + getQualityHTML(); break;
+                case 'sales_marketing': mainContent.innerHTML = bc + getSalesMarketingHTML(); break;
+                case 'dues': mainContent.innerHTML = bc + getDuesHTML(); break;
+                case 'customer_portal': mainContent.innerHTML = bc + getCustomerPortalHTML(); break;
+                case 'handover': mainContent.innerHTML = bc + getHandoverHTML(); break;
+                case 'compliance': mainContent.innerHTML = bc + getComplianceHTML(); break;
+                case 'bi_reports': mainContent.innerHTML = bc + getBIReportsHTML(); break;
+                case 'layout_planning': mainContent.innerHTML = bc + getLayoutPlanningHTML(); break;
+                case 'design_mgmt': mainContent.innerHTML = bc + getDesignMgmtHTML(); break;
+                case 'settings': mainContent.innerHTML = bc + getSettingsHTML(); break;
+                default: mainContent.innerHTML = bc + `<div class="flex flex-col items-center justify-center h-full text-center animate-fade-in"><h2 class="text-2xl font-bold text-[#1a1f1c]">Module Under Construction</h2></div>`;
             }
             setTimeout(initDynamicFeatures, 50);
         }
@@ -1231,6 +1698,7 @@
         // --- VIEWS HTML GENERATORS ---
 
         function getDashboardHTML() {
+            const kpis = calculateKPIs();
             return `
                 <div class="space-y-6 animate-fade-in">
                     <div class="flex justify-between items-end">
@@ -1242,26 +1710,26 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
                             <p class="text-sm font-semibold text-[#3b4a40] flex items-center gap-2"><i data-lucide="wallet" class="w-4 h-4"></i> Total Revenue (YTD)</p>
-                            <h3 class="text-3xl font-bold text-[#1a1f1c] mt-2">${mockKPIs.revenue.current}</h3>
+                            <h3 class="text-3xl font-bold text-[#1a1f1c] mt-2">${kpis.revenue.current}</h3>
                             <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
-                                <span>Target: ${mockKPIs.revenue.target}</span><span class="text-[#3b4a40] font-bold">${mockKPIs.revenue.progress}%</span>
+                                <span>Target: ${kpis.revenue.target}</span><span class="text-[#3b4a40] font-bold">${kpis.revenue.progress}%</span>
                             </div>
-                            <div class="w-full bg-[#f4f3ee] h-2 rounded-full mt-2 overflow-hidden"><div class="bg-[#b5bca1] h-full rounded-full" style="width: ${mockKPIs.revenue.progress}%"></div></div>
+                            <div class="w-full bg-[#f4f3ee] h-2 rounded-full mt-2 overflow-hidden"><div class="bg-[#b5bca1] h-full rounded-full" style="width: ${kpis.revenue.progress}%"></div></div>
                         </div>
                         <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
                             <p class="text-sm font-semibold text-[#3b4a40] flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Active Leads</p>
-                            <h3 class="text-3xl font-bold text-[#1a1f1c] mt-2">${mockKPIs.leads.total}</h3>
+                            <h3 class="text-3xl font-bold text-[#1a1f1c] mt-2">${kpis.leads.total}</h3>
                             <div class="mt-4 flex items-center gap-4 text-sm">
-                                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#3b4a40]"></span> ${mockKPIs.leads.local} Local</div>
-                                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#b5bca1]"></span> ${mockKPIs.leads.nrb} NRB</div>
+                                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#3b4a40]"></span> ${kpis.leads.local} Local</div>
+                                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#b5bca1]"></span> ${kpis.leads.nrb} NRB</div>
                             </div>
                         </div>
                         <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
                             <p class="text-sm font-semibold text-[#3b4a40] flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Construction Budget</p>
-                            <h3 class="text-3xl font-bold text-green-700 mt-2">${mockKPIs.budget.status}</h3>
+                            <h3 class="text-3xl font-bold text-green-700 mt-2">${kpis.budget.status}</h3>
                             <div class="mt-4 flex items-center gap-2 text-sm">
                                 <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
-                                <span class="text-gray-600">Variance: <strong class="text-[#1a1f1c]">${mockKPIs.budget.variance}</strong> saved</span>
+                                <span class="text-gray-600">Variance: <strong class="text-[#1a1f1c]">${kpis.budget.variance}</strong> saved</span>
                             </div>
                         </div>
                     </div>
@@ -2712,7 +3180,14 @@
                         </div>
                         <div class="flex justify-between items-center w-full pr-12">
                             <p class="text-sm text-gray-500">${item.details}</p>
-                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-blue-50 text-blue-700 border-blue-200 shadow-sm">${item.status}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-blue-50 text-blue-700 border-blue-200 shadow-sm">${item.status}</span>
+                                ${item.targetProject ? (() => {
+                                    const projName = (mockProjects.find(proj => proj.id === item.targetProject) || {}).name;
+                                    const hasLayout = projName && mockLayoutProjects.some(lp => lp.name === projName);
+                                    return hasLayout ? `<button onclick="openLayoutForProject('${projName}')" class="text-[10px] font-bold bg-white border border-[#3b4a40] text-[#3b4a40] px-2.5 py-1 rounded hover:bg-[#3b4a40] hover:text-white transition shadow-sm flex items-center gap-1"><i data-lucide="grid-3x3" class="w-3 h-3"></i> View in Layout Grid</button>` : '';
+                                })() : ''}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -10982,9 +11457,16 @@ const mockDesigns = [
     { id: 'DSG-008', project: 'Jolshiri Abason', name: 'Interior Design - Lobby', type: 'Interior', version: 'v1', designer: 'Arc. Sultana Rahman', status: 'Draft', submittedDate: '2026-07-30', approvedDate: '', notes: 'Modern lobby with reception' },
 ];
 
+        // ── Global Layout Planning State ──
+        let gLayoutActiveId = 'LAY-001';
+        let gLayoutSelectedPlot = null;
+
+        function setActiveLayout(id) { gLayoutActiveId = id; gLayoutSelectedPlot = null; renderContent(); }
+        function setSelectedPlot(id) { gLayoutSelectedPlot = id; renderContent(); }
+
         function getLayoutPlanningHTML() {
-            const [activeLayout, setActiveLayout] = React.useState('LAY-001');
-            const [selectedPlot, setSelectedPlot] = React.useState(null);
+            const activeLayout = gLayoutActiveId;
+            const selectedPlot = gLayoutSelectedPlot;
             const project = mockLayoutProjects.find(p => p.id === activeLayout);
             const grid = mockLayoutGrids[activeLayout] || [];
 
@@ -11038,13 +11520,13 @@ const mockDesigns = [
                                 <h3 class="font-bold text-sm text-[#1a1f1c]">${project.name} — Layout Grid</h3>
                                 <span class="text-xs text-gray-400">Roads: ${project.roads}</span>
                             </div>
-                            <div class="grid gap-1.5" style="grid-template-columns: repeat(${activeLayout === 'LAY-001' ? 6 : 8}, minmax(0, 1fr))">
+                            <div class="grid gap-1.5" data-active-layout="${activeLayout}" style="grid-template-columns: repeat(${activeLayout === 'LAY-001' ? 6 : 8}, minmax(0, 1fr))">
                                 ${grid.map(p => {
                                     const colorClass = statusColors[p.status] || 'bg-gray-100 border-gray-300 text-gray-400';
                                     const isAmenity = p.status === 'amenity';
                                     const isNotAcquired = p.status === 'not_acquired';
                                     return `
-                                        <div onclick="setSelectedPlot('${p.id}')" class="aspect-square rounded-lg border-2 ${colorClass} flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-all text-[9px] font-bold p-0.5 relative ${isAmenity ? 'opacity-70' : ''}">
+                                        <div onclick="setSelectedPlot('${p.id}')" oncontextmenu="showPlotContextMenu(event,'${p.id}')" data-plot-cell="${p.id}" class="aspect-square rounded-lg border-2 ${colorClass} flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-all text-[9px] font-bold p-0.5 relative ${isAmenity ? 'opacity-70' : ''}">
                                             ${isAmenity ? '<i data-lucide="tree-pine" class="w-4 h-4"></i>' : isNotAcquired ? '<i data-lucide="lock" class="w-3 h-3 opacity-40"></i>' : `<span>${p.id}</span>`}
                                             ${p.status === 'sold' ? '<span class="text-[7px] absolute bottom-0.5">●</span>' : isNotAcquired ? '<span class="text-[6px] absolute bottom-0.5 text-gray-400">future</span>' : ''}
                                         </div>
@@ -11077,8 +11559,22 @@ const mockDesigns = [
                                         ${plot.road_access ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Road Access</p><p class="font-bold text-[#1a1f1c]">${plot.road_access}</p></div>` : ''}
                                         ${plot.customer ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Customer</p><p class="font-bold text-[#1a1f1c]">${plot.customer}</p></div>` : ''}
                                         <div class="flex gap-2 pt-2">
-                                            <button class="flex-1 bg-[#1a1f1c] text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#2c3e2e] transition">Book Plot</button>
-                                            <button class="bg-white border border-[#e2e0d8] px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#f4f3ee] transition">Reserve</button>
+                                            ${plot.status === 'sold' && plot.customer ? `
+                                                <button onclick="openCrmForCustomer('${plot.customer}')" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition flex items-center justify-center gap-1"><i data-lucide="users" class="w-3 h-3"></i> View in CRM</button>
+                                                <button onclick="openBookingForPlot('${plot.id}')" class="flex-1 bg-[#1a1f1c] text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#2c3e2e] transition flex items-center justify-center gap-1"><i data-lucide="bookmark" class="w-3 h-3"></i> View Booking</button>
+                                            ` : plot.status === 'reserved' && plot.customer ? `
+                                                <button onclick="openCrmForCustomer('${plot.customer}')" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition flex items-center justify-center gap-1"><i data-lucide="users" class="w-3 h-3"></i> View in CRM</button>
+                                                <button class="flex-1 bg-white border border-[#e2e0d8] px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#f4f3ee] transition">Reserved</button>
+                                            ` : plot.status === 'available' ? `
+                                                <button class="flex-1 bg-[#1a1f1c] text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#2c3e2e] transition">Book Plot</button>
+                                                <button class="bg-white border border-[#e2e0d8] px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#f4f3ee] transition">Reserve</button>
+                                            ` : plot.status === 'sold' ? `
+                                                <button class="flex-1 bg-gray-100 text-gray-500 px-3 py-2 rounded-lg text-xs font-bold cursor-not-allowed border border-[#e2e0d8]" title="No customer assigned">Sold (No Customer)</button>
+                                            ` : plot.status === 'not_acquired' ? `
+                                                <button class="flex-1 bg-gray-100 text-gray-500 px-3 py-2 rounded-lg text-xs font-bold cursor-not-allowed border border-dashed border-gray-300" title="Land not yet acquired">Not Available</button>
+                                            ` : `
+                                                <button class="flex-1 bg-gray-100 text-gray-500 px-3 py-2 rounded-lg text-xs font-bold cursor-not-allowed border border-[#e2e0d8]">${plot.status.replace(/_/g, ' ')}</button>
+                                            `}
                                         </div>
                                     </div>
                                 `;
@@ -11088,6 +11584,231 @@ const mockDesigns = [
                 </div>
             `;
         }
+
+        // ── Plot Cell Context Menu ──
+        let activeContextPlotId = null;
+
+        function showPlotContextMenu(e, plotId) {
+            e.preventDefault();
+            e.stopPropagation();
+            activeContextPlotId = plotId;
+
+            // Find the plot data from whichever grid is active
+            const activeLayout = gLayoutActiveId;
+            const grid = mockLayoutGrids[activeLayout] || [];
+            const plot = grid.find(p => p.id === plotId);
+            if (!plot) return hidePlotContextMenu();
+
+            const menu = document.getElementById('plotContextMenu');
+            const content = document.getElementById('plotContextMenuContent');
+
+            // Build status-specific menu items
+            const items = [];
+            const addItem = (icon, label, action, danger) => {
+                items.push(
+                    `<button class="plot-context-menu-item${danger ? ' danger' : ''}" onclick="executePlotAction('${action}','${plotId}')">` +
+                    `<i data-lucide="${icon}" class="ctx-icon w-4 h-4"></i> ${label}</button>`
+                );
+            };
+            const addSep = () => items.push('<div class="plot-context-menu-separator"></div>');
+            const addHeader = (text) => items.push(`<div class="plot-context-menu-header">${text}</div>`);
+
+            addHeader(plotId + ' · ' + plot.status.replace(/_/g, ' '));
+
+            switch (plot.status) {
+                case 'available':
+                    addItem('handshake', 'Book Plot', 'book');
+                    addItem('lock', 'Reserve', 'reserve');
+                    addSep();
+                    addItem('x-circle', 'Mark Not Acquired', 'mark_not_acquired');
+                    addItem('user-plus', 'Assign Customer', 'assign_customer');
+                    addSep();
+                    addItem('info', 'View Details', 'view_details');
+                    break;
+
+                case 'sold':
+                    addItem('user', 'View Customer', 'view_customer');
+                    addSep();
+                    addItem('rotate-ccw', 'Mark Available', 'mark_available');
+                    addItem('lock', 'Mark Reserved', 'mark_reserved');
+                    addSep();
+                    addItem('info', 'View Details', 'view_details');
+                    break;
+
+                case 'reserved':
+                    addItem('check-circle', 'Confirm Booking', 'book');
+                    addItem('x-circle', 'Cancel Reservation', 'cancel_reservation');
+                    addSep();
+                    addItem('user-plus', 'Assign Customer', 'assign_customer');
+                    addSep();
+                    addItem('info', 'View Details', 'view_details');
+                    break;
+
+                case 'not_acquired':
+                    addItem('unlock', 'Acquire Land', 'acquire');
+                    addSep();
+                    addItem('trash-2', 'Remove Plot', 'remove_plot', true);
+                    addSep();
+                    addItem('info', 'View Details', 'view_details');
+                    break;
+
+                case 'amenity':
+                    addItem('pencil', 'Edit Amenity Info', 'edit_amenity');
+                    addItem('grid', 'Convert to Plot', 'convert_to_plot');
+                    addSep();
+                    addItem('info', 'View Details', 'view_details');
+                    break;
+
+                default:
+                    addItem('info', 'View Details', 'view_details');
+            }
+
+            content.innerHTML = items.join('');
+
+            // Re-initialize Lucide icons for the menu
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons({ attrs: { 'stroke-width': 1.5 } });
+            }
+
+            // Position the menu
+            const x = Math.min(e.clientX, window.innerWidth - 210);
+            const y = Math.min(e.clientY, window.innerHeight - 50);
+            menu.style.left = x + 'px';
+            menu.style.top = y + 'px';
+
+            menu.classList.add('active');
+        }
+
+        function hidePlotContextMenu() {
+            const menu = document.getElementById('plotContextMenu');
+            menu.classList.remove('active');
+            activeContextPlotId = null;
+        }
+
+        function executePlotAction(action, plotId) {
+            // Find which grid the plot belongs to
+            const activeLayout = gLayoutActiveId;
+            const grid = mockLayoutGrids[activeLayout] || [];
+            const plot = grid.find(p => p.id === plotId);
+            if (!plot) return;
+
+            let msg = '';
+
+            switch (action) {
+                case 'book':
+                    if (plot.status === 'available' || plot.status === 'reserved') {
+                        plot.status = 'sold';
+                        msg = `✅ Plot ${plotId} has been booked (marked as Sold).`;
+                    }
+                    break;
+                case 'reserve':
+                    if (plot.status === 'available') {
+                        plot.status = 'reserved';
+                        msg = `🔒 Plot ${plotId} has been reserved.`;
+                    }
+                    break;
+                case 'mark_not_acquired':
+                    if (plot.status === 'available') {
+                        plot.status = 'not_acquired';
+                        msg = `📌 Plot ${plotId} marked as Not Acquired.`;
+                    }
+                    break;
+                case 'mark_available':
+                    if (plot.status === 'sold' || plot.status === 'reserved') {
+                        plot.status = 'available';
+                        msg = `🔄 Plot ${plotId} marked as Available.`;
+                    }
+                    break;
+                case 'mark_reserved':
+                    if (plot.status === 'sold') {
+                        plot.status = 'reserved';
+                        msg = `🔒 Plot ${plotId} marked as Reserved.`;
+                    }
+                    break;
+                case 'cancel_reservation':
+                    if (plot.status === 'reserved') {
+                        plot.status = 'available';
+                        msg = `❌ Reservation cancelled for ${plotId}.`;
+                    }
+                    break;
+                case 'acquire':
+                    if (plot.status === 'not_acquired') {
+                        plot.status = 'available';
+                        msg = `🏗️ Plot ${plotId} has been acquired (now Available).`;
+                    }
+                    break;
+                case 'remove_plot':
+                    if (confirm(`Remove plot ${plotId} from the layout?`)) {
+                        const idx = grid.indexOf(plot);
+                        if (idx !== -1) grid.splice(idx, 1);
+                        msg = `🗑️ Plot ${plotId} removed from layout.`;
+                    }
+                    break;
+                case 'convert_to_plot':
+                    if (plot.status === 'amenity') {
+                        plot.status = 'available';
+                        msg = `📐 Amenity ${plotId} converted to an Available plot.`;
+                    }
+                    break;
+                case 'assign_customer':
+                    msg = `👤 Assign Customer dialog for ${plotId} (opens in modal).`;
+                    break;
+                case 'view_customer':
+                    const cust = plot.customer || 'No customer assigned';
+                    msg = `👤 Plot ${plotId} — Customer: ${cust}`;
+                    break;
+                case 'edit_amenity':
+                    msg = `✏️ Editing amenity ${plotId} (opens in modal).`;
+                    break;
+                case 'view_details':
+                    // Simulate clicking the plot to show details
+                    setSelectedPlot(plotId);
+                    msg = '';
+                    break;
+            }
+
+            hidePlotContextMenu();
+
+            if (msg) {
+                // Show a temporary toast notification
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 bg-[#1a1f1c] text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg z-[10000] animate-fade-in';
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => toast.remove(), 350);
+                }, 2500);
+            }
+
+            // Re-render the layout
+            renderContent();
+        }
+
+        // Close context menu on any click outside, or Escape key
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('plotContextMenu');
+            if (menu && menu.classList.contains('active')) {
+                // Only close if the click is outside the menu
+                if (!menu.contains(e.target)) {
+                    hidePlotContextMenu();
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hidePlotContextMenu();
+            }
+        });
+
+        // Prevent default browser context menu on the plot grid area
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('[data-plot-cell]')) {
+                e.preventDefault();
+            }
+        });
 
         function getDesignMgmtHTML() {
             const [activeFilter, setActiveFilter] = React.useState('All');
