@@ -6706,21 +6706,20 @@
 
             return `
                 <div class="space-y-2 animate-fade-in flex flex-col h-full">
-                    <div class="flex justify-between items-center mb-2 shrink-0">
-                        <div>
-                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">System Settings</h2>
-                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage users, organizational roles, and configuration.</p>
-                        </div>
-                        <button class="bg-[#3b4a40] text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#1a1f1c] transition flex items-center gap-2 shadow-sm">
-                            <i data-lucide="save" class="w-4 h-4"></i> Save Changes
-                        </button>
-                    </div>
-
                     <!-- Settings Layout -->
                     <div class="flex flex-col md:flex-row gap-3 flex-1 overflow-hidden">
                         <!-- Settings Navigation Sidebar -->
-                        <div class="w-full md:w-64 bg-white rounded-2xl border border-[#e2e0d8] shadow-sm p-4 h-max flex flex-col gap-1 shrink-0">
+                        <div class="w-full md:w-64 bg-white rounded-2xl border border-[#e2e0d8] shadow-sm p-4 flex flex-col gap-1 shrink-0">
+                            <div class="pb-3 mb-2 border-b border-[#e2e0d8]">
+                                <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">System Settings</h2>
+                                <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage users, organizational roles, and configuration.</p>
+                            </div>
                             ${sidebarHTML}
+                            <div class="mt-auto pt-3 border-t border-[#e2e0d8]">
+                                <button class="w-full bg-[#3b4a40] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1a1f1c] transition flex items-center justify-center gap-2 shadow-sm">
+                                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Save Changes
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Settings Main Content Area -->
