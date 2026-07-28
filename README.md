@@ -43,9 +43,18 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Project Types:** Land/Plotting, Apartment/Construction
 - **Project Dashboard:** Budget vs actual, timeline phases, unit/plot inventory
 - **Project Configuration:** Type, location, total area, units/plots, phases, budget
+- **Project Lifecycle Stages:** Track each project through a full lifecycle pipeline with status badges and stage-specific actions:
+  1. 🔵 **Concept & Feasibility** — Market analysis, site assessment, financial modeling
+  2. 🟡 **Pre-Development & Design** — Architectural planning, layout approval, budgeting
+  3. 🟣 **Financing** — Loan processing, investor funding, payment structuring
+  4. 🟠 **Procurement** — Contractor bidding, material sourcing, supplier agreements
+  5. 🔴 **Construction Execution** — Active building, site supervision, quality control
+  6. 🟢 **Project Closeout** — Handover, final inspections, documentation
+- **Stage Transition Workflow:** Move projects between stages with automatic date logging and audit trail
 - **Timeline Phases:** Add milestones with dates, status, progress %
 - **Unit/Plot Management:**
   - **Flat units:** Floor-wise grid view with unit details (size, price, status)
+  - **Construction Stages:** Per-unit progress tracking (Brickwork → Plastering → Finishing → Completed)
   - **Plots:** Grid layout with color-coded status (Available/Sold/Reserved)
   - **Pricing Modal:** Set base price, final price, discounts
   - **Log Work:** Track man-hours and work logs per unit
