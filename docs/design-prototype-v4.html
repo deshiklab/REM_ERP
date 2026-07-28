@@ -161,6 +161,37 @@
     .group-card h4{font-size:12px;font-weight:600;color:#222;margin-bottom:6px}
     .group-card .g-mods{font-size:10px;color:#888}
     .group-card .g-mods span{display:inline-block;padding:1px 6px;background:#f0f4ff;color:#1565c0;border-radius:4px;margin:2px;font-size:9px}
+    .tbl-toolbar{display:flex;align-items:center;gap:4px;padding:6px 10px;background:#fafbfc;border-bottom:1px solid #e8e8e8;flex-wrap:wrap}
+    .tbl-toolbar .tt-btn{padding:4px 8px;font-size:10px;font-weight:500;border:1px solid #e0e0e0;border-radius:5px;background:#fff;color:#555;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:3px;white-space:nowrap}
+    .tbl-toolbar .tt-btn:hover{border-color:#2F80ED;color:#2F80ED;background:#f0f4ff}
+    .tbl-toolbar .tt-btn.active{background:#2F80ED;color:#fff;border-color:#2F80ED}
+    .tbl-toolbar .tt-spacer{flex:1}
+    .tbl-toolbar .tt-label{font-size:10px;color:#888;font-weight:500}
+    th.sortable{cursor:pointer;user-select:none;position:relative;padding-right:18px!important}
+    th.sortable:hover{background:#f0f4ff}
+    th.sortable .s-arrow{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:8px;color:#bbb;line-height:1}
+    th.sortable .s-arrow.asc{color:#2F80ED}
+    th.sortable .s-arrow.desc{color:#2F80ED}
+    .col-menu{position:absolute;background:#fff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);padding:8px;z-index:200;min-width:170px;display:none}
+    .col-menu.active{display:block}
+    .col-menu label{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:11px;color:#333;transition:all .1s}
+    .col-menu label:hover{background:#f0f4ff}
+    .col-menu input[type=checkbox]{accent-color:#2F80ED;width:13px;height:13px}
+    .filter-panel{padding:8px 10px;background:#f8f9fa;border-bottom:1px solid #e8e8e8;display:none;align-items:center;gap:6px;flex-wrap:wrap}
+    .filter-panel.active{display:flex}
+    .filter-panel select,.filter-panel input{padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;outline:none;background:#fff}
+    .filter-panel select:focus,.filter-panel input:focus{border-color:#2F80ED}
+    .filter-panel .fp-label{font-size:10px;color:#888;font-weight:500}
+    .filter-panel .fp-btn{padding:4px 10px;font-size:10px;font-weight:500;border-radius:4px;cursor:pointer;transition:all .12s}
+    .filter-panel .fp-btn.primary{background:#2F80ED;color:#fff;border:none}
+    .filter-panel .fp-btn.primary:hover{background:#2568c9}
+    .filter-panel .fp-btn.secondary{background:#fff;color:#555;border:1px solid #e0e0e0}
+    .filter-panel .fp-btn.secondary:hover{border-color:#2F80ED;color:#2F80ED}
+    .table-wrap{overflow-x:auto;position:relative}
+    col.hidden{visibility:collapse}
+    th.hidden{display:none}
+    td.hidden{display:none}
+    @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:fixed;inset:0;background:#fff;padding:20px;overflow:auto;z-index:9999}#printArea table{font-size:10px}#printArea th{background:#f5f5f5!important;color:#333!important}}
   </style>
 </head>
 <body>
@@ -1093,8 +1124,269 @@ function openEmployee(id){
   );
 }
 
+// ═══ TABLE ENHANCEMENTS: SORT, FILTER, EXPORT, PRINT, COLUMNS ═══
+function enhanceAllTables(){
+  var tables=document.querySelectorAll('#mainContent table');
+  tables.forEach(function(tbl,ti){
+    if(tbl.dataset.enhanced)return;
+    tbl.dataset.enhanced='1';
+    if(!tbl.querySelector('thead'))return;
+    // Find or create wrapper
+    var wrap=tbl.closest('.table-wrap');
+    if(!wrap)return;
+    // Add table ID
+    var tid='tbl_'+ti;
+    tbl.id=tid;
+    // Add colgroup for column visibility
+    var colgroup=tbl.querySelector('colgroup');
+    if(!colgroup){
+      colgroup=document.createElement('colgroup');
+      tbl.insertBefore(colgroup,tbl.firstChild);
+    }
+    var firstRow=tbl.querySelector('thead tr');
+    if(firstRow){
+      var cols=firstRow.querySelectorAll('th');
+      cols.forEach(function(th,ci){
+        // Add col element
+        var col=document.createElement('col');
+        col.id='col_'+tid+'_'+ci;
+        colgroup.appendChild(col);
+        // Make sortable
+        th.classList.add('sortable');
+        th.setAttribute('data-col',ci);
+        var arrow=document.createElement('span');
+        arrow.className='s-arrow';
+        arrow.textContent='⇅';
+        th.appendChild(arrow);
+        th.addEventListener('click',function(){sortTable(tid,ci);});
+        // Hide checkboxes from sortable
+        if(th.querySelector('input[type=checkbox]')){th.classList.remove('sortable');}
+      });
+    }
+    // Build toolbar if not exists
+    if(!wrap.parentElement.querySelector('.tbl-toolbar')){
+      var card=wrap.closest('.card')||wrap.parentElement;
+      if(card.classList.contains('card')||card.tagName==='DIV'){
+        // Try card-header first, otherwise insert before the table wrapper
+        var header=card.querySelector('.card-header')||card;
+        var insertPoint=header;
+        if(header===card&&card.querySelector('.card-body')){
+          // Insert before card-body's first child (which is the table-wrap)
+          var body=card.querySelector('.card-body');
+          if(body&&body.firstChild)insertPoint=body;
+          else insertPoint=body;
+        }
+        if(!insertPoint.querySelector('.tbl-toolbar')){
+          var tb=document.createElement('div');tb.className='tbl-toolbar';
+          tb.style.borderBottom='1px solid #e8e8e8';
+          // Row count
+          var rows=tbl.querySelectorAll('tbody tr').length;
+          var rc=document.createElement('span');rc.className='tt-label';rc.textContent=rows+' rows';
+          tb.appendChild(rc);
+          tb.appendChild(document.createElement('span')).className='tt-spacer';
+          // Filter button
+          var fb=document.createElement('button');fb.className='tt-btn';fb.innerHTML='🔍 Filter';
+          fb.onclick=function(){toggleFilterPanel(tid);};
+          tb.appendChild(fb);
+          // Export CSV
+          var eb=document.createElement('button');eb.className='tt-btn';eb.innerHTML='📥 CSV';
+          eb.onclick=function(){exportCSV(tid);};
+          tb.appendChild(eb);
+          // Print
+          var pb=document.createElement('button');pb.className='tt-btn';pb.innerHTML='🖨 Print';
+          pb.onclick=function(){printTable(tid);};
+          tb.appendChild(pb);
+          // Columns
+          var cb=document.createElement('button');cb.className='tt-btn';cb.innerHTML='👁 Columns';
+          cb.onclick=function(){toggleColMenu(tid);};
+          cb.style.position='relative';
+          tb.appendChild(cb);
+          // Insert toolbar after card-header
+          header.after(tb);
+          // Add filter panel
+          var fp=document.createElement('div');fp.className='filter-panel';fp.id='fp_'+tid;
+          fp.innerHTML='<span class="fp-label">Search:</span><input id="fp_search_'+tid+'" placeholder="Type to filter..." oninput="filterTable(\''+tid+'\')" style="flex:1;max-width:180px"/> <span class="fp-label">Sort:</span><select id="fp_sort_'+tid+'" onchange="sortTableBy(\''+tid+'\')"><option value="">Default</option>'+getSortOptions(tid)+'</select> <button class="fp-btn primary" onclick="filterTable(\''+tid+'\')">Apply</button> <button class="fp-btn secondary" onclick="clearFilter(\''+tid+'\')">Clear</button>';
+          tb.after(fp);
+          // Add column menu
+          var cm=document.createElement('div');cm.className='col-menu';cm.id='cm_'+tid;
+          cm.innerHTML=getColMenuHTML(tid);
+          cb.appendChild(cm);
+        }  // end toolbar build
+      }  // end card check
+    }
+  });
+}
+function getSortOptions(tid){
+  var tbl=document.getElementById(tid);if(!tbl)return'';
+  var ths=tbl.querySelectorAll('thead th');
+  var opts='';
+  ths.forEach(function(th,i){
+    var label=th.textContent.replace('⇅','').trim();
+    if(label&&!th.querySelector('input[type=checkbox]')){
+      opts+='<option value="'+i+'_asc">'+label+' ↑</option><option value="'+i+'_desc">'+label+' ↓</option>';
+    }
+  });
+  return opts;
+}
+function getColMenuHTML(tid){
+  var tbl=document.getElementById(tid);if(!tbl)return'';
+  var ths=tbl.querySelectorAll('thead th');
+  var html='<div style="font-size:10px;font-weight:600;color:#555;margin-bottom:4px;padding:2px 6px">Toggle Columns</div>';
+  ths.forEach(function(th,i){
+    var label=th.textContent.replace('⇅','').trim();
+    if(label){
+      html+='<label><input type="checkbox" checked onchange="toggleColumn(\''+tid+'\','+i+',this.checked)"/> '+label+'</label>';
+    }
+  });
+  return html;
+}
+var sortState={};
+function sortTable(tid,ci){
+  var tbl=document.getElementById(tid);if(!tbl)return;
+  var key=tid+'_'+ci;
+  if(sortState[key]===undefined||sortState[key]==='desc')sortState[key]='asc';else sortState[key]='desc';
+  var dir=sortState[key];
+  // Update arrows
+  tbl.querySelectorAll('th.sortable .s-arrow').forEach(function(a){a.textContent='⇅';a.className='s-arrow';});
+  var th=tbl.querySelectorAll('thead th')[ci];
+  if(th){var ar=th.querySelector('.s-arrow');if(ar){ar.textContent=dir==='asc'?'▲':'▼';ar.className='s-arrow '+dir;}}
+  // Sort rows
+  var tbody=tbl.querySelector('tbody');if(!tbody)return;
+  var rows=Array.from(tbody.querySelectorAll('tr'));
+  var isNum=false;
+  if(rows.length>0){
+    var val=rows[0].querySelectorAll('td')[ci]?.textContent.trim().replace(/[^0-9.]/g,'');
+    isNum=val&&val.length>0;
+  }
+  rows.sort(function(a,b){
+    var va=(a.querySelectorAll('td')[ci]?.textContent||'').trim();
+    var vb=(b.querySelectorAll('td')[ci]?.textContent||'').trim();
+    if(isNum){va=parseFloat(va.replace(/[^0-9.]/g,''))||0;vb=parseFloat(vb.replace(/[^0-9.]/g,''))||0;}
+    return dir==='asc'?(va>vb?1:va<vb?-1:0):(va<vb?1:va>vb?-1:0);
+  });
+  rows.forEach(function(r){tbody.appendChild(r);});
+  updateRowCount(tid);
+}
+function sortTableBy(tid){
+  var sel=document.getElementById('fp_sort_'+tid);if(!sel||!sel.value)return;
+  var parts=sel.value.split('_');
+  sortState={};sortTable(tid,parseInt(parts[0]));
+}
+var filterTimeout={};
+function filterTable(tid){
+  clearTimeout(filterTimeout[tid]);
+  filterTimeout[tid]=setTimeout(function(){
+    var input=document.getElementById('fp_search_'+tid);if(!input)return;
+    var q=input.value.toLowerCase();
+    var tbl=document.getElementById(tid);if(!tbl)return;
+    var rows=tbl.querySelectorAll('tbody tr');
+    rows.forEach(function(r){
+      var txt=r.textContent.toLowerCase();
+      r.style.display=!q||txt.includes(q)?'':'none';
+    });
+    updateRowCount(tid);
+  },200);
+}
+function clearFilter(tid){
+  var input=document.getElementById('fp_search_'+tid);if(input)input.value='';
+  var sel=document.getElementById('fp_sort_'+tid);if(sel)sel.value='';
+  var tbl=document.getElementById(tid);if(!tbl)return;
+  tbl.querySelectorAll('tbody tr').forEach(function(r){r.style.display='';});
+  updateRowCount(tid);
+}
+function toggleFilterPanel(tid){
+  var fp=document.getElementById('fp_'+tid);if(fp)fp.classList.toggle('active');
+}
+function toggleColMenu(tid){
+  var cm=document.getElementById('cm_'+tid);
+  if(!cm)return;
+  cm.classList.toggle('active');
+  // Close other menus
+  document.querySelectorAll('.col-menu.active').forEach(function(m){if(m.id!=='cm_'+tid)m.classList.remove('active');});
+  // Close on outside click
+  if(cm.classList.contains('active')){
+    setTimeout(function(){
+      document.addEventListener('click',function __closeCol(e){
+        if(!cm.contains(e.target)&&!e.target.closest('.tt-btn')){
+          cm.classList.remove('active');
+          document.removeEventListener('click',__closeCol);
+        }
+      });
+    },10);
+  }
+}
+function toggleColumn(tid,ci,show){
+  var tbl=document.getElementById(tid);if(!tbl)return;
+  // Toggle col element
+  var col=document.getElementById('col_'+tid+'_'+ci);
+  if(col)col.className=show?'':'hidden';
+  // Toggle th
+  var th=tbl.querySelectorAll('thead th')[ci];
+  if(th)th.className=show?'sortable':'sortable hidden';
+  // Toggle td in each row
+  tbl.querySelectorAll('tbody tr').forEach(function(r){
+    var td=r.querySelectorAll('td')[ci];
+    if(td)td.className=show?'':'hidden';
+  });
+}
+function exportCSV(tid){
+  var tbl=document.getElementById(tid);if(!tbl)return;
+  var rows=[];
+  // Header
+  var hdr=[];
+  tbl.querySelectorAll('thead th:not(.hidden)').forEach(function(th){
+    var txt=th.textContent.replace('⇅','').replace('▲','').replace('▼','').trim();
+    if(txt)hdr.push('"'+txt.replace(/"/g,'""')+'"');
+  });
+  if(hdr.length)rows.push(hdr.join(','));
+  // Body
+  tbl.querySelectorAll('tbody tr').forEach(function(tr){
+    if(tr.style.display==='none')return;
+    var cells=[];
+    tr.querySelectorAll('td:not(.hidden)').forEach(function(td){
+      var txt=td.textContent.trim().replace(/"/g,'""');
+      cells.push('"'+txt+'"');
+    });
+    if(cells.length)rows.push(cells.join(','));
+  });
+  var csv=rows.join('\n');
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=tid+'_export.csv';a.click();URL.revokeObjectURL(a.href);
+  showToast('CSV exported!','success');
+}
+function printTable(tid){
+  var tbl=document.getElementById(tid);if(!tbl)return;
+  var clone=tbl.cloneNode(true);
+  // Remove hidden elements from clone
+  clone.querySelectorAll('.hidden').forEach(function(el){el.remove();});
+  clone.querySelectorAll('th .s-arrow').forEach(function(el){el.remove();});
+  var html='<div id="printArea"><h2 style="font-size:16px;margin-bottom:10px;color:#333">'+document.querySelector('.page-title')?.textContent||'Report'+'</h2>'+clone.outerHTML+'<p style="margin-top:10px;font-size:9px;color:#999">Generated by REM ERP</p></div>';
+  var pw=window.open('','_blank');
+  pw.document.write('<html><head><title>Print</title><style>table{width:100%;border-collapse:collapse;font-size:10px}th,td{padding:6px 8px;border:1px solid #ddd;text-align:left}th{background:#f5f5f5;font-weight:600}tr:nth-child(even){background:#fafafa}</style></head><body>'+html+'</body></html>');
+  pw.document.close();
+  setTimeout(function(){pw.print();pw.close();},500);
+}
+function updateRowCount(tid){
+  var tbl=document.getElementById(tid);if(!tbl)return;
+  var visible=tbl.querySelectorAll('tbody tr:not([style*=\"display: none\"])').length;
+  var total=tbl.querySelectorAll('tbody tr').length;
+  var toolbar=tbl.closest('.table-wrap')?.parentElement?.querySelector('.tbl-toolbar');
+  if(toolbar){
+    var label=toolbar.querySelector('.tt-label');
+    if(label)label.textContent=visible+'/'+total+' rows';
+  }
+}
+
 // ═══ INIT ═══
 switchGroup('executive');
+// Enhance tables after init
+setTimeout(function(){enhanceAllTables();},100);
+// Override render to also enhance tables
+var origRender=renderModule;
+renderModule=function(){origRender();setTimeout(function(){enhanceAllTables();},50);};
+var origSwitch=switchModule;
+switchModule=function(mod){currentModule=mod;origSwitch(mod);setTimeout(function(){enhanceAllTables();},50);};
 </script>
 </body>
 </html>
