@@ -129,6 +129,30 @@
     .toast.info{background:#1565c0}
     html.dark{filter:invert(1) hue-rotate(180deg);background:#0b0c11}
     html.dark img,html.dark canvas,html.dark svg,html.dark .sidebar-item[data-tip]:hover::after{filter:invert(1) hue-rotate(180deg)}
+    .lead-panel{width:480px;max-width:95vw;background:#fff;height:100%;box-shadow:-4px 0 20px rgba(0,0,0,.1);display:flex;flex-direction:column;animation:slideIn .25s ease-out}
+    .lead-header{background:#fff;border-bottom:1px solid #e8e8e8}
+    .lead-info-row{display:flex;gap:6px;flex-wrap:wrap}
+    .lead-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase}
+    .lead-tabs{display:flex;border-bottom:1px solid #e8e8e8;background:#fafafa}
+    .lead-tab{padding:10px 16px;font-size:12px;font-weight:500;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+    .lead-tab:hover{color:#2F80ED}
+    .lead-tab.active{color:#2F80ED;border-bottom-color:#2F80ED}
+    .lead-body{flex:1;overflow-y:auto;padding:16px;background:#f8f9fa}
+    .lead-footer{padding:12px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:8px}
+    .lead-foot-btn{flex:1;padding:8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid #e0e0e0;background:#fff;color:#333}
+    .lead-foot-btn:hover{border-color:#2F80ED;color:#2F80ED}
+    .lead-foot-btn.primary{background:#2F80ED;color:#fff;border-color:#2F80ED}
+    .lead-foot-btn.primary:hover{background:#2568c9}
+    .lead-foot-btn.success{background:#2e7d32;color:#fff;border-color:#2e7d32}
+    .lead-foot-btn.success:hover{background:#1b5e20}
+    .installment-item{padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .installment-item:hover{border-color:#2F80ED}
+    .doc-item{padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;align-items:center;gap:10px;margin-bottom:6px;cursor:pointer}
+    .doc-item:hover{border-color:#2F80ED}
+    .activity-item{padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:6px}
+    .activity-item:hover{border-color:#2F80ED}
+    .verif-item{padding:8px 12px;border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .lead-avatar{width:44px;height:44px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
   </style>
 </head>
 <body>
@@ -219,19 +243,37 @@
   </div>
 </div></div>
 
-<div id="leadSlideOut" class="slide-out"><div class="backdrop" onclick="closeLeadPanel()"></div><div class="panel" id="leadPanelContent"></div></div>
+<div id="leadSlideOut" class="slide-out"><div class="backdrop" onclick="closeLeadPanel()"></div><div class="lead-panel" id="leadPanelContent"></div></div>
 <div id="toastContainer" class="toast-container"></div>
 <div id="crudModal" class="modal-overlay"><div class="modal-box" id="crudFormContent"></div></div>
 
 <script>
 // ═══ DATA ═══
 const mockLeads = [
-  {id:1,name:'Tariqul Islam',phone:'+880****0000',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Facebook',value:'৳1.5 Cr',lastContact:'2h ago',paymentStatus:'Up to Date'},
-  {id:2,name:'Dr. Rubina Ali',phone:'+141****0198',property:'Jolshiri - Apt 4B',status:'Site Visit',priority:'Medium',type:'NRB',source:'Referral',value:'৳2.2 Cr',lastContact:'1d ago',paymentStatus:'Pending'},
-  {id:3,name:'Ahasan Habib',phone:'+880****1111',property:'Muktodhara - 3 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Walk-in',value:'৳95 Lac',lastContact:'3h ago',paymentStatus:'Overdue'},
-  {id:4,name:'Kamrul Hasan',phone:'+880****2222',property:'Jolshiri - Apt 9A',status:'Booked',priority:'Low',type:'Local',source:'Website',value:'৳1.8 Cr',lastContact:'5d ago',paymentStatus:'Up to Date'},
-  {id:5,name:'Syed Rahman',phone:'+971****4567',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'NRB',source:'Facebook',value:'৳1.5 Cr',lastContact:'10m ago',paymentStatus:'Pending'},
-  {id:6,name:'Fatima Begum',phone:'+880****5432',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳85 Lac',lastContact:'2d ago',paymentStatus:'Up to Date'}
+  {id:1,name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Facebook',value:'৳1.5 Cr',lastContact:'2h ago',paymentStatus:'Up to Date',
+   installments:[{date:'Oct 01, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Nov 01, 2024',amount:'৳5,00,000',status:'Due'}],
+   documents:[{name:'NID_Front.jpg',type:'ID Document'},{name:'Application_Form.pdf',type:'Application'}],
+   activities:[{type:'Call',user:'Iftekhar',date:'Today, 10:30 AM',text:'Discussed plot location and pricing.'},{type:'Note',user:'System',date:'Yesterday, 4:00 PM',text:'Lead created via Facebook Ad campaign.'}]},
+  {id:2,name:'Dr. Rubina Ali',phone:'+1 415 555 0198',email:'rubina@example.com',property:'Jolshiri - Apt 4B',status:'Site Visit',priority:'Medium',type:'NRB',source:'Referral',value:'৳2.2 Cr',lastContact:'1d ago',paymentStatus:'Pending',
+   installments:[{date:'Oct 15, 2024',amount:'৳2,00,000',status:'Paid'}],
+   documents:[],
+   activities:[{type:'Meeting',user:'Hasanul Banna',date:'Yesterday, 2:00 PM',text:'Site visit scheduled for Saturday. Client confirmed.'}]},
+  {id:3,name:'Ahasan Habib',phone:'+880 1819 111111',email:'ahasan@example.com',property:'Muktodhara - 3 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Walk-in',value:'৳95 Lac',lastContact:'3h ago',paymentStatus:'Overdue',
+   installments:[{date:'Sep 10, 2024',amount:'৳1,00,000',status:'Overdue'}],
+   documents:[{name:'Trade_License.pdf',type:'Business Doc'}],
+   activities:[{type:'Call',user:'Sales Team',date:'Today, 9:00 AM',text:'Negotiated price down to 92 Lac. Client thinking.'}]},
+  {id:4,name:'Kamrul Hasan',phone:'+880 1912 222222',email:'kamrul@example.com',property:'Jolshiri - Apt 9A',status:'Booked',priority:'Low',type:'Local',source:'Website',value:'৳1.8 Cr',lastContact:'5d ago',paymentStatus:'Up to Date',
+   installments:[{date:'Sep 20, 2024',amount:'৳10,00,000',status:'Paid'}],
+   documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'NID_Copy.pdf',type:'ID Document'}],
+   activities:[{type:'Note',user:'System',date:'Sep 20, 2024',text:'Booking confirmed. Unit 9A allocated.'}]},
+  {id:5,name:'Syed Rahman',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'NRB',source:'Facebook',value:'৳1.5 Cr',lastContact:'10m ago',paymentStatus:'Pending',
+   installments:[],
+   documents:[],
+   activities:[]},
+  {id:6,name:'Fatima Begum',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳85 Lac',lastContact:'2d ago',paymentStatus:'Up to Date',
+   installments:[],
+   documents:[],
+   activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]}
 ];
 const mockProjects = [
   {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
@@ -394,10 +436,136 @@ let currentZoom=100;
 function changeZoom(d){currentZoom+=d;if(currentZoom<60)currentZoom=60;if(currentZoom>150)currentZoom=150;document.getElementById('mainContent').style.zoom=currentZoom+'%';document.getElementById('zoomLabel').textContent=currentZoom+'%'}
 function resetZoom(){currentZoom=100;document.getElementById('mainContent').style.zoom='';document.getElementById('zoomLabel').textContent='100%'}
 function toggleFullScreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen()}else{if(document.exitFullscreen)document.exitFullscreen()}}
-function openLead(id){
+function leadBadgeColor(v){return{v:'Hot':'#c62828','Warm':'#e65100','Cold':'#888','New Inquiry':'#1565c0','Site Visit':'#ff9800','Negotiation':'#e65100','Booked':'#2e7d32','Local':'#1565c0','NRB':'#7b1fa2','Facebook':'#1877f2','Referral':'#00897b','Walk-in':'#ff8f00','Website':'#1565c0','Agent':'#2F80ED'}[v]||'#888'}
+function leadGetInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+function openLead(id){openLeadPanel(id,'profile')}
+function openLeadPanel(leadId,tab){
+  const l=mockLeads.find(x=>x.id===leadId);if(!l)return;
+  const container=document.getElementById('leadSlideOut');
+  const content=document.getElementById('leadPanelContent');
+  const isClient=['Booked','Downpayment','Installments','Handover','Completed'].includes(l.status);
+  const tabs=['profile','installments','documents','activities'];
+  const tabLabels=['Profile','Installments','Documents','Activities'];
+  let tabContent='';
+  if(tab==='profile'){
+    tabContent=`
+      <div class="stats-row" style="grid-template-columns:1fr 1fr">
+        <div class="stat-card"><div class="label">Phone</div><div style="font-size:13px;font-weight:600;margin-top:2px">${l.phone||'—'}</div></div>
+        <div class="stat-card"><div class="label">Email</div><div style="font-size:13px;font-weight:600;margin-top:2px">${l.email||'—'}</div></div>
+      </div>
+      <div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:8px">
+        <div class="stat-card"><div class="label">Target Value</div><div style="font-size:18px;font-weight:700;color:#2e7d32;margin-top:2px">${l.value}</div></div>
+        <div class="stat-card"><div class="label">Payment Status</div><div style="font-size:13px;font-weight:600;margin-top:2px;color:${l.paymentStatus==='Up to Date'?'#2e7d32':l.paymentStatus==='Overdue'?'#c62828':'#e65100'}">${l.paymentStatus}</div></div>
+      </div>
+      <div style="margin-top:14px">
+        <h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px;display:flex;align-items:center;gap:6px">📋 Upcoming Actions</h3>
+        <div style="padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;display:flex;align-items:flex-start;gap:8px">
+          <input type="checkbox" style="margin-top:2px;accent-color:#2F80ED"/>
+          <div><div style="font-size:12px;font-weight:500">Send updated Plot Map for Block B</div><div style="font-size:11px;color:#e53935;margin-top:2px">Due today at 4:00 PM</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px;display:flex;align-items:center;gap:6px">✅ Verification Status</h3>
+        <div class="verif-item" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9"><span style="display:flex;align-items:center;gap:6px">✓ NID Uploaded</span><span style="font-size:10px;font-weight:600;cursor:pointer">View</span></div>
+        <div class="verif-item" style="background:#fff3e0;color:#e65100;border:1px solid #ffe0b2"><span style="display:flex;align-items:center;gap:6px">⚠ Booking Money Pending</span><span style="font-size:10px;font-weight:600;cursor:pointer">Send Reminder</span></div>
+      </div>`;
+  }else if(tab==='installments'){
+    tabContent=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">💰 Payment Schedule</h3>
+        <button onclick="openAddLeadInstallment(${l.id})" style="padding:5px 10px;background:#2F80ED;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer">+ Add Entry</button>
+      </div>
+      ${l.installments&&l.installments.length>0?l.installments.map(i=>`<div class="installment-item"><div><div style="font-size:13px;font-weight:600">${i.amount}</div><div style="font-size:11px;color:#888;margin-top:2px">${i.date}</div></div><span style="padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;background:${i.status==='Paid'?'#e8f5e9':i.status==='Overdue'?'#fce4ec':'#fff3e0'};color:${i.status==='Paid'?'#2e7d32':i.status==='Overdue'?'#c62828':'#e65100'};border:1px solid ${i.status==='Paid'?'#c8e6c9':i.status==='Overdue'?'#f8bbd0':'#ffe0b2'}">${i.status}</span></div>`).join(''):`<div style="text-align:center;padding:30px;color:#999;font-size:12px;border:2px dashed #e0e0e0;border-radius:8px">No payment entries yet.</div>`}`;
+  }else if(tab==='documents'){
+    tabContent=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">📄 Attached Documents</h3>
+        <button onclick="showToast('Upload feature coming soon','info')" style="padding:5px 10px;background:#2F80ED;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer">+ Upload</button>
+      </div>
+      ${l.documents&&l.documents.length>0?l.documents.map(d=>`<div class="doc-item"><div style="width:32px;height:32px;border-radius:6px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;color:#2F80ED;font-size:14px">📄</div><div style="flex:1"><div style="font-size:12px;font-weight:500">${d.name}</div><div style="font-size:10px;color:#888">${d.type}</div></div><span style="color:#2F80ED;font-size:11px;cursor:pointer">👁</span><span style="color:#888;font-size:11px;cursor:pointer">⬇</span></div>`).join(''):`<div style="text-align:center;padding:30px;color:#999;font-size:12px;border:2px dashed #e0e0e0;border-radius:8px">No documents uploaded yet.</div>`}`;
+  }else if(tab==='activities'){
+    if(!l.activities)l.activities=[];
+    const actsHTML=l.activities.map(a=>`<div class="activity-item"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px"><span style="color:#2F80ED">${a.type==='Call'?'📞':a.type==='Meeting'?'👥':'📝'}</span>${a.type} <span style="font-weight:400;color:#888">by ${a.user}</span></span><span style="font-size:10px;color:#999">${a.date}</span></div><div style="font-size:12px;color:#555">${a.text}</div></div>`).join('');
+    tabContent=`
+      <h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:6px">📊 Activity Log</h3>
+      <div style="padding:10px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:10px">
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <select id="leadActType" style="padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;outline:none"><option value="Call">📞 Call</option><option value="Meeting">👥 Meeting</option><option value="Note">📝 Note</option></select>
+        </div>
+        <div style="display:flex;gap:6px">
+          <input id="leadActText" placeholder="Log details (e.g. Spoke about pricing...)" style="flex:1;padding:6px 10px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;outline:none"/>
+          <button onclick="addLeadActivity(${l.id})" style="padding:6px 12px;background:#2F80ED;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Log</button>
+        </div>
+      </div>
+      <div>${actsHTML||'<div style="text-align:center;padding:30px;color:#999;font-size:12px;border:2px dashed #e0e0e0;border-radius:8px">No activities logged yet.</div>'}</div>`;
+  }
+  content.innerHTML=`
+    <div class="lead-header" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="lead-avatar">${leadGetInitials(l.name)}</div>
+          <div>
+            <div class="lead-info-row" style="margin-bottom:4px">
+              <span class="lead-badge" style="background:${leadBadgeColor(l.type)}15;color:${leadBadgeColor(l.type)};border:1px solid ${leadBadgeColor(l.type)}">${l.type}</span>
+              <span class="lead-badge" style="background:${leadBadgeColor(l.status)}15;color:${leadBadgeColor(l.status)};border:1px solid ${leadBadgeColor(l.status)}">${l.status}</span>
+              <span class="lead-badge" style="background:${leadBadgeColor(l.source)}15;color:${leadBadgeColor(l.source)};border:1px solid ${leadBadgeColor(l.source)}">${l.source}</span>
+            </div>
+            <div style="font-size:15px;font-weight:700;color:#222">${l.name}</div>
+            <div style="font-size:12px;color:#2F80ED;margin-top:2px">${l.property}</div>
+          </div>
+        </div>
+        <span onclick="closeLeadPanel()" style="cursor:pointer;color:#999;font-size:18px;padding:4px">✕</span>
+      </div>
+    </div>
+    <div class="lead-tabs">${tabs.map((t,i)=>`<div class="lead-tab ${t===tab?'active':''}" onclick="openLeadPanel(${l.id},'${t}')">${tabLabels[i]}</div>`).join('')}</div>
+    <div class="lead-body">${tabContent}</div>
+    <div class="lead-footer">
+      <button class="lead-foot-btn" onclick="showToast('PDF export coming soon','info')">⬇ PDF</button>
+      <button class="lead-foot-btn" onclick="showToast('Email feature coming soon','info')">✉ Email</button>
+      <button class="lead-foot-btn primary" onclick="showToast('Dialing ${l.phone}...','info')">📞 Call</button>
+      ${isClient?`<button class="lead-foot-btn success" onclick="openAddLeadInstallment(${l.id})">💰 Collect</button>`:`<button class="lead-foot-btn success" onclick="convertLeadToBooking(${l.id})">📌 Book</button>`}
+    </div>`;
+  if(container.classList.contains('active')){container.classList.add('active')}
+  container.classList.add('active');
+  setTimeout(()=>{const el=document.querySelector('#leadActText');if(el)el.focus()},400);
+}
+function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remove('active')}
+function addLeadActivity(id){
   const l=mockLeads.find(x=>x.id===id);if(!l)return;
-  document.getElementById('leadPanelContent').innerHTML=`<div style="padding:14px 16px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:600">${l.name}</span><span style="cursor:pointer;color:#999" onclick="closeLeadPanel()">✕</span></div><div style="flex:1;padding:16px">${['Phone','Property','Source','Value','Last Contact'].map(f=>`<div class="form-group"><label class="form-label">${f}</label><div style="font-size:13px">${l[f.toLowerCase().replace(' ','')]||l[f.toLowerCase()]||'—'}</div></div>`).join('')}</div>`;
-  document.getElementById('leadSlideOut').classList.add('active');
+  const type=document.getElementById('leadActType').value;
+  const text=document.getElementById('leadActText').value;
+  if(!text.trim())return;
+  if(!l.activities)l.activities=[];
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+', '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  l.activities.unshift({type,user:'You',date:dateStr,text:text.trim()});
+  document.getElementById('leadActText').value='';
+  openLeadPanel(id,'activities');
+  showToast('Activity logged!');
+}
+function openAddLeadInstallment(id){
+  const l=mockLeads.find(x=>x.id===id);if(!l)return;
+  const amt=prompt('Enter installment amount (e.g. ৳2,00,000):');
+  if(!amt)return;
+  const d=new Date();
+  const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  if(!l.installments)l.installments=[];
+  l.installments.push({date:dateStr,amount:amt,status:'Due'});
+  openLeadPanel(id,'installments');
+  showToast('Installment added!');
+}
+function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.findIndex(x=>x.id===id);if(i>-1){mockLeads.splice(i,1);closeLeadPanel();renderModule();showToast('Deleted','info')}}
+function convertLeadToBooking(id){
+  const l=mockLeads.find(x=>x.id===id);if(!l)return;
+  if(!confirm(`Convert ${l.name} to booking?`))return;
+  addItem(mockBookings,{id:'BKG-'+(100+mockBookings.length+1),client:l.name,property:l.property.split('-')[0].trim(),unit:l.property.split('-')[1]||'—',price:l.value,advance:'৳0',status:'Pending Review',type:'Plot'});
+  l.status='Booked';
+  l.priority='Low';
+  if(!l.activities)l.activities=[];
+  l.activities.push({type:'Note',user:'System',date:'Just now',text:'Converted to booking.'});
+  closeLeadPanel();
+  renderModule();
+  showToast('Converted to booking!');
 }
 function globalSearch(){
   const q=document.getElementById('globalSearchInput').value.toLowerCase();
@@ -427,7 +595,7 @@ function nextId(a){return Math.max(0,...a.map(i=>i.id||0))+1}
 function addItem(a,i){a.push(i);showToast('Created');renderModule()}
 function updateItem(a,id,u){const i=a.findIndex(x=>x.id===id);if(i>-1){a[i]={...a[i],...u};showToast('Updated','info');renderModule()}}
 function deleteItem(a,id,l){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(x=>x.id===id);if(i>-1){a.splice(i,1);showToast('Deleted','info');renderModule()}}
-function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',inputField('Name','f_name',l.name)+inputField('Phone','f_phone',l.phone)+inputField('Property','f_prop',l.property)+selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'])+selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'])+selectField('Priority','f_priority',l.priority,['High','Medium','Low'])+inputField('Value','f_value',l.value),()=>{const d={id:l.id,name:g('f_name'),phone:g('f_phone'),property:g('f_prop'),source:g('f_source'),status:g('f_status'),priority:g('f_priority'),value:g('f_value'),type:l.type,lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d):updateItem(mockLeads,l.id,d)})}
+function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',inputField('Name','f_name',l.name)+inputField('Phone','f_phone',l.phone)+inputField('Email','f_email',l.email)+inputField('Property','f_prop',l.property)+selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'])+selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'])+selectField('Priority','f_priority',l.priority,['High','Medium','Low'])+inputField('Value','f_value',l.value),()=>{const d={id:l.id,name:g('f_name'),phone:g('f_phone'),email:g('f_email'),property:g('f_prop'),source:g('f_source'),status:g('f_status'),priority:g('f_priority'),value:g('f_value'),type:l.type,lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d):updateItem(mockLeads,l.id,d)})}
 function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',inputField('Name','f_name',p.name)+inputField('Location','f_loc',p.location)+selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed'])+inputField('Budget','f_budget',p.budget)+inputField('Manager','f_mgr',p.manager)+selectField('Type','f_type',p.type,['land','flat'])+inputField('Plots/Units','f_total',p.plots||p.units||''),()=>{const d={...p,name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')};if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d):updateItem(mockProjects,p.id,d)})}
 function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',inputField('Client','f_client',b.client)+inputField('Property','f_prop',b.property)+inputField('Unit','f_unit',b.unit)+inputField('Price','f_price',b.price)+inputField('Advance','f_adv',b.advance)+selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),()=>{const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,{id:nextId(mockBookings),...d,type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}):updateItem(mockBookings,b.id,d)})}
 function crudEmployee(item){const n=!item;const e=n?{name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',inputField('Name','f_name',e.name)+inputField('Designation','f_desig',e.designation)+selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT'])+inputField('Phone','f_phone',e.phone),()=>{const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,{...d,id:nextId(mockEmployees)}):updateItem(mockEmployees,e.id,{...d,status:e.status})})}
@@ -467,7 +635,7 @@ function renderCRM(el){
       <button class="action-btn primary" onclick="crudLead()">+ Add Lead</button>
     </div>
     ${crmView==='list'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Property</th><th>Priority</th><th>Value</th><th>Status</th><th></th></tr></thead><tbody>${mockLeads.filter(l=>{const f=document.getElementById('crmFStatus');return !f||!f.value||l.status===f.value}).map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="font-weight:500">${l.name}</td><td>${l.phone}</td><td>${l.property}</td><td><span class="badge-status ${l.priority==='High'?'badge-hot':l.priority==='Medium'?'badge-warm':'badge-cold'}">${l.priority}</span></td><td style="font-weight:500">${l.value}</td><td><span class="badge-status ${l.status==='Booked'?'badge-active':l.status==='New Inquiry'?'badge-pending':'badge-reserved'}">${l.status}</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:12px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:12px" onclick="event.stopPropagation();if(confirm('Delete lead?')){const i=mockLeads.findIndex(x=>x.id===${l.id});if(i>-1){mockLeads.splice(i,1);renderModule();showToast('Deleted','info')}}">✕</span> ${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:11px;font-weight:600" onclick="event.stopPropagation();if(confirm('Convert to booking?')){addItem(mockBookings,{id:'BKG-'+(100+mockBookings.length+1),client:'${l.name}',property:'${l.property}',unit:'—',price:'${l.value}',advance:'৳0',status:'Pending Review',type:'Plot'});l.status='Booked';renderModule();showToast('Converted to booking')}">→B</span>`:''}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Status</th><th></th></tr></thead><tbody>${mockLeads.filter(l=>{const f=document.getElementById('crmFStatus');return !f||!f.value||l.status===f.value}).map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="padding:4px 4px 4px 12px;width:32px"><div style="width:26px;height:26px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">${leadGetInitials(l.name)}</div></td><td style="font-weight:500">${l.name}</td><td>${l.phone}</td><td>${l.property}</td><td><span style="display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${leadBadgeColor(l.source)}"></span>${l.source}</span></td><td style="font-weight:500;color:#2e7d32">${l.value}</td><td><span class="badge-status ${l.status==='Booked'?'badge-active':l.status==='New Inquiry'?'badge-pending':'badge-reserved'}">${l.status}</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:12px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:12px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span> ${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:11px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</td></tr>`).join('')}</tbody></table></div></div></div>
     `:`<div style="display:flex;gap:12px;overflow-x:auto;flex:1;min-height:300px">${['New Inquiry','Site Visit','Negotiation','Booked'].map(st=>{const items=mockLeads.filter(l=>l.status===st);return `<div class="kanban-col"><div style="padding:8px 10px;font-size:11px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>${st}</span><span style="background:#e0e0e0;border-radius:10px;padding:0 8px;font-size:10px">${items.length}</span></div><div style="flex:1;overflow-y:auto;padding:4px 8px">${items.map(l=>`<div class="kanban-card" onclick="openLead(${l.id})"><div style="font-size:12px;font-weight:600">${l.name}</div><div style="font-size:11px;color:#888;margin-top:2px">${l.property}</div><div style="font-size:11px;color:#888">${l.value} · ${l.source}</div><div style="margin-top:4px;display:flex;gap:4px"><span class="badge-status ${l.priority==='High'?'badge-hot':l.priority==='Medium'?'badge-warm':'badge-cold'}">${l.priority}</span><span class="badge-status ${l.type==='NRB'?'badge-reserved':'badge-closed'}">${l.type}</span></div></div>`).join('')}</div></div>`}).join('')}</div>`}
     <div class="content-footer"><div class="breadcrumb">CRM <span>›</span> ${crmView==='list'?'List':'Pipeline'}</div></div></div>`;
 }
