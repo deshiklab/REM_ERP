@@ -42,12 +42,161 @@
             from { transform: translateX(100%); } 
             to { transform: translateX(0); } 
         }
+        @keyframes sidebarFadeIn {
+            from { opacity: 0; transform: translateX(-4px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
         
         .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-slide-in-right { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ── Collapsible Sidebar ── */
+        #sidebar { transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+        #sidebar.collapsed { width: 64px !important; }
+        #sidebar:not(.collapsed) { width: 256px !important; }
+        /* In collapsed mode, hover expands temporarily */
+        #sidebar.collapsed:hover { width: 256px !important; }
+        
+        #sidebar.collapsed .sidebar-label,
+        #sidebar.collapsed .sidebar-chevron,
+        #sidebar.collapsed .sidebar-sub,
+        #sidebar.collapsed .sidebar-profile-text,
+        #sidebar.collapsed .sidebar-header-title,
+        #sidebar.collapsed .sidebar-header-subtitle,
+        #sidebar.collapsed .sidebar-search,
+        #sidebar.collapsed .sidebar-footer-text { display: none; }
+        
+        #sidebar.collapsed .sidebar-group-btn { justify-content: center; padding: 10px 6px; }
+        #sidebar.collapsed .sidebar-item-btn { justify-content: center; padding: 8px 6px; gap: 0; }
+        #sidebar.collapsed .sidebar-nav { padding: 8px 4px; }
+        #sidebar.collapsed .sidebar-profile { justify-content: center; padding: 6px; }
+        #sidebar.collapsed .sidebar-header-content { justify-content: center; }
+        
+        #sidebar.collapsed .sidebar-item-btn i,
+        #sidebar.collapsed .sidebar-group-btn i { margin: 0; }
+        
+        #sidebar.collapsed .sidebar-group-items { display: none !important; }
+        
+        /* Sidebar tooltips when collapsed */
+        #sidebar.collapsed [data-sidebar-tooltip] { position: relative; }
+        #sidebar.collapsed [data-sidebar-tooltip]::after {
+            content: attr(data-sidebar-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 8px;
+            background: #1a1f1c;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.15s ease;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #374151;
+        }
+        #sidebar.collapsed [data-sidebar-tooltip]:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Hide tooltips when sidebar is hover-expanded in collapsed mode */
+        #sidebar.collapsed:hover [data-sidebar-tooltip]::after {
+            display: none;
+        }
+        
+        /* Sidebar toggle button */
+        .sidebar-toggle-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .sidebar-toggle-btn:hover { background: rgba(255,255,255,0.1); }
+        .sidebar-toggle-btn.collapsed-state i { transform: rotate(180deg); }
+
+        /* ── Full-bleed content overrides ── */
+        #main-content {
+            padding: 0 !important;
+        }
+        #main-content > div {
+            padding: 8px;
+        }
+        /* Remove outer card wrappers — let tables breathe */
+        #main-content .bg-white.rounded-2xl,
+        #main-content .bg-white.rounded-xl.border {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            box-shadow: none !important;
+            border-top: 1px solid #e2e0d8 !important;
+        }
+        /* Slim table headers */
+        #main-content table thead th {
+            padding: 6px 12px !important;
+            font-size: 10px !important;
+            letter-spacing: 0.5px !important;
+            background: #fafaf8 !important;
+            border-bottom: 1px solid #e2e0d8 !important;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        #main-content table tbody td {
+            padding: 6px 12px !important;
+        }
+        #main-content table tbody tr:hover {
+            background: #f4f3ee !important;
+        }
+        /* Module title as thin sticky header */
+        #main-content .module-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            padding: 4px 12px;
+            background: rgba(244, 243, 238, 0.92);
+            backdrop-filter: blur(4px);
+            border-bottom: 1px solid #e2e0d8;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1a1f1c;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        /* Slim topbar */
+        #app-topbar {
+            height: 32px !important;
+            padding: 0 8px !important;
+        }
+        #app-topbar button {
+            padding: 4px;
+        }
+        #app-topbar button i {
+            width: 16px;
+            height: 16px;
+        }
+        /* Footer adjustment */
+        #app-footer {
+            height: 28px !important;
+            font-size: 9px !important;
+        }
 
         /* Hatched diagonal pattern for "Not Acquired" plots */
         .bg-hatched {
@@ -257,49 +406,94 @@
     <div id="mobile-overlay" class="fixed inset-0 bg-[#1a1f1c]/50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed md:static top-0 left-0 h-screen w-64 bg-[#1a1f1c] text-white z-40 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out flex flex-col shrink-0">
-        <div class="p-6 flex items-center justify-between border-b border-gray-800">
-            <div>
-                <h1 class="text-xl font-bold tracking-wider text-[#b5bca1]">MARS</h1>
-                <p class="text-[10px] tracking-widest text-gray-400 uppercase">Constech Limited</p>
+    <aside id="sidebar" class="fixed md:static top-0 left-0 h-screen w-64 bg-[#1a1f1c] text-white z-40 transform -translate-x-full md:translate-x-0 flex flex-col shrink-0">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header-content flex items-center justify-between px-4 h-12 border-b border-gray-800 shrink-0">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-8 h-8 rounded-lg bg-[#b5bca1] text-[#1a1f1c] flex items-center justify-center font-bold text-sm shrink-0">
+                    M
+                </div>
+                <div class="overflow-hidden">
+                    <h1 class="sidebar-header-title text-sm font-bold tracking-wider text-[#b5bca1] truncate">MARS</h1>
+                    <p class="sidebar-header-subtitle text-[9px] tracking-widest text-gray-500 uppercase truncate">Constech Limited</p>
+                </div>
             </div>
-            <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+            <div class="flex items-center gap-1">
+                <div onclick="toggleSidebarCollapse()" class="sidebar-toggle-btn" data-sidebar-tooltip="Collapse sidebar" id="sidebar-collapse-btn">
+                    <i data-lucide="panel-left-close" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
         </div>
         
-        <nav id="sidebar-nav" class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+        <!-- Global Search (visible when expanded) -->
+        <div class="sidebar-search px-3 py-2 border-b border-gray-800 shrink-0">
+            <div class="relative">
+                <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5"></i>
+                <input type="text" id="sidebar-global-search" onkeyup="handleGlobalSearch(event)" placeholder="Search everything..." class="w-full pl-7 pr-2 py-1.5 bg-gray-800/50 border border-gray-700 rounded-md text-xs text-gray-200 placeholder-gray-500 focus:ring-1 focus:ring-[#b5bca1] outline-none transition-all" autocomplete="off" />
+                <div id="global-search-dropdown" class="absolute left-0 right-0 top-full mt-1 bg-gray-900 rounded-xl border border-gray-700 hidden overflow-hidden z-[100] max-h-[60vh] overflow-y-auto shadow-xl"></div>
+            </div>
+        </div>
+        
+        <nav id="sidebar-nav" class="sidebar-nav flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
             <!-- Nav items injected via JS -->
         </nav>
         
-        <div class="p-4 border-t border-gray-800 relative" id="profile-menu-container">
-            <div id="sidebar-profile-button" onclick="toggleProfileMenu()" class="flex items-center gap-3 hover:bg-gray-800/50 p-2 -mx-2 rounded-lg transition-colors cursor-pointer">
-                <div class="w-10 h-10 rounded-full bg-[#b5bca1] text-[#1a1f1c] flex items-center justify-center font-bold shadow-inner shrink-0">
-                    HB
-                </div>
-                <div class="overflow-hidden flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-white truncate">MD Hasanul Banna</p>
-                    <p id="profile-role-label" class="text-[10px] text-[#b5bca1] truncate uppercase tracking-wider mt-0.5">Super Admin</p>
-                </div>
-                <i data-lucide="chevron-up" class="w-3.5 h-3.5 text-gray-500 shrink-0"></i>
-            </div>
-            <!-- Profile Menu -->
-            <div id="profile-menu" class="absolute bottom-full mb-2 left-4 right-4 bg-gray-900/80 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg hidden p-2">
-                <div class="px-3 py-2 border-b border-gray-700 mb-2">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Switch Role</p>
-                    <div class="flex flex-wrap gap-1 mt-1.5">
-                        <button onclick="setRole('Super Admin')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Super Admin">Super Admin</button>
-                        <button onclick="setRole('Sales Agent')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Sales Agent">Sales Agent</button>
-                        <button onclick="setRole('Site Engineer')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Site Engineer">Site Engineer</button>
-                        <button onclick="setRole('Finance')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Finance">Finance</button>
+        <!-- Sidebar Footer with minimal icons -->
+        <div class="sidebar-footer border-t border-gray-800 shrink-0">
+            <div class="flex items-center justify-between px-3 py-1.5">
+                <div class="flex items-center gap-1">
+                    <button onclick="toggleDarkMode()" id="dark-mode-btn-sidebar" class="text-gray-400 hover:text-white p-1 rounded transition-colors" data-sidebar-tooltip="Toggle Dark Mode">
+                        <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="toggleFullScreen()" id="fullscreen-btn-sidebar" class="text-gray-400 hover:text-white p-1 rounded transition-colors" data-sidebar-tooltip="Toggle Fullscreen">
+                        <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <div class="relative" id="notifications-container-sidebar">
+                        <button onclick="toggleNotifications()" class="relative text-gray-400 hover:text-white p-1 rounded transition-colors" data-sidebar-tooltip="Notifications">
+                            <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                            <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-[#1a1f1c]"></span>
+                        </button>
                     </div>
                 </div>
-                <button onclick="openMyProfileModal()" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-700/50 hover:text-white transition-colors">
-                    <i data-lucide="user-circle" class="w-4 h-4"></i> My Profile
-                </button>
-                <button onclick="openChangePasswordModal()" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-700/50 hover:text-white transition-colors">
-                    <i data-lucide="key-round" class="w-4 h-4"></i> Change Password
-                </button>
+                <div class="flex items-center gap-1">
+                    <button class="text-gray-400 hover:text-red-400 p-1 rounded transition-colors" data-sidebar-tooltip="Logout">
+                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Profile area -->
+            <div id="profile-menu-container" class="relative px-2 pb-2">
+                <div id="sidebar-profile-button" onclick="toggleProfileMenu()" class="sidebar-profile flex items-center gap-2 hover:bg-gray-800/50 p-1.5 rounded-lg transition-colors cursor-pointer">
+                    <div class="w-7 h-7 rounded-full bg-[#b5bca1] text-[#1a1f1c] flex items-center justify-center font-bold text-xs shrink-0">
+                        HB
+                    </div>
+                    <div class="sidebar-profile-text overflow-hidden flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-white truncate">MD Hasanul Banna</p>
+                        <p id="profile-role-label" class="text-[9px] text-[#b5bca1] truncate uppercase tracking-wider">Super Admin</p>
+                    </div>
+                    <i data-lucide="chevron-up" class="sidebar-chevron w-3 h-3 text-gray-500 shrink-0"></i>
+                </div>
+                <!-- Profile Menu -->
+                <div id="profile-menu" class="absolute bottom-full mb-2 left-2 right-2 bg-gray-900/80 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg hidden p-2" style="z-index: 50;">
+                    <div class="px-3 py-2 border-b border-gray-700 mb-2">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Switch Role</p>
+                        <div class="flex flex-wrap gap-1 mt-1.5">
+                            <button onclick="setRole('Super Admin')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Super Admin">Super Admin</button>
+                            <button onclick="setRole('Sales Agent')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Sales Agent">Sales Agent</button>
+                            <button onclick="setRole('Site Engineer')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Site Engineer">Site Engineer</button>
+                            <button onclick="setRole('Finance')" class="role-btn text-[10px] px-2 py-1 rounded-md border transition-all font-medium" data-role="Finance">Finance</button>
+                        </div>
+                    </div>
+                    <button onclick="openMyProfileModal()" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-700/50 hover:text-white transition-colors">
+                        <i data-lucide="user-circle" class="w-4 h-4"></i> My Profile
+                    </button>
+                    <button onclick="openChangePasswordModal()" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-200 hover:bg-gray-700/50 hover:text-white transition-colors">
+                        <i data-lucide="key-round" class="w-4 h-4"></i> Change Password
+                    </button>
+                </div>
             </div>
         </div>
     </aside>
@@ -311,82 +505,66 @@
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        <!-- Top Bar -->
-        <header class="h-9 flex items-center justify-between px-3 bg-white/80 backdrop-blur-md border-b border-[#e2e0d8] z-20 shrink-0">
-            <div class="flex items-center gap-2">
-                <button onclick="toggleSidebar()" class="p-2 text-[#3b4a40] hover:bg-[#f4f3ee] rounded-md" data-tooltip="Toggle Menu">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
+        <!-- Slim Topbar -->
+        <header id="app-topbar" class="flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-[#e2e0d8] z-20 shrink-0">
+            <div class="flex items-center gap-1">
+                <button onclick="toggleSidebar()" class="p-1.5 text-[#3b4a40] hover:bg-[#f4f3ee] rounded-md" data-tooltip="Toggle Menu">
+                    <i data-lucide="menu" class="w-4 h-4"></i>
                 </button>
-                <div id="topbar-icons" class="hidden md:flex items-center gap-1 border-l border-gray-200 ml-2 pl-2">
+                <div id="topbar-icons" class="hidden md:flex items-center gap-0.5 border-l border-gray-200 ml-1.5 pl-1.5">
                     <!-- Icons will be injected here by JS -->
                 </div>
-                <div class="relative hidden md:block" id="global-search-container">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-[18px] h-[18px]"></i>
-                    <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="Search properties, leads, documents..." class="pl-8 pr-3 py-1 w-56 bg-[#f4f3ee] border-none rounded-full text-xs focus:ring-2 focus:ring-[#3b4a40] outline-none transition-all" autocomplete="off" />
-                    <div id="global-search-dropdown" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-[#e2e0d8] hidden overflow-hidden z-[100] max-h-[70vh] overflow-y-auto"></div>
-                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="toggleDarkMode()" id="dark-mode-btn" class="text-[#3b4a40] hover:text-[#1a1f1c] transition-colors" data-tooltip="Toggle Dark Mode">
-                    <i data-lucide="moon" class="w-5 h-5"></i>
-                </button>
-                <button onclick="toggleFullScreen()" id="fullscreen-btn" class="text-[#3b4a40] hover:text-[#1a1f1c] transition-colors" data-tooltip="Toggle Fullscreen">
-                    <i data-lucide="maximize" class="w-5 h-5"></i>
-                </button>
+            <div class="flex items-center gap-1">
                 <div class="relative" id="notifications-container">
-                    <button onclick="toggleNotifications()" class="relative text-[#3b4a40] hover:text-[#1a1f1c] transition-colors" data-tooltip="Notifications">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    <button onclick="toggleNotifications()" class="relative p-1.5 text-[#3b4a40] hover:text-[#1a1f1c] transition-colors" data-tooltip="Notifications">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                     </button>
                     <!-- Notifications Dropdown -->
-                    <div id="notifications-dropdown" class="absolute right-0 mt-4 w-80 bg-white rounded-xl shadow-2xl border border-[#e2e0d8] hidden flex-col z-50 transform origin-top-right transition-all">
+                    <div id="notifications-dropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-[#e2e0d8] hidden flex-col z-50 transform origin-top-right transition-all">
                         <div class="p-2 border-b border-[#e2e0d8] flex justify-between items-center bg-[#f4f3ee] rounded-t-xl">
                             <h3 class="font-bold text-[#1a1f1c]">Notifications</h3>
                             <span class="text-xs bg-[#3b4a40] text-white px-2 py-0.5 rounded-full">3 New</span>
                         </div>
                         <div class="max-h-64 overflow-y-auto">
-                            <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                            <div class="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
                                 <p class="text-sm font-semibold text-[#1a1f1c]">PO-24-089 Requires Approval</p>
                                 <p class="text-xs text-gray-500 mt-1">Shah Cement Industries • ৳ 5,50,000</p>
                             </div>
-                            <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                            <div class="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
                                 <p class="text-sm font-semibold text-[#1a1f1c]">Payment Received</p>
                                 <p class="text-xs text-gray-500 mt-1">Dr. Rubina Ali • ৳ 2,00,000</p>
                             </div>
                         </div>
-                        <div class="p-3 text-center border-t border-[#e2e0d8] hover:bg-gray-50 rounded-b-xl cursor-pointer">
+                        <div class="p-2 text-center border-t border-[#e2e0d8] hover:bg-gray-50 rounded-b-xl cursor-pointer">
                             <span class="text-xs font-bold text-[#3b4a40]">View All Activity</span>
                         </div>
                     </div>
-                </div>
-                <div class="flex items-center border-l border-[#e2e0d8] pl-4">
-                    <button class="text-[#3b4a40] hover:text-red-600 transition-colors" data-tooltip="Logout">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </button>
                 </div>
             </div>
         </header>
 
         <!-- Dynamic View Container -->
-        <main id="main-content" class="flex-1 p-2 md:p-3 overflow-y-auto relative bg-[#f4f3ee]">
+        <main id="main-content" class="flex-1 overflow-y-auto relative bg-[#f4f3ee]">
             <!-- Content injected here -->
         </main>
         
-        <footer id="app-footer" class="h-8 flex items-center justify-between px-4 bg-white border-t border-[#e2e0d8] text-[10px] text-gray-500 shrink-0 z-20 sticky bottom-0">
-            <div class="flex-1 flex items-center gap-1 text-[9px] text-gray-400" id="footer-breadcrumb">
+        <footer id="app-footer" class="flex items-center justify-between px-3 bg-white border-t border-[#e2e0d8] text-gray-500 shrink-0 z-20 sticky bottom-0">
+            <div class="flex-1 flex items-center gap-1 text-gray-400" id="footer-breadcrumb">
                 <i data-lucide="house" class="w-2.5 h-2.5"></i>
                 <span>Executive Overview</span>
             </div>
             <div class="flex items-center justify-center">
                 System Integrated by <span class="font-bold text-[#1a1f1c] ml-1 tracking-wide">BITSCOL</span>
             </div>
-            <div class="flex-1 flex items-center justify-end gap-3">
+            <div class="flex-1 flex items-center justify-end gap-2">
                 <button onclick="changeZoom(-5)" class="hover:text-[#1a1f1c] transition-colors" data-tooltip="Zoom Out">
-                    <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="zoom-out" class="w-3 h-3"></i>
                 </button>
-                <span id="zoom-level" class="font-bold text-[#1a1f1c] w-7 text-center cursor-pointer hover:text-[#3b4a40]" onclick="resetZoom()" data-tooltip="Reset Zoom">100%</span>
+                <span id="zoom-level" class="font-bold text-[#1a1f1c] w-6 text-center cursor-pointer hover:text-[#3b4a40]" onclick="resetZoom()" data-tooltip="Reset Zoom">100%</span>
                 <button onclick="changeZoom(5)" class="hover:text-[#1a1f1c] transition-colors" data-tooltip="Zoom In">
-                    <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="zoom-in" class="w-3 h-3"></i>
                 </button>
             </div>
         </footer>
@@ -885,6 +1063,7 @@
 
         let activeTab = 'dashboard';
         let isSidebarOpen = false;
+        let sidebarCollapsed = false;
         let projectListTab = 'land'; // 'land' or 'flat'
         let projectDisplayMode = 'grid'; // 'grid' or 'list'
         let activeProjectId = null;
@@ -977,6 +1156,13 @@
 
         // --- APP STATE & NAVIGATION ---
         function initApp() { 
+            // Load sidebar state
+            const savedSidebar = localStorage.getItem('sidebarCollapsed');
+            if (savedSidebar === 'true') {
+                sidebarCollapsed = true;
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('sidebar-collapse-btn').classList.add('collapsed-state');
+            }
             renderSidebar(); renderTopbarIcons();
             renderContent(); 
             lucide.createIcons(); 
@@ -992,16 +1178,21 @@
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
                 document.documentElement.classList.add('dark');
-                const icon = document.querySelector('#dark-mode-btn i');
-                if (icon) icon.setAttribute('data-lucide', 'sun');
+                const icons = document.querySelectorAll('#dark-mode-btn-sidebar i, #dark-mode-btn i');
+                icons.forEach(icon => { if (icon) icon.setAttribute('data-lucide', 'sun'); });
                 lucide.createIcons();
             }
 
             // Click outside to close dropdowns
             document.addEventListener('click', (e) => {
-                const notificationsContainer = document.getElementById('notifications-container');
+                const containers = ['notifications-container', 'notifications-container-sidebar'];
+                let inAnyNotification = false;
+                containers.forEach(id => {
+                    const container = document.getElementById(id);
+                    if (container && container.contains(e.target)) inAnyNotification = true;
+                });
                 const notificationsDropdown = document.getElementById('notifications-dropdown');
-                if (notificationsContainer && notificationsDropdown && !notificationsContainer.contains(e.target) && !notificationsDropdown.classList.contains('hidden')) {
+                if (!inAnyNotification && notificationsDropdown && !notificationsDropdown.classList.contains('hidden')) {
                     notificationsDropdown.classList.add('hidden');
                     notificationsDropdown.classList.remove('flex');
                 }
@@ -1015,13 +1206,14 @@
 
             // Fullscreen change listener
             document.addEventListener('fullscreenchange', () => {
-                const btn = document.getElementById('fullscreen-btn');
-                if (!btn) return;
-                const icon = btn.querySelector('i');
-                if (document.fullscreenElement) {
-                    icon.setAttribute('data-lucide', 'minimize');
-                } else {
-                    icon.setAttribute('data-lucide', 'maximize');
+                const btns = document.querySelectorAll('#fullscreen-btn-sidebar i, #fullscreen-btn i');
+                const icon = btns[0];
+                if (icon) {
+                    if (document.fullscreenElement) {
+                        icon.setAttribute('data-lucide', 'minimize');
+                    } else {
+                        icon.setAttribute('data-lucide', 'maximize');
+                    }
                 }
                 lucide.createIcons();
             });
@@ -1031,11 +1223,13 @@
             const html = document.documentElement;
             const isDark = html.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            const icon = document.querySelector('#dark-mode-btn i');
-            if (icon) {
-                icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-                lucide.createIcons();
-            }
+            const icons = document.querySelectorAll('#dark-mode-btn-sidebar i, #dark-mode-btn i');
+            icons.forEach(icon => {
+                if (icon) {
+                    icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+                }
+            });
+            lucide.createIcons();
         }
 
         function toggleSidebar() {
@@ -1043,12 +1237,28 @@
             const overlay = document.getElementById('mobile-overlay');
             
             if (window.innerWidth < 768) {
-                isSidebarOpen = sidebar.classList.contains('-translate-x-full');
-                if (isSidebarOpen) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } 
+                const isHidden = sidebar.classList.contains('-translate-x-full');
+                if (isHidden) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } 
                 else { sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); }
-            } else {
-                sidebar.classList.toggle('md:-ml-64');
             }
+        }
+        
+        function toggleSidebarCollapse() {
+            sidebarCollapsed = !sidebarCollapsed;
+            const sidebar = document.getElementById('sidebar');
+            const btn = document.getElementById('sidebar-collapse-btn');
+            if (sidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                btn.classList.add('collapsed-state');
+                btn.setAttribute('data-sidebar-tooltip', 'Expand sidebar');
+            } else {
+                sidebar.classList.remove('collapsed');
+                btn.classList.remove('collapsed-state');
+                btn.setAttribute('data-sidebar-tooltip', 'Collapse sidebar');
+            }
+            localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+            // Re-render icons after resize
+            setTimeout(() => lucide.createIcons(), 50);
         }
 
         function toggleFullScreen() {
@@ -1200,19 +1410,19 @@
                 const hasActive = group.items.some(i => activeTab === i.id);
                 return `
                     <div class="mb-0.5">
-                        <button onclick="toggleGroup('${group.label}')" 
-                            class="w-full flex items-center justify-between px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${hasActive ? 'text-[#b5bca1]' : 'text-gray-500'} hover:text-gray-200 hover:bg-gray-800/50 transition-all">
+                        <button onclick="toggleGroup('${group.label}')" data-sidebar-tooltip="${group.label}"
+                            class="sidebar-group-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${hasActive ? 'text-[#b5bca1]' : 'text-gray-500'} hover:text-gray-200 hover:bg-gray-800/50 transition-all">
                             <span class="flex items-center gap-2">
-                                <i data-lucide="${group.icon}" class="w-3.5 h-3.5"></i> ${group.label}
+                                <i data-lucide="${group.icon}" class="w-4 h-4 shrink-0"></i> <span class="sidebar-label">${group.label}</span>
                             </span>
-                            <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+                            <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="sidebar-chevron w-3 h-3 transition-transform duration-200"></i>
                         </button>
-                        <div class="${isExpanded ? '' : 'hidden'} space-y-0.5 mt-0.5">
+                        <div class="sidebar-group-items ${isExpanded ? '' : 'hidden'} space-y-0.5 mt-0.5">
                             ${group.items.map(item => {
                                 const isActive = activeTab === item.id;
                                 const activeClasses = isActive ? 'bg-[#3b4a40] text-white shadow-sm' : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200';
-                                return `<button onclick="setActiveTab('${item.id}')" class="w-full flex items-center gap-3 pl-7 pr-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeClasses}">
-                                    <i data-lucide="${item.icon}" class="w-4 h-4 ${isActive ? 'text-[#b5bca1]' : ''}"></i> ${item.label}
+                                return `<button onclick="setActiveTab('${item.id}')" data-sidebar-tooltip="${item.label}" class="sidebar-item-btn w-full flex items-center gap-2 pl-7 pr-3 py-1.5 rounded-lg text-sm font-medium transition-all ${activeClasses}">
+                                    <i data-lucide="${item.icon}" class="w-4 h-4 shrink-0 ${isActive ? 'text-[#b5bca1]' : ''}"></i> <span class="sidebar-label">${item.label}</span>
                                 </button>`;
                             }).join('')}
                         </div>
@@ -1232,8 +1442,8 @@
                 if (!item) return '';
                 const isActive = activeTab === item.id;
                 const activeClasses = isActive ? 'bg-[#3b4a40] text-white' : 'text-gray-500 hover:bg-[#f4f3ee] hover:text-[#1a1f1c]';
-                return `<button onclick="setActiveTab('${item.id}')" data-tooltip="${item.label}" class="p-2 rounded-lg transition-colors ${activeClasses}">
-                            <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                return `<button onclick="setActiveTab('${item.id}')" data-tooltip="${item.label}" class="p-1 rounded-lg transition-colors ${activeClasses}">
+                            <i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i>
                         </button>`;
             }).join('');
             setTimeout(() => lucide.createIcons(), 10);
@@ -1309,7 +1519,7 @@
             }
         ];
         function handleGlobalSearch(e) {
-            const input = document.getElementById('global-search-input');
+            const input = document.getElementById('sidebar-global-search') || document.getElementById('global-search-input');
             const dropdown = document.getElementById('global-search-dropdown');
             if (!input || !dropdown) return;
             const query = input.value.trim();
@@ -1366,9 +1576,9 @@
         }
         // Close global search dropdown on Escape or outside click
         document.addEventListener('click', function(e) {
-            const container = document.getElementById('global-search-container');
+            const container = document.getElementById('sidebar-global-search')?.parentElement;
             const dropdown = document.getElementById('global-search-dropdown');
-            if (container && dropdown && !container.contains(e.target)) {
+            if (dropdown && (!container || !container.contains(e.target))) {
                 dropdown.classList.add('hidden');
             }
         });
