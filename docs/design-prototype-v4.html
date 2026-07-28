@@ -773,22 +773,25 @@ function renderSettings(el) {
 let currentModule = 'dashboard';
 
 function switchModule(mod) {
-  currentModule = mod;
+  // Normalize aliases
+  const normalize = { 'land': 'plots', 'reports': 'dashboard', 'help': 'settings' };
+  const resolved = normalize[mod] || mod;
+  currentModule = resolved;
   // Update sidebar active states
   document.querySelectorAll('#sidebarNav .sidebar-item').forEach(el => el.classList.remove('active'));
   const sidebarMap = { 'dashboard': 0, 'crm': 1, 'plots': 2, 'sales': 3, 'bookings': 4, 'finance': 5, 'stock': 6, 'projects': 7, 'hr': 8, 'settings': 9 };
-  const idx = sidebarMap[mod];
+  const idx = sidebarMap[resolved];
   if (idx !== undefined) {
     const items = document.querySelectorAll('#sidebarNav .sidebar-item');
     if (items[idx]) items[idx].classList.add('active');
   }
   // Update top nav tabs
   document.querySelectorAll('#topNav .top-nav-item').forEach(el => el.classList.remove('active'));
-  const tabMap = { 'dashboard': 0, 'sales': 1, 'land': 2, 'plots': 2, 'bookings': 3, 'finance': 4, 'stock': 5, 'projects': 6, 'hr': 7, 'reports': 8, 'settings': 9 };
-  const tidx = tabMap[mod] !== undefined ? tabMap[mod] : 0;
+  const tabMap = { 'dashboard': 0, 'crm': 1, 'sales': 1, 'plots': 2, 'bookings': 3, 'finance': 4, 'stock': 5, 'projects': 6, 'hr': 7, 'settings': 9 };
+  const tidx = tabMap[resolved] !== undefined ? tabMap[resolved] : 0;
   const tabs = document.querySelectorAll('#topNav .top-nav-item');
   if (tabs[tidx]) tabs[tidx].classList.add('active');
-  render(mod);
+  render(resolved);
 }
 
 function switchTab(el, tab) {
