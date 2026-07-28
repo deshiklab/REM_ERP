@@ -368,7 +368,7 @@
         </header>
 
         <!-- Dynamic View Container -->
-        <main id="main-content" class="flex-1 p-4 md:p-8 overflow-y-auto relative bg-[#f4f3ee]">
+        <main id="main-content" class="flex-1 p-2 md:p-3 overflow-y-auto relative bg-[#f4f3ee]">
             <!-- Content injected here -->
         </main>
         
@@ -1375,45 +1375,6 @@
         });
 
         // ── Breadcrumb Helpers ──
-        function getBreadcrumbHTML() {
-            const tabToLabel = {
-                dashboard: 'Executive Dashboard', bi_reports: 'BI & Reports',
-                crm: 'CRM & Leads', sales_marketing: 'Sales & Marketing', dues: 'Dues & Recovery',
-                land_mgmt: 'Land Acquisition', layout_planning: 'Layout & Planning',
-                design_mgmt: 'Design Management', projects: 'Project Management',
-                bookings: 'Flat & Plot Booking', customer_portal: 'Customer Portal', handover: 'Handover & Post-Sales',
-                finance: 'Accounts & Finance', boq: 'BOQ & Cost Control',
-                stock: 'Stock & Procurement', contractors: 'Contractors', equipment: 'Equipment Tracking',
-                labor: 'Labor Management', quality: 'QC & Inspection', variation_orders: 'Variation Orders',
-                compliance: 'Regulatory Compliance', vault: 'Data Vault', knowledge_base: 'Knowledge Base',
-                contacts: 'Contact Book', settings: 'System Settings', tasks: 'Task Management', chat: 'Team Workspace'
-            };
-            const tabToGroup = {};
-            menuGroups.forEach(g => { g.items.forEach(i => { tabToGroup[i.id] = g.label; }); });
-            const crumbs = [];
-            const group = tabToGroup[activeTab];
-            if (group) crumbs.push(group);
-            const label = tabToLabel[activeTab] || activeTab.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-            if (label) crumbs.push(label);
-            // Deeper context
-            if (activeTab === 'layout_planning') {
-                const proj = mockLayoutProjects.find(p => p.id === gLayoutActiveId);
-                if (proj) crumbs.push(proj.name);
-                if (gLayoutSelectedPlot) crumbs.push('Plot ' + gLayoutSelectedPlot);
-            } else if (activeTab === 'land_mgmt') {
-                const s = { identification:'Identification', feasibility:'Feasibility', legal:'Legal Vetting', acquisition:'Acquisition', planning:'Planning' };
-                if (s[landMgmtActiveTab]) crumbs.push(s[landMgmtActiveTab]);
-            }
-            if (crumbs.length === 0) return '';
-            return `<div class="flex items-center gap-0.5 mb-4 text-xs tracking-wide bg-white/70 backdrop-blur-sm px-4 py-2 rounded-xl border border-[#e2e0d8] shadow-sm">
-                <i data-lucide="house" class="w-3 h-3 text-gray-400 mr-1"></i>
-                ${crumbs.map((c,i) => {
-                    const isLast = i === crumbs.length - 1;
-                    return `<span class="${isLast ? 'text-[#1a1f1c] font-bold' : 'text-gray-500'} text-xs">${c}</span>${!isLast ? '<span class="text-gray-300 text-xs mx-1.5">›</span>' : ''}`;
-                }).join('')}
-            </div>`;
-        }
-
         // ── Cross-Module Navigation Helpers ──
         function openCrmForCustomer(customerName) {
             closeUniversalModal();
@@ -1426,7 +1387,6 @@
             showToast('📋 Bookings opened — Plot ' + plotId, 'success');
         }
         function openLayoutForProject(projectName) {
-            // Find the layout that matches the given project name
             const layout = mockLayoutProjects.find(p => p.name === projectName);
             if (layout) {
                 closeUniversalModal();
@@ -1440,36 +1400,35 @@
 
         function renderContent() {
             const mainContent = document.getElementById('main-content');
-            const bc = getBreadcrumbHTML();
             switch(activeTab) {
-                case 'dashboard': mainContent.innerHTML = bc + getDashboardHTML(); break;
-                case 'crm': mainContent.innerHTML = bc + getCRMHTML(); break;
-                case 'land_mgmt': mainContent.innerHTML = bc + getLandMgmtHTML(); break;
-                case 'projects': mainContent.innerHTML = bc + getProjectsHTML(); break;
-                case 'bookings': mainContent.innerHTML = bc + getBookingsHTML(); break;
-                case 'finance': mainContent.innerHTML = bc + getFinanceHTML(); break;
-                case 'stock': mainContent.innerHTML = bc + getStockHTML(); break;
-                case 'contacts': mainContent.innerHTML = bc + getContactsHTML(); break;
-                case 'tasks': mainContent.innerHTML = bc + getTasksHTML(); break;
-                case 'chat': mainContent.innerHTML = bc + getChatHTML(); break;
-                case 'vault': mainContent.innerHTML = bc + getVaultHTML(); break;
-                case 'knowledge_base': mainContent.innerHTML = bc + getKnowledgeBaseHTML(); break;
-                case 'contractors': mainContent.innerHTML = bc + getContractorsHTML(); break;
-                case 'boq': mainContent.innerHTML = bc + getBOQHTML(); break;
-                case 'variation_orders': mainContent.innerHTML = bc + getVariationOrdersHTML(); break;
-                case 'equipment': mainContent.innerHTML = bc + getEquipmentHTML(); break;
-                case 'labor': mainContent.innerHTML = bc + getLaborHTML(); break;
-                case 'quality': mainContent.innerHTML = bc + getQualityHTML(); break;
-                case 'sales_marketing': mainContent.innerHTML = bc + getSalesMarketingHTML(); break;
-                case 'dues': mainContent.innerHTML = bc + getDuesHTML(); break;
-                case 'customer_portal': mainContent.innerHTML = bc + getCustomerPortalHTML(); break;
-                case 'handover': mainContent.innerHTML = bc + getHandoverHTML(); break;
-                case 'compliance': mainContent.innerHTML = bc + getComplianceHTML(); break;
-                case 'bi_reports': mainContent.innerHTML = bc + getBIReportsHTML(); break;
-                case 'layout_planning': mainContent.innerHTML = bc + getLayoutPlanningHTML(); break;
-                case 'design_mgmt': mainContent.innerHTML = bc + getDesignMgmtHTML(); break;
-                case 'settings': mainContent.innerHTML = bc + getSettingsHTML(); break;
-                default: mainContent.innerHTML = bc + `<div class="flex flex-col items-center justify-center h-full text-center animate-fade-in"><h2 class="text-2xl font-bold text-[#1a1f1c]">Module Under Construction</h2></div>`;
+                case 'dashboard': mainContent.innerHTML = getDashboardHTML(); break;
+                case 'crm': mainContent.innerHTML = getCRMHTML(); break;
+                case 'land_mgmt': mainContent.innerHTML = getLandMgmtHTML(); break;
+                case 'projects': mainContent.innerHTML = getProjectsHTML(); break;
+                case 'bookings': mainContent.innerHTML = getBookingsHTML(); break;
+                case 'finance': mainContent.innerHTML = getFinanceHTML(); break;
+                case 'stock': mainContent.innerHTML = getStockHTML(); break;
+                case 'contacts': mainContent.innerHTML = getContactsHTML(); break;
+                case 'tasks': mainContent.innerHTML = getTasksHTML(); break;
+                case 'chat': mainContent.innerHTML = getChatHTML(); break;
+                case 'vault': mainContent.innerHTML = getVaultHTML(); break;
+                case 'knowledge_base': mainContent.innerHTML = getKnowledgeBaseHTML(); break;
+                case 'contractors': mainContent.innerHTML = getContractorsHTML(); break;
+                case 'boq': mainContent.innerHTML = getBOQHTML(); break;
+                case 'variation_orders': mainContent.innerHTML = getVariationOrdersHTML(); break;
+                case 'equipment': mainContent.innerHTML = getEquipmentHTML(); break;
+                case 'labor': mainContent.innerHTML = getLaborHTML(); break;
+                case 'quality': mainContent.innerHTML = getQualityHTML(); break;
+                case 'sales_marketing': mainContent.innerHTML = getSalesMarketingHTML(); break;
+                case 'dues': mainContent.innerHTML = getDuesHTML(); break;
+                case 'customer_portal': mainContent.innerHTML = getCustomerPortalHTML(); break;
+                case 'handover': mainContent.innerHTML = getHandoverHTML(); break;
+                case 'compliance': mainContent.innerHTML = getComplianceHTML(); break;
+                case 'bi_reports': mainContent.innerHTML = getBIReportsHTML(); break;
+                case 'layout_planning': mainContent.innerHTML = getLayoutPlanningHTML(); break;
+                case 'design_mgmt': mainContent.innerHTML = getDesignMgmtHTML(); break;
+                case 'settings': mainContent.innerHTML = getSettingsHTML(); break;
+                default: mainContent.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center animate-fade-in"><h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Module Under Construction</h2></div>`;
             }
             setTimeout(initDynamicFeatures, 50);
         }
@@ -1700,15 +1659,15 @@
         function getDashboardHTML() {
             const kpis = calculateKPIs();
             return `
-                <div class="space-y-6 animate-fade-in">
+                <div class="space-y-2 animate-fade-in">
                     <div class="flex justify-between items-end">
                         <div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Executive Overview</h2>
-                            <p class="text-[#3b4a40] text-sm mt-1">Real-time performance metrics across all projects.</p>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Executive Overview</h2>
+                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Real-time performance metrics across all projects.</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="bg-white/90 backdrop-blur-md p-3 rounded-xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
                             <p class="text-sm font-semibold text-[#3b4a40] flex items-center gap-2"><i data-lucide="wallet" class="w-4 h-4"></i> Total Revenue (YTD)</p>
                             <h3 class="text-3xl font-bold text-[#1a1f1c] mt-2">${kpis.revenue.current}</h3>
                             <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
@@ -1716,7 +1675,7 @@
                             </div>
                             <div class="w-full bg-[#f4f3ee] h-2 rounded-full mt-2 overflow-hidden"><div class="bg-[#b5bca1] h-full rounded-full" style="width: ${kpis.revenue.progress}%"></div></div>
                         </div>
-                        <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
+                        <div class="bg-white/90 backdrop-blur-md p-3 rounded-xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
                             <p class="text-sm font-semibold text-[#3b4a40] flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Active Leads</p>
                             <h3 class="text-3xl font-bold text-[#1a1f1c] mt-2">${kpis.leads.total}</h3>
                             <div class="mt-4 flex items-center gap-4 text-sm">
@@ -1724,7 +1683,7 @@
                                 <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#b5bca1]"></span> ${kpis.leads.nrb} NRB</div>
                             </div>
                         </div>
-                        <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
+                        <div class="bg-white/90 backdrop-blur-md p-3 rounded-xl border border-[#e2e0d8] shadow-sm relative overflow-hidden">
                             <p class="text-sm font-semibold text-[#3b4a40] flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Construction Budget</p>
                             <h3 class="text-3xl font-bold text-green-700 mt-2">${kpis.budget.status}</h3>
                             <div class="mt-4 flex items-center gap-2 text-sm">
@@ -1733,9 +1692,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                        <div class="lg:col-span-2 flex flex-col gap-6">
-                            <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-6">
+                        <div class="lg:col-span-2 flex flex-col gap-3">
+                            <div class="bg-white/90 backdrop-blur-md p-3 rounded-xl border border-[#e2e0d8] shadow-sm">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="font-bold text-[#1a1f1c] flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-[#3b4a40]"></i> Revenue Trend</h3>
                                     <select class="text-xs border border-[#e2e0d8] rounded p-1.5 outline-none bg-gray-50 text-[#3b4a40] font-semibold"><option>Last 6 Months</option><option>This Year</option></select>
@@ -1744,7 +1703,7 @@
                                     <canvas id="dashboardChart"></canvas>
                                 </div>
                             </div>
-                            <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm">
+                            <div class="bg-white/90 backdrop-blur-md p-3 rounded-xl border border-[#e2e0d8] shadow-sm">
                                 <h3 class="font-bold text-[#1a1f1c] mb-4 border-b border-[#e2e0d8] pb-2 flex items-center gap-2"><i data-lucide="check-square" class="w-4 h-4 text-[#3b4a40]"></i> Quick To-Dos</h3>
                                 <form onsubmit="addTask(event)" class="flex gap-2 mb-4">
                                     <input type="text" id="new-task-input" placeholder="What needs to be done?" class="flex-1 border border-[#e2e0d8] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#3b4a40] transition bg-gray-50 focus:bg-white">
@@ -1754,7 +1713,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="lg:col-span-1 bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-[#e2e0d8] shadow-sm overflow-hidden flex flex-col">
+                        <div class="lg:col-span-1 bg-white/90 backdrop-blur-md p-3 rounded-xl border border-[#e2e0d8] shadow-sm overflow-hidden flex flex-col">
                             <h3 class="font-bold text-[#1a1f1c] mb-4 border-b border-[#e2e0d8] pb-2 flex items-center gap-2"><i data-lucide="bell-ring" class="w-4 h-4 text-[#3b4a40]"></i> Recent Activities</h3>
                             <div class="flex-1 overflow-y-auto space-y-5 pr-2 no-scrollbar">
                                 <div class="relative pl-5 border-l-2 border-[#b5bca1]">
@@ -1847,7 +1806,7 @@
                     <div class="p-6 border-b border-[#e2e0d8] flex justify-between items-center bg-[#f4f3ee]/30 shrink-0">
                         <div><h3 class="font-bold text-lg text-[#1a1f1c]">Feasibility & Survey</h3><p class="text-xs text-gray-500">Soil tests, digital survey, and ROI analysis.</p></div>
                     </div>
-                    <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
                         ${items.map(item => `
                         <div class="border border-[#e2e0d8] rounded-xl p-5 bg-white shadow-sm flex flex-col justify-between">
                             <div>
@@ -2057,7 +2016,7 @@
                     <div class="p-6 border-b border-[#e2e0d8] flex justify-between items-center bg-[#f4f3ee]/30 shrink-0">
                         <div><h3 class="font-bold text-lg text-[#1a1f1c]">Planning & Approvals</h3><p class="text-xs text-gray-500">Master layout, environment clearance, and RAJUK approvals.</p></div>
                     </div>
-                    <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         ${items.map(item => `
                         <div class="border border-[#e2e0d8] rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col hover:border-[#b5bca1] transition">
                             <div class="bg-gray-100 h-36 relative flex items-center justify-center border-b border-[#e2e0d8]">
@@ -2120,18 +2079,18 @@
             }
 
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2 shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Land Acquisition & Development</h2>
-                            <p class="text-[#3b4a40] text-sm mt-1">Lifecycle management from identification to planning.</p>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Land Acquisition & Development</h2>
+                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Lifecycle management from identification to planning.</p>
                         </div>
                         <button onclick="openNewProposalModal()" class="bg-[#1a1f1c] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition flex items-center gap-2 shadow-md">
                             <i data-lucide="plus" class="w-4 h-4"></i> New Proposal
                         </button>
                     </div>
                     
-                    <div class="flex flex-col md:flex-row gap-6 flex-1 overflow-hidden">
+                    <div class="flex flex-col md:flex-row gap-3 flex-1 overflow-hidden">
                         <div class="w-full md:w-64 bg-white rounded-2xl border border-[#e2e0d8] shadow-sm p-4 h-max flex flex-col gap-1.5 shrink-0">
                             ${sidebarHTML}
                         </div>
@@ -2145,11 +2104,11 @@
 
         function getContactsHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Contact Book</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Unified directory for clients, suppliers, contractors, and staff.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Contact Book</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Unified directory for clients, suppliers, contractors, and staff.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <input type="file" id="import-contacts-input" accept=".csv" onchange="handleImportContacts(event)" class="hidden">
@@ -2214,11 +2173,11 @@
 
         function getBookingsHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Flat & Plot Bookings</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Manage property allocations and advance payment collections.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Flat & Plot Bookings</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage property allocations and advance payment collections.</p>
                          </div>
                          <button onclick="openAddBookingModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="file-plus-2" class="w-4 h-4"></i> New Booking</button>
                     </div>
@@ -2420,7 +2379,7 @@
                     </div>
 
                     <div class="flex-1 overflow-x-auto pb-4 custom-scrollbar">
-                        ${crmViewType === 'kanban' ? `<div class="flex gap-6 min-w-max h-full items-start pb-2">${boardHTML}</div>` : listHTML}
+                        ${crmViewType === 'kanban' ? `<div class="flex gap-3 min-w-max h-full items-start pb-2">${boardHTML}</div>` : listHTML}
                     </div>
                 </div>
             `;
@@ -2453,17 +2412,17 @@
             }).join('');
 
             return `
-                <div class="space-y-6 animate-fade-in h-full flex flex-col">
+                <div class="space-y-2 animate-fade-in h-full flex flex-col">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Task Management</h2>
-                            <p class="text-[#3b4a40] text-sm mt-1">Interactive Kanban board for general team tasks.</p>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Task Management</h2>
+                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Interactive Kanban board for general team tasks.</p>
                         </div>
                         <button onclick="addKanbanTask()" class="bg-[#1a1f1c] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition flex items-center gap-2 shadow-md">
                             <i data-lucide="plus" class="w-4 h-4"></i> New Task
                         </button>
                     </div>
-                    <div class="flex flex-1 gap-6 overflow-x-auto pb-4 custom-scrollbar">
+                    <div class="flex flex-1 gap-3 overflow-x-auto pb-4 custom-scrollbar">
                         ${boardHTML}
                     </div>
                 </div>
@@ -2619,7 +2578,7 @@
                                 <span class="bg-[#b5bca1]/30 text-[#3b4a40] text-[10px] uppercase px-2 py-1 rounded font-bold tracking-wider">${lead.status}</span>
                                 <span class="bg-gray-200 text-gray-700 text-[10px] uppercase px-2 py-1 rounded font-bold tracking-wider border border-gray-300"><i data-lucide="facebook" class="w-3 h-3 inline"></i> ${lead.source}</span>
                             </div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">${lead.name}</h2>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">${lead.name}</h2>
                             <p class="text-[#3b4a40] text-sm mt-1 flex items-center gap-1.5 font-medium"><i data-lucide="building" class="w-4 h-4"></i> ${lead.property}</p>
                         </div>
                     </div>
@@ -3192,7 +3151,7 @@
                     </div>
                 </div>
                 
-                <div class="flex border-b border-[#e2e0d8] bg-white text-sm font-medium text-gray-500 sticky top-0 z-10 shadow-sm px-2 sm:px-6 gap-2 sm:gap-6 overflow-x-auto no-scrollbar">
+                <div class="flex border-b border-[#e2e0d8] bg-white text-sm font-medium text-gray-500 sticky top-0 z-10 shadow-sm px-2 sm:px-6 gap-2 sm:gap-3 overflow-x-auto no-scrollbar">
                     <button onclick="openLandProposalDetails('${item.id}', 'overview')" class="py-3.5 border-b-2 whitespace-nowrap ${tab === 'overview' ? 'border-[#3b4a40] text-[#1a1f1c] font-bold' : 'border-transparent hover:text-[#1a1f1c]'} transition flex items-center gap-2"><i data-lucide="info" class="w-4 h-4"></i> Overview</button>
                     <button onclick="openLandProposalDetails('${item.id}', 'geo_risk')" class="py-3.5 border-b-2 whitespace-nowrap ${tab === 'geo_risk' ? 'border-[#3b4a40] text-[#1a1f1c] font-bold' : 'border-transparent hover:text-[#1a1f1c]'} transition flex items-center gap-2"><i data-lucide="map" class="w-4 h-4"></i> Geo & Risk</button>
                     <button onclick="openLandProposalDetails('${item.id}', 'financials')" class="py-3.5 border-b-2 whitespace-nowrap ${tab === 'financials' ? 'border-[#3b4a40] text-[#1a1f1c] font-bold' : 'border-transparent hover:text-[#1a1f1c]'} transition flex items-center gap-2"><i data-lucide="calculator" class="w-4 h-4"></i> Financials</button>
@@ -3301,7 +3260,7 @@
                     <h2 class="text-xl font-bold text-[#1a1f1c] flex items-center gap-2"><i data-lucide="map" class="w-5 h-5 text-[#3b4a40]"></i> New Land Proposal</h2>
                     <button onclick="closeUniversalModal()" class="text-gray-400 hover:text-[#1a1f1c] bg-white p-2 rounded-full shadow-sm transition"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
-                <div class="flex border-b border-[#e2e0d8] bg-white text-sm font-medium text-gray-500 sticky top-0 z-10 shadow-sm px-6 gap-6">
+                <div class="flex border-b border-[#e2e0d8] bg-white text-sm font-medium text-gray-500 sticky top-0 z-10 shadow-sm px-6 gap-3">
                     <button type="button" onclick="switchNewPropTab('basic')" id="np-tab-basic" class="py-3.5 border-b-2 border-[#3b4a40] text-[#1a1f1c] font-bold transition flex items-center gap-2">Basic Details</button>
                     <button type="button" onclick="switchNewPropTab('site')" id="np-tab-site" class="py-3.5 border-b-2 border-transparent hover:text-[#1a1f1c] transition flex items-center gap-2">Site & Legal</button>
                     <button type="button" onclick="switchNewPropTab('owner')" id="np-tab-owner" class="py-3.5 border-b-2 border-transparent hover:text-[#1a1f1c] transition flex items-center gap-2">Owner & Notes</button>
@@ -3710,7 +3669,7 @@
                     <button onclick="closeUniversalModal()" class="text-gray-400 hover:text-[#1a1f1c] bg-white p-2 rounded-full shadow-sm transition"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
                 <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-2 gap-3">
                         <div class="border border-[#e2e0d8] rounded-xl p-4 bg-gray-50">
                             <h4 class="text-sm font-bold text-[#1a1f1c] mb-3 flex items-center gap-2"><i data-lucide="map" class="w-4 h-4 text-blue-600"></i> Digital Survey</h4>
                             <div class="space-y-3">
@@ -3837,7 +3796,7 @@
                     <button onclick="openLandProposalDetails('${id}', 'financials')" class="text-gray-400 hover:text-[#1a1f1c] bg-white p-2 rounded-full shadow-sm transition"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
                 </div>
                 <div class="p-6 space-y-6 max-h-[65vh] overflow-y-auto custom-scrollbar">
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-4">
                             <h4 class="font-bold text-sm text-[#1a1f1c] border-b border-gray-100 pb-2">Acquisition Costs</h4>
                             <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Land Asking Price (Cr)</label><input type="text" id="rf-price" value="${item.price.replace(/[^0-9.]/g,'')}" class="w-full border border-[#e2e0d8] bg-gray-50 rounded-lg p-2.5 outline-none focus:border-[#3b4a40] focus:bg-white transition text-sm font-bold"/></div>
@@ -4147,7 +4106,7 @@
                     <button onclick="closeUniversalModal()" class="text-gray-400 hover:text-[#1a1f1c] bg-white p-2 rounded-full shadow-sm transition"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
                 <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar bg-[#f4f3ee]/30">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div class="border border-[#e2e0d8] rounded-xl p-4 bg-white shadow-sm">
                             <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Primary Details</h5>
                             <div class="space-y-4">
@@ -4409,7 +4368,7 @@
             wrapper.classList.add('max-w-6xl');
             
             const contentHTML = isLand ? `
-                <div class="grid grid-cols-12 gap-6">
+                <div class="grid grid-cols-12 gap-3">
                     <div class="col-span-4 border-r border-[#e2e0d8] pr-6 space-y-5 overflow-y-auto max-h-[60vh] custom-scrollbar">
                         <div>
                             <h3 class="font-bold text-[#1a1f1c] text-sm uppercase tracking-wide border-b border-[#e2e0d8] pb-2 mb-3">Base Pricing</h3>
@@ -4499,7 +4458,7 @@
                     </div>
                 </div>
             ` : `
-                <div class="grid grid-cols-12 gap-6">
+                <div class="grid grid-cols-12 gap-3">
                     <div class="col-span-4 border-r border-[#e2e0d8] pr-6 space-y-5 overflow-y-auto max-h-[60vh] custom-scrollbar">
                         <div>
                             <h3 class="font-bold text-[#1a1f1c] text-sm uppercase tracking-wide border-b border-[#e2e0d8] pb-2 mb-3">Base Pricing</h3>
@@ -4860,8 +4819,8 @@
             `).join('') : '<p class="text-xs text-gray-500 py-4 text-center border-2 border-dashed border-[#e2e0d8] rounded-xl">No issues reported.</p>';
 
             return `
-                <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 animate-fade-in mt-6">
-                    <div class="xl:col-span-3 bg-white p-6 rounded-2xl border border-[#e2e0d8] shadow-sm">
+                <div class="grid grid-cols-1 xl:grid-cols-4 gap-3 animate-fade-in mt-6">
+                    <div class="xl:col-span-3 bg-white p-3 rounded-xl border border-[#e2e0d8] shadow-sm">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                             <div>
                                 <h3 class="font-bold text-[#1a1f1c] text-lg">Muktodhara Green Park - Block A Map</h3>
@@ -5009,7 +4968,7 @@
                             <button onclick="setProjectSideTab('issues')" class="flex-1 py-2 text-xs font-bold rounded-md transition ${projectDetailSideTab === 'issues' ? 'bg-[#1a1f1c] text-white shadow' : 'text-gray-500 hover:bg-gray-50'}">Issues Log</button>
                         </div>
                         ${projectDetailSideTab === 'stats' ? `
-                            <div class="bg-white p-6 rounded-2xl border border-[#e2e0d8] shadow-sm animate-fade-in">
+                            <div class="bg-white p-3 rounded-xl border border-[#e2e0d8] shadow-sm animate-fade-in">
                                 <h3 class="font-bold text-[#1a1f1c] border-b border-[#e2e0d8] pb-3 mb-4 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-[#3b4a40]"></i> Block Statistics</h3>
                                 <div class="space-y-4">
                                     <div class="flex justify-between items-center"><p class="text-sm text-gray-500">Total Plots</p><p class="text-lg font-bold">120</p></div>
@@ -5053,8 +5012,8 @@
             `).join('') : '<p class="text-xs text-gray-500 py-4 text-center border-2 border-dashed border-[#e2e0d8] rounded-xl">No issues reported.</p>';
 
             return `
-                <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 animate-fade-in mt-6">
-                    <div class="xl:col-span-3 bg-white p-6 rounded-2xl border border-[#e2e0d8] shadow-sm">
+                <div class="grid grid-cols-1 xl:grid-cols-4 gap-3 animate-fade-in mt-6">
+                    <div class="xl:col-span-3 bg-white p-3 rounded-xl border border-[#e2e0d8] shadow-sm">
                         <!-- Overall Progress Bar -->
                         <div class="mb-8 bg-gray-50 p-5 rounded-xl border border-[#e2e0d8]">
                             <div class="flex justify-between items-end mb-3">
@@ -5179,7 +5138,7 @@
                 let viewContent = isLand ? getLandDetailsHTML() : getFlatDetailsHTML();
 
                 return `
-                    <div class="space-y-6 animate-fade-in">
+                    <div class="space-y-2 animate-fade-in">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                              <div class="flex items-center gap-3">
                                  <button onclick="closeProject()" class="p-2 bg-white border border-[#e2e0d8] rounded-xl hover:bg-gray-50 transition shadow-sm text-gray-500 hover:text-[#1a1f1c]">
@@ -5187,7 +5146,7 @@
                                  </button>
                                  <div>
                                      <div class="flex items-center gap-2">
-                                         <h2 class="text-2xl font-bold text-[#1a1f1c]">${project.name}</h2>
+                                         <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">${project.name}</h2>
                                          <span class="bg-gray-100 text-gray-600 border border-gray-200 text-[10px] px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">${project.status}</span>
                                      </div>
                                      <p class="text-gray-500 text-sm mt-0.5 flex items-center gap-3">
@@ -5226,7 +5185,7 @@
             let projectsGridHTML = '';
             
             if (projectDisplayMode === 'grid') {
-                projectsGridHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">` + 
+                projectsGridHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">` + 
                     filteredProjects.map(p => {
                         return `<div onclick="openProject('${p.id}')" class="bg-white rounded-2xl border border-[#e2e0d8] shadow-sm hover:shadow-md hover:border-[#b5bca1] transition cursor-pointer overflow-hidden group flex flex-col">
                             <div class="h-32 bg-gray-100 relative overflow-hidden">
@@ -5307,8 +5266,8 @@
                 <div class="space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Project Management</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Manage all construction and plotting projects.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Project Management</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage all construction and plotting projects.</p>
                          </div>
                          <button onclick="openAddProjectModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="folder-plus" class="w-4 h-4"></i> New Project</button>
                     </div>
@@ -5340,7 +5299,7 @@
         // --- TEAM CHAT & TASKS ---
         function getChatHTML() {
             return `
-                <div class="flex h-[calc(100vh-120px)] gap-6 animate-fade-in">
+                <div class="flex h-[calc(100vh-120px)] gap-3 animate-fade-in">
                     <!-- Chat Area -->
                     <div class="flex-1 bg-white rounded-2xl border border-[#e2e0d8] shadow-sm flex flex-col overflow-hidden">
                         <div class="p-4 border-b border-[#e2e0d8] bg-[#f4f3ee]/50 flex justify-between items-center shrink-0">
@@ -5451,11 +5410,11 @@
         // --- ENHANCED ACCOUNTS & FINANCE LOGIC ---
         function getFinanceHTML() {
             return `
-                <div class="space-y-6 animate-fade-in">
+                <div class="space-y-2 animate-fade-in">
                     <div class="flex justify-between items-center mb-2">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Accounts & Finance</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Manage receivables, payables, and cash flow.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Accounts & Finance</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage receivables, payables, and cash flow.</p>
                          </div>
                          <div class="flex gap-2 flex-wrap justify-end">
                              <button onclick="openAccountsSettingsModal()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="settings-2" class="w-4 h-4 text-gray-500"></i> Settings</button>
@@ -5493,7 +5452,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                         <!-- Left Column: Chart & Collections -->
                         <div class="lg:col-span-1 space-y-6">
                             <!-- Profit & Loss Quick View -->
@@ -5700,9 +5659,9 @@
             }
 
             return `
-                <div class="space-y-6 animate-fade-in flex flex-col h-[calc(100vh-120px)]">
+                <div class="space-y-2 animate-fade-in flex flex-col h-[calc(100vh-120px)]">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
-                        <div><h2 class="text-2xl font-bold text-[#1a1f1c]">Stock & Procurement</h2><p class="text-[#3b4a40] text-sm mt-1">Manage multi-site inventory and vendor purchase orders.</p></div>
+                        <div><h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Stock & Procurement</h2><p class="text-[#3b4a40] text-[10px] mt-0.5">Manage multi-site inventory and vendor purchase orders.</p></div>
                         <div class="flex gap-3 items-center">
                             <button onclick="showToast('Downloading Stock Report (Excel)...', 'success')" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Export Report</button>
                             <button onclick="${isInventory ? 'openAddItemModal()' : 'openAddPOModal()'}" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> ${isInventory ? 'Add Item' : 'Create PO'}</button>
@@ -5728,7 +5687,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-1 overflow-hidden">
                         <div class="lg:col-span-2 flex flex-col gap-4 overflow-hidden">
                             <!-- Toolbar -->
                             <div class="bg-white p-3 rounded-xl border border-[#e2e0d8] shadow-sm flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between shrink-0">
@@ -5877,7 +5836,7 @@
             return `
                 <div class="h-[calc(100vh-120px)] flex flex-col animate-fade-in">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 shrink-0">
-                        <div><h2 class="text-2xl font-bold text-[#1a1f1c]">Project Data Vault</h2><p class="text-[#3b4a40] text-sm mt-1">Highly secure repository for legal and land documents.</p></div>
+                        <div><h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Project Data Vault</h2><p class="text-[#3b4a40] text-[10px] mt-0.5">Highly secure repository for legal and land documents.</p></div>
                         <div class="flex gap-2 items-center">
                             <button onclick="showToast('Downloading Vault Archive (ZIP)...', 'success')" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition flex items-center gap-2 shadow-sm"><i data-lucide="download" class="w-4 h-4"></i> Export Report</button>
                             <button onclick="openUploadDocModal()" class="bg-[#1a1f1c] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition flex items-center gap-2 shadow-md"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload Document</button>
@@ -5899,7 +5858,7 @@
                         </div>
                     </div>
                     
-                    <div class="flex-1 flex gap-6 overflow-hidden">
+                    <div class="flex-1 flex gap-3 overflow-hidden">
                         <div class="w-64 bg-white/90 backdrop-blur-md rounded-2xl border border-[#e2e0d8] shadow-sm flex flex-col h-full overflow-y-auto shrink-0 hidden md:flex">
                             <div class="p-4 border-b border-[#e2e0d8] bg-[#f4f3ee]/50 sticky top-0"><h3 class="font-bold text-[#1a1f1c] text-sm uppercase tracking-wider">Categories</h3></div>
                             <div class="p-4 flex-1 space-y-1">
@@ -6044,7 +6003,7 @@
                         <div><h3 class="font-bold text-lg text-[#1a1f1c]">Company & System Profile</h3><p class="text-xs text-gray-500">Update organizational details and system localization.</p></div>
                     </div>
                     <div class="p-6 overflow-y-auto flex-1 space-y-6">
-                        <div class="flex items-center gap-6">
+                        <div class="flex items-center gap-3">
                             <div class="w-24 h-24 bg-gray-100 border border-[#e2e0d8] rounded-xl flex items-center justify-center font-bold text-2xl text-[#b5bca1] shadow-inner">MARS</div>
                             <div>
                                 <button class="px-4 py-2 bg-white text-sm font-bold text-[#1a1f1c] rounded-lg hover:bg-gray-50 transition border border-[#e2e0d8] shadow-sm mb-2">Change Logo</button>
@@ -6174,7 +6133,7 @@
                             <button class="bg-[#1a1f1c] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#3b4a40] transition flex items-center gap-2 shadow-sm"><i data-lucide="plus" class="w-4 h-4"></i> Add Webhook</button>
                         </div>
                     </div>
-                    <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+                    <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
                         <!-- Integration Card 1 -->
                         <div class="border border-[#e2e0d8] rounded-xl p-5 bg-white shadow-sm flex flex-col gap-4 hover:border-[#b5bca1] transition">
                             <div class="flex justify-between items-start">
@@ -6330,7 +6289,7 @@
                         <button onclick="showToast('Template saved successfully', 'success')" class="bg-[#3b4a40] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-[#1a1f1c] transition shadow-md flex items-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save Template</button>
                     </div>
                     <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-white">
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
                             <div class="lg:col-span-2 flex flex-col space-y-4">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="col-span-2 md:col-span-1">
@@ -6542,7 +6501,7 @@
                             <p class="text-sm text-gray-600 leading-relaxed mb-4">Welcome to Mars Constech ERP. This system is an end-to-end operational platform designed to streamline your daily workflows—from tracking initial sales inquiries and acquiring land, to overseeing construction progress and handling financial transactions. Use the primary left navigation bar to access different modules. For quick navigation, utilize the universal search bar at the top.</p>
                         </section>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <!-- Executive Dashboard -->
                             <section id="docs-dashboard" class="border border-[#e2e0d8] rounded-xl p-5 shadow-sm hover:border-[#b5bca1] transition scroll-mt-6">
                                 <h4 class="text-lg font-bold text-[#1a1f1c] mb-3 flex items-center gap-2"><i data-lucide="layout-dashboard" class="w-5 h-5 text-[#3b4a40]"></i> Executive Dashboard</h4>
@@ -6684,7 +6643,7 @@
                         <!-- Advanced Features -->
                         <section id="docs-advanced" class="mt-8 border-t border-[#e2e0d8] pt-6 scroll-mt-6">
                             <h4 class="text-xl font-bold text-[#1a1f1c] mb-4 flex items-center gap-2"><i data-lucide="zap" class="w-5 h-5 text-yellow-500"></i> Advanced Features</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="bg-gray-50 p-4 rounded-xl border border-[#e2e0d8]">
                                     <h5 class="font-bold text-sm text-[#1a1f1c] mb-2 flex items-center gap-2"><i data-lucide="webhook" class="w-4 h-4 text-purple-600"></i> API & Webhooks</h5>
                                     <p class="text-xs text-gray-600 leading-relaxed">Extend the ERP's capabilities. Integrate third-party gateways (SMS providers, SSLCommerz for payments, SendGrid for emails, and WhatsApp Business API). Register outgoing Webhooks to sync data with external platforms (Zapier/Slack) upon specific events.</p>
@@ -6719,11 +6678,11 @@
             }
 
             return `
-                <div class="space-y-6 animate-fade-in flex flex-col h-[calc(100vh-128px)] md:h-[calc(100vh-160px)]">
+                <div class="space-y-2 animate-fade-in flex flex-col h-[calc(100vh-128px)] md:h-[calc(100vh-160px)]">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">System Settings</h2>
-                            <p class="text-[#3b4a40] text-sm mt-1">Manage users, organizational roles, and configuration.</p>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">System Settings</h2>
+                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage users, organizational roles, and configuration.</p>
                         </div>
                         <button class="bg-[#3b4a40] text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#1a1f1c] transition flex items-center gap-2 shadow-sm">
                             <i data-lucide="save" class="w-4 h-4"></i> Save Changes
@@ -6731,7 +6690,7 @@
                     </div>
 
                     <!-- Settings Layout -->
-                    <div class="flex flex-col md:flex-row gap-6 flex-1 overflow-hidden">
+                    <div class="flex flex-col md:flex-row gap-3 flex-1 overflow-hidden">
                         <!-- Settings Navigation Sidebar -->
                         <div class="w-full md:w-64 bg-white rounded-2xl border border-[#e2e0d8] shadow-sm p-4 h-max flex flex-col gap-1 shrink-0">
                             ${sidebarHTML}
@@ -8789,15 +8748,15 @@
                 <div class="h-[calc(100vh-120px)] flex flex-col animate-fade-in">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Knowledge Base</h2>
-                            <p class="text-[#3b4a40] text-sm mt-1">Company policies, organizational guides, and documentation.</p>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Knowledge Base</h2>
+                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Company policies, organizational guides, and documentation.</p>
                         </div>
                         <button onclick="openAddKBArticleModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition flex items-center gap-2 shadow-md">
                             <i data-lucide="plus" class="w-4 h-4"></i> Create Article
                         </button>
                     </div>
 
-                    <div class="flex-1 flex gap-6 overflow-hidden mt-2">
+                    <div class="flex-1 flex gap-3 overflow-hidden mt-2">
                         <!-- Sidebar -->
                         <div class="w-full sm:w-64 bg-white/90 backdrop-blur-md rounded-2xl border border-[#e2e0d8] shadow-sm flex flex-col h-full overflow-y-auto shrink-0 hidden md:flex">
                             <div class="p-4 border-b border-[#e2e0d8] bg-[#f4f3ee]/50 sticky top-0"><h3 class="font-bold text-[#1a1f1c] text-sm uppercase tracking-wider">Categories</h3></div>
@@ -9190,7 +9149,7 @@
                 <button onclick="closeUniversalModal()" class="text-gray-400 hover:text-[#1a1f1c] bg-white p-2 rounded-full shadow-sm transition"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
                 <div class="p-6 overflow-y-auto max-h-[70vh] bg-[#f4f3ee]/30 custom-scrollbar">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
                     <div class="lg:col-span-2 flex flex-col space-y-4">
                         <div class="mb-4">
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Template Style</label>
@@ -10517,11 +10476,11 @@ const mockCompliance = [
 // ── CONTRACTORS ──
         function getContractorsHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Contractor Management</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Manage approved contractors, trade assignments, billing & compliance.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Contractor Management</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage approved contractors, trade assignments, billing & compliance.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="openContractorFilterPanel()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="filter" class="w-4 h-4"></i> Filter</button>
@@ -10591,11 +10550,11 @@ const mockCompliance = [
             const totalActual = mockBOQItems.reduce((s,i)=>s+i.actualCost,0);
             const variance = totalBudget - totalActual;
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">BOQ & Cost Control</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Bill of Quantities, budget vs actual tracking, and cost variance analysis.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">BOQ & Cost Control</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Bill of Quantities, budget vs actual tracking, and cost variance analysis.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="exportBOQ()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
@@ -10662,11 +10621,11 @@ const mockCompliance = [
 // ── VARIATION ORDERS ──
         function getVariationOrdersHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Variation Orders</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Track scope changes, cost impacts, and approval workflows.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Variation Orders</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Track scope changes, cost impacts, and approval workflows.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="openNewVariationOrderModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="file-plus-2" class="w-4 h-4"></i> New VO</button>
@@ -10724,11 +10683,11 @@ const mockCompliance = [
 // ── EQUIPMENT TRACKING ──
         function getEquipmentHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Equipment Tracking</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Monitor equipment status, maintenance schedules, and utilization rates.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Equipment Tracking</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Monitor equipment status, maintenance schedules, and utilization rates.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="openScheduleMaintenanceModal()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="wrench" class="w-4 h-4"></i> Schedule Maintenance</button>
@@ -10791,11 +10750,11 @@ const mockCompliance = [
             const totalPayroll = mockLabor.reduce((s,l)=>s+l.monthlyPay,0);
             const present = mockLabor.filter(l=>l.status==='Present').length;
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Labor Management</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Track workforce attendance, wage distribution, and monthly payroll.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Labor Management</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Track workforce attendance, wage distribution, and monthly payroll.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="exportLaborPayroll()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Export Payroll</button>
@@ -10862,11 +10821,11 @@ const mockCompliance = [
             const approved = mockInspections.filter(i=>i.result==='Approved').length;
             const rejected = mockInspections.filter(i=>i.result==='Rejected').length;
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">QC & Inspection</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Quality control inspections, snag lists, and defect tracking.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">QC & Inspection</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Quality control inspections, snag lists, and defect tracking.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="openNewInspectionModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4"></i> New Inspection</button>
@@ -10880,7 +10839,7 @@ const mockCompliance = [
                         <div class="bg-white p-4 rounded-xl border border-[#e2e0d8] shadow-sm flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center"><i data-lucide="x-circle" class="w-5 h-5"></i></div><div><p class="text-xs text-gray-500 font-bold uppercase">Rejected</p><p class="text-xl font-bold text-red-700">${rejected}</p></div></div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 flex-1 overflow-hidden">
                         <!-- Inspections Table -->
                         <div class="bg-white rounded-2xl border border-[#e2e0d8] shadow-sm flex flex-col overflow-hidden">
                             <div class="p-4 border-b border-[#e2e0d8] bg-[#f4f3ee]/50 flex justify-between items-center shrink-0">
@@ -10952,11 +10911,11 @@ const mockCompliance = [
             const totalLeads = mockCampaigns.reduce((s,c)=>s+c.leads,0);
             const totalConversions = mockCampaigns.reduce((s,c)=>s+c.conversions,0);
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Sales & Marketing</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Campaign tracking, lead generation, and conversion analytics.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Sales & Marketing</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Campaign tracking, lead generation, and conversion analytics.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="openNewCampaignModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="megaphone" class="w-4 h-4"></i> New Campaign</button>
@@ -11019,11 +10978,11 @@ const mockCompliance = [
             const overdue = mockDues.filter(d=>d.status==='Overdue').length;
             const totalDueAmt = mockDues.reduce((s,d)=>s+parseInt(d.due.replace(/[^0-9]/g,'')),0);
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Dues & Recovery</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Track overdue installments, aging buckets, and recovery actions.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Dues & Recovery</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Track overdue installments, aging buckets, and recovery actions.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="exportDuesReport()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Export Report</button>
@@ -11089,11 +11048,11 @@ const mockCompliance = [
 // ── CUSTOMER PORTAL ──
         function getCustomerPortalHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Customer Portal</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Self-service access for customers to view dues, bookings, snags, and documents.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Customer Portal</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Self-service access for customers to view dues, bookings, snags, and documents.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="previewCustomerPortal()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Preview Portal</button>
@@ -11171,11 +11130,11 @@ const mockCompliance = [
 // ── HANDOVER & POST-SALES ──
         function getHandoverHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Handover & Post-Sales</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Manage unit handovers, warranty tracking, and post-occupancy support.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Handover & Post-Sales</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Manage unit handovers, warranty tracking, and post-occupancy support.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="openNewHandoverModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="file-plus-2" class="w-4 h-4"></i> New Handover</button>
@@ -11252,11 +11211,11 @@ const mockCompliance = [
 // ── REGULATORY COMPLIANCE ──
         function getComplianceHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">Regulatory & Compliance</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Track RAJUK approvals, environmental clearances, fire licenses, and tax filings.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Regulatory & Compliance</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Track RAJUK approvals, environmental clearances, fire licenses, and tax filings.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="openNewComplianceRecordModal()" class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4"></i> New Record</button>
@@ -11320,11 +11279,11 @@ const mockCompliance = [
 // ── BI & REPORTS ──
         function getBIReportsHTML() {
             return `
-                <div class="space-y-6 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                <div class="space-y-2 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
                     <div class="flex justify-between items-center mb-2 shrink-0">
                          <div>
-                             <h2 class="text-2xl font-bold text-[#1a1f1c]">BI & Reports</h2>
-                             <p class="text-[#3b4a40] text-sm mt-1">Executive dashboards, data visualizations, and custom report generation.</p>
+                             <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">BI & Reports</h2>
+                             <p class="text-[#3b4a40] text-[10px] mt-0.5">Executive dashboards, data visualizations, and custom report generation.</p>
                          </div>
                          <div class="flex items-center gap-2">
                              <button onclick="scheduleBIReport()" class="bg-white border border-[#e2e0d8] text-[#1a1f1c] px-3 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> Schedule Report</button>
@@ -11357,7 +11316,7 @@ const mockCompliance = [
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-1 overflow-hidden">
                         <!-- Revenue Breakdown -->
                         <div class="bg-white rounded-2xl border border-[#e2e0d8] shadow-sm flex flex-col overflow-hidden">
                             <div class="p-4 border-b border-[#e2e0d8] bg-[#f4f3ee]/50 flex justify-between items-center shrink-0">
@@ -11486,8 +11445,8 @@ const mockDesigns = [
                     <!-- Header -->
                     <div class="flex justify-between items-center shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Layout & Planning</h2>
-                            <p class="text-[#3b4a40] text-sm mt-1">Visual land subdivision and plot management.</p>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Layout & Planning</h2>
+                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Visual land subdivision and plot management.</p>
                         </div>
                         <button class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> New Layout</button>
                     </div>
@@ -11838,8 +11797,8 @@ const mockDesigns = [
                     <!-- Header -->
                     <div class="flex justify-between items-center shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Design Management</h2>
-                            <p class="text-[#3b4a40] text-sm mt-1">Architectural designs, approvals, and version control.</p>
+                            <h2 class="text-xs font-bold text-[#1a1f1c] uppercase tracking-wider">Design Management</h2>
+                            <p class="text-[#3b4a40] text-[10px] mt-0.5">Architectural designs, approvals, and version control.</p>
                         </div>
                         <button class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i> Upload New Design</button>
                     </div>
