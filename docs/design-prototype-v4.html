@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REM ERP v4</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8f9fa; color: #333; overflow: hidden; height: 100vh; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+    /* ── LAYOUT ── */
+    .app-shell { display: flex; height: 100vh; }
+
+    /* ── SIDEBAR (icon-only, fixed 72px) ── */
+    #sidebar { width: 72px; min-width: 72px; background: #fff; border-right: 1px solid #e8e8e8; display: flex; flex-direction: column; z-index: 50; }
+    .sidebar-logo { height: 48px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #f0f0f0; }
+    .sidebar-logo svg { width: 24px; height: 24px; color: #2F80ED; }
+    .sidebar-nav { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 2px; overflow-y: auto; }
+    .sidebar-item { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; position: relative; color: #666; transition: all 0.15s; }
+    .sidebar-item:hover { background: #f0f4ff; color: #2F80ED; }
+    .sidebar-item.active { background: #eef3ff; color: #2F80ED; }
+    .sidebar-item.active::before { content: ''; position: absolute; left: -12px; top: 8px; bottom: 8px; width: 4px; background: #2F80ED; border-radius: 0 3px 3px 0; }
+    .sidebar-item svg { width: 20px; height: 20px; stroke-width: 1.5; }
+    .sidebar-item[data-tip] { position: relative; }
+    .sidebar-item[data-tip]:hover::after { content: attr(data-tip); position: absolute; left: 100%; margin-left: 10px; top: 50%; transform: translateY(-50%); background: #1f2937; color: #fff; padding: 4px 10px; border-radius: 5px; font-size: 11px; font-weight: 500; white-space: nowrap; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .sidebar-bottom { padding: 8px 0; border-top: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+    /* ── MAIN CONTENT ── */
+    .main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    /* ── TOP BAR (app identity + horizontal nav) ── */
+    .top-bar { height: 48px; min-height: 48px; background: #fff; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; padding: 0 20px; gap: 24px; }
+    .app-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: #333; white-space: nowrap; }
+    .app-brand .badge { font-size: 10px; color: #999; font-weight: 400; }
+    .top-nav { display: flex; align-items: center; gap: 4px; flex: 1; overflow-x: auto; }
+    .top-nav-item { padding: 6px 14px; font-size: 13px; font-weight: 500; color: #666; border-radius: 6px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .top-nav-item:hover { background: #f0f4ff; color: #2F80ED; }
+    .top-nav-item.active { color: #2F80ED; background: #eef3ff; position: relative; }
+    .top-nav-item.active::after { content: ''; position: absolute; bottom: -12px; left: 8px; right: 8px; height: 2px; background: #2F80ED; border-radius: 1px; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .top-actions .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: #666; transition: all 0.15s; }
+    .top-actions .icon-btn:hover { background: #f0f0f0; color: #333; }
+    .top-actions .icon-btn svg { width: 18px; height: 18px; }
+    .top-actions .user-avatar { width: 28px; height: 28px; border-radius: 6px; background: #2F80ED; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+
+    /* ── CONTENT AREA ── */
+    .content { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* ── TOOLBAR ── */
+    .toolbar { display: flex; align-items: center; gap: 8px; padding: 0; flex-wrap: wrap; }
+    .toolbar .filter-btn { padding: 6px 12px; font-size: 12px; font-weight: 500; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; color: #333; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .toolbar .filter-btn:hover { border-color: #2F80ED; color: #2F80ED; }
+    .toolbar .filter-btn.active { background: #2F80ED; color: #fff; border-color: #2F80ED; }
+    .toolbar .search-box { display: flex; align-items: center; border: 1px solid #e0e0e0; border-radius: 6px; padding: 0 10px; background: #fff; flex: 1; max-width: 280px; }
+    .toolbar .search-box input { border: none; outline: none; font-size: 12px; padding: 6px 8px; width: 100%; background: transparent; }
+    .toolbar .search-box input::placeholder { color: #999; }
+    .toolbar .search-box svg { width: 14px; height: 14px; color: #999; }
+    .toolbar .spacer { flex: 1; }
+    .toolbar .action-btn { padding: 6px 14px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .toolbar .action-btn.primary { background: #2F80ED; color: #fff; border: none; }
+    .toolbar .action-btn.primary:hover { background: #2568c9; }
+    .toolbar .action-btn.secondary { background: #fff; color: #333; border: 1px solid #e0e0e0; }
+    .toolbar .action-btn.secondary:hover { border-color: #2F80ED; color: #2F80ED; }
+    .toolbar .action-btn svg { width: 14px; height: 14px; }
+    .toolbar select { padding: 6px 28px 6px 10px; font-size: 12px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; color: #333; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+    .toolbar select:focus { outline: none; border-color: #2F80ED; }
+
+    /* ── MODULE GRID ── */
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+
+    /* ── CARD ── */
+    .card { background: #fff; border-radius: 8px; border: 1px solid #e8e8e8; overflow: hidden; }
+    .card-header { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+    .card-header h3 { font-size: 13px; font-weight: 600; color: #333; }
+    .card-body { padding: 14px; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th { padding: 8px 12px; text-align: left; font-weight: 600; color: #555; border-bottom: 1px solid #e0e0e0; white-space: nowrap; background: #fff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+    thead th:first-child { padding-left: 14px; }
+    thead th:last-child { padding-right: 14px; }
+    tbody td { padding: 7px 12px; border-bottom: 1px solid #f2f2f2; color: #333; white-space: nowrap; }
+    tbody td:first-child { padding-left: 14px; }
+    tbody td:last-child { padding-right: 14px; }
+    tbody tr:hover { background: #f8faff; }
+    tbody tr:last-child td { border-bottom: none; }
+    table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* ── STATUS BADGES ── */
+    .badge-status { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; display: inline-block; }
+    .badge-active { background: #e8f5e9; color: #2e7d32; }
+    .badge-pending { background: #fff3e0; color: #e65100; }
+    .badge-closed { background: #f5f5f5; color: #757575; }
+    .badge-reserved { background: #e3f2fd; color: #1565c0; }
+    .badge-sold { background: #fce4ec; color: #c62828; }
+
+    /* ── KPI STATS ── */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    .stat-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 12px 14px; }
+    .stat-card .label { font-size: 11px; color: #888; font-weight: 500; }
+    .stat-card .value { font-size: 20px; font-weight: 700; color: #333; margin-top: 2px; }
+    .stat-card .trend { font-size: 11px; color: #2e7d32; margin-top: 2px; }
+
+    /* ── FORM ELEMENTS ── */
+    .form-input { padding: 7px 10px; font-size: 12px; border: 1px solid #e0e0e0; border-radius: 6px; outline: none; width: 100%; background: #fff; }
+    .form-input:focus { border-color: #2F80ED; box-shadow: 0 0 0 2px rgba(47,128,237,0.1); }
+    .form-label { font-size: 12px; font-weight: 500; color: #555; margin-bottom: 4px; display: block; }
+    .form-group { margin-bottom: 10px; }
+
+    /* ── TOGGLE ── */
+    .toggle { width: 28px; height: 16px; border-radius: 8px; background: #ddd; cursor: pointer; position: relative; transition: all 0.2s; display: inline-block; }
+    .toggle.on { background: #2F80ED; }
+    .toggle::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .toggle.on::after { left: 14px; }
+
+    /* ── PAGE TITLE ── */
+    .page-title { font-size: 16px; font-weight: 700; color: #222; }
+    .page-subtitle { font-size: 12px; color: #888; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 2px; background: #f5f5f5; border-radius: 6px; padding: 2px; }
+    .tab { padding: 5px 12px; font-size: 11px; font-weight: 500; border-radius: 5px; cursor: pointer; color: #666; transition: all 0.15s; white-space: nowrap; }
+    .tab.active { background: #fff; color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+    /* ── DASHBOARD MODULES ── */
+    .dashboard-quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .quick-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 14px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+    .quick-card:hover { border-color: #2F80ED; box-shadow: 0 2px 8px rgba(47,128,237,0.08); }
+    .quick-card .icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .quick-card .icon svg { width: 18px; height: 18px; }
+    .quick-card .info { flex: 1; }
+    .quick-card .info .title { font-size: 12px; font-weight: 600; color: #333; }
+    .quick-card .info .count { font-size: 11px; color: #888; }
+
+    /* ── PLOT GRID (Layout & Planning) ── */
+    .plot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 3px; }
+    .plot-cell { aspect-ratio: 1; border-radius: 4px; cursor: pointer; position: relative; font-size: 7px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
+    .plot-available { background: #4caf50; }
+    .plot-sold { background: #e53935; }
+    .plot-reserved { background: #1e88e5; }
+    .plot-amenity { background: #90a4ae; }
+    .plot-not-acquired { background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 6px); border: 1px dashed #ccc; color: #999; }
+
+    /* ── FOOTER ── */
+    .content-footer { margin-top: auto; padding: 8px 0 0; border-top: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #888; }
+    .content-footer .pagination { display: flex; align-items: center; gap: 4px; }
+    .content-footer .pagination button { padding: 3px 8px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; cursor: pointer; font-size: 11px; color: #555; }
+    .content-footer .pagination button:hover { border-color: #2F80ED; color: #2F80ED; }
+    .content-footer .pagination button.active { background: #2F80ED; color: #fff; border-color: #2F80ED; }
+    .content-footer .breadcrumb { display: flex; align-items: center; gap: 4px; color: #999; font-size: 11px; }
+    .content-footer .breadcrumb span { color: #666; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.2s ease-out; }
+
+    /* ── HIDDEN ── */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- ═══ SIDEBAR (icon-only, 72px, like reference) ═══ -->
+  <div id="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    </div>
+    <div class="sidebar-nav" id="sidebarNav">
+      <div class="sidebar-item active" data-tip="Dashboard" onclick="switchModule('dashboard')" title="Dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="CRM" onclick="switchModule('crm')" title="CRM">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Plots" onclick="switchModule('plots')" title="Plots">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Sales" onclick="switchModule('sales')" title="Sales">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Bookings" onclick="switchModule('bookings')" title="Bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Finance" onclick="switchModule('finance')" title="Finance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="M12 6v12"/><path d="M16 10H10a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Stock" onclick="switchModule('stock')" title="Stock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Projects" onclick="switchModule('projects')" title="Projects">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="HR" onclick="switchModule('hr')" title="HR">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Settings" onclick="switchModule('settings')" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-item" data-tip="Help" onclick="switchModule('help')" title="Help">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="sidebar-item" data-tip="Logout" title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN AREA ═══ -->
+  <div class="main-area">
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="app-brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F80ED" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        REM ERP
+        <span class="badge">v4.0</span>
+      </div>
+      <div class="top-nav" id="topNav">
+        <div class="top-nav-item active" onclick="switchTab(this,'dashboard')">Dashboard</div>
+        <div class="top-nav-item" onclick="switchTab(this,'sales')">Sales &amp; CRM</div>
+        <div class="top-nav-item" onclick="switchTab(this,'land')">Land &amp; Plots</div>
+        <div class="top-nav-item" onclick="switchTab(this,'bookings')">Bookings</div>
+        <div class="top-nav-item" onclick="switchTab(this,'finance')">Finance</div>
+        <div class="top-nav-item" onclick="switchTab(this,'stock')">Stock</div>
+        <div class="top-nav-item" onclick="switchTab(this,'projects')">Projects</div>
+        <div class="top-nav-item" onclick="switchTab(this,'hr')">HR</div>
+        <div class="top-nav-item" onclick="switchTab(this,'reports')">Reports</div>
+        <div class="top-nav-item" onclick="switchTab(this,'settings')">Settings</div>
+      </div>
+      <div class="top-actions">
+        <div class="icon-btn" title="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="icon-btn" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div class="user-avatar" title="Admin">SA</div>
+      </div>
+    </div>
+
+    <!-- ═══ CONTENT AREA ═══ -->
+    <div class="content" id="mainContent">
+      <!-- Content rendered dynamically by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════
+const DATA = {
+  plots: [
+    { id: 'A-101', status: 'available', size: '5 katha', price: 4500000, block: 'A' },
+    { id: 'A-102', status: 'sold', size: '5 katha', price: 4200000, block: 'A', customer: 'Md. Rahman' },
+    { id: 'A-103', status: 'reserved', size: '5 katha', price: 4600000, block: 'A', customer: 'S. Ahmed' },
+    { id: 'A-104', status: 'available', size: '8 katha', price: 7200000, block: 'A' },
+    { id: 'B-101', status: 'available', size: '3 katha', price: 2700000, block: 'B' },
+    { id: 'B-102', status: 'sold', size: '3 katha', price: 2500000, block: 'B', customer: 'F. Hasan' },
+    { id: 'B-103', status: 'not-acquired', size: '5 katha', price: 0, block: 'B' },
+    { id: 'B-104', status: 'reserved', size: '5 katha', price: 4500000, block: 'B', customer: 'T. Islam' },
+    { id: 'C-101', status: 'available', size: '10 katha', price: 9000000, block: 'C' },
+    { id: 'C-102', status: 'not-acquired', size: '10 katha', price: 0, block: 'C' },
+    { id: 'C-103', status: 'sold', size: '5 katha', price: 4300000, block: 'C', customer: 'A. Khan' },
+    { id: 'D-101', status: 'available', size: '6 katha', price: 5400000, block: 'D' },
+  ],
+  leads: [
+    { name: 'Abdur Rahman', phone: '01712345678', source: 'Website', status: 'hot', project: 'Muktodhara', date: '2026-06-10' },
+    { name: 'Fatima Begum', phone: '01798765432', source: 'Referral', status: 'warm', project: 'Jolshiri', date: '2026-06-12' },
+    { name: 'Shahidul Islam', phone: '01755556666', source: 'Facebook', status: 'cold', project: 'Rupnagar', date: '2026-06-08' },
+    { name: 'Nusrat Jahan', phone: '01733334444', source: 'Walk-in', status: 'hot', project: 'Muktodhara', date: '2026-06-14' },
+    { name: 'Mizanur Rahman', phone: '01777778888', source: 'Referral', status: 'warm', project: 'Jolshiri', date: '2026-06-11' },
+    { name: 'Shamima Akhter', phone: '01722223333', source: 'Website', status: 'cold', project: 'Rupnagar', date: '2026-06-07' },
+    { name: 'Kamal Hossain', phone: '01744445555', source: 'Agent', status: 'hot', project: 'Muktodhara', date: '2026-06-13' },
+    { name: 'Jannatul Ferdous', phone: '01766667777', source: 'Facebook', status: 'warm', project: 'Jolshiri', date: '2026-06-09' },
+  ],
+  bookings: [
+    { id: 'BKG-001', customer: 'Abdur Rahman', plot: 'A-103', amount: 4600000, paid: 1150000, status: 'active', date: '2026-06-01' },
+    { id: 'BKG-002', customer: 'S. Ahmed', plot: 'B-104', amount: 4500000, paid: 900000, status: 'active', date: '2026-06-05' },
+    { id: 'BKG-003', customer: 'Md. Rahman', plot: 'A-102', amount: 4200000, paid: 4200000, status: 'closed', date: '2026-05-15' },
+    { id: 'BKG-004', customer: 'F. Hasan', plot: 'B-102', amount: 2500000, paid: 1500000, status: 'active', date: '2026-06-10' },
+    { id: 'BKG-005', customer: 'A. Khan', plot: 'C-103', amount: 4300000, paid: 800000, status: 'active', date: '2026-06-12' },
+  ],
+  employees: [
+    { name: 'Rofiqul Islam', designation: 'Site Engineer', dept: 'Construction', phone: '01711112222', status: 'active' },
+    { name: 'Shamim Reza', designation: 'Sales Manager', dept: 'Sales', phone: '01733335555', status: 'active' },
+    { name: 'Nazma Akhter', designation: 'Accountant', dept: 'Finance', phone: '01755557777', status: 'active' },
+    { name: 'Mizanur Rahman', designation: 'Project Manager', dept: 'Management', phone: '01777779999', status: 'active' },
+    { name: 'Tanvir Ahmed', designation: 'Civil Engineer', dept: 'Construction', phone: '01799991111', status: 'active' },
+    { name: 'Shahana Parvin', designation: 'HR Executive', dept: 'HR', phone: '01744446666', status: 'active' },
+  ],
+  invoices: [
+    { inv: 'INV-001', customer: 'Abdur Rahman', amount: 460000, due: '2026-07-01', status: 'pending' },
+    { inv: 'INV-002', customer: 'S. Ahmed', amount: 450000, due: '2026-07-05', status: 'paid' },
+    { inv: 'INV-003', customer: 'F. Hasan', amount: 250000, due: '2026-07-10', status: 'overdue' },
+    { inv: 'INV-004', customer: 'A. Khan', amount: 430000, due: '2026-07-15', status: 'pending' },
+  ]
+};
+
+// ══════════════════════════════════════════════════════════
+// MODULE RENDERERS
+// ══════════════════════════════════════════════════════════
+function render(module) {
+  const el = document.getElementById('mainContent');
+  switch(module) {
+    case 'dashboard': renderDashboard(el); break;
+    case 'crm': renderCRM(el); break;
+    case 'plots': renderPlots(el); break;
+    case 'sales': renderSales(el); break;
+    case 'bookings': renderBookings(el); break;
+    case 'finance': renderFinance(el); break;
+    case 'stock': renderStock(el); break;
+    case 'projects': renderProjects(el); break;
+    case 'hr': renderHR(el); break;
+    case 'settings': renderSettings(el); break;
+    default: renderDashboard(el);
+  }
+}
+
+function renderDashboard(el) {
+  const avail = DATA.plots.filter(p => p.status === 'available').length;
+  const sold = DATA.plots.filter(p => p.status === 'sold').length;
+  const reserved = DATA.plots.filter(p => p.status === 'reserved').length;
+  const totalRevenue = DATA.plots.filter(p => p.status === 'sold').reduce((s, p) => s + p.price, 0);
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Dashboard</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Welcome to REM ERP — Real Estate Management System</div>
+
+      <div class="stats-row" style="margin-bottom:14px">
+        <div class="stat-card"><div class="label">Available Plots</div><div class="value">${avail}</div><div class="trend">+2 this month</div></div>
+        <div class="stat-card"><div class="label">Sold Plots</div><div class="value">${sold}</div><div class="trend" style="color:#c62828">4 total</div></div>
+        <div class="stat-card"><div class="label">Reserved</div><div class="value">${reserved}</div></div>
+        <div class="stat-card"><div class="label">Total Revenue</div><div class="value">৳${(totalRevenue/10000000).toFixed(1)}Cr</div><div class="trend">+18% vs last month</div></div>
+        <div class="stat-card"><div class="label">Active Bookings</div><div class="value">${DATA.bookings.filter(b=>b.status==='active').length}</div></div>
+        <div class="stat-card"><div class="label">Hot Leads</div><div class="value">${DATA.leads.filter(l=>l.status==='hot').length}</div><div class="trend">+3 this week</div></div>
+      </div>
+
+      <div class="dashboard-quick" style="margin-bottom:14px">
+        <div class="quick-card" onclick="switchModule('plots')">
+          <div class="icon" style="background:#e8f5e9;color:#2e7d32"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+          <div class="info"><div class="title">Plot Inventory</div><div class="count">${DATA.plots.length} plots</div></div>
+        </div>
+        <div class="quick-card" onclick="switchModule('crm')">
+          <div class="icon" style="background:#fff3e0;color:#e65100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="info"><div class="title">CRM / Leads</div><div class="count">${DATA.leads.length} active leads</div></div>
+        </div>
+        <div class="quick-card" onclick="switchModule('bookings')">
+          <div class="icon" style="background:#e3f2fd;color:#1565c0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div class="info"><div class="title">Bookings</div><div class="count">${DATA.bookings.length} active</div></div>
+        </div>
+        <div class="quick-card" onclick="switchModule('finance')">
+          <div class="icon" style="background:#fce4ec;color:#c62828"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="M12 6v12"/></svg></div>
+          <div class="info"><div class="title">Finance</div><div class="count">${DATA.invoices.length} outstanding</div></div>
+        </div>
+        <div class="quick-card" onclick="switchModule('hr')">
+          <div class="icon" style="background:#f3e5f5;color:#7b1fa2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="info"><div class="title">Employees</div><div class="count">${DATA.employees.length} staff</div></div>
+        </div>
+        <div class="quick-card" onclick="switchModule('projects')">
+          <div class="icon" style="background:#e0f2f1;color:#00695c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="info"><div class="title">Projects</div><div class="count">3 active projects</div></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="card">
+          <div class="card-header"><h3>Recent Bookings</h3></div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>ID</th><th>Customer</th><th>Plot</th><th class="num">Amount</th><th>Status</th></tr></thead>
+                <tbody>
+                  ${DATA.bookings.slice(0,4).map(b => `<tr>
+                    <td>${b.id}</td><td>${b.customer}</td><td>${b.plot}</td><td class="num">৳${(b.amount/100000).toFixed(1)}L</td>
+                    <td><span class="badge-status ${b.status==='active'?'badge-active':'badge-closed'}">${b.status}</span></td>
+                  </tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Hot Leads</h3></div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Project</th><th>Source</th><th>Date</th></tr></thead>
+                <tbody>
+                  ${DATA.leads.filter(l=>l.status==='hot').map(l => `<tr>
+                    <td>${l.name}</td><td>${l.project}</td><td>${l.source}</td><td>${l.date}</td>
+                  </tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCRM(el) {
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Sales &amp; CRM</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Manage leads, clients, and sales pipeline</div>
+
+      <div class="toolbar" style="margin-bottom:8px">
+        <div class="tabs">
+          <div class="tab active">All Leads</div>
+          <div class="tab">Clients</div>
+          <div class="tab">Pipeline</div>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input placeholder="Search leads..." />
+        </div>
+        <select><option>All Status</option><option>Hot</option><option>Warm</option><option>Cold</option></select>
+        <div class="spacer"></div>
+        <button class="action-btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Lead</button>
+        <button class="action-btn secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</button>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Phone</th><th>Source</th><th>Status</th><th>Project</th><th>Date</th><th></th></tr></thead>
+              <tbody>
+                ${DATA.leads.map(l => `<tr>
+                  <td style="font-weight:500">${l.name}</td>
+                  <td>${l.phone}</td>
+                  <td>${l.source}</td>
+                  <td><span class="badge-status ${l.status==='hot'?'badge-active':l.status==='warm'?'badge-reserved':'badge-closed'}">${l.status}</span></td>
+                  <td>${l.project}</td>
+                  <td>${l.date}</td>
+                  <td><div class="toggle ${l.status==='hot'?'on':''}"></div></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-footer">
+        <div class="breadcrumb">Sales &amp; CRM <span>›</span> All Leads</div>
+        <div class="pagination">
+          <button>‹</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>›</button>
+          <span style="margin-left:8px;color:#999">1-8 / 24</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderPlots(el) {
+  const avail = DATA.plots.filter(p => p.status === 'available').length;
+  const sold = DATA.plots.filter(p => p.status === 'sold').length;
+  const reserved = DATA.plots.filter(p => p.status === 'reserved').length;
+
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Land &amp; Plots</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Visual layout and inventory management</div>
+
+      <div class="stats-row" style="margin-bottom:12px">
+        <div class="stat-card"><div class="label">Available</div><div class="value" style="color:#4caf50">${avail}</div></div>
+        <div class="stat-card"><div class="label">Sold</div><div class="value" style="color:#e53935">${sold}</div></div>
+        <div class="stat-card"><div class="label">Reserved</div><div class="value" style="color:#1e88e5">${reserved}</div></div>
+        <div class="stat-card"><div class="label">Total Plots</div><div class="value">${DATA.plots.length}</div></div>
+      </div>
+
+      <div class="toolbar" style="margin-bottom:8px">
+        <div class="tabs">
+          <div class="tab active">Layout View</div>
+          <div class="tab">List View</div>
+        </div>
+        <select><option>All Blocks</option><option>Block A</option><option>Block B</option></select>
+        <select><option>All Status</option><option>Available</option><option>Sold</option><option>Reserved</option></select>
+        <div class="spacer"></div>
+        <button class="action-btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Plot</button>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div style="display:flex;gap:16px;margin-bottom:12px;font-size:11px">
+            <span><span style="display:inline-block;width:12px;height:12px;background:#4caf50;border-radius:3px;vertical-align:middle;margin-right:4px"></span> Available</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#e53935;border-radius:3px;vertical-align:middle;margin-right:4px"></span> Sold</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#1e88e5;border-radius:3px;vertical-align:middle;margin-right:4px"></span> Reserved</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);border:1px dashed #ccc;border-radius:3px;vertical-align:middle;margin-right:4px"></span> Not Acquired</span>
+          </div>
+          <div class="plot-grid">
+            ${DATA.plots.map(p => {
+              const cls = p.status === 'available' ? 'plot-available' :
+                          p.status === 'sold' ? 'plot-sold' :
+                          p.status === 'reserved' ? 'plot-reserved' :
+                          'plot-not-acquired';
+              return `<div class="plot-cell ${cls}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="card-header"><h3>Plot Inventory</h3></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Plot ID</th><th>Block</th><th>Size</th><th class="num">Price</th><th>Status</th><th>Customer</th><th></th></tr></thead>
+              <tbody>
+                ${DATA.plots.map(p => `<tr>
+                  <td style="font-weight:500">${p.id}</td>
+                  <td>Block ${p.block}</td>
+                  <td>${p.size}</td>
+                  <td class="num">${p.price ? '৳'+(p.price/100000).toFixed(1)+'L' : '—'}</td>
+                  <td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('-',' ')}</span></td>
+                  <td>${p.customer || '—'}</td>
+                  <td><div class="toggle ${p.status==='available'?'on':''}"></div></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-footer">
+        <div class="breadcrumb">Land &amp; Plots <span>›</span> Layout View</div>
+        <div class="pagination">
+          <button>‹</button><button class="active">1</button><button>2</button><button>›</button>
+          <span style="margin-left:8px;color:#999">1-12 / 24</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSales(el) {
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Sales &amp; Marketing</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Campaigns, agents, and sales performance</div>
+      <div class="card" style="padding:20px;text-align:center;color:#999">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <div style="font-size:13px;font-weight:500;color:#666">Sales Module</div>
+        <div style="font-size:11px;margin-top:4px">Track sales targets, commissions, and agent performance</div>
+      </div>
+      <div class="content-footer">
+        <div class="breadcrumb">Sales <span>›</span> Overview</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderBookings(el) {
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Bookings</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Booking management and payment tracking</div>
+
+      <div class="toolbar" style="margin-bottom:8px">
+        <div class="tabs">
+          <div class="tab active">All Bookings</div>
+          <div class="tab">Installments</div>
+          <div class="tab">Handover</div>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input placeholder="Search bookings..." />
+        </div>
+        <div class="spacer"></div>
+        <button class="action-btn primary">+ New Booking</button>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Booking ID</th><th>Customer</th><th>Plot</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Due</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                ${DATA.bookings.map(b => `<tr>
+                  <td style="font-weight:500">${b.id}</td>
+                  <td>${b.customer}</td>
+                  <td>${b.plot}</td>
+                  <td class="num">৳${(b.amount/100000).toFixed(1)}L</td>
+                  <td class="num">৳${(b.paid/100000).toFixed(1)}L</td>
+                  <td class="num" style="${b.amount-b.paid>0?'color:#e53935':''}">৳${((b.amount-b.paid)/100000).toFixed(1)}L</td>
+                  <td><span class="badge-status ${b.status==='active'?'badge-active':'badge-closed'}">${b.status}</span></td>
+                  <td><div class="toggle ${b.status==='active'?'on':''}"></div></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-footer">
+        <div class="breadcrumb">Bookings <span>›</span> All Bookings</div>
+        <div class="pagination">
+          <button>‹</button><button class="active">1</button><button>2</button><button>›</button>
+          <span style="margin-left:8px;color:#999">1-5 / 15</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderFinance(el) {
+  const paid = DATA.invoices.filter(i => i.status === 'paid').reduce((s,i) => s + i.amount, 0);
+  const pending = DATA.invoices.filter(i => i.status === 'pending').reduce((s,i) => s + i.amount, 0);
+  const overdue = DATA.invoices.filter(i => i.status === 'overdue').reduce((s,i) => s + i.amount, 0);
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Finance &amp; Accounts</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Invoicing, payments, and financial reporting</div>
+
+      <div class="stats-row" style="margin-bottom:12px">
+        <div class="stat-card"><div class="label">Total Collected</div><div class="value" style="color:#2e7d32">৳${(paid/100000).toFixed(1)}L</div></div>
+        <div class="stat-card"><div class="label">Pending</div><div class="value" style="color:#e65100">৳${(pending/100000).toFixed(1)}L</div></div>
+        <div class="stat-card"><div class="label">Overdue</div><div class="value" style="color:#c62828">৳${(overdue/100000).toFixed(1)}L</div></div>
+        <div class="stat-card"><div class="label">Total Revenue</div><div class="value">৳${((paid+pending+overdue)/100000).toFixed(1)}L</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Invoice</th><th>Customer</th><th class="num">Amount</th><th>Due Date</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                ${DATA.invoices.map(i => `<tr>
+                  <td style="font-weight:500">${i.inv}</td>
+                  <td>${i.customer}</td>
+                  <td class="num">৳${(i.amount/1000).toFixed(0)}K</td>
+                  <td>${i.due}</td>
+                  <td><span class="badge-status ${i.status==='paid'?'badge-active':i.status==='pending'?'badge-pending':'badge-sold'}">${i.status}</span></td>
+                  <td><div class="toggle ${i.status==='paid'?'on':''}"></div></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-footer">
+        <div class="breadcrumb">Finance <span>›</span> Invoices</div>
+        <div class="pagination">
+          <button>‹</button><button class="active">1</button><button>2</button><button>›</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderStock(el) {
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Stock &amp; Inventory</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Construction materials and equipment tracking</div>
+      <div class="card" style="padding:20px;text-align:center;color:#999">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+        <div style="font-size:13px;font-weight:500;color:#666">Stock Module</div>
+        <div style="font-size:11px;margin-top:4px">Track materials, equipment, and inventory levels</div>
+      </div>
+      <div class="content-footer">
+        <div class="breadcrumb">Stock <span>›</span> Overview</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderProjects(el) {
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Projects</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Active and completed project management</div>
+      <div class="card" style="padding:20px;text-align:center;color:#999">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <div style="font-size:13px;font-weight:500;color:#666">Projects Module</div>
+        <div style="font-size:11px;margin-top:4px">Manage Muktodhara, Jolshiri, Rupnagar and more</div>
+      </div>
+      <div class="content-footer">
+        <div class="breadcrumb">Projects <span>›</span> Overview</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderHR(el) {
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Human Resources</div>
+      <div class="page-subtitle" style="margin-bottom:12px">Employee management and attendance</div>
+
+      <div class="toolbar" style="margin-bottom:8px">
+        <div class="tabs">
+          <div class="tab active">All Staff</div>
+          <div class="tab">Attendance</div>
+          <div class="tab">Payroll</div>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input placeholder="Search employees..." />
+        </div>
+        <div class="spacer"></div>
+        <button class="action-btn primary">+ Add Employee</button>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Designation</th><th>Department</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                ${DATA.employees.map(e => `<tr>
+                  <td style="font-weight:500">${e.name}</td>
+                  <td>${e.designation}</td>
+                  <td>${e.dept}</td>
+                  <td>${e.phone}</td>
+                  <td><span class="badge-status badge-active">${e.status}</span></td>
+                  <td><div class="toggle on"></div></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-footer">
+        <div class="breadcrumb">HR <span>›</span> All Staff</div>
+        <div class="pagination">
+          <button>‹</button><button class="active">1</button><button>2</button><button>›</button>
+          <span style="margin-left:8px;color:#999">1-6 / 18</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSettings(el) {
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="page-title">Settings</div>
+      <div class="page-subtitle" style="margin-bottom:12px">System configuration and preferences</div>
+      <div class="card" style="padding:20px;text-align:center;color:#999">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <div style="font-size:13px;font-weight:500;color:#666">Settings</div>
+        <div style="font-size:11px;margin-top:4px">System configuration, user management, and preferences</div>
+      </div>
+      <div class="content-footer">
+        <div class="breadcrumb">Settings <span>›</span> General</div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════
+let currentModule = 'dashboard';
+
+function switchModule(mod) {
+  currentModule = mod;
+  // Update sidebar active states
+  document.querySelectorAll('#sidebarNav .sidebar-item').forEach(el => el.classList.remove('active'));
+  const sidebarMap = { 'dashboard': 0, 'crm': 1, 'plots': 2, 'sales': 3, 'bookings': 4, 'finance': 5, 'stock': 6, 'projects': 7, 'hr': 8, 'settings': 9 };
+  const idx = sidebarMap[mod];
+  if (idx !== undefined) {
+    const items = document.querySelectorAll('#sidebarNav .sidebar-item');
+    if (items[idx]) items[idx].classList.add('active');
+  }
+  // Update top nav tabs
+  document.querySelectorAll('#topNav .top-nav-item').forEach(el => el.classList.remove('active'));
+  const tabMap = { 'dashboard': 0, 'sales': 1, 'land': 2, 'plots': 2, 'bookings': 3, 'finance': 4, 'stock': 5, 'projects': 6, 'hr': 7, 'reports': 8, 'settings': 9 };
+  const tidx = tabMap[mod] !== undefined ? tabMap[mod] : 0;
+  const tabs = document.querySelectorAll('#topNav .top-nav-item');
+  if (tabs[tidx]) tabs[tidx].classList.add('active');
+  render(mod);
+}
+
+function switchTab(el, tab) {
+  document.querySelectorAll('#topNav .top-nav-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  switchModule(tab);
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+render('dashboard');
+</script>
+</body>
+</html>
