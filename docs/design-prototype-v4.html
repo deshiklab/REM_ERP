@@ -669,7 +669,7 @@ function renderProjects(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active</div>
     <div class="toolbar" style="margin-bottom:8px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn primary" onclick="crudProject()">+ New Project</button></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">${mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
-      <div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:13px;font-weight:600">${p.name}</div><div style="font-size:11px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
+      <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:13px;font-weight:600">${p.name}</div><div style="font-size:11px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
       <div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px"><span>Progress</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div></div>
       <div style="font-size:11px;color:#666;display:flex;gap:12px"><span>${p.budget}</span><span>${p.manager}</span>${p.plots?`<span>${p.plots} plots</span>`:''}${p.units?`<span>${p.units} units</span>`:''}</div>
       <div style="margin-top:6px;display:flex;gap:6px"><span class="badge-status badge-active">${p.stats.sold} sold</span><span class="badge-status badge-reserved">${p.stats.reserved} reserved</span><span class="badge-status badge-closed">${p.stats.available} avail</span></div>
@@ -680,7 +680,7 @@ function renderProjects(el){
 function renderBookings(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Bookings</div><div class="page-subtitle">${mockBookings.length} bookings</div>
     <div class="toolbar" style="margin-bottom:8px"><div class="spacer"></div><button class="action-btn primary" onclick="crudBooking()">+ New Booking</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Status</th></tr></thead><tbody>${mockBookings.map(b=>`<tr><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td>${b.unit}</td><td class="num">${b.price}</td><td class="num">${b.advance}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Status</th></tr></thead><tbody>${mockBookings.map(b=>`<tr style="cursor:pointer" onclick="openBooking('${b.id}')"><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td>${b.unit}</td><td class="num">${b.price}</td><td class="num">${b.advance}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
     <div class="content-footer"><div class="breadcrumb">Bookings <span>›</span> All</div></div></div>`;
 }
 
@@ -691,7 +691,7 @@ function renderFinance(el){
       ['Outflows',mockTransactions.filter(t=>t.type==='Outflow').length,'#c62828'],
       ['Total',mockTransactions.length,'']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
-    <div class="card"><div class="card-header"><h3>Transactions</h3><button class="action-btn primary" onclick="crudTransaction()" style="padding:4px 10px;font-size:11px">+ Add</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockTransactions.map(t=>`<tr><td style="font-weight:500">${t.id}</td><td>${t.desc}</td><td><span class="badge-status ${t.type==='Inflow'?'badge-active':'badge-sold'}">${t.type}</span></td><td class="num" style="font-weight:600;color:${t.type==='Inflow'?'#2e7d32':'#c62828'}">${t.amount}</td><td><span class="badge-status ${t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved'}">${t.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-header"><h3>Transactions</h3><button class="action-btn primary" onclick="crudTransaction()" style="padding:4px 10px;font-size:11px">+ Add</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockTransactions.map(t=>`<tr style="cursor:pointer" onclick="openTransaction('${t.id}')"><td style="font-weight:500">${t.id}</td><td>${t.desc}</td><td><span class="badge-status ${t.type==='Inflow'?'badge-active':'badge-sold'}">${t.type}</span></td><td class="num" style="font-weight:600;color:${t.type==='Inflow'?'#2e7d32':'#c62828'}">${t.amount}</td><td><span class="badge-status ${t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved'}">${t.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
     <div class="content-footer"><div class="breadcrumb">Finance <span>›</span> Transactions</div></div></div>`;
 }
 
@@ -699,15 +699,15 @@ function renderStock(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Stock &amp; Procurement</div><div class="page-subtitle">Inventory and purchase orders</div>
     <div class="toolbar" style="margin-bottom:8px"><button class="filter-btn ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';renderModule()">Inventory</button><button class="filter-btn ${stockTab==='po'?'active':''}" onclick="stockTab='po';renderModule()">Purchase Orders</button><div class="spacer"></div><button class="action-btn primary" onclick="stockTab==='inventory'?crudStockItem():crudPO()">+ New</button></div>
     ${stockTab==='inventory'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th>Quantity</th><th>Status</th><th>Reorder</th></tr></thead><tbody>${mockInventory.map(i=>`<tr><td style="font-weight:500">${i.item}</td><td>${i.site}</td><td>${i.quantity}</td><td><span class="badge-status ${i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold'}">${i.status}</span></td><td>${i.reorder}</td></tr>`).join('')}</tbody></table></div></div></div>
-    `:`<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Vendor</th><th>Items</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockPOs.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.vendor}</td><td>${p.items}</td><td class="num">${p.amount}</td><td><span class="badge-status ${p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending'}">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>`}
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th>Quantity</th><th>Status</th><th>Reorder</th></tr></thead><tbody>${mockInventory.map(i=>`<tr style="cursor:pointer" onclick="openStockItem(${i.id})"><td style="font-weight:500">${i.item}</td><td>${i.site}</td><td>${i.quantity}</td><td><span class="badge-status ${i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold'}">${i.status}</span></td><td>${i.reorder}</td></tr>`).join('')}</tbody></table></div></div></div>
+    `:`<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Vendor</th><th>Items</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockPOs.map(p=>`<tr style="cursor:pointer" onclick="openPO('${p.id}')"><td style="font-weight:500">${p.id}</td><td>${p.vendor}</td><td>${p.items}</td><td class="num">${p.amount}</td><td><span class="badge-status ${p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending'}">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>`}
     <div class="content-footer"><div class="breadcrumb">Stock <span>›</span> ${stockTab==='inventory'?'Inventory':'PO'}</div></div></div>`;
 }
 
 function renderHR(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Human Resources</div><div class="page-subtitle">${mockEmployees.length} employees</div>
     <div class="toolbar" style="margin-bottom:8px"><div class="spacer"></div><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${mockEmployees.map(e=>`<tr><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${mockEmployees.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
     <div class="content-footer"><div class="breadcrumb">HR <span>›</span> All Staff</div></div></div>`;
 }
 
@@ -752,6 +752,86 @@ function renderSub(mod){
   el.innerHTML=`<div class="fade-in"><div class="page-title">${titles[mod]||mod}</div><div class="page-subtitle">${items.length} records</div>
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr>${(headers[mod]||[]).map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${items.map(i=>`<tr>${(fields[mod]||[]).map(f=>`<td>${i[f]||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div></div>
     <div class="content-footer"><div class="breadcrumb">${titles[mod]||mod} <span>›</span> List</div></div></div>`;
+}
+
+
+// ═══ DETAIL PANEL HELPERS ═══
+function showDetailPanel(title, bodyHTML, footerHTML) {
+  const c = document.getElementById('leadPanelContent');
+  const c2 = document.getElementById('leadSlideOut');
+  c.innerHTML = `<div style="padding:14px 16px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;background:#fafafa"><span style="font-size:14px;font-weight:600">${title}</span><span onclick="closeLeadPanel()" style="cursor:pointer;color:#999;font-size:18px">✕</span></div><div style="flex:1;overflow-y:auto;padding:16px;background:#f8f9fa">${bodyHTML}</div>${footerHTML||''}`;
+  c2.classList.add('active');
+}
+
+function detailStatRow(items){
+  return `<div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">${items.map(([l,v])=>`<div class="stat-card"><div class="label">${l}</div><div style="font-size:13px;font-weight:600;margin-top:2px">${v||'—'}</div></div>`).join('')}</div>`;
+}
+
+// ─── Projects Detail ───
+function openProject(id){
+  const p=mockProjects.find(x=>x.id===id);if(!p)return;
+  const progressColor=p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935';
+  showDetailPanel('Project: '+p.name,
+    detailStatRow([['ID',p.id],['Location',p.location],['Status',p.status],['Manager',p.manager],['Budget',p.budget],['Type',p.type]])+
+    `<div style="margin-top:12px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Progress</h3><div class="progress-bar" style="height:8px"><div class="fill" style="width:${p.progress}%;background:${progressColor};height:8px;border-radius:4px"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:4px"><span>${p.progress}% complete</span><span style="color:${progressColor};font-weight:600">${p.progress>60?'On Track':p.progress>30?'Needs Attention':'At Risk'}</span></div></div>`+
+    `<div style="margin-top:12px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Unit Status</h3>`+detailStatRow([['Sold',p.stats.sold],['Reserved',p.stats.reserved],['Available',p.stats.available],['Total',p.plots||p.units||0]])+'</div>',
+    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudProject(mockProjects.find(x=>x.id==='${p.id}'));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel();switchModule('bookings')">📋 View Bookings</button></div>`
+  );
+}
+
+// ─── Booking Detail ───
+function openBooking(id){
+  const b=mockBookings.find(x=>x.id===id);if(!b)return;
+  showDetailPanel('Booking: '+b.id,
+    detailStatRow([['Client',b.client],['Property',b.property],['Unit',b.unit],['Date',b.date],['Type',b.type],['Status',b.status]])+
+    `<div style="margin-top:14px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Payment Summary</h3>`+
+    detailStatRow([['Total Price',b.price],['Advance Paid',b.advance],['Due',b.price+' - '+b.advance]])+'</div>'+
+    `<div style="margin-top:14px"><h3 style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">Payment Schedule</h3><div style="padding:12px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:12px">Schedule details will appear here after downpayment.</div></div>`,
+    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudBooking(mockBookings.find(x=>x.id==='${b.id}'));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn success">📄 Receipt</button></div>`
+  );
+}
+
+// ─── Transaction Detail ───
+function openTransaction(id){
+  const t=mockTransactions.find(x=>x.id===id);if(!t)return;
+  const isInflow=t.type==='Inflow';
+  showDetailPanel('Transaction: '+t.id,
+    detailStatRow([['ID',t.id],['Date',t.date],['Description',t.desc],['Client/Vendor',t.client||t.vendor||'—'],['Project',t.project||'—'],['Type',t.type],['Status',t.status]])+
+    `<div style="margin-top:14px;text-align:center;padding:20px;background:#fff;border:1px solid #e8e8e8;border-radius:8px"><div style="font-size:28px;font-weight:700;color:${isInflow?'#2e7d32':'#c62828'}">${t.amount}</div><div style="font-size:11px;color:#888;margin-top:4px">${isInflow?'Inflow (Received)':'Outflow (Payment)'}</div></div>`,
+    `<div class="lead-footer"><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+  );
+}
+
+// ─── Stock Item Detail ───
+function openStockItem(id){
+  const i=mockInventory.find(x=>x.id===id);if(!i)return;
+  const statusColor=i.status==='Adequate'?'#2e7d32':i.status==='Warning'?'#e65100':'#c62828';
+  const reorderStatus=i.reorder>0?`Reorder at ${i.reorder}`:'No reorder point';
+  showDetailPanel('Stock: '+i.item,
+    detailStatRow([['Item',i.item],['Site',i.site],['Quantity',i.quantity],['Status',i.status],['Reorder Level',i.reorder||'None']])+
+    `<div style="margin-top:14px"><div style="padding:12px;border-radius:6px;background:${statusColor}15;border:1px solid ${statusColor}"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600;color:${statusColor}">${i.status}</span><span style="font-size:11px;color:#666">${reorderStatus}</span></div><div style="margin-top:8px;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:${i.status==='Adequate'?'75':i.status==='Warning'?'40':'15'}%;background:${statusColor};border-radius:3px;transition:width .3s"></div></div></div></div>`,
+    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudStockItem(mockInventory.find(x=>x.id===${i.id}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+  );
+}
+
+// ─── PO Detail ───
+function openPO(id){
+  const p=mockPOs.find(x=>x.id===id);if(!p)return;
+  showDetailPanel('Purchase Order: '+p.id,
+    detailStatRow([['PO ID',p.id],['Date',p.date],['Vendor',p.vendor],['Items',p.items],['Amount',p.amount],['Site',p.site],['Status',p.status]]),
+    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudPO(mockPOs.find(x=>x.id==='${p.id}'));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+  );
+}
+
+// ─── Employee Detail ───
+function openEmployee(id){
+  const e=mockEmployees.find(x=>x.id===id);if(!e)return;
+  showDetailPanel(e.name,
+    `<div style="text-align:center;padding:20px"><div style="width:56px;height:56px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 12px">${leadGetInitials(e.name)}</div><div style="font-size:16px;font-weight:700">${e.name}</div><div style="font-size:12px;color:#2F80ED">${e.designation||'Staff'}</div></div>`+
+    detailStatRow([['Department',e.dept],['Phone',e.phone],['Email',e.email||'—'],['Status',e.status],['Join Date',e.joinDate||'—'],['ID',e.id]])+
+    `<div style="margin-top:14px"><div class="verif-item" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9"><span>✓ Active Employee</span><span style="font-size:10px;font-weight:600;cursor:pointer">View Profile</span></div></div>`,
+    `<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudEmployee(mockEmployees.find(x=>x.id===${e.id}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>`
+  );
 }
 
 render('dashboard');
