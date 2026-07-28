@@ -127,6 +127,8 @@
     .toast.success{background:#2e7d32}
     .toast.error{background:#c62828}
     .toast.info{background:#1565c0}
+    html.dark{filter:invert(1) hue-rotate(180deg);background:#0b0c11}
+    html.dark img,html.dark canvas,html.dark svg,html.dark .sidebar-item[data-tip]:hover::after{filter:invert(1) hue-rotate(180deg)}
   </style>
 </head>
 <body>
@@ -147,6 +149,7 @@
       <div class="sidebar-item" data-tip="Settings" onclick="switchModule('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></div>
     </div>
     <div class="sidebar-bottom">
+      <div class="sidebar-item" data-tip="Fullscreen" onclick="toggleFullScreen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></div>
       <div class="sidebar-item" data-tip="Role: Super Admin" onclick="toggleRoleMenu()" id="roleBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z"/></svg></div>
       <div class="sidebar-item" data-tip="Theme" onclick="toggleDarkMode()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="themeIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
     </div>
@@ -175,6 +178,16 @@
       </div>
     </div>
     <div class="content" id="mainContent"></div>
+    <div style="height:32px;min-height:32px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 14px;font-size:11px;color:#888;justify-content:space-between">
+      <div class="breadcrumb">REM ERP <span>›</span> <span id="footerModName">Dashboard</span></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="changeZoom(-10)" style="padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;color:#555">−</button>
+        <span id="zoomLabel" onclick="resetZoom()" style="cursor:pointer;font-weight:600;min-width:36px;text-align:center;font-size:11px">100%</span>
+        <button onclick="changeZoom(10)" style="padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;color:#555">+</button>
+        <span style="color:#e0e0e0">|</span>
+        <button onclick="toggleFullScreen()" style="padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:10px;color:#555" title="Fullscreen">⛶</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -349,6 +362,8 @@ function switchModule(mod){
 }
 function render(mod){
   const el=document.getElementById('mainContent');
+  const names={dashboard:'Dashboard',crm:'Sales & CRM',land_mgmt:'Land Acquisition',plots:'Plots',projects:'Projects',bookings:'Bookings',finance:'Finance',stock:'Stock',hr:'HR',tasks:'Tasks',settings:'Settings',more:'All Modules'};
+  document.getElementById('footerModName').textContent=names[mod]||mod;
   switch(mod){
     case'dashboard':renderDashboard(el);break; case'crm':renderCRM(el);break; case'land_mgmt':renderLandMgmt(el);break;
     case'plots':renderPlots(el);break; case'projects':renderProjects(el);break; case'bookings':renderBookings(el);break;
@@ -370,8 +385,14 @@ function setRole(role){
 }
 function toggleDarkMode(){
   const is=document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme',is?'dark':'light');
   document.getElementById('themeIcon').outerHTML=is?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="themeIcon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="themeIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
 }
+if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');
+let currentZoom=100;
+function changeZoom(d){currentZoom+=d;if(currentZoom<60)currentZoom=60;if(currentZoom>150)currentZoom=150;document.getElementById('mainContent').style.zoom=currentZoom+'%';document.getElementById('zoomLabel').textContent=currentZoom+'%'}
+function resetZoom(){currentZoom=100;document.getElementById('mainContent').style.zoom='';document.getElementById('zoomLabel').textContent='100%'}
+function toggleFullScreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen()}else{if(document.exitFullscreen)document.exitFullscreen()}}
 function openLead(id){
   const l=mockLeads.find(x=>x.id===id);if(!l)return;
   document.getElementById('leadPanelContent').innerHTML=`<div style="padding:14px 16px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:600">${l.name}</span><span style="cursor:pointer;color:#999" onclick="closeLeadPanel()">✕</span></div><div style="flex:1;padding:16px">${['Phone','Property','Source','Value','Last Contact'].map(f=>`<div class="form-group"><label class="form-label">${f}</label><div style="font-size:13px">${l[f.toLowerCase().replace(' ','')]||l[f.toLowerCase()]||'—'}</div></div>`).join('')}</div>`;
