@@ -155,7 +155,28 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 
 ---
 
-### 14. Contractor & Subcontractor Management
+### 14. Layout & Planning (Visual Plot Grid)
+- **Project Selector** — Switch between layout projects (Apartment / Land Plotting)
+- **Interactive Grid Canvas** — Color-coded plot cells with real-time status
+- **Plot Status Colors:** Available (🟢 green), Sold (🔴 red), Reserved (🟡 yellow), Amenity (⚪ gray)
+- **Click-to-Select** — Click any plot to see ID, type, status, area (sqft/katha), price, road access, customer
+- **Road Network** — Visual road dimension indicators (6m, 8m, 10m)
+- **Amenity Markers** — Park, lake, community hall, playground, mosque, school
+- **Stats Bar** — Total plots, available, sold, reserved, amenities counts
+- **Legend** — Color key for all plot types
+- **Supports:** Apartment floor-wise unit grids + Land plotting plot-wise grids
+
+### 15. Design Management
+- **Design Types:** Floor Plans, Elevations, Site Plans, Plot Designs, Building Designs, Structural, Interior
+- **Version Tracking** — Design version history (v1, v2, v3...) with dates
+- **Lifecycle:** Draft → Under Review → Approved → Rejected
+- **Design Cards Grid** — Visual card layout (not a table) with type icons, project, designer
+- **Filter Tabs** — Filter by design type
+- **Status Badges** — Color-coded (Draft=gray, Under Review=blue, Approved=green, Rejected=red)
+- **Dates** — Submitted date + Approved date tracking
+- **Action Buttons:** View, Download, New Version, Archive
+
+### 16. Contractor & Subcontractor Management
 - **Subcontractor Database** — Trades, rates, agreements, insurance, licenses, performance rating
 - **Work Orders** — Issue work orders per project/unit with scope, timeline, price, attachments
 - **Work Completion Certificates** — Approve completed work stages, release milestone payments
@@ -164,7 +185,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Mobilization Tracking** — Track contractor mobilization status (mobilized, demobilized)
 - **Site Attendance** — Daily contractor worker count per project for billing verification
 
-### 15. Bill of Quantities (BOQ) & Cost Control
+### 17. Bill of Quantities (BOQ) & Cost Control
 - **BOQ Builder** — Itemized quantity takeoff per project (excavation, brickwork, plastering, finishing, MEP, etc.)
 - **Rate Analysis** — Material + labor + equipment + overhead rates per BOQ item
 - **Running Account (R.A.) Bills** — Track partial billing as work progresses, with certified quantities
@@ -173,7 +194,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Unit Rate Database** — Maintain standard rates library for common construction items
 - **Budget vs Actual Charts** — Visual comparison across project phases
 
-### 16. Variation Order Management
+### 18. Variation Order Management
 - **Change Request** — Document scope changes with reason, originator, impact assessment
 - **Variation Order Approval** — Multi-level approval workflow (Site Engineer → PM → Director)
 - **Cost Impact Analysis** — Auto-calculate revised BOQ totals and budget impact
@@ -181,7 +202,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **VO Log** — Complete audit trail of all changes per project with status tracking
 - **Variation Register** — Master register across all projects with financial summary
 
-### 17. Equipment & Machinery Tracking
+### 19. Equipment & Machinery Tracking
 - **Asset Register** — Excavators, cranes, concrete mixers, dump trucks, vibrators, generators
 - **Allocation & Scheduling** — Assign equipment to projects/sites with time-bound schedules
 - **Maintenance Schedule** — Preventive maintenance alerts (daily/weekly/monthly), service history log
@@ -190,7 +211,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Depreciation Tracking** — Calculate and track asset depreciation
 - **Operator Assignment** — Link equipment to designated operators
 
-### 18. Labor Management
+### 20. Labor Management
 - **Daily Attendance** — Worker check-in/out per site with biometric/photo support
 - **Wage Calculation** — Daily/weekly/monthly wages based on attendance + overtime
 - **Labor Categories** — Skilled, semi-skilled, unskilled with configurable rate cards
@@ -200,7 +221,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Overtime Management** — Overtime approval, rate calculation (1.5x / 2x)
 - **Daily Labor Cost Report** — Per-project labor cost summary
 
-### 19. Quality Control & Inspection
+### 21. Quality Control & Inspection
 - **Inspection Checklists** — Configurable checklists per trade (concrete, brickwork, finishing, electrical, plumbing, MEP)
 - **Snag / Defect List** — Log defects found during inspection with photos, assign for rectification
 - **Non-Conformance Report (NCR)** — Formal quality issue tracking with root cause analysis
@@ -210,7 +231,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Testing Register** — Track material tests (cube test, slump test, compaction test) with results
 - **Quality Dashboard** — Pass/fail rates, NCR aging, recurring defect patterns
 
-### 20. Sales & Marketing Suite
+### 22. Sales & Marketing Suite
 - **Marketing Campaign Management** — Track campaigns (billboard, social media, newspaper, referral) with budget and ROI
 - **Unit Hold / Reservation** — Temporary hold with configurable auto-expiry (7/14/30 days)
 - **Follow-up Automation** — Auto-trigger reminders for expiring holds, pending documents
@@ -220,7 +241,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Source Tracking** — Lead source analysis (walk-in, referral, agent, social media, billboard)
 - **Sales Dashboard** — Agent-wise performance, conversion rates, revenue pipeline
 
-### 21. Dues & Recovery Management
+### 23. Dues & Recovery Management
 - **Automated Dues Tracking** — Overdue installment detection with aging buckets (30/60/90/120+ days)
 - **Automated Reminders** — Configurable SMS/Email reminders: X days before due, on due date, overdue alerts
 - **Late Fee Calculator** — Configurable penalty %, grace period, waiver approval
@@ -230,7 +251,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Recovery Dashboard** — Aging analysis, collection efficiency, DSO (Days Sales Outstanding)
 - **Amortization Schedule Viewer** — Display full payment schedule with paid/due/overdue indicators
 
-### 22. Customer Portal & Self-Service
+### 24. Customer Portal & Self-Service
 - **Booking Dashboard** — View unit/plot details, booking status, payment history
 - **Installment Dues** — See upcoming and overdue installments with amounts and dates
 - **Online Payment** — Pay installments via integrated gateway (SSLCommerz, bKash, Nagad)
@@ -239,7 +260,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Complaint / Query Ticket** — Submit and track complaints or queries
 - **Mobile-First Design** — Responsive interface optimized for smartphone access
 
-### 23. Handover & Post-Sales
+### 25. Handover & Post-Sales
 - **Pre-Handover Inspection (POS)** — Punch list before unit handover, tracked item by item
 - **Snag Rectification Tracker** — Assign contractor/team to fix issues with deadline
 - **Handover Certificate** — Generate formal handover document with digital signature
@@ -248,7 +269,7 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 - **Post-Handover Support** — Track maintenance requests after handover
 - **Utility Connection Tracker** — Gas, electricity, water, internet connection status per unit
 
-### 24. Regulatory & Compliance (Bangladesh Focus)
+### 26. Regulatory & Compliance (Bangladesh Focus)
 - **RAJUK Approval Tracker** — Application status, fees, inspections, approvals per project
 - **REHAB Membership Management** — Renewal dates, project listing updates
 - **Bank Lien Tracking** — Track units under bank lien against construction loan
