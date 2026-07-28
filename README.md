@@ -158,7 +158,12 @@ A comprehensive Enterprise Resource Planning system for **Mars Constech Limited*
 ### 14. Layout & Planning (Visual Plot Grid)
 - **Project Selector** — Switch between layout projects (Apartment / Land Plotting)
 - **Interactive Grid Canvas** — Color-coded plot cells with real-time status
-- **Plot Status Colors:** Available (🟢 green), Sold (🔴 red), Reserved (🟡 yellow), Amenity (⚪ gray)
+- **Plot Status Colors:**
+  - 🟢 **Available** (green) — Company-owned, ready to sell
+  - 🔴 **Sold** (red) — Transferred to customer
+  - 🟡 **Reserved** (yellow) — Under booking / earnest money
+  - ⚪ **Not Acquired** (grey hatched) — In master plan but land not yet purchased by company
+  - ⬜ **Amenity** (white border) — Park, lake, mosque, school, etc.
 - **Click-to-Select** — Click any plot to see ID, type, status, area (sqft/katha), price, road access, customer
 - **Road Network** — Visual road dimension indicators (6m, 8m, 10m)
 - **Amenity Markers** — Park, lake, community hall, playground, mosque, school

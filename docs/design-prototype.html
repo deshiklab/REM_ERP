@@ -49,6 +49,22 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* Hatched diagonal pattern for "Not Acquired" plots */
+        .bg-hatched {
+            background-image: repeating-linear-gradient(
+                45deg,
+                #e5e7eb 0px,
+                #e5e7eb 2px,
+                #d1d5db 2px,
+                #d1d5db 4px
+            );
+            background-size: 6px 6px;
+        }
+        .border-hatched {
+            border-style: dashed !important;
+            border-width: 2px !important;
+        }
+
         /* Custom Reusable Tooltip */
         [data-tooltip] { position: relative; }
         [data-tooltip]:before {
@@ -432,8 +448,8 @@
         ];
         const auditLog = [{ id: 1, user: 'Iftekhar Ahmad', action: 'Viewed', doc: 'Muktodhara CS Khatiyan', time: '10 mins ago' }, { id: 2, user: 'Hasanul Banna', action: 'Downloaded', doc: 'Saf-Kabala Dolil - Rubina', time: '1 hour ago' }];
         const mockPlots = [
-            { id: 'M-101', type: '3 Katha', status: 'sold' }, { id: 'M-102', type: '3 Katha', status: 'available' }, { id: 'M-103', type: '5 Katha', status: 'reserved' }, { id: 'M-104', type: '5 Katha', status: 'available' },
-            { id: 'M-105', type: '3 Katha', status: 'sold' }, { id: 'M-106', type: '10 Katha', status: 'available' }, { id: 'M-107', type: '5 Katha', status: 'sold' }, { id: 'M-108', type: '3 Katha', status: 'available' },
+            { id: 'M-101', type: '3 Katha', status: 'sold' }, { id: 'M-102', type: '3 Katha', status: 'available' }, { id: 'M-103', type: '5 Katha', status: 'reserved' }, { id: 'M-104', type: '5 Katha', status: 'not_acquired' },
+            { id: 'M-105', type: '3 Katha', status: 'sold' }, { id: 'M-106', type: '10 Katha', status: 'available' }, { id: 'M-107', type: '5 Katha', status: 'not_acquired' }, { id: 'M-108', type: '3 Katha', status: 'available' },
         ];
         const mockFlats = [
             { floor: '6th Floor', units: [{ id: '6A', status: 'Finishing' }, { id: '6B', status: 'Brickwork' }, { id: '6C', status: 'Brickwork' }] },
@@ -4271,6 +4287,7 @@
                                     <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-green-500"></div> Available</span>
                                     <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-red-500"></div> Sold</span>
                                     <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div> Reserved</span>
+                                    <span class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-gray-400 border border-dashed border-gray-500" style="background-image: repeating-linear-gradient(45deg,#d1d5db 0px,#d1d5db 2px,#9ca3af 2px,#9ca3af 4px);background-size:6px 6px;"></div> Not Acquired</span>
                                 </div>
                             </div>
                             <div class="bg-gray-50 p-1 rounded-lg border border-[#e2e0d8] flex shadow-sm shrink-0">
@@ -4278,6 +4295,7 @@
                                 <button onclick="setPlotFilter('available')" class="px-4 py-1.5 rounded-md text-xs font-bold transition ${plotFilter === 'available' ? 'bg-green-600 text-white shadow' : 'text-gray-500 hover:text-green-700'}">Available</button>
                                 <button onclick="setPlotFilter('sold')" class="px-4 py-1.5 rounded-md text-xs font-bold transition ${plotFilter === 'sold' ? 'bg-red-600 text-white shadow' : 'text-gray-500 hover:text-red-700'}">Sold</button>
                                 <button onclick="setPlotFilter('reserved')" class="px-4 py-1.5 rounded-md text-xs font-bold transition ${plotFilter === 'reserved' ? 'bg-yellow-600 text-white shadow' : 'text-gray-500 hover:text-yellow-700'}">Reserved</button>
+                                <button onclick="setPlotFilter('not_acquired')" class="px-4 py-1.5 rounded-md text-xs font-bold transition ${plotFilter === 'not_acquired' ? 'bg-gray-500 text-white shadow' : 'text-gray-500 hover:text-gray-700'}">Not Acquired</button>
                                 <div class="w-px h-6 bg-[#e2e0d8] mx-1 self-center hidden sm:block"></div>
                                 <button onclick="openLayoutBuilderModal()" class="px-3 py-1.5 rounded-md text-xs font-bold transition text-[#3b4a40] hover:bg-[#e2e0d8] hidden sm:flex items-center gap-1" data-tooltip="Drag & Drop Builder"><i data-lucide="layout-template" class="w-3.5 h-3.5"></i> Builder</button>
                             </div>
@@ -4295,7 +4313,8 @@
                             ${mockPlots.map(plot => {
                                 let bg = plot.status === 'available' ? 'bg-green-50 border-green-300 text-green-700 hover:bg-green-100' : 
                                          plot.status === 'sold' ? 'bg-red-50 border-red-200 text-red-700' : 
-                                         'bg-yellow-50 border-yellow-300 text-yellow-700';
+                                         plot.status === 'reserved' ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 
+                                         'bg-white border-gray-300 text-gray-500 border-dashed bg-hatched';
                                 let isVisible = plotFilter === 'all' || plotFilter === plot.status;
                                 let opacityClass = isVisible ? 'opacity-100 hover:scale-105 hover:shadow-md' : 'opacity-20 grayscale pointer-events-none';
                                 return `
@@ -10818,9 +10837,9 @@ const mockLayoutGrids = {
         row: Math.floor(i / 6),
         col: i % 6,
         type: i < 16 ? 'Flat' : (i < 20 ? 'Shop' : 'Amenity'),
-        status: ['available', 'sold', 'reserved', 'sold', 'available', 'sold', 'available', 'available', 'sold', 'reserved', 'available', 'available', 'sold', 'sold', 'available', 'available', 'available', 'reserved', 'available', 'available', 'amenity', 'amenity', 'amenity', 'amenity'][i],
+        status: ['not_acquired', 'sold', 'reserved', 'sold', 'available', 'sold', 'available', 'not_acquired', 'sold', 'reserved', 'available', 'available', 'sold', 'sold', 'available', 'available', 'available', 'reserved', 'available', 'not_acquired', 'amenity', 'amenity', 'amenity', 'amenity'][i],
         area_sqft: [1200, 950, 1100, 1350, 900, 1000, 1250, 1050, 950, 1150, 1200, 900, 1100, 1300, 1000, 950, 800, 850, 900, 950, 0, 0, 0, 0][i],
-        price: [9500000, 7200000, 8500000, 10500000, 6800000, 7800000, 9800000, 8000000, 7200000, 8800000, 9500000, 6800000, 8500000, 10200000, 7800000, 7200000, 0, 0, 0, 0, 0, 0, 0, 0][i],
+        price: [0, 7200000, 8500000, 10500000, 6800000, 7800000, 9800000, 0, 7200000, 8800000, 9500000, 6800000, 8500000, 10200000, 7800000, 7200000, 0, 0, 0, 0, 0, 0, 0, 0][i],
         road_access: ['8m', '8m', '8m', '8m', '6m', '6m', '8m', '8m', '8m', '8m', '6m', '6m', '8m', '8m', '8m', '8m', '6m', '6m', '6m', '6m', '—', '—', '—', '—'][i],
         customer: i === 1 ? 'Md. Kamrul Hasan' : (i === 3 ? 'Dr. Rubina Ali' : (i === 5 ? 'Engr. Salahuddin' : (i === 8 ? 'Mrs. Jahanara' : (i === 9 ? 'Mizanur Rahman' : (i === 12 ? 'Ms. Farhana' : (i === 13 ? 'Ahasan Habib' : ''))))))
     })),
@@ -10829,18 +10848,18 @@ const mockLayoutGrids = {
         row: Math.floor(i / 8),
         col: i % 8,
         type: i < 40 ? 'Plot' : 'Amenity',
-        status: i < 40 ? (['available', 'sold', 'available', 'available', 'sold', 'reserved', 'available', 'available', 'available', 'sold', 'available', 'available', 'sold', 'sold', 'available', 'available', 'available', 'available', 'reserved', 'available', 'sold', 'available', 'available', 'available', 'available', 'available', 'sold', 'available', 'available', 'sold', 'available', 'available', 'available', 'available', 'available', 'reserved', 'available', 'available', 'sold', 'available'][i % 40]) : 'amenity',
+        status: i < 40 ? (['not_acquired', 'sold', 'available', 'available', 'sold', 'reserved', 'available', 'available', 'available', 'sold', 'available', 'available', 'sold', 'sold', 'not_acquired', 'available', 'available', 'available', 'reserved', 'available', 'sold', 'available', 'available', 'available', 'not_acquired', 'available', 'sold', 'available', 'available', 'sold', 'available', 'available', 'not_acquired', 'available', 'available', 'reserved', 'available', 'available', 'sold', 'available'][i % 40]) : 'amenity',
         katha: i < 40 ? [3, 5, 3, 3, 5, 3, 5, 3, 3, 3, 5, 3, 5, 3, 3, 3, 5, 3, 3, 5, 3, 5, 3, 3, 3, 5, 3, 5, 3, 3, 5, 3, 3, 5, 3, 3, 5, 3, 5, 3][i % 40] : 0,
-        price: i < 40 ? [8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000][i % 40] : 0,
+        price: i < 40 ? [0, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 0, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 0, 14000000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 0, 8500000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000][i % 40] : 0,
     })),
     'LAY-003': Array.from({length: 32}, (_, i) => ({
         id: `R-${String(i+1).padStart(2,'0')}`,
         row: Math.floor(i / 8),
         col: i % 8,
         type: i < 28 ? 'Plot' : 'Amenity',
-        status: i < 28 ? (['available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available'][i % 28]) : 'amenity',
+        status: i < 28 ? (['available', 'available', 'available', 'not_acquired', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'not_acquired', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'not_acquired', 'available', 'available', 'available', 'available', 'available', 'available', 'available'][i % 28]) : 'amenity',
         katha: [3, 5, 3, 5, 3, 5, 3, 3, 5, 3, 5, 3, 5, 3, 3, 5, 3, 5, 3, 5, 3, 3, 5, 3, 5, 3, 5, 3, 0, 0, 0, 0][i],
-        price: [8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 0, 0, 0, 0][i],
+        price: [8000000, 13000000, 8000000, 0, 8000000, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 0, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 0, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 0, 0, 0, 0][i],
     }))
 };
 
@@ -10866,10 +10885,11 @@ const mockDesigns = [
                 available: 'bg-green-100 border-green-300 text-green-800',
                 sold: 'bg-red-100 border-red-300 text-red-800',
                 reserved: 'bg-yellow-100 border-yellow-300 text-yellow-800',
+                not_acquired: 'bg-hatched border-hatched border-gray-400 text-gray-500',
                 amenity: 'bg-gray-100 border-gray-300 text-gray-400'
             };
 
-            const stats = { total: grid.length, available: 0, sold: 0, reserved: 0, amenity: 0 };
+            const stats = { total: grid.length, available: 0, sold: 0, reserved: 0, not_acquired: 0, amenity: 0 };
             grid.forEach(p => { if (stats[p.status] !== undefined) stats[p.status]++; else stats.amenity++; });
 
             return `
@@ -10884,11 +10904,12 @@ const mockDesigns = [
                     </div>
 
                     <!-- Stats bar -->
-                    <div class="grid grid-cols-5 gap-3 shrink-0">
+                    <div class="grid grid-cols-6 gap-3 shrink-0">
                         <div class="bg-white p-3 rounded-xl border border-[#e2e0d8] shadow-sm text-center"><p class="text-xs text-gray-500">Total Plots</p><p class="text-xl font-bold text-[#1a1f1c]">${stats.total}</p></div>
                         <div class="bg-white p-3 rounded-xl border border-green-200 shadow-sm text-center"><p class="text-xs text-gray-500">Available</p><p class="text-xl font-bold text-green-700">${stats.available}</p></div>
                         <div class="bg-white p-3 rounded-xl border border-red-200 shadow-sm text-center"><p class="text-xs text-gray-500">Sold</p><p class="text-xl font-bold text-red-700">${stats.sold}</p></div>
                         <div class="bg-white p-3 rounded-xl border border-yellow-200 shadow-sm text-center"><p class="text-xs text-gray-500">Reserved</p><p class="text-xl font-bold text-yellow-700">${stats.reserved}</p></div>
+                        <div class="bg-white p-3 rounded-xl border border-gray-300 shadow-sm text-center border-dashed"><p class="text-xs text-gray-500">Not Acquired</p><p class="text-xl font-bold text-gray-500">${stats.not_acquired}</p></div>
                         <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm text-center"><p class="text-xs text-gray-500">Amenities</p><p class="text-xl font-bold text-gray-600">${stats.amenity}</p></div>
                     </div>
 
@@ -10914,19 +10935,21 @@ const mockDesigns = [
                                 ${grid.map(p => {
                                     const colorClass = statusColors[p.status] || 'bg-gray-100 border-gray-300 text-gray-400';
                                     const isAmenity = p.status === 'amenity';
+                                    const isNotAcquired = p.status === 'not_acquired';
                                     return `
                                         <div onclick="setSelectedPlot('${p.id}')" class="aspect-square rounded-lg border-2 ${colorClass} flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-all text-[9px] font-bold p-0.5 relative ${isAmenity ? 'opacity-70' : ''}">
-                                            ${isAmenity ? '<i data-lucide="tree-pine" class="w-4 h-4"></i>' : `<span>${p.id}</span>`}
-                                            ${p.status === 'sold' ? '<span class="text-[7px] absolute bottom-0.5">●</span>' : ''}
+                                            ${isAmenity ? '<i data-lucide="tree-pine" class="w-4 h-4"></i>' : isNotAcquired ? '<i data-lucide="lock" class="w-3 h-3 opacity-40"></i>' : `<span>${p.id}</span>`}
+                                            ${p.status === 'sold' ? '<span class="text-[7px] absolute bottom-0.5">●</span>' : isNotAcquired ? '<span class="text-[6px] absolute bottom-0.5 text-gray-400">future</span>' : ''}
                                         </div>
                                     `;
                                 }).join('')}
                             </div>
                             <!-- Legend -->
-                            <div class="flex gap-4 mt-3 text-[10px] text-gray-500">
+                            <div class="flex gap-4 mt-3 text-[10px] text-gray-500 flex-wrap">
                                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-100 border border-green-300"></span> Available</span>
                                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 border border-red-300"></span> Sold</span>
                                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-100 border border-yellow-300"></span> Reserved</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-300" style="background-image: repeating-linear-gradient(45deg,#e5e7eb 0px,#e5e7eb 2px,#d1d5db 2px,#d1d5db 4px);background-size:6px 6px;border-style:dashed!important;"></span> Not Acquired</span>
                                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-300"></span> Amenity</span>
                             </div>
                         </div>
@@ -10941,7 +10964,7 @@ const mockDesigns = [
                                     <div class="space-y-2 text-xs">
                                         <div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Plot ID</p><p class="font-bold text-[#1a1f1c]">${plot.id}</p></div>
                                         <div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Type</p><p class="font-bold text-[#1a1f1c]">${plot.type}</p></div>
-                                        <div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Status</p><p class="font-bold capitalize ${plot.status === 'available' ? 'text-green-700' : plot.status === 'sold' ? 'text-red-700' : plot.status === 'reserved' ? 'text-yellow-700' : 'text-gray-400'}">${plot.status}</p></div>
+                                        <div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Status</p><p class="font-bold capitalize ${plot.status === 'available' ? 'text-green-700' : plot.status === 'sold' ? 'text-red-700' : plot.status === 'reserved' ? 'text-yellow-700' : plot.status === 'not_acquired' ? 'text-gray-500' : 'text-gray-400'}">${plot.status.replace(/_/g, ' ')}</p></div>
                                         ${plot.area_sqft ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Area</p><p class="font-bold text-[#1a1f1c]">${plot.area_sqft} sqft${plot.katha ? ' / ' + plot.katha + ' Katha' : ''}</p></div>` : ''}
                                         ${plot.price ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Price</p><p class="font-bold text-[#1a1f1c]">৳ ${plot.price.toLocaleString()}</p></div>` : ''}
                                         ${plot.road_access ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Road Access</p><p class="font-bold text-[#1a1f1c]">${plot.road_access}</p></div>` : ''}
