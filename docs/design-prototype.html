@@ -541,6 +541,8 @@
             { id: 'handover', label: 'Handover & Post-Sales', icon: 'key-round' },
             { id: 'compliance', label: 'Regulatory Compliance', icon: 'shield' },
             { id: 'bi_reports', label: 'BI & Reports', icon: 'bar-chart-3' },
+            { id: 'layout_planning', label: 'Layout & Planning', icon: 'grid-3x3' },
+            { id: 'design_mgmt', label: 'Design Management', icon: 'ruler' },
             { id: 'settings', label: 'System Settings', icon: 'settings' },
         ];
 
@@ -874,6 +876,8 @@
                 case 'handover': mainContent.innerHTML = getHandoverHTML(); break;
                 case 'compliance': mainContent.innerHTML = getComplianceHTML(); break;
                 case 'bi_reports': mainContent.innerHTML = getBIReportsHTML(); break;
+                case 'layout_planning': mainContent.innerHTML = getLayoutPlanningHTML(); break;
+                case 'design_mgmt': mainContent.innerHTML = getDesignMgmtHTML(); break;
                 case 'settings': mainContent.innerHTML = getSettingsHTML(); break;
                 default: mainContent.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center animate-fade-in"><h2 class="text-2xl font-bold text-[#1a1f1c]">Module Under Construction</h2></div>`;
             }
@@ -10800,6 +10804,247 @@ const mockCompliance = [
             `;
         }
 
+// ── LAYOUT PLANNING MOCK DATA ──
+const mockLayoutProjects = [
+    { id: 'LAY-001', name: 'Jolshiri Abason', type: 'Apartment', totalArea: '3.5 Katha', plots: 24, roads: '8m + 6m', amenities: ['Park', 'Community Hall', 'Playground'], status: 'Approved', approvalDate: '2026-05-15' },
+    { id: 'LAY-002', name: 'Muktodhara Green Park', type: 'Land Plotting', totalArea: '12 Katha', plots: 48, roads: '10m + 8m + 6m', amenities: ['Park', 'Lake', 'Mosque', 'School'], status: 'In Progress', approvalDate: '' },
+    { id: 'LAY-003', name: 'Rupnagar Residential', type: 'Land Plotting', totalArea: '8 Katha', plots: 32, roads: '8m + 6m', amenities: ['Park', 'Playground'], status: 'Draft', approvalDate: '' },
+];
+
+// Grid layout data for Jolshiri (3 blocks x 8 rows)
+const mockLayoutGrids = {
+    'LAY-001': Array.from({length: 24}, (_, i) => ({
+        id: `J-${String(i+1).padStart(2,'0')}`,
+        row: Math.floor(i / 6),
+        col: i % 6,
+        type: i < 16 ? 'Flat' : (i < 20 ? 'Shop' : 'Amenity'),
+        status: ['available', 'sold', 'reserved', 'sold', 'available', 'sold', 'available', 'available', 'sold', 'reserved', 'available', 'available', 'sold', 'sold', 'available', 'available', 'available', 'reserved', 'available', 'available', 'amenity', 'amenity', 'amenity', 'amenity'][i],
+        area_sqft: [1200, 950, 1100, 1350, 900, 1000, 1250, 1050, 950, 1150, 1200, 900, 1100, 1300, 1000, 950, 800, 850, 900, 950, 0, 0, 0, 0][i],
+        price: [9500000, 7200000, 8500000, 10500000, 6800000, 7800000, 9800000, 8000000, 7200000, 8800000, 9500000, 6800000, 8500000, 10200000, 7800000, 7200000, 0, 0, 0, 0, 0, 0, 0, 0][i],
+        road_access: ['8m', '8m', '8m', '8m', '6m', '6m', '8m', '8m', '8m', '8m', '6m', '6m', '8m', '8m', '8m', '8m', '6m', '6m', '6m', '6m', '—', '—', '—', '—'][i],
+        customer: i === 1 ? 'Md. Kamrul Hasan' : (i === 3 ? 'Dr. Rubina Ali' : (i === 5 ? 'Engr. Salahuddin' : (i === 8 ? 'Mrs. Jahanara' : (i === 9 ? 'Mizanur Rahman' : (i === 12 ? 'Ms. Farhana' : (i === 13 ? 'Ahasan Habib' : ''))))))
+    })),
+    'LAY-002': Array.from({length: 48}, (_, i) => ({
+        id: `M-${String(i+1).padStart(2,'0')}`,
+        row: Math.floor(i / 8),
+        col: i % 8,
+        type: i < 40 ? 'Plot' : 'Amenity',
+        status: i < 40 ? (['available', 'sold', 'available', 'available', 'sold', 'reserved', 'available', 'available', 'available', 'sold', 'available', 'available', 'sold', 'sold', 'available', 'available', 'available', 'available', 'reserved', 'available', 'sold', 'available', 'available', 'available', 'available', 'available', 'sold', 'available', 'available', 'sold', 'available', 'available', 'available', 'available', 'available', 'reserved', 'available', 'available', 'sold', 'available'][i % 40]) : 'amenity',
+        katha: i < 40 ? [3, 5, 3, 3, 5, 3, 5, 3, 3, 3, 5, 3, 5, 3, 3, 3, 5, 3, 3, 5, 3, 5, 3, 3, 3, 5, 3, 5, 3, 3, 5, 3, 3, 5, 3, 3, 5, 3, 5, 3][i % 40] : 0,
+        price: i < 40 ? [8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 8500000, 14000000, 8500000, 14000000, 8500000][i % 40] : 0,
+    })),
+    'LAY-003': Array.from({length: 32}, (_, i) => ({
+        id: `R-${String(i+1).padStart(2,'0')}`,
+        row: Math.floor(i / 8),
+        col: i % 8,
+        type: i < 28 ? 'Plot' : 'Amenity',
+        status: i < 28 ? (['available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available', 'available'][i % 28]) : 'amenity',
+        katha: [3, 5, 3, 5, 3, 5, 3, 3, 5, 3, 5, 3, 5, 3, 3, 5, 3, 5, 3, 5, 3, 3, 5, 3, 5, 3, 5, 3, 0, 0, 0, 0][i],
+        price: [8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 8000000, 13000000, 8000000, 13000000, 8000000, 13000000, 8000000, 0, 0, 0, 0][i],
+    }))
+};
+
+// ── DESIGN MANAGEMENT MOCK DATA ──
+const mockDesigns = [
+    { id: 'DSG-001', project: 'Jolshiri Abason', name: 'Floor Plan - Type A (1200 sqft)', type: 'Floor Plan', version: 'v3', designer: 'Arc. Rafiqul Islam', status: 'Approved', submittedDate: '2026-06-10', approvedDate: '2026-06-28', notes: '3BR + Living + Dining + 2 Bath' },
+    { id: 'DSG-002', project: 'Jolshiri Abason', name: 'Floor Plan - Type B (950 sqft)', type: 'Floor Plan', version: 'v2', designer: 'Arc. Rafiqul Islam', status: 'Approved', submittedDate: '2026-06-10', approvedDate: '2026-06-25', notes: '2BR + Living + Dining + 2 Bath' },
+    { id: 'DSG-003', project: 'Jolshiri Abason', name: 'Elevation - Front View', type: 'Elevation', version: 'v4', designer: 'Arc. Sultana Rahman', status: 'Under Review', submittedDate: '2026-07-15', approvedDate: '', notes: 'Modern contemporary with glass facade' },
+    { id: 'DSG-004', project: 'Muktodhara Green Park', name: 'Master Layout Plan', type: 'Site Plan', version: 'v5', designer: 'Arc. Rafiqul Islam', status: 'Approved', submittedDate: '2026-05-20', approvedDate: '2026-06-15', notes: '48 plots with central lake and park' },
+    { id: 'DSG-005', project: 'Muktodhara Green Park', name: 'Typical Plot Design (5 Katha)', type: 'Plot Design', version: 'v2', designer: 'Arc. Sultana Rahman', status: 'Approved', submittedDate: '2026-06-01', approvedDate: '2026-06-20', notes: 'Setback 5ft all sides, 2-story allowance' },
+    { id: 'DSG-006', project: 'Muktodhara Green Park', name: 'Community Hall Design', type: 'Building Design', version: 'v1', designer: 'Arc. Rafiqul Islam', status: 'Draft', submittedDate: '2026-07-28', approvedDate: '', notes: '2000 sqft community hall with stage' },
+    { id: 'DSG-007', project: 'Jolshiri Abason', name: 'Structural Design - Foundation', type: 'Structural', version: 'v2', designer: 'Engr. Kabir Hossain', status: 'Approved', submittedDate: '2026-04-10', approvedDate: '2026-04-25', notes: 'Mat foundation, 5-story load bearing' },
+    { id: 'DSG-008', project: 'Jolshiri Abason', name: 'Interior Design - Lobby', type: 'Interior', version: 'v1', designer: 'Arc. Sultana Rahman', status: 'Draft', submittedDate: '2026-07-30', approvedDate: '', notes: 'Modern lobby with reception' },
+];
+
+        function getLayoutPlanningHTML() {
+            const [activeLayout, setActiveLayout] = React.useState('LAY-001');
+            const [selectedPlot, setSelectedPlot] = React.useState(null);
+            const project = mockLayoutProjects.find(p => p.id === activeLayout);
+            const grid = mockLayoutGrids[activeLayout] || [];
+
+            const statusColors = {
+                available: 'bg-green-100 border-green-300 text-green-800',
+                sold: 'bg-red-100 border-red-300 text-red-800',
+                reserved: 'bg-yellow-100 border-yellow-300 text-yellow-800',
+                amenity: 'bg-gray-100 border-gray-300 text-gray-400'
+            };
+
+            const stats = { total: grid.length, available: 0, sold: 0, reserved: 0, amenity: 0 };
+            grid.forEach(p => { if (stats[p.status] !== undefined) stats[p.status]++; else stats.amenity++; });
+
+            return `
+                <div class="space-y-4 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center shrink-0">
+                        <div>
+                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Layout & Planning</h2>
+                            <p class="text-[#3b4a40] text-sm mt-1">Visual land subdivision and plot management.</p>
+                        </div>
+                        <button class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> New Layout</button>
+                    </div>
+
+                    <!-- Stats bar -->
+                    <div class="grid grid-cols-5 gap-3 shrink-0">
+                        <div class="bg-white p-3 rounded-xl border border-[#e2e0d8] shadow-sm text-center"><p class="text-xs text-gray-500">Total Plots</p><p class="text-xl font-bold text-[#1a1f1c]">${stats.total}</p></div>
+                        <div class="bg-white p-3 rounded-xl border border-green-200 shadow-sm text-center"><p class="text-xs text-gray-500">Available</p><p class="text-xl font-bold text-green-700">${stats.available}</p></div>
+                        <div class="bg-white p-3 rounded-xl border border-red-200 shadow-sm text-center"><p class="text-xs text-gray-500">Sold</p><p class="text-xl font-bold text-red-700">${stats.sold}</p></div>
+                        <div class="bg-white p-3 rounded-xl border border-yellow-200 shadow-sm text-center"><p class="text-xs text-gray-500">Reserved</p><p class="text-xl font-bold text-yellow-700">${stats.reserved}</p></div>
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm text-center"><p class="text-xs text-gray-500">Amenities</p><p class="text-xl font-bold text-gray-600">${stats.amenity}</p></div>
+                    </div>
+
+                    <!-- Project tabs -->
+                    <div class="flex gap-2 shrink-0">
+                        ${mockLayoutProjects.map(p => `
+                            <button onclick="setActiveLayout('${p.id}')" class="px-4 py-2 rounded-lg text-sm font-bold transition-all border ${activeLayout === p.id ? 'bg-[#1a1f1c] text-white border-[#1a1f1c]' : 'bg-white text-[#1a1f1c] border-[#e2e0d8] hover:bg-[#f4f3ee]'}">
+                                ${p.name}
+                                <span class="text-[10px] ml-2 opacity-70">${p.type} • ${p.plots} plots</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Main layout area -->
+                    <div class="flex-1 flex gap-4 overflow-hidden">
+                        <!-- Grid canvas -->
+                        <div class="flex-1 bg-white rounded-2xl border border-[#e2e0d8] shadow-sm p-4 overflow-auto">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-sm text-[#1a1f1c]">${project.name} — Layout Grid</h3>
+                                <span class="text-xs text-gray-400">Roads: ${project.roads}</span>
+                            </div>
+                            <div class="grid gap-1.5" style="grid-template-columns: repeat(${activeLayout === 'LAY-001' ? 6 : 8}, minmax(0, 1fr))">
+                                ${grid.map(p => {
+                                    const colorClass = statusColors[p.status] || 'bg-gray-100 border-gray-300 text-gray-400';
+                                    const isAmenity = p.status === 'amenity';
+                                    return `
+                                        <div onclick="setSelectedPlot('${p.id}')" class="aspect-square rounded-lg border-2 ${colorClass} flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-all text-[9px] font-bold p-0.5 relative ${isAmenity ? 'opacity-70' : ''}">
+                                            ${isAmenity ? '<i data-lucide="tree-pine" class="w-4 h-4"></i>' : `<span>${p.id}</span>`}
+                                            ${p.status === 'sold' ? '<span class="text-[7px] absolute bottom-0.5">●</span>' : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                            <!-- Legend -->
+                            <div class="flex gap-4 mt-3 text-[10px] text-gray-500">
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-100 border border-green-300"></span> Available</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 border border-red-300"></span> Sold</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-100 border border-yellow-300"></span> Reserved</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-300"></span> Amenity</span>
+                            </div>
+                        </div>
+
+                        <!-- Plot info panel -->
+                        <div class="w-72 bg-white rounded-2xl border border-[#e2e0d8] shadow-sm p-4 overflow-y-auto shrink-0">
+                            <h3 class="font-bold text-sm text-[#1a1f1c] mb-3 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-[#3b4a40]"></i> Plot Details</h3>
+                            ${selectedPlot ? (() => {
+                                const plot = grid.find(p => p.id === selectedPlot);
+                                if (!plot) return '<p class="text-xs text-gray-400">Select a plot to view details.</p>';
+                                return `
+                                    <div class="space-y-2 text-xs">
+                                        <div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Plot ID</p><p class="font-bold text-[#1a1f1c]">${plot.id}</p></div>
+                                        <div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Type</p><p class="font-bold text-[#1a1f1c]">${plot.type}</p></div>
+                                        <div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Status</p><p class="font-bold capitalize ${plot.status === 'available' ? 'text-green-700' : plot.status === 'sold' ? 'text-red-700' : plot.status === 'reserved' ? 'text-yellow-700' : 'text-gray-400'}">${plot.status}</p></div>
+                                        ${plot.area_sqft ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Area</p><p class="font-bold text-[#1a1f1c]">${plot.area_sqft} sqft${plot.katha ? ' / ' + plot.katha + ' Katha' : ''}</p></div>` : ''}
+                                        ${plot.price ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Price</p><p class="font-bold text-[#1a1f1c]">৳ ${plot.price.toLocaleString()}</p></div>` : ''}
+                                        ${plot.road_access ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Road Access</p><p class="font-bold text-[#1a1f1c]">${plot.road_access}</p></div>` : ''}
+                                        ${plot.customer ? `<div class="bg-[#f4f3ee] p-3 rounded-xl"><p class="text-gray-500">Customer</p><p class="font-bold text-[#1a1f1c]">${plot.customer}</p></div>` : ''}
+                                        <div class="flex gap-2 pt-2">
+                                            <button class="flex-1 bg-[#1a1f1c] text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#2c3e2e] transition">Book Plot</button>
+                                            <button class="bg-white border border-[#e2e0d8] px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#f4f3ee] transition">Reserve</button>
+                                        </div>
+                                    </div>
+                                `;
+                            })() : '<p class="text-xs text-gray-400">Click a plot to view its details.</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getDesignMgmtHTML() {
+            const [activeFilter, setActiveFilter] = React.useState('All');
+            const [selectedDesign, setSelectedDesign] = React.useState(null);
+            const filters = ['All', 'Floor Plan', 'Elevation', 'Site Plan', 'Structural', 'Interior'];
+            const filtered = activeFilter === 'All' ? mockDesigns : mockDesigns.filter(d => d.type === activeFilter);
+
+            const stats = {
+                total: mockDesigns.length,
+                approved: mockDesigns.filter(d => d.status === 'Approved').length,
+                review: mockDesigns.filter(d => d.status === 'Under Review').length,
+                draft: mockDesigns.filter(d => d.status === 'Draft').length
+            };
+
+            const statusBadge = (s) => {
+                const m = { 'Approved': 'bg-green-100 text-green-800', 'Under Review': 'bg-yellow-100 text-yellow-800', 'Draft': 'bg-gray-100 text-gray-500' };
+                return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${m[s] || 'bg-gray-100 text-gray-500'}">${s}</span>`;
+            };
+
+            const typeIcon = (t) => {
+                const m = { 'Floor Plan': 'layers', 'Elevation': 'mountain', 'Site Plan': 'map', 'Plot Design': 'land-plot', 'Building Design': 'building-2', 'Structural': 'construction', 'Interior': 'palette' };
+                return m[t] || 'file';
+            };
+
+            return `
+                <div class="space-y-4 animate-fade-in h-[calc(100vh-120px)] flex flex-col">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center shrink-0">
+                        <div>
+                            <h2 class="text-2xl font-bold text-[#1a1f1c]">Design Management</h2>
+                            <p class="text-[#3b4a40] text-sm mt-1">Architectural designs, approvals, and version control.</p>
+                        </div>
+                        <button class="bg-[#1a1f1c] text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-[#2c3e2e] transition shadow-md flex items-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i> Upload New Design</button>
+                    </div>
+
+                    <!-- Stats cards -->
+                    <div class="grid grid-cols-4 gap-4 shrink-0">
+                        <div class="bg-white p-4 rounded-xl border border-[#e2e0d8] shadow-sm"><p class="text-xs text-gray-500">Total Designs</p><p class="text-2xl font-bold text-[#1a1f1c]">${stats.total}</p><p class="text-[10px] text-gray-400 mt-1">Across all projects</p></div>
+                        <div class="bg-white p-4 rounded-xl border border-green-200 shadow-sm"><p class="text-xs text-gray-500">Approved</p><p class="text-2xl font-bold text-green-700">${stats.approved}</p><p class="text-[10px] text-green-600 mt-1">Ready for construction</p></div>
+                        <div class="bg-white p-4 rounded-xl border border-yellow-200 shadow-sm"><p class="text-xs text-gray-500">Under Review</p><p class="text-2xl font-bold text-yellow-700">${stats.review}</p><p class="text-[10px] text-yellow-600 mt-1">Pending approval</p></div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm"><p class="text-xs text-gray-500">Draft</p><p class="text-2xl font-bold text-gray-600">${stats.draft}</p><p class="text-[10px] text-gray-400 mt-1">In progress</p></div>
+                    </div>
+
+                    <!-- Filter tabs -->
+                    <div class="flex gap-2 shrink-0 flex-wrap">
+                        ${filters.map(f => `
+                            <button onclick="setActiveFilter('${f}')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${activeFilter === f ? 'bg-[#1a1f1c] text-white border-[#1a1f1c]' : 'bg-white text-[#1a1f1c] border-[#e2e0d8] hover:bg-[#f4f3ee]'}">
+                                ${f}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Design cards grid -->
+                    <div class="flex-1 overflow-y-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${filtered.map(d => `
+                                <div class="bg-white rounded-2xl border border-[#e2e0d8] shadow-sm hover:shadow-md transition-all p-4 flex flex-col">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="w-10 h-10 rounded-xl bg-[#f4f3ee] flex items-center justify-center text-[#3b4a40] border border-[#e2e0d8]">
+                                            <i data-lucide="${typeIcon(d.type)}" class="w-5 h-5"></i>
+                                        </div>
+                                        ${statusBadge(d.status)}
+                                    </div>
+                                    <h4 class="font-bold text-sm text-[#1a1f1c] leading-tight mb-1">${d.name}</h4>
+                                    <p class="text-[10px] text-gray-400 mb-2">${d.project}</p>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-[10px] bg-[#f4f3ee] px-2 py-0.5 rounded font-bold text-[#3b4a40]">${d.version}</span>
+                                        <span class="text-[10px] text-gray-400">by ${d.designer}</span>
+                                    </div>
+                                    <div class="text-[10px] text-gray-500 space-y-0.5 mb-3">
+                                        <p>Submitted: ${d.submittedDate}</p>
+                                        ${d.approvedDate ? `<p>Approved: ${d.approvedDate}</p>` : ''}
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 italic mb-3 bg-[#f4f3ee]/50 p-2 rounded-lg">${d.notes}</div>
+                                    <div class="flex gap-2 mt-auto pt-3 border-t border-[#e2e0d8]">
+                                        <button onclick="viewDesign('${d.id}')" class="flex-1 bg-[#1a1f1c] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#2c3e2e] transition flex items-center justify-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> View</button>
+                                        <button onclick="downloadDesign('${d.id}')" class="bg-white border border-[#e2e0d8] px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#f4f3ee] transition flex items-center justify-center gap-1"><i data-lucide="download" class="w-3 h-3"></i></button>
+                                        <button onclick="newDesignVersion('${d.id}')" class="bg-white border border-[#e2e0d8] px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-[#f4f3ee] transition flex items-center justify-center gap-1"><i data-lucide="rotate-ccw" class="w-3 h-3"></i></button>
+                                        <button onclick="archiveDesign('${d.id}')" class="bg-white border border-red-200 text-red-500 px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-red-50 transition flex items-center justify-center gap-1"><i data-lucide="archive" class="w-3 h-3"></i></button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
 
     </script>
 </body>
