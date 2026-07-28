@@ -318,6 +318,24 @@ const mockTasks = [
   {id:7,title:'Review Q3 Financials',status:'Review',priority:'High'},
   {id:8,title:'Vendor payment (Shah Cement)',status:'Done',priority:'Low'}
 ];
+// SALES & MARKETING
+const mockCampaigns = [
+  {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:'Tk 1,50,000',leads:45,conversions:8,roi:'320%',status:'Active'},
+  {id:'CAM-002',name:'Jolshiri Launch Event',channel:'On-site Event',budget:'Tk 3,00,000',leads:78,conversions:12,roi:'450%',status:'Completed'},
+  {id:'CAM-003',name:'Billboard - Dhaka EPZ',channel:'Billboard',budget:'Tk 2,40,000',leads:22,conversions:3,roi:'180%',status:'Active'},
+  {id:'CAM-004',name:'Referral Program Q3',channel:'Referral',budget:'Tk 50,000',leads:15,conversions:5,roi:'520%',status:'Active'},
+  {id:'CAM-005',name:'Newspaper Ad - Prothom Alo',channel:'Print',budget:'Tk 1,80,000',leads:30,conversions:4,roi:'210%',status:'Completed'},
+];
+// DUES & RECOVERY
+const mockDues = [
+  {id:'BKG-008',customer:'Dr. Rubina Ali',project:'Jolshiri Abason',unit:'Apt 4B',totalPrice:'Tk 65,00,000',paid:'Tk 55,00,000',due:'Tk 10,00,000',dueDate:'2026-06-30',daysOverdue:28,status:'Overdue',bucket:'30 Days'},
+  {id:'BKG-012',customer:'Md. Taher Uddin',project:'Muktodhara Green Park',unit:'Plot 17',totalPrice:'Tk 28,00,000',paid:'Tk 20,00,000',due:'Tk 8,00,000',dueDate:'2026-07-15',daysOverdue:13,status:'Overdue',bucket:'15 Days'},
+  {id:'BKG-015',customer:'Engr. Salahuddin',project:'Muktodhara Green Park',unit:'Plot 22',totalPrice:'Tk 32,00,000',paid:'Tk 24,00,000',due:'Tk 8,00,000',dueDate:'2026-05-15',daysOverdue:74,status:'Critical',bucket:'60+ Days'},
+  {id:'BKG-010',customer:'Mrs. Jahanara Begum',project:'Jolshiri Abason',unit:'Apt 3C',totalPrice:'Tk 58,00,000',paid:'Tk 48,00,000',due:'Tk 10,00,000',dueDate:'2026-08-15',daysOverdue:-18,status:'Upcoming',bucket:'Future'},
+];
+// CRM STATE
+let crmTab='leads';
+
 const mockEmployees = [
   {name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',status:'active'},
   {name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',status:'active'},
@@ -623,11 +641,17 @@ function renderDashboard(el){
 }
 
 function renderCRM(el){
+  if(crmTab==="sales_marketing"){renderSalesMarketing(el);return}
+  if(crmTab==="dues"){renderDues(el);return}
   el.innerHTML=`<div class="fade-in"><div class="page-title">CRM &amp; Leads</div><div class="page-subtitle">${mockLeads.length} total · ${mockLeads.filter(l=>l.priority==='High').length} hot · ${mockLeads.filter(l=>l.status==='New Inquiry').length} new</div>
     <div class="stats-row" style="margin-bottom:10px">${[
       ['Total',mockLeads.length,''],['Hot',mockLeads.filter(l=>l.priority==='High').length,'#c62828'],['Warm',mockLeads.filter(l=>l.priority==='Medium').length,'#e65100'],
       ['New',mockLeads.filter(l=>l.status==='New Inquiry').length,''],['Booked',mockLeads.filter(l=>l.status==='Booked').length,'#2e7d32']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
+    <div class="toolbar" style="margin-bottom:8px">
+<div class="tabs"><div class="tab ${crmTab==='leads'?'active':''}" onclick="crmTab='leads';renderModule()">CRM &amp; Leads</div><div class="tab ${crmTab==='sales_marketing'?'active':''}" onclick="crmTab='sales_marketing';renderModule()">Sales &amp; Marketing</div><div class="tab ${crmTab==='dues'?'active':''}" onclick="crmTab='dues';renderModule()">Dues &amp; Recovery</div></div>
+      <div class="spacer"></div>
+    </div>
     <div class="toolbar" style="margin-bottom:8px">
       <div class="tabs"><div class="tab ${crmView==='list'?'active':''}" onclick="crmView='list';renderModule()">List</div><div class="tab ${crmView==='kanban'?'active':''}" onclick="crmView='kanban';renderModule()">Pipeline</div></div>
       <select id="crmFStatus" style="padding:4px 8px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px" onchange="renderModule()"><option value="">All Status</option><option>New Inquiry</option><option>Site Visit</option><option>Negotiation</option><option>Booked</option></select>
@@ -640,6 +664,63 @@ function renderCRM(el){
     <div class="content-footer"><div class="breadcrumb">CRM <span>›</span> ${crmView==='list'?'List':'Pipeline'}</div></div></div>`;
 }
 
+function renderSalesMarketing(el){
+  const act=mockCampaigns.filter(function(c){return c.status==="Active"}).length;
+  const tL=mockCampaigns.reduce(function(s,c){return s+c.leads},0);
+  const tC=mockCampaigns.reduce(function(s,c){return s+c.conversions},0);
+  var h="<div class=\"fade-in\"><div class=\"page-title\">Sales & Marketing</div><div class=\"page-subtitle\">"+mockCampaigns.length+" campaigns</div>";
+  h+="<div class=\"stats-row\" style=\"margin-bottom:10px\">";
+  [["Campaigns",mockCampaigns.length,""],["Active",act,"#2e7d32"],["Total Leads",tL,"#1565c0"],["Conversions",tC,"#e65100"]].forEach(function(s){
+    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
+    if(s[2])h+=" style=\"color:"+s[2]+"\"";
+    h+=">"+s[1]+"</div></div>";
+  });
+  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Campaigns</h3><button class=\"action-btn primary\" onclick=\"showToast(\'New campaign form coming soon\',\'info\')\" style=\"padding:4px 10px;font-size:11px\">+ New</button></div>";
+  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Leads</th><th>Conv.</th><th>Rate</th><th>ROI</th><th>Status</th></tr></thead><tbody>";
+  mockCampaigns.forEach(function(c){
+    var roiP=parseInt(c.roi);
+    var roiCol=roiP>=300?"#2e7d32":roiP>=200?"#e65100":"#c62828";
+    h+="<tr><td style=\"font-weight:500\">"+c.name+"<div style=\"font-size:10px;color:#888\">"+c.id+"</div></td>";
+    h+="<td><span style=\"padding:2px 8px;border-radius:4px;font-size:10px;background:#f0f4ff;color:#1565c0\">"+c.channel+"</span></td>";
+    h+="<td>"+c.budget+"</td><td style=\"color:#1565c0;font-weight:600\">"+c.leads+"</td>";
+    h+="<td style=\"color:#2e7d32;font-weight:600\">"+c.conversions+"</td>";
+    h+="<td>"+(c.leads>0?Math.round(c.conversions/c.leads*100):0)+"%</td>";
+    h+="<td style=\"color:"+roiCol+";font-weight:600\">"+c.roi+"</td>";
+    h+="<td><span class=\"badge-status "+(c.status==="Active"?"badge-active":"badge-closed")+"\">"+c.status+"</span></td></tr>";
+  });
+  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">CRM <span>\u203a</span> Sales & Marketing</div></div></div>";
+  el.innerHTML=h;
+}
+function renderDues(el){
+  var crit=mockDues.filter(function(d){return d.status==="Critical"}).length;
+  var over=mockDues.filter(function(d){return d.status==="Overdue"}).length;
+  var tot=mockDues.reduce(function(s,d){return s+parseInt(d.due.replace(/[^0-9]/g,""))},0);
+  var h="<div class=\"fade-in\"><div class=\"page-title\">Dues & Recovery</div><div class=\"page-subtitle\">"+mockDues.length+" accounts</div>";
+  h+="<div class=\"stats-row\" style=\"margin-bottom:10px\">";
+  [["Total Dues",mockDues.length,""],["Critical",crit,"#c62828"],["Overdue",over,"#e65100"],["Due Amount","Tk "+tot.toLocaleString(),""]].forEach(function(s){
+    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
+    if(s[2])h+=" style=\"color:"+s[2]+"\"";
+    h+=">"+s[1]+"</div></div>";
+  });
+  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Dues Tracker</h3>";
+  h+="<div style=\"display:flex;gap:6px\"><button class=\"action-btn secondary\" onclick=\"showToast(\'Export coming soon\',\'info\')\" style=\"padding:4px 8px;font-size:10px\">Export</button>";
+  h+="<button class=\"action-btn primary\" onclick=\"showToast(\'Sending reminders...\',\'info\')\" style=\"padding:4px 8px;font-size:10px\">Send Reminders</button></div></div>";
+  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Customer</th><th>Project/Unit</th><th>Total</th><th>Paid</th><th>Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Status</th></tr></thead><tbody>";
+  mockDues.forEach(function(d){
+    var odCol=d.daysOverdue>0?"#c62828":"#2e7d32";
+    var bCl=d.bucket==="60+ Days"?"badge-sold":d.bucket==="30 Days"?"badge-hot":d.bucket==="15 Days"?"badge-pending":"badge-active";
+    var sCl=d.status==="Critical"?"badge-sold":d.status==="Overdue"?"badge-hot":"badge-active";
+    h+="<tr><td style=\"font-weight:500\">"+d.customer+"<div style=\"font-size:10px;color:#888\">"+d.id+"</div></td>";
+    h+="<td>"+d.project+"<br><span style=\"font-size:10px;color:#888\">"+d.unit+"</span></td>";
+    h+="<td>"+d.totalPrice+"</td><td style=\"color:#2e7d32\">"+d.paid+"</td>";
+    h+="<td style=\"color:#c62828;font-weight:600\">"+d.due+"</td><td style=\"font-size:11px\">"+d.dueDate+"</td>";
+    h+="<td style=\"color:"+odCol+";font-weight:600\">"+(d.daysOverdue>0?d.daysOverdue+"d":"On track")+"</td>";
+    h+="<td><span class=\"badge-status "+bCl+"\">"+d.bucket+"</span></td>";
+    h+="<td><span class=\"badge-status "+sCl+"\">"+d.status+"</span></td></tr>";
+  });
+  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">CRM <span>\u203a</span> Dues & Recovery</div></div></div>";
+  el.innerHTML=h;
+}
 function renderPlots(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Land &amp; Plots</div><div class="page-subtitle">View and manage plot inventory</div>
     <div class="stats-row" style="margin-bottom:12px">${[
