@@ -192,6 +192,12 @@
     col.hidden{visibility:collapse}
     th.hidden{display:none}
     td.hidden{display:none}
+    .pagination{display:flex;align-items:center;gap:3px;padding:6px 10px;border-top:1px solid #f0f0f0;flex-wrap:wrap;background:#fafbfc}
+    .pagination .pg-btn{padding:3px 9px;font-size:10px;font-weight:500;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#555;cursor:pointer;transition:all .12s;min-width:26px;text-align:center;line-height:1.4;user-select:none}
+    .pagination .pg-btn:hover:not(:disabled){border-color:#2F80ED;color:#2F80ED;background:#f0f4ff}
+    .pagination .pg-btn:disabled{opacity:.4;cursor:default}
+    .pagination .pg-btn.pg-active{background:#2F80ED;color:#fff;border-color:#2F80ED;font-weight:600}
+    .pagination .pg-info{font-size:9px;color:#999;margin-left:auto;white-space:nowrap}
     @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:fixed;inset:0;background:#fff;padding:20px;overflow:auto;z-index:9999}#printArea table{font-size:10px}#printArea th{background:#f5f5f5!important;color:#333!important}}
   </style>
 </head>
@@ -577,6 +583,28 @@ function switchModule(mod) {
   }
 }
 
+// ═══ PAGINATION SYSTEM ═══
+const _PG={};
+function _pg(id,data,perPage){
+  if(!_PG[id])_PG[id]={page:1,perPage:perPage||5};
+  const s=_PG[id],total=data.length,tp=Math.ceil(total/s.perPage)||1;
+  if(s.page>tp)s.page=tp;
+  const st=(s.page-1)*s.perPage;
+  return {items:data.slice(st,st+s.perPage),total,page:s.page,totalPages:tp,perPage:s.perPage};
+}
+function _pgGo(id,p){if(_PG[id])_PG[id].page=p;renderModule()}
+function _pgHtml(id,total,page,tp){
+  if(tp<=1)return '';
+  let h='<div class="pagination">';
+  h+=`<button class="pg-btn" onclick="_pgGo('${id}',1)"${page<=1?' disabled':''}>«</button>`;
+  h+=`<button class="pg-btn" onclick="_pgGo('${id}',${page-1})"${page<=1?' disabled':''}>‹</button>`;
+  const stp=Math.max(1,page-2),enp=Math.min(tp,page+2);
+  for(let i=stp;i<=enp;i++)h+=`<button class="pg-btn${i===page?' pg-active':''}" onclick="_pgGo('${id}',${i})">${i}</button>`;
+  h+=`<button class="pg-btn" onclick="_pgGo('${id}',${page+1})"${page>=tp?' disabled':''}>›</button>`;
+  h+=`<button class="pg-btn" onclick="_pgGo('${id}',${tp})"${page>=tp?' disabled':''}>»</button>`;
+  h+=`<span class="pg-info">${total} records (${tp} pages)</span></div>`;
+  return h;
+}
 function renderModule() { switchModule(currentModule); }// ═══ RENDER FUNCTIONS ═══
 function renderDashboard(el){
   const a=mockPlots.filter(p=>p.status==='available').length, s=mockPlots.filter(p=>p.status==='sold').length, r=mockPlots.filter(p=>p.status==='reserved').length;
@@ -600,19 +628,21 @@ function renderDashboard(el){
 }
 
 function renderCRM(el){
+  var _crmF=mockLeads.filter(function(l){const f=document.getElementById('crmFStatus');return !f||!f.value||l.status===f.value});
+  const pcrm=_pg('crm',_crmF);
   el.innerHTML=`<div class="fade-in"><div class="page-title">CRM &amp; Leads</div><div class="page-subtitle">${mockLeads.length} total · ${mockLeads.filter(l=>l.priority==='High').length} hot · ${mockLeads.filter(l=>l.status==='New Inquiry').length} new</div>
     <div class="stats-row" style="margin-bottom:8px">${[
       ['Total',mockLeads.length,''],['Hot',mockLeads.filter(l=>l.priority==='High').length,'#c62828'],['Warm',mockLeads.filter(l=>l.priority==='Medium').length,'#e65100'],
       ['New',mockLeads.filter(l=>l.status==='New Inquiry').length,''],['Booked',mockLeads.filter(l=>l.status==='Booked').length,'#2e7d32']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs"><div class="tab ${crmView==='list'?'active':''}" onclick="crmView='list';renderModule()">List</div><div class="tab ${crmView==='kanban'?'active':''}" onclick="crmView='kanban';renderModule()">Pipeline</div></div>
-      <select id="crmFStatus" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px" onchange="renderModule()"><option value="">All Status</option><option>New Inquiry</option><option>Site Visit</option><option>Negotiation</option><option>Booked</option></select>
+      <div class="tabs"><div class="tab ${crmView==='list'?'active':''}" onclick="crmView='list';_PG['crm']={page:1,perPage:10};renderModule()">List</div><div class="tab ${crmView==='kanban'?'active':''}" onclick="crmView='kanban';_PG['crm']={page:1,perPage:10};renderModule()">Pipeline</div></div>
+      <select id="crmFStatus" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px" onchange="_PG['crm']={page:1,perPage:10};renderModule()"><option value="">All Status</option><option>New Inquiry</option><option>Site Visit</option><option>Negotiation</option><option>Booked</option></select>
       <div class="spacer"></div>
       <button class="action-btn primary" onclick="crudLead()">+ Add Lead</button>
     </div>
     ${crmView==='list'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Status</th><th></th></tr></thead><tbody>${mockLeads.filter(l=>{const f=document.getElementById('crmFStatus');return !f||!f.value||l.status===f.value}).map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="padding:4px 4px 4px 10px;width:28px"><div style="width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${leadGetInitials(l.name)}</div></td><td style="font-weight:500">${l.name}</td><td>${l.phone}</td><td>${l.property}</td><td><span style="display:inline-flex;align-items:center;gap:2px"><span style="width:5px;height:5px;border-radius:50%;background:${leadBadgeColor(l.source)}"></span>${l.source}</span></td><td style="font-weight:500;color:#2e7d32">${l.value}</td><td><span class="badge-status ${l.status==='Booked'?'badge-active':l.status==='New Inquiry'?'badge-pending':'badge-reserved'}">${l.status}</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span> ${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:10px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Status</th><th></th></tr></thead><tbody>${pcrm.items.map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="padding:4px 4px 4px 10px;width:28px"><div style="width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${leadGetInitials(l.name)}</div></td><td style="font-weight:500">${l.name}</td><td>${l.phone}</td><td>${l.property}</td><td><span style="display:inline-flex;align-items:center;gap:2px"><span style="width:5px;height:5px;border-radius:50%;background:${leadBadgeColor(l.source)}"></span>${l.source}</span></td><td style="font-weight:500;color:#2e7d32">${l.value}</td><td><span class="badge-status ${l.status==='Booked'?'badge-active':l.status==='New Inquiry'?'badge-pending':'badge-reserved'}">${l.status}</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span> ${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:10px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</td></tr>`).join('')}</tbody></table>${_pgHtml('crm',pcrm.total,pcrm.page,pcrm.totalPages)}</div></div></div>
     `:`<div style="display:flex;gap:10px;overflow-x:auto;flex:1;min-height:280px">${['New Inquiry','Site Visit','Negotiation','Booked'].map(st=>{const items=mockLeads.filter(l=>l.status===st);return `<div class="kanban-col"><div style="padding:6px 8px;font-size:10px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>${st}</span><span style="background:#e0e0e0;border-radius:10px;padding:0 6px;font-size:9px">${items.length}</span></div><div style="flex:1;overflow-y:auto;padding:4px 6px">${items.map(l=>`<div class="kanban-card" onclick="openLead(${l.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:11px;font-weight:600">${l.name}</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span><span style="color:#e53935;cursor:pointer;font-size:9px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span></div></div><div style="font-size:10px;color:#888;margin-top:2px">${l.property}</div><div style="font-size:10px;color:#888">${l.value} · ${l.source}</div><div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap"><span class="badge-status ${l.priority==='High'?'badge-sold':l.priority==='Medium'?'badge-pending':'badge-closed'}">${l.priority}</span><span class="badge-status ${l.type==='NRB'?'badge-reserved':'badge-closed'}">${l.type}</span>${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600;padding:1px 5px;background:#e8f5e9;border-radius:4px" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</div></div>`).join('')}</div></div>`}).join('')}</div>`}
     <div class="content-footer"><div class="breadcrumb">CRM <span>›</span> ${crmView==='list'?'List':'Pipeline'}</div></div></div>`;
 }
@@ -621,6 +651,7 @@ function renderSalesMarketing(el){
   const act=mockCampaigns.filter(function(c){return c.status==="Active"}).length;
   const tL=mockCampaigns.reduce(function(s,c){return s+c.leads},0);
   const tC=mockCampaigns.reduce(function(s,c){return s+c.conversions},0);
+  var pagSM=_pg('campaigns',mockCampaigns);
   var h="<div class=\"fade-in\"><div class=\"page-title\">Sales & Marketing</div><div class=\"page-subtitle\">"+mockCampaigns.length+" campaigns</div>";
   h+="<div class=\"stats-row\" style=\"margin-bottom:8px\">";
   [["Campaigns",mockCampaigns.length,""],["Active",act,"#2e7d32"],["Total Leads",tL,"#1565c0"],["Conversions",tC,"#e65100"]].forEach(function(s){
@@ -630,7 +661,9 @@ function renderSalesMarketing(el){
   });
   h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Campaigns</h3><button class=\"action-btn primary\" onclick=\"showToast('New campaign form coming soon','info')\" style=\"padding:4px 8px;font-size:10px\">+ New</button></div>";
   h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Leads</th><th>Conv.</th><th>Rate</th><th>ROI</th><th>Status</th></tr></thead><tbody>";
-  mockCampaigns.forEach(function(c){
+  var _cARR=pagSM.items;
+  for(var ci=0;ci<_cARR.length;ci++){
+    var c=_cARR[ci];
     var roiP=parseInt(c.roi);
     var roiCol=roiP>=300?"#2e7d32":roiP>=200?"#e65100":"#c62828";
     h+="<tr><td style=\"font-weight:500\">"+c.name+"<div style=\"font-size:9px;color:#888\">"+c.id+"</div></td>";
@@ -640,8 +673,8 @@ function renderSalesMarketing(el){
     h+="<td>"+(c.leads>0?Math.round(c.conversions/c.leads*100):0)+"%</td>";
     h+="<td style=\"color:"+roiCol+";font-weight:600\">"+c.roi+"</td>";
     h+="<td><span class=\"badge-status "+(c.status==="Active"?"badge-active":"badge-closed")+"\">"+c.status+"</span></td></tr>";
-  });
-  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">Sales & Marketing <span>›</span> Campaigns</div></div></div>";
+  }
+  h+="</tbody></table>"+_pgHtml('campaigns',pagSM.total,pagSM.page,pagSM.totalPages)+"</div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">Sales & Marketing <span>›</span> Campaigns</div></div></div>";
   el.innerHTML=h;
 }
 
@@ -649,6 +682,7 @@ function renderDues(el){
   var crit=mockDues.filter(function(d){return d.status==="Critical"}).length;
   var over=mockDues.filter(function(d){return d.status==="Overdue"}).length;
   var tot=mockDues.reduce(function(s,d){return s+parseInt(d.due.replace(/[^0-9]/g,""))},0);
+  var pagD=_pg('dues',mockDues);
   var h="<div class=\"fade-in\"><div class=\"page-title\">Dues & Recovery</div><div class=\"page-subtitle\">"+mockDues.length+" accounts</div>";
   h+="<div class=\"stats-row\" style=\"margin-bottom:8px\">";
   [["Total Dues",mockDues.length,""],["Critical",crit,"#c62828"],["Overdue",over,"#e65100"],["Due Amount","Tk "+tot.toLocaleString(),""]].forEach(function(s){
@@ -660,7 +694,9 @@ function renderDues(el){
   h+="<div style=\"display:flex;gap:5px\"><button class=\"action-btn secondary\" onclick=\"showToast('Export coming soon','info')\" style=\"padding:3px 7px;font-size:9px\">Export</button>";
   h+="<button class=\"action-btn primary\" onclick=\"showToast('Sending reminders...','info')\" style=\"padding:3px 7px;font-size:9px\">Send Reminders</button></div></div>";
   h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Customer</th><th>Project/Unit</th><th>Total</th><th>Paid</th><th>Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Status</th></tr></thead><tbody>";
-  mockDues.forEach(function(d){
+  var _dARR=pagD.items;
+  for(var di=0;di<_dARR.length;di++){
+    var d=_dARR[di];
     var odCol=d.daysOverdue>0?"#c62828":"#2e7d32";
     var bCl=d.bucket==="60+ Days"?"badge-sold":d.bucket==="30 Days"?"badge-sold":d.bucket==="15 Days"?"badge-pending":"badge-active";
     var sCl=d.status==="Critical"?"badge-sold":d.status==="Overdue"?"badge-pending":"badge-active";
@@ -671,12 +707,13 @@ function renderDues(el){
     h+="<td style=\"color:"+odCol+";font-weight:600\">"+(d.daysOverdue>0?d.daysOverdue+"d":"On track")+"</td>";
     h+="<td><span class=\"badge-status "+bCl+"\">"+d.bucket+"</span></td>";
     h+="<td><span class=\"badge-status "+sCl+"\">"+d.status+"</span></td></tr>";
-  });
-  h+="</tbody></table></div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">Dues <span>›</span> Recovery</div></div></div>";
+  }
+  h+="</tbody></table>"+_pgHtml('dues',pagD.total,pagD.page,pagD.totalPages)+"</div></div></div><div class=\"content-footer\"><div class=\"breadcrumb\">Dues <span>›</span> Recovery</div></div></div>";
   el.innerHTML=h;
 }
 
 function renderPlots(el){
+  const pP2=_pg('plots',mockPlots);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Plots & Layout</div><div class="page-subtitle">Land / Plotting layout management</div>
     <div class="stats-row" style="margin-bottom:10px">${[
       ['Available',mockPlots.filter(p=>p.status==='available').length,'#4caf50'],['Sold',mockPlots.filter(p=>p.status==='sold').length,'#e53935'],
@@ -689,15 +726,17 @@ function renderPlots(el){
       ].map(([l,b])=>`<span><span style="display:inline-block;width:10px;height:10px;background:${b};border-radius:2px;vertical-align:middle;margin-right:3px${l==='Not Acquired'?';border:1px dashed #ccc':''}"></span>${l}</span>`).join('')}</div>
       <div class="plot-grid">${mockPlots.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`}).join('')}</div>
     </div></div>
-    <div class="card" style="margin-top:10px"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${mockPlots.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card" style="margin-top:10px"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${pP2.items.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Plots <span>›</span> Layout</div></div></div>`;
 }
 
 function renderLandMgmt(el){
   const stages=['identification','feasibility','legal','acquisition','planning'];
+  const landF=mockLandProposals.filter(p=>p.stage===landTab);
+  const pL=_pg('land',landF);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Land Acquisition</div><div class="page-subtitle">${mockLandProposals.length} proposals across 6 stages</div>
-    <div class="toolbar" style="margin-bottom:6px">${stages.map(s=>`<button class="filter-btn ${landTab===s?'active':''}" onclick="landTab='${s}';renderModule()">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}<div class="spacer"></div><button class="action-btn primary">+ New Proposal</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Price</th><th>Risk</th><th>ROI</th><th>Status</th></tr></thead><tbody>${mockLandProposals.filter(p=>p.stage===landTab).length===0?'<tr><td colspan="7" style="text-align:center;color:#999;padding:18px">None in this stage</td></tr>':mockLandProposals.filter(p=>p.stage===landTab).map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.name}</td><td>${p.area}</td><td>${p.price}</td><td><span class="badge-status ${p.risk==='Low'?'badge-active':p.risk==='Medium'?'badge-pending':'badge-sold'}">${p.risk}</span></td><td style="color:#2e7d32;font-weight:600">${p.roi}</td><td><span class="badge-status badge-pending">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="toolbar" style="margin-bottom:6px">${stages.map(s=>`<button class="filter-btn ${landTab===s?'active':''}" onclick="landTab='${s}';_PG['land']={page:1,perPage:10};renderModule()">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}<div class="spacer"></div><button class="action-btn primary">+ New Proposal</button></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Price</th><th>Risk</th><th>ROI</th><th>Status</th></tr></thead><tbody>${pL.total===0?'<tr><td colspan="7" style="text-align:center;color:#999;padding:18px">None in this stage</td></tr>':pL.items.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.name}</td><td>${p.area}</td><td>${p.price}</td><td><span class="badge-status ${p.risk==='Low'?'badge-active':p.risk==='Medium'?'badge-pending':'badge-sold'}">${p.risk}</span></td><td style="color:#2e7d32;font-weight:600">${p.roi}</td><td><span class="badge-status badge-pending">${p.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('land',pL.total,pL.page,pL.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Land <span>›</span> ${landTab}</div></div></div>`;
 }
 
@@ -714,49 +753,55 @@ function renderProjects(el){
 }
 
 function renderBookings(el){
+  const pB=_pg('bookings',mockBookings);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Bookings</div><div class="page-subtitle">${mockBookings.length} bookings · ${mockBookings.filter(b=>b.status==='Confirmed').length} confirmed</div>
     <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudBooking()">+ New Booking</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Status</th></tr></thead><tbody>${mockBookings.map(b=>`<tr style="cursor:pointer" onclick="openBooking('${b.id}')"><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td>${b.unit}</td><td class="num">${b.price}</td><td class="num">${b.advance}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Status</th></tr></thead><tbody>${pB.items.map(b=>`<tr style="cursor:pointer" onclick="openBooking('${b.id}')"><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td>${b.unit}</td><td class="num">${b.price}</td><td class="num">${b.advance}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('bookings',pB.total,pB.page,pB.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Bookings <span>›</span> All</div></div></div>`;
 }
 
 function renderCustomerPortal(el){
+  const pC=_pg('customers',mockCustomers);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Customer Portal</div><div class="page-subtitle">${mockCustomers.length} active customers</div>
     <div class="stats-row" style="margin-bottom:8px">${[
       ['Total Customers',mockCustomers.length,''],['Active',mockCustomers.filter(c=>c.status==='Active').length,'#2e7d32'],
       ['Overdue',mockCustomers.filter(c=>c.status==='Overdue').length,'#c62828'],['Total Collection','৳1.2 Cr','#1565c0']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
     <div class="card"><div class="card-header"><h3>Customer Accounts</h3><button class="action-btn primary" onclick="showToast('Send bulk notification coming soon','info')" style="padding:3px 7px;font-size:9px">Notify All</button></div>
-    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Property</th><th>Status</th><th class="num">Dues</th><th>Next Due</th><th>Payments</th></tr></thead><tbody>${mockCustomers.map(c=>`<tr><td style="font-weight:500">${c.id}</td><td>${c.name}</td><td>${c.property}</td><td><span class="badge-status ${c.status==='Active'?'badge-active':'badge-sold'}">${c.status}</span></td><td class="num" style="color:#c62828;font-weight:600">${c.dues}</td><td style="font-size:10px">${c.nextDue}</td><td style="text-align:center;font-weight:600">${c.payments}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Property</th><th>Status</th><th class="num">Dues</th><th>Next Due</th><th>Payments</th></tr></thead><tbody>${pC.items.map(c=>`<tr><td style="font-weight:500">${c.id}</td><td>${c.name}</td><td>${c.property}</td><td><span class="badge-status ${c.status==='Active'?'badge-active':'badge-sold'}">${c.status}</span></td><td class="num" style="color:#c62828;font-weight:600">${c.dues}</td><td style="font-size:10px">${c.nextDue}</td><td style="text-align:center;font-weight:600">${c.payments}</td></tr>`).join('')}</tbody></table>${_pgHtml('customers',pC.total,pC.page,pC.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Customer Portal <span>›</span> Accounts</div></div></div>`;
 }
 
 function renderHandover(el){
+  const pH=_pg('handover',mockHandover);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Handover & Post-Sales</div><div class="page-subtitle">${mockHandover.length} units</div>
     <div class="card"><div class="card-header"><h3>Handover Pipeline</h3></div>
-    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Unit</th><th>Customer</th><th>Status</th><th>Est. Date</th><th>Snags</th><th>POS Date</th></tr></thead><tbody>${mockHandover.map(h=>`<tr><td style="font-weight:500">${h.unit}</td><td>${h.customer}</td><td><span class="badge-status ${h.status==='Handover Scheduled'?'badge-active':h.status==='Inspection Pending'?'badge-pending':'badge-reserved'}">${h.status}</span></td><td>${h.date}</td><td style="text-align:center;font-weight:600;color:${h.snags>0?'#c62828':'#2e7d32'}">${h.snags}</td><td>${h.pos_date||'—'}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Unit</th><th>Customer</th><th>Status</th><th>Est. Date</th><th>Snags</th><th>POS Date</th></tr></thead><tbody>${pH.items.map(h=>`<tr><td style="font-weight:500">${h.unit}</td><td>${h.customer}</td><td><span class="badge-status ${h.status==='Handover Scheduled'?'badge-active':h.status==='Inspection Pending'?'badge-pending':'badge-reserved'}">${h.status}</span></td><td>${h.date}</td><td style="text-align:center;font-weight:600;color:${h.snags>0?'#c62828':'#2e7d32'}">${h.snags}</td><td>${h.pos_date||'—'}</td></tr>`).join('')}</tbody></table>${_pgHtml('handover',pH.total,pH.page,pH.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Handover <span>›</span> Pipeline</div></div></div>`;
 }
 
 function renderBOQ(el){
   const apps=mockBOQ.filter(b=>b.status==='Approved').length;
+  const pB=_pg('boq',mockBOQ);
   el.innerHTML=`<div class="fade-in"><div class="page-title">BOQ & Cost Control</div><div class="page-subtitle">${mockBOQ.length} items · ${apps} approved</div>
     <div class="toolbar" style="margin-bottom:6px"><button class="action-btn primary" onclick="showToast('New BOQ item coming soon','info')">+ Add Item</button><div class="spacer"></div><span style="font-size:10px;color:#888">Total: ${mockBOQ.reduce((s,i)=>s+parseInt(i.total.replace(/[^0-9]/g,'')),0).toLocaleString()} ৳</span></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>BOQ ID</th><th>Project</th><th>Item</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>${mockBOQ.map(b=>`<tr><td style="font-weight:500">${b.id}</td><td>${b.project}</td><td>${b.item}</td><td class="num">${b.qty}</td><td>${b.unit}</td><td class="num">${b.rate}</td><td class="num" style="font-weight:600;color:#2e7d32">${b.total}</td><td><span class="badge-status ${b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed'}">${b.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>BOQ ID</th><th>Project</th><th>Item</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>${pB.items.map(b=>`<tr><td style="font-weight:500">${b.id}</td><td>${b.project}</td><td>${b.item}</td><td class="num">${b.qty}</td><td>${b.unit}</td><td class="num">${b.rate}</td><td class="num" style="font-weight:600;color:#2e7d32">${b.total}</td><td><span class="badge-status ${b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed'}">${b.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('boq',pB.total,pB.page,pB.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">BOQ <span>›</span> Cost Control</div></div></div>`;
 }
 
 function renderVariations(el){
+  const pV=_pg('variations',mockVariations);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Variation Orders</div><div class="page-subtitle">${mockVariations.length} changes tracked</div>
     <div class="card"><div class="card-header"><h3>Variation Register</h3><button class="action-btn primary" onclick="showToast('New variation form coming soon','info')" style="padding:3px 7px;font-size:9px">+ New VO</button></div>
-    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>VO ID</th><th>Project</th><th>Title</th><th>Status</th><th>Cost Impact</th><th>Schedule</th><th>Originator</th></tr></thead><tbody>${mockVariations.map(v=>`<tr><td style="font-weight:500">${v.id}</td><td>${v.project}</td><td>${v.title}</td><td><span class="badge-status ${v.status==='Approved'?'badge-active':v.status==='Pending Review'?'badge-pending':'badge-closed'}">${v.status}</span></td><td style="color:#c62828;font-weight:600">${v.impact}</td><td style="color:#e65100;font-size:10px">${v.schedule}</td><td style="font-size:10px">${v.originator}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>VO ID</th><th>Project</th><th>Title</th><th>Status</th><th>Cost Impact</th><th>Schedule</th><th>Originator</th></tr></thead><tbody>${pV.items.map(v=>`<tr><td style="font-weight:500">${v.id}</td><td>${v.project}</td><td>${v.title}</td><td><span class="badge-status ${v.status==='Approved'?'badge-active':v.status==='Pending Review'?'badge-pending':'badge-closed'}">${v.status}</span></td><td style="color:#c62828;font-weight:600">${v.impact}</td><td style="color:#e65100;font-size:10px">${v.schedule}</td><td style="font-size:10px">${v.originator}</td></tr>`).join('')}</tbody></table>${_pgHtml('variations',pV.total,pV.page,pV.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Variations <span>›</span> Register</div></div></div>`;
 }
 
 function renderKB(el){
+  const pK=_pg('kb',mockKnowledgeBase);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Knowledge Base</div><div class="page-subtitle">${mockKnowledgeBase.length} articles</div>
     <div style="display:flex;gap:6px;margin-bottom:8px"><div class="search-box" style="max-width:100%;flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search knowledge base..." style="font-size:11px"/></div></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Article</th><th>Category</th><th>Updated</th><th>Author</th></tr></thead><tbody>${mockKnowledgeBase.map(k=>`<tr><td style="font-weight:500;cursor:pointer;color:#2F80ED">${k.title}</td><td><span class="badge-status badge-reserved">${k.category}</span></td><td style="font-size:10px">${k.updated}</td><td style="font-size:10px">${k.author}</td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Article</th><th>Category</th><th>Updated</th><th>Author</th></tr></thead><tbody>${pK.items.map(k=>`<tr><td style="font-weight:500;cursor:pointer;color:#2F80ED">${k.title}</td><td><span class="badge-status badge-reserved">${k.category}</span></td><td style="font-size:10px">${k.updated}</td><td style="font-size:10px">${k.author}</td></tr>`).join('')}</tbody></table>${_pgHtml('kb',pK.total,pK.page,pK.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Knowledge Base <span>›</span> Articles</div></div></div>`;
 }
 
@@ -780,12 +825,13 @@ function renderWorkspace(el){
 }
 
 function renderBIReports(el){
+  const pR=_pg('bi',mockBIReports);
   el.innerHTML=`<div class="fade-in"><div class="page-title">BI & Reports</div><div class="page-subtitle">${mockBIReports.length} reports · Real-time analytics</div>
     <div class="stats-row" style="margin-bottom:8px">${[
       ['Reports',mockBIReports.length,''],['Auto Reports',mockBIReports.filter(r=>r.status==='Auto').length,'#2e7d32'],['Charts Available','6','#1565c0']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
     <div class="card"><div class="card-header"><h3>Reports Dashboard</h3><button class="action-btn primary" onclick="showToast('Generate new report coming soon','info')" style="padding:3px 7px;font-size:9px">+ New</button></div>
-    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Report Name</th><th>Type</th><th>Period</th><th>Updated</th><th>Status</th></tr></thead><tbody>${mockBIReports.map(r=>`<tr><td style="font-weight:500;cursor:pointer;color:#2F80ED">${r.name}</td><td><span class="badge-status badge-reserved">${r.type}</span></td><td>${r.period}</td><td style="font-size:10px">${r.updated}</td><td><span class="badge-status ${r.status==='Auto'?'badge-active':'badge-pending'}">${r.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Report Name</th><th>Type</th><th>Period</th><th>Updated</th><th>Status</th></tr></thead><tbody>${pR.items.map(r=>`<tr><td style="font-weight:500;cursor:pointer;color:#2F80ED">${r.name}</td><td><span class="badge-status badge-reserved">${r.type}</span></td><td>${r.period}</td><td style="font-size:10px">${r.updated}</td><td><span class="badge-status ${r.status==='Auto'?'badge-active':'badge-pending'}">${r.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('bi',pR.total,pR.page,pR.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">BI <span>›</span> Reports</div></div></div>`;
 }
 
@@ -807,29 +853,33 @@ function renderSubTable(el, mod, items, headers, fields, title){
 }
 
 function renderFinance(el){
+  const pF=_pg('finance',mockTransactions);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Finance</div><div class="page-subtitle">${mockTransactions.length} transactions</div>
     <div class="stats-row" style="margin-bottom:10px">${[
       ['Inflows',mockTransactions.filter(t=>t.type==='Inflow').length,'#2e7d32'],
       ['Outflows',mockTransactions.filter(t=>t.type==='Outflow').length,'#c62828'],
       ['Total',mockTransactions.length,'']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
-    <div class="card"><div class="card-header"><h3>Transactions</h3><button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockTransactions.map(t=>`<tr style="cursor:pointer" onclick="openTransaction('${t.id}')"><td style="font-weight:500">${t.id}</td><td>${t.desc}</td><td><span class="badge-status ${t.type==='Inflow'?'badge-active':'badge-sold'}">${t.type}</span></td><td class="num" style="font-weight:600;color:${t.type==='Inflow'?'#2e7d32':'#c62828'}">${t.amount}</td><td><span class="badge-status ${t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved'}">${t.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-header"><h3>Transactions</h3><button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${pF.items.map(t=>`<tr style="cursor:pointer" onclick="openTransaction('${t.id}')"><td style="font-weight:500">${t.id}</td><td>${t.desc}</td><td><span class="badge-status ${t.type==='Inflow'?'badge-active':'badge-sold'}">${t.type}</span></td><td class="num" style="font-weight:600;color:${t.type==='Inflow'?'#2e7d32':'#c62828'}">${t.amount}</td><td><span class="badge-status ${t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved'}">${t.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('finance',pF.total,pF.page,pF.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">Finance <span>›</span> Transactions</div></div></div>`;
 }
 
 function renderStock(el){
+  const pI=_pg('inv',mockInventory);
+  const pPO=_pg('po',mockPOs);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Stock & Procurement</div><div class="page-subtitle">Inventory and purchase orders</div>
-    <div class="toolbar" style="margin-bottom:6px"><button class="filter-btn ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';renderModule()">Inventory</button><button class="filter-btn ${stockTab==='po'?'active':''}" onclick="stockTab='po';renderModule()">Purchase Orders</button><div class="spacer"></div><button class="action-btn primary" onclick="stockTab==='inventory'?crudStockItem():crudPO()">+ New</button></div>
+    <div class="toolbar" style="margin-bottom:6px"><button class="filter-btn ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';_PG['inv']={page:1,perPage:10};_PG['po']={page:1,perPage:10};renderModule()">Inventory</button><button class="filter-btn ${stockTab==='po'?'active':''}" onclick="stockTab='po';_PG['inv']={page:1,perPage:10};_PG['po']={page:1,perPage:10};renderModule()">Purchase Orders</button><div class="spacer"></div><button class="action-btn primary" onclick="stockTab==='inventory'?crudStockItem():crudPO()">+ New</button></div>
     ${stockTab==='inventory'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th>Quantity</th><th>Status</th><th>Reorder</th></tr></thead><tbody>${mockInventory.map(i=>`<tr style="cursor:pointer" onclick="openStockItem(${i.id})"><td style="font-weight:500">${i.item}</td><td>${i.site}</td><td>${i.quantity}</td><td><span class="badge-status ${i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold'}">${i.status}</span></td><td>${i.reorder}</td></tr>`).join('')}</tbody></table></div></div></div>
-    `:`<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Vendor</th><th>Items</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${mockPOs.map(p=>`<tr style="cursor:pointer" onclick="openPO('${p.id}')"><td style="font-weight:500">${p.id}</td><td>${p.vendor}</td><td>${p.items}</td><td class="num">${p.amount}</td><td><span class="badge-status ${p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending'}">${p.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>`}
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th>Quantity</th><th>Status</th><th>Reorder</th></tr></thead><tbody>${pI.items.map(i=>`<tr style="cursor:pointer" onclick="openStockItem(${i.id})"><td style="font-weight:500">${i.item}</td><td>${i.site}</td><td>${i.quantity}</td><td><span class="badge-status ${i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold'}">${i.status}</span></td><td>${i.reorder}</td></tr>`).join('')}</tbody></table>${_pgHtml('inv',pI.total,pI.page,pI.totalPages)}</div></div></div>
+    `:`<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Vendor</th><th>Items</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${pPO.items.map(p=>`<tr style="cursor:pointer" onclick="openPO('${p.id}')"><td style="font-weight:500">${p.id}</td><td>${p.vendor}</td><td>${p.items}</td><td class="num">${p.amount}</td><td><span class="badge-status ${p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending'}">${p.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('po',pPO.total,pPO.page,pPO.totalPages)}</div></div></div>`}
     <div class="content-footer"><div class="breadcrumb">Stock <span>›</span> ${stockTab==='inventory'?'Inventory':'PO'}</div></div></div>`;
 }
 
 function renderHR(el){
+  const pE=_pg('hr',mockEmployees);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Human Resources</div><div class="page-subtitle">${mockEmployees.length} employees</div>
     <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${mockEmployees.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${pE.items.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('hr',pE.total,pE.page,pE.totalPages)}</div></div></div>
     <div class="content-footer"><div class="breadcrumb">HR <span>›</span> All Staff</div></div></div>`;
 }
 
@@ -878,7 +928,8 @@ function renderSettings(el){
   const sidebar=si.map(s=>'<div onclick="settingsTab=\''+s.id+'\';renderModule()" style="padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;transition:all .15s;background:'+(settingsTab===s.id?'#eef3ff':'transparent')+';'+(settingsTab===s.id?'font-weight:600;color:#2F80ED':'color:#555')+'"><span style="font-size:14px">'+s.icon+'</span><div><div style="font-size:11px;font-weight:'+(settingsTab===s.id?'600':'500')+'">'+s.label+'</div><div style="font-size:9px;color:#888">'+s.desc+'</div></div></div>').join('');
   var mc='';
   if(settingsTab==='users'){
-    mc='<div class="card"><div class="card-header"><h3>Users ('+mockUsers.length+')</h3><div style="display:flex;gap:6px"><button class="action-btn secondary" onclick="settingsBulkAction()" style="padding:3px 7px;font-size:9px">Bulk Actions</button><button class="action-btn primary" onclick="settingsAddUser()" style="padding:3px 7px;font-size:9px">+ Add User</button></div></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th style="width:28px"><input type="checkbox"/></th><th>Name</th><th>Email</th><th>Role</th><th>Dept</th><th>Last Login</th><th>Status</th><th></th></tr></thead><tbody>'+mockUsers.map(function(u){return '<tr><td><input type="checkbox"/></td><td style="font-weight:500">'+u.name+'</td><td>'+u.email+'</td><td><span class="badge-status" style="background:#e3f2fd;color:#1565c0">'+u.role+'</span></td><td>'+u.dept+'</td><td style="font-size:10px;color:#888">'+(u.lastLogin||'Today, 9:30 AM')+'</td><td><span class="badge-status '+(u.status==='Active'?'badge-active':'badge-closed')+'">'+u.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="settingsEditUser(u)">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="settingsToggleUser(u)">⊘</span></td></tr>';}).join('')+'</tbody></table></div></div></div>';
+    var pUsers=_pg('settings_users',mockUsers);
+    mc='<div class="card"><div class="card-header"><h3>Users ('+mockUsers.length+')</h3><div style="display:flex;gap:6px"><button class="action-btn secondary" onclick="settingsBulkAction()" style="padding:3px 7px;font-size:9px">Bulk Actions</button><button class="action-btn primary" onclick="settingsAddUser()" style="padding:3px 7px;font-size:9px">+ Add User</button></div></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th style="width:28px"><input type="checkbox"/></th><th>Name</th><th>Email</th><th>Role</th><th>Dept</th><th>Last Login</th><th>Status</th><th></th></tr></thead><tbody>';var _uARR=pUsers.items;for(var _ui=0;_ui<_uARR.length;_ui++){var u=_uARR[_ui];mc+='<tr><td><input type="checkbox"/></td><td style="font-weight:500">'+u.name+'</td><td>'+u.email+'</td><td><span class="badge-status" style="background:#e3f2fd;color:#1565c0">'+u.role+'</span></td><td>'+u.dept+'</td><td style="font-size:10px;color:#888">'+(u.lastLogin||'Today, 9:30 AM')+'</td><td><span class="badge-status '+(u.status==='Active'?'badge-active':'badge-closed')+'">'+u.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="settingsEditUser(u)">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="settingsToggleUser(u)">⊘</span></td></tr>';}mc+='</tbody></table>'+_pgHtml('settings_users',pUsers.total,pUsers.page,pUsers.totalPages)+'</div></div></div>';
   }else if(settingsTab==='roles'){
     mc='<div class="card"><div class="card-header"><h3>Permission Matrix — Role: '+currentRole+'</h3><button class="action-btn primary" onclick="showToast(\'Permissions saved!\',\'success\')" style="padding:3px 7px;font-size:9px">Save Permissions</button></div><div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:400px;overflow-y:auto"><table style="font-size:10px"><thead><tr style="position:sticky;top:0;background:#fff"><th style="min-width:130px;background:#fff;z-index:1">Module</th>'+PERMISSION_ACTIONS.map(function(a){return '<th style="text-align:center;min-width:55px;background:#f0f4ff;color:#2F80ED;font-size:9px">'+a+'</th>';}).join('')+'</tr></thead><tbody>'+PERMISSION_MODULES.map(function(m,mi){var perms=(MOCK_PERMISSIONS[currentRole]||MOCK_PERMISSIONS['Super Admin'])[mi];return '<tr><td style="font-weight:500;padding:5px 10px">'+m+'</td>'+PERMISSION_ACTIONS.map(function(a,ai){return '<td style="text-align:center;padding:5px"><div onclick="showToast(\'Toggle permission for '+m+': '+a+'\',\'info\')" style="width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:'+(perms[ai]==='✓'?'#2F80ED':'#e0e0e0')+';color:#fff;font-size:10px;font-weight:700;transition:all .15s;user-select:none">'+(perms[ai]==='✓'?'✓':'')+'</div></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div></div></div><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">'+['Super Admin','Sales Agent','Site Engineer','Finance'].map(function(r){return '<div onclick="setRole(\''+r+'\')" style="padding:4px 10px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:500;background:'+(r===currentRole?'#2F80ED':'#f0f0f0')+';color:'+(r===currentRole?'#fff':'#555')+';border:none;transition:all .15s">'+r+'</div>';}).join('')+'</div>';
   }else if(settingsTab==='company'){
