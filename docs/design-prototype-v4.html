@@ -280,7 +280,17 @@
       .top-actions{gap:3px!important}
     }
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-@media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:fixed;inset:0;background:#fff;padding:20px;overflow:auto;z-index:9999}#printArea table{font-size:10px}#printArea th{background:#f5f5f5!important;color:#333!important}}
+    .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.35);z-index:9998;align-items:center;justify-content:center;overflow-y:auto;padding:20px}
+    .modal-overlay.active{display:flex}
+    .modal-box{background:#fff;border-radius:12px;padding:20px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.15);animation:fadeIn .2s ease-out}
+    html.dark .modal-overlay{background:rgba(0,0,0,.6)}
+    html.dark .modal-box{background:#1e293b;border:1px solid #2a3a52}
+    .modal-box h3{font-size:14px;font-weight:700;color:#333;margin:0}
+    html.dark .modal-box h3{color:#e0e0e0}
+    @media(max-width:768px){
+      .modal-box{max-width:96vw;padding:16px;border-radius:10px}
+    }
+    @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:fixed;inset:0;background:#fff;padding:20px;overflow:auto;z-index:9999}#printArea table{font-size:10px}#printArea th{background:#f5f5f5!important;color:#333!important}}
   </style>
   <style>
     /* Global tooltip system */
