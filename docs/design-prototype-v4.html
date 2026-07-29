@@ -332,18 +332,26 @@ const DB = {
 };
 
 window.mockLeads = DB.init('leads', [
-  {id:1,name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Facebook',value:'৳1.5 Cr',lastContact:'2h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 3:00 PM',paymentStatus:'Up to Date',
+  {id:1,name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Facebook',value:'৳1.5 Cr',lastContact:'2h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 3:00 PM',paymentStatus:'Up to Date',
    installments:[{date:'Oct 01, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Nov 01, 2024',amount:'৳5,00,000',status:'Due'}],
    documents:[{name:'NID_Front.jpg',type:'ID Document'},{name:'Application_Form.pdf',type:'Application'}],
    activities:[{type:'Call',user:'Iftekhar',date:'Today, 10:30 AM',text:'Discussed plot location and pricing.'},{type:'Note',user:'System',date:'Yesterday, 4:00 PM',text:'Lead created via Facebook Ad campaign.'}]},
-  {id:2,name:'Dr. Rubina Ali',phone:'+1 415 555 0198',email:'rubina@example.com',property:'Jolshiri - Apt 4B',status:'Site Visit',priority:'Medium',type:'NRB',source:'Referral',value:'৳2.2 Cr',lastContact:'1d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Tomorrow, 11:00 AM',paymentStatus:'Pending',
-   installments:[{date:'Oct 15, 2024',amount:'৳2,00,000',status:'Paid'}],documents:[],activities:[{type:'Meeting',user:'Hasanul Banna',date:'Yesterday, 2:00 PM',text:'Site visit scheduled for Saturday. Client confirmed.'}]},
+  {id:2,name:'Dr. Rubina Ali',phone:'+1 415 555 0198',email:'rubina@example.com',property:'Jolshiri - Apt 4B',status:'Installments',priority:'Medium',type:'NRB',source:'Referral',value:'৳2.2 Cr',lastContact:'1d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Tomorrow, 11:00 AM',paymentStatus:'Pending',
+   installments:[{date:'Oct 15, 2024',amount:'৳2,00,000',status:'Paid'},{date:'Nov 15, 2024',amount:'৳2,00,000',status:'Due'},{date:'Dec 15, 2024',amount:'৳2,00,000',status:'Upcoming'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'Downpayment_Receipt.pdf',type:'Receipt'}],activities:[{type:'Meeting',user:'Hasanul Banna',date:'Yesterday, 2:00 PM',text:'Site visit scheduled for Saturday. Client confirmed.'},{type:'Call',user:'Sales Team',date:'3 days ago',text:'Client confirmed downpayment schedule.'}]},
   {id:3,name:'Ahasan Habib',phone:'+880 1819 111111',email:'ahasan@example.com',property:'Muktodhara - 3 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Walk-in',value:'৳95 Lac',lastContact:'3h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 5:00 PM',paymentStatus:'Overdue',
    installments:[{date:'Sep 10, 2024',amount:'৳1,00,000',status:'Overdue'}],documents:[{name:'Trade_License.pdf',type:'Business Doc'}],activities:[{type:'Call',user:'Sales Team',date:'Today, 9:00 AM',text:'Negotiated price down to 92 Lac. Client thinking.'}]},
-  {id:4,name:'Kamrul Hasan',phone:'+880 1912 222222',email:'kamrul@example.com',property:'Jolshiri - Apt 9A',status:'Booked',priority:'Low',type:'Local',source:'Website',value:'৳1.8 Cr',lastContact:'5d ago',owner:'Sales Team',nextFollowUp:'—',paymentStatus:'Up to Date',
+  {id:4,name:'Kamrul Hasan',phone:'+880 1912 222222',email:'kamrul@example.com',property:'Jolshiri - Apt 9A',status:'Booked',priority:'Low',type:'Local',source:'Website',value:'৳1.8 Cr',lastContact:'5d ago',owner:'Sales Team A',nextFollowUp:'—',paymentStatus:'Up to Date',
    installments:[{date:'Sep 20, 2024',amount:'৳10,00,000',status:'Paid'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'NID_Copy.pdf',type:'ID Document'}],activities:[{type:'Note',user:'System',date:'Sep 20, 2024',text:'Booking confirmed. Unit 9A allocated.'}]},
-  {id:5,name:'Syed Rahman',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'NRB',source:'Facebook',value:'৳1.5 Cr',lastContact:'10m ago',owner:'Unassigned',nextFollowUp:'Tomorrow, 9:00 AM',paymentStatus:'Pending',installments:[],documents:[],activities:[]},
-  {id:6,name:'Fatima Begum',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳85 Lac',lastContact:'2d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Overdue — 3 days ago',paymentStatus:'Up to Date',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]}
+  {id:5,name:'Syed Rahman',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'Contacted',priority:'High',type:'NRB',source:'Facebook',value:'৳1.5 Cr',lastContact:'10m ago',owner:'Unassigned',nextFollowUp:'Tomorrow, 9:00 AM',paymentStatus:'Pending',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'Today, 12:00 PM',text:'Initial contact made. Client interested in 5 katha south-facing plot.'}]},
+  {id:6,name:'Fatima Begum',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳85 Lac',lastContact:'2d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Overdue — 3 days ago',paymentStatus:'Up to Date',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]},
+  {id:7,name:'Shamim Reza',phone:'+880 1700 111111',email:'shamim@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Website',value:'৳1.5 Cr',lastContact:'30m ago',owner:'Unassigned',nextFollowUp:'Today, 4:30 PM',paymentStatus:'—',installments:[],documents:[],activities:[{type:'Note',user:'System',date:'Today, 12:30 PM',text:'Lead captured from website contact form.'}]},
+  {id:8,name:'Mrs. Jahanara Begum',phone:'+880 1712 333333',email:'jahanara@example.com',property:'Jolshiri - Apt 3C',status:'Downpayment',priority:'Medium',type:'Local',source:'Referral',value:'৳2.0 Cr',lastContact:'1d ago',owner:'Hasanul Banna',nextFollowUp:'Today, 10:00 AM',paymentStatus:'Pending',
+   installments:[{date:'Nov 01, 2024',amount:'৳8,00,000',status:'Paid'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'Payment_Plan.pdf',type:'Document'}],activities:[{type:'Meeting',user:'Hasanul Banna',date:'2 days ago',text:'Downpayment of 8 Lac received. Unit 3C reserved.'}]},
+  {id:9,name:'Md. Taher Uddin',phone:'+880 1713 444444',email:'taher@example.com',property:'Muktodhara - Plot 17',status:'Contacted',priority:'Low',type:'Local',source:'Billboard',value:'৳42 Lac',lastContact:'4d ago',owner:'Sales Team A',nextFollowUp:'Next week',paymentStatus:'—',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team A',date:'4 days ago',text:'Left voicemail. Follow up next week.'}]},
+  {id:10,name:'Engr. Salahuddin',phone:'+880 1714 555555',email:'salahuddin@example.com',property:'Muktodhara - Plot 22',status:'Negotiation',priority:'Medium',type:'Local',source:'Walk-in',value:'৳55 Lac',lastContact:'1d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Today, 2:00 PM',paymentStatus:'—',installments:[],documents:[{name:'Business_Card.jpg',type:'Document'}],activities:[{type:'Meeting',user:'Iftekhar Ahmad',date:'Yesterday, 11:00 AM',text:'Client visited office. Discussed payment plan for Plot 22.'}]},
+  {id:11,name:'Nazma Akhter',phone:'+880 1715 666666',email:'nazma@example.com',property:'Jolshiri - Apt 7A',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳1.6 Cr',lastContact:'3d ago',owner:'Sales Team A',nextFollowUp:'Tomorrow, 10:00 AM',paymentStatus:'—',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team A',date:'3 days ago',text:'Referred by Kamrul Hasan. Interested in 3BR apartment.'}]},
+  {id:12,name:'Mr. Abdul Karim',phone:'+971 55 777 8888',email:'karim@example.com',property:'Jolshiri - Apt 12B',status:'Installments',priority:'High',type:'NRB',source:'Facebook',value:'৳2.8 Cr',lastContact:'5h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 2:00 PM',paymentStatus:'Up to Date',
+   installments:[{date:'Oct 05, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Nov 05, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Dec 05, 2024',amount:'৳5,00,000',status:'Upcoming'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'Passport_Copy.pdf',type:'ID Document'}],activities:[{type:'Payment',user:'System',date:'Nov 05, 2024',text:'2nd installment of 5 Lac received.'},{type:'Call',user:'Hasanul Banna',date:'1 week ago',text:'Client confirmed 3rd installment schedule.'}]}
 ]);
 window.mockProjects = DB.init('projects', [
   {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
@@ -696,22 +704,102 @@ function renderDashboardCharts(){
 }
 
 function renderCRM(el){
-  var _crmF=mockLeads.filter(function(l){const f=document.getElementById('crmFStatus');return !f||!f.value||l.status===f.value});
-  const pcrm=_pg('crm',_crmF);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">CRM &amp; Leads</div><div class="page-subtitle">${mockLeads.length} total · ${mockLeads.filter(l=>l.priority==='High').length} hot · ${mockLeads.filter(l=>l.status==='New Inquiry').length} new</div>
-    <div class="stats-row" style="margin-bottom:8px">${[
-      ['Total',mockLeads.length,''],['Hot',mockLeads.filter(l=>l.priority==='High').length,'#c62828'],['Warm',mockLeads.filter(l=>l.priority==='Medium').length,'#e65100'],
-      ['New',mockLeads.filter(l=>l.status==='New Inquiry').length,''],['Booked',mockLeads.filter(l=>l.status==='Booked').length,'#2e7d32']
-    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
+  var sq=(document.getElementById('crmSearch')||{}).value||'';
+  var sf=(document.getElementById('crmFStatus')||{}).value||'';
+  var pf=(document.getElementById('crmFPriority')||{}).value||'';
+  var tf=(document.getElementById('crmFType')||{}).value||'';
+  var filtered=mockLeads.filter(function(l){
+    if(sq&&l.name.toLowerCase().indexOf(sq.toLowerCase())===-1&&l.phone.indexOf(sq)===-1&&l.property.toLowerCase().indexOf(sq.toLowerCase())===-1)return false;
+    if(sf&&l.status!==sf)return false;
+    if(pf&&l.priority!==pf)return false;
+    if(tf&&l.type!==tf)return false;
+    return true;
+  });
+  const HOT=mockLeads.filter(l=>l.priority==='High').length;
+  const CONV=mockLeads.filter(l=>l.status==='Booked'||l.status==='Downpayment'||l.status==='Installments').length;
+  const NEW=mockLeads.filter(l=>l.status==='New Inquiry').length;
+  const CONVR=mockLeads.length>0?Math.round(CONV/mockLeads.length*100):0;
+  const pcrm=_pg('crm',filtered);
+  el.innerHTML=`<div class="fade-in"><div class="page-title">CRM &amp; Leads</div><div class="page-subtitle">${mockLeads.length} total · ${HOT} hot · ${CONV} converted (${CONVR}%) · ${NEW} new</div>
+    <div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(85px,1fr))">${['New Inquiry','Contacted','Site Visit','Negotiation','Booked','Downpayment','Installments'].map(function(s){
+      var c=mockLeads.filter(function(l){return l.status===s}).length;
+      return '<div class="stat-card" style="padding:5px 6px"><div class="label" style="font-size:8px">'+s+'</div><div class="value" style="font-size:13px;color:'+{NIC:'#1565c0',CT:'#e65100',SV:'#c62828',NG:'#7b1fa2',BK:'#2e7d32',DP:'#00838f',IN:'#f9a825'}[{NIC:'NIC',CT:'CT',SV:'SV',NG:'NG',BK:'BK',DP:'DP',IN:'IN'}[s.slice(0,2)]||'NIC']+'">'+c+'</div></div>';
+    }).join('')}</div>
     <div class="toolbar" style="margin-bottom:6px">
       <div class="tabs"><div class="tab ${crmView==='list'?'active':''}" onclick="crmView='list';_PG['crm']={page:1,perPage:_pgPerPage};renderModule()">List</div><div class="tab ${crmView==='kanban'?'active':''}" onclick="crmView='kanban';_PG['crm']={page:1,perPage:_pgPerPage};renderModule()">Pipeline</div></div>
-      <select id="crmFStatus" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()"><option value="">All Status</option><option>New Inquiry</option><option>Site Visit</option><option>Negotiation</option><option>Booked</option></select>
+      <input id="crmSearch" placeholder="Search name/phone/property..." value="${sq.replace(/"/g,'&quot;')}" oninput="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 200px"/>
+      <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${['New Inquiry','Contacted','Site Visit','Negotiation','Booked','Downpayment','Installments'].map(function(s){return '<option value="'+s+'"'+(sf===s?' selected':'')+'>'+s+'</option>'}).join('')}</select>
+      <select id="crmFPriority" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Priority</option><option value="High"${pf==='High'?' selected':''}>High</option><option value="Medium"${pf==='Medium'?' selected':''}>Medium</option><option value="Low"${pf==='Low'?' selected':''}>Low</option></select>
+      <select id="crmFType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Type</option><option value="Local"${tf==='Local'?' selected':''}>Local</option><option value="NRB"${tf==='NRB'?' selected':''}>NRB</option></select>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudLead()">+ Add Lead</button>
+      <button class="action-btn primary" onclick="crudLead()" style="padding:3px 8px;font-size:10px">+ Add Lead</button>
     </div>
-    ${crmView==='list'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Priority</th><th>Owner</th><th>Next F/U</th><th>Status</th><th></th></tr></thead><tbody>${pcrm.items.map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="padding:4px 4px 4px 10px;width:28px"><div style="width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${leadGetInitials(l.name)}</div></td><td style="font-weight:500">${l.name}</td><td>${l.phone}</td><td>${l.property}</td><td><span style="display:inline-flex;align-items:center;gap:2px"><span style="width:5px;height:5px;border-radius:50%;background:${leadBadgeColor(l.source)}"></span>${l.source}</span></td><td style="font-weight:500;color:#2e7d32">${l.value}</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:${leadBadgeColor(l.priority)}">${l.priority}</span></td><td style="font-size:10px;color:#555">${l.owner||'—'}</td><td style="font-size:10px;font-weight:500;color:${leadFupColor(l.nextFollowUp)}">${l.nextFollowUp||'—'}</td><td><select onchange="event.stopPropagation();inlineSetLeadStatus(${l.id},this.value)" onclick="event.stopPropagation()" style="padding:1px 4px;font-size:9px;border:1px solid #e0e0e0;border-radius:3px;cursor:pointer;max-width:110px;background:#fff;color:#555;outline:none"><option value="New Inquiry" ${l.status==='New Inquiry'?'selected':''}>New Inquiry</option><option value="Site Visit" ${l.status==='Site Visit'?'selected':''}>Site Visit</option><option value="Negotiation" ${l.status==='Negotiation'?'selected':''}>Negotiation</option><option value="Booked" ${l.status==='Booked'?'selected':''}>Booked</option></select></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span> ${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:10px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</td></tr>`).join('')}</tbody></table>${_pgHtml('crm',pcrm.total,pcrm.page,pcrm.totalPages,pcrm.perPage)}</div></div></div>
-    `:`<div style="display:flex;gap:10px;overflow-x:auto;flex:1;min-height:280px">${['New Inquiry','Site Visit','Negotiation','Booked'].map(st=>{const items=mockLeads.filter(l=>l.status===st);return `<div class="kanban-col"><div style="padding:6px 8px;font-size:10px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>${st}</span><span style="background:#e0e0e0;border-radius:10px;padding:0 6px;font-size:9px">${items.length}</span></div><div style="flex:1;overflow-y:auto;padding:4px 6px">${items.map(l=>`<div class="kanban-card" onclick="openLead(${l.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:11px;font-weight:600">${l.name}</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id===${l.id}))">✎</span><span style="color:#e53935;cursor:pointer;font-size:9px" onclick="event.stopPropagation();deleteLead(${l.id})">✕</span></div></div><div style="font-size:10px;color:#888;margin-top:2px">${l.property}</div><div style="font-size:10px;color:#888">${l.value} · ${l.source}</div><div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap"><span class="badge-status ${l.priority==='High'?'badge-sold':l.priority==='Medium'?'badge-pending':'badge-closed'}">${l.priority}</span><span class="badge-status ${l.type==='NRB'?'badge-reserved':'badge-closed'}">${l.type}</span>${l.status!=='Booked'?`<span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600;padding:1px 5px;background:#e8f5e9;border-radius:4px" onclick="event.stopPropagation();convertLeadToBooking(${l.id})">→B</span>`:''}</div></div>`).join('')}</div></div>`}).join('')}</div>`}</div>`;
+    ${crmView==='list'?renderCRMList(filtered,pcrm):renderCRMKanban()}
+  </div>`;
+}
+
+function renderCRMList(filtered,pcrm){
+  return `<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Priority</th><th>Owner</th><th>Next F/U</th><th>Stage</th><th></th></tr></thead><tbody>${
+    pcrm.items.map(function(l){
+      var next={'New Inquiry':'Contacted','Contacted':'Site Visit','Site Visit':'Negotiation','Negotiation':'Booked','Booked':'Downpayment','Downpayment':'Installments','Installments':'Completed'}[l.status];
+      var sc={'New Inquiry':'#e3f2fd','Contacted':'#fff3e0','Site Visit':'#fce4ec','Negotiation':'#f3e5f5','Booked':'#e8f5e9','Downpayment':'#e0f7fa','Installments':'#fff8e1'}[l.status];
+      var stc={'New Inquiry':'#1565c0','Contacted':'#e65100','Site Visit':'#c62828','Negotiation':'#7b1fa2','Booked':'#2e7d32','Downpayment':'#00838f','Installments':'#f9a825'}[l.status];
+      return '<tr style="cursor:pointer" onclick="openLead('+l.id+')"><td style="padding:4px 4px 4px 10px;width:28px"><div style="width:24px;height:24px;border-radius:50%;background:'+sc+';color:'+stc+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+leadGetInitials(l.name)+'</div></td><td style="font-weight:500">'+l.name+'</td><td style="font-size:10px">'+l.phone+'</td><td style="font-size:10px">'+l.property+'</td><td><span style="display:inline-flex;align-items:center;gap:2px"><span style="width:5px;height:5px;border-radius:50%;background:'+leadBadgeColor(l.source)+'"></span>'+l.source+'</span></td><td style="font-weight:500;color:#2e7d32;font-size:10px">'+l.value+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+leadBadgeColor(l.priority)+'">'+l.priority+'</span></td><td style="font-size:10px;color:#555">'+(l.owner||'\u2014')+'</td><td style="font-size:9px;font-weight:500;color:'+leadFupColor(l.nextFollowUp)+'">'+(l.nextFollowUp||'\u2014')+'</td><td><select onchange="event.stopPropagation();inlineSetLeadStatus('+l.id+',this.value)" onclick="event.stopPropagation()" style="padding:1px 3px;font-size:8px;border:1px solid #e0e0e0;border-radius:3px;cursor:pointer;max-width:100px;background:'+sc+';color:'+stc+';font-weight:600;outline:none">'+['New Inquiry','Contacted','Site Visit','Negotiation','Booked','Downpayment','Installments'].map(function(s){return '<option value="'+s+'"'+(l.status===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></td><td style="white-space:nowrap">'+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id==='+l.id+'))">\u270E</span>'+
+      ' <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();deleteLead('+l.id+')">\u2715</span>'+
+      (next&&next!=='Completed'?' <span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();advanceLeadStage('+l.id+')">\u25B6 '+next+'</span>':'')+
+      (l.status==='Booked'||l.status==='Downpayment'||l.status==='Installments'?'':' <span style="color:#1565c0;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking('+l.id+')">\uD83D\uDCCB</span>')+
+    '</td></tr>'
+    }).join('')
+  }</tbody></table>${_pgHtml('crm',pcrm.total,pcrm.page,pcrm.totalPages,pcrm.perPage)}</div></div></div>`;
+}
+
+function renderCRMKanban(){
+  return `<div style="display:flex;gap:8px;overflow-x:auto;flex:1;min-height:300px">${['New Inquiry','Contacted','Site Visit','Negotiation','Booked','Downpayment','Installments'].map(function(st){
+    var items=mockLeads.filter(function(l){return l.status===st});
+    var bc={'New Inquiry':'#e3f2fd','Contacted':'#fff3e0','Site Visit':'#fce4ec','Negotiation':'#f3e5f5','Booked':'#e8f5e9','Downpayment':'#e0f7fa','Installments':'#fff8e1'}[st];
+    var stc={'New Inquiry':'#1565c0','Contacted':'#e65100','Site Visit':'#c62828','Negotiation':'#7b1fa2','Booked':'#2e7d32','Downpayment':'#00838f','Installments':'#f9a825'}[st];
+    return '<div class="kanban-col" style="min-width:170px;flex:1"><div style="padding:5px 8px;font-size:9px;font-weight:600;color:'+stc+';background:'+bc+';border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center"><span>'+st+'</span><span style="background:'+stc+';color:#fff;border-radius:10px;padding:0 6px;font-size:9px">'+items.length+'</span></div><div style="flex:1;overflow-y:auto;padding:4px">'+
+    items.map(function(l){
+      var next={'New Inquiry':'Contacted','Contacted':'Site Visit','Site Visit':'Negotiation','Negotiation':'Booked','Booked':'Downpayment','Downpayment':'Installments','Installments':'Completed'}[l.status];
+      return '<div class="kanban-card" style="margin-bottom:4px;cursor:pointer" onclick="openLead('+l.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:10px;font-weight:600">'+l.name+'</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:8px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id==='+l.id+'))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:8px" onclick="event.stopPropagation();deleteLead('+l.id+')">\u2715</span></div></div><div style="font-size:9px;color:#888;margin-top:2px">'+l.property+'</div><div style="font-size:9px;color:#888">'+l.value+' \u00B7 '+l.source+'</div><div style="margin-top:2px;display:flex;gap:2px;flex-wrap:wrap"><span class="badge-status '+(l.priority==='High'?'badge-sold':l.priority==='Medium'?'badge-pending':'badge-closed')+'" style="font-size:7px">'+l.priority+'</span><span class="badge-status '+(l.type==='NRB'?'badge-reserved':'badge-closed')+'" style="font-size:7px">'+l.type+'</span>'+
+      (next&&next!=='Completed'?'<span style="color:#2e7d32;cursor:pointer;font-size:8px;font-weight:600;padding:1px 4px;background:#e8f5e9;border-radius:3px" onclick="event.stopPropagation();advanceLeadStage('+l.id+')">\u25B6</span>':'')+
+      '</div></div>';
+    }).join('')+
+    '</div></div>';
+  }).join('')}</div>`;
+}
+
+function advanceLeadStage(id){
+  var l=mockLeads.find(function(x){return x.id===id});if(!l)return;
+  var next={'New Inquiry':'Contacted','Contacted':'Site Visit','Site Visit':'Negotiation','Negotiation':'Booked','Booked':'Downpayment','Downpayment':'Installments','Installments':'Completed'}[l.status];
+  if(!next||next==='Completed')return showToast('Pipeline complete','info');
+  l.status=next;
+  l.lastContact='Just now';
+  l.activities=l.activities||[];
+  l.activities.unshift({type:'System',user:'System',date:'Just now',text:'Stage advanced to '+next});
+  DB.save('leads');
+  renderModule();
+  showToast('\u25B6 Advanced to '+next,'success');
+}
+
+function inlineSetLeadStatus(id,status){
+  var l=mockLeads.find(function(x){return x.id===id});if(!l)return;
+  l.status=status;l.lastContact='Just now';
+  DB.save('leads');renderModule();showToast(status,'info');
+}
+
+function assignLeadModal(id){
+  openModal('Assign Lead',
+    selectField('Assign to','assign_to',(mockLeads.find(function(x){return x.id===id})||{}).owner||'Unassigned',['Hasanul Banna','Iftekhar Ahmad','Sales Team A','Sales Team B','Unassigned'],true),
+    function(){
+      var l=mockLeads.find(function(x){return x.id===id});if(!l)return;
+      l.owner=document.getElementById('assign_to').value;
+      l.activities=l.activities||[];
+      l.activities.unshift({type:'System',user:'System',date:'Just now',text:'Assigned to '+l.owner});
+      DB.save('leads');renderModule();showToast('Assigned to '+l.owner,'success');
+    }
+  );
 }
 
 function renderSalesMarketing(el){
