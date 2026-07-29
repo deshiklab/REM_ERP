@@ -783,22 +783,31 @@ window.mockTaxEntries = DB.init('tax_entries', [
   {id:'TAX-005',type:'TDS',desc:'TDS on Consultancy Fee',vendor:'Architect Consultancy',project:'Muktodhara',amount:7500,rate:'10%',status:'Paid',date:'2024-10-08'}
 ]);
 window.mockTasks = DB.init('tasks', [
-  {id:1,title:'Call Tariqul Islam regarding Muktodhara plot',status:'To Do',priority:'High'},
-  {id:2,title:'Review PO-24-089 for Shah Cement',status:'To Do',priority:'Medium'},
-  {id:3,title:'Schedule site visit at Jolshiri',status:'In Progress',priority:'Medium'},
-  {id:4,title:'Follow up with plumber',status:'Done',priority:'Low'},
-  {id:5,title:'Draft Jolshiri Phase 2 layout',status:'To Do',priority:'High'},
-  {id:6,title:'Update CRM lead statuses',status:'In Progress',priority:'Medium'},
-  {id:7,title:'Review Q3 Financials',status:'Review',priority:'High'},
-  {id:8,title:'Vendor payment (Shah Cement)',status:'Done',priority:'Low'}
-,
-  {id:9,title:'Prepare Jolshiri Phase 2 BOQ',status:'To Do',priority:'High'},
-  {id:10,title:'Follow up on Kazi Nizam penthouse inquiry',status:'To Do',priority:'High'},
-  {id:11,title:'Inspect foundation work at Muktodhara Block C',status:'In Progress',priority:'Medium'},
-  {id:12,title:'Prepare monthly sales report for June',status:'To Do',priority:'Medium'},
-  {id:13,title:'Renew equipment insurance for JCB and Crane',status:'To Do',priority:'Low'},
-  {id:14,title:'Resolve water connection complaint for Apt 3B',status:'In Progress',priority:'High'},
-  {id:15,title:'Update contractor evaluation scorecards',status:'To Do',priority:'Medium'}
+  {id:1,title:'Call Tariqul Islam regarding Muktodhara plot',status:'To Do',priority:'High',project:'Muktodhara',assignee:'Hasanul Banna',deadline:'2026-06-20',desc:'Contact Tariqul to discuss 5 katha plot pricing and schedule site visit',tags:['CRM','Follow-up']},
+  {id:2,title:'Review PO-24-089 for Shah Cement',status:'To Do',priority:'Medium',project:'Muktodhara',assignee:'Mizanur Rahman',deadline:'2026-06-22',desc:'Verify PO quantities and pricing against quotation Q-2024-089',tags:['Procurement','Review']},
+  {id:3,title:'Schedule site visit at Jolshiri',status:'In Progress',priority:'Medium',project:'Jolshiri',assignee:'Hasanul Banna',deadline:'2026-06-18',desc:'Coordinate with site engineer for client visit on Saturday',tags:['CRM','Site Visit']},
+  {id:4,title:'Follow up with plumbing contractor',status:'Done',priority:'Low',project:'Jolshiri',assignee:'Mizanur Rahman',deadline:'2026-06-10',desc:'Check on Apt 3B water connection complaint status',tags:['Construction','Follow-up']},
+  {id:5,title:'Draft Jolshiri Phase 2 layout',status:'To Do',priority:'High',project:'Jolshiri',assignee:'Shamim Reza',deadline:'2026-07-01',desc:'Preliminary layout for 12 katha land parcel including road width, plot sizes, and common areas',tags:['Design','Planning']},
+  {id:6,title:'Update CRM lead statuses',status:'In Progress',priority:'Medium',project:'All',assignee:'Iftekhar Ahmad',deadline:'2026-06-19',desc:'Batch update all leads from Site Visit stage based on this week interactions',tags:['CRM','Admin']},
+  {id:7,title:'Review Q3 Financials',status:'Review',priority:'High',project:'All',assignee:'Mizanur Rahman',deadline:'2026-06-25',desc:'Consolidate Q3 income, expense, and variance reports for board meeting',tags:['Finance','Review']},
+  {id:8,title:'Process vendor payment (Shah Cement)',status:'Done',priority:'Low',project:'Muktodhara',assignee:'Nazma Akhter',deadline:'2026-06-05',desc:'Release payment for cement delivery PO-24-089',tags:['Finance','Payment']},
+  {id:9,title:'Prepare Jolshiri Phase 2 BOQ',status:'To Do',priority:'High',project:'Jolshiri',assignee:'Shamim Reza',deadline:'2026-06-28',desc:'Bill of quantities for earthwork, foundation, structure, and finishing',tags:['BOQ','Planning']},
+  {id:10,title:'Follow up on Kazi Nizam penthouse inquiry',status:'To Do',priority:'High',project:'Skyline Towers',assignee:'Iftekhar Ahmad',deadline:'2026-06-21',desc:'High-value prospect interested in penthouse at Skyline Towers',tags:['CRM','High-Value']},
+  {id:11,title:'Inspect foundation at Muktodhara Block C',status:'In Progress',priority:'Medium',project:'Muktodhara',assignee:'Mizanur Rahman',deadline:'2026-06-20',desc:'Verify rebar placement and concrete pour quality for footing F-12 to F-18',tags:['QC','Inspection']},
+  {id:12,title:'Prepare monthly sales report June',status:'To Do',priority:'Medium',project:'All',assignee:'Iftekhar Ahmad',deadline:'2026-06-30',desc:'Monthly sales report with bookings, collections, and pipeline metrics',tags:['Reporting','Sales']},
+  {id:13,title:'Renew equipment insurance JCB & Crane',status:'To Do',priority:'Low',project:'Muktodhara',assignee:'Nazma Akhter',deadline:'2026-07-15',desc:'Insurance renewal for 2 JCBs and 1 tower crane (policy #INS-2026-089)',tags:['Admin','Compliance']},
+  {id:14,title:'Resolve water connection Apt 3B',status:'In Progress',priority:'High',project:'Jolshiri',assignee:'Mizanur Rahman',deadline:'2026-06-18',desc:'Customer complaint: low water pressure in Apt 3B. Check overhead tank pump',tags:['Customer Service','Maintenance']},
+  {id:15,title:'Update contractor scorecards',status:'To Do',priority:'Medium',project:'All',assignee:'Shamim Reza',deadline:'2026-06-25',desc:'Quarterly evaluation for 12 active contractors across all sites',tags:['Procurement','Evaluation']},
+  {id:16,title:'Verify land title for Purbachal plot',status:'To Do',priority:'High',project:'Land',assignee:'Md. Hasan Ali',deadline:'2026-07-05',desc:'Original deed verification at Sub-Registry for proposed acquisition',tags:['Legal','Land']},
+  {id:17,title:'Draft marketing plan H2 2026',status:'In Progress',priority:'Medium',project:'All',assignee:'Hasanul Banna',deadline:'2026-06-30',desc:'Q3-Q4 marketing campaign budget allocation and channel strategy',tags:['Marketing','Planning']},
+  {id:18,title:'Conduct safety training Jolshiri site',status:'To Do',priority:'High',project:'Jolshiri',assignee:'Mizanur Rahman',deadline:'2026-07-10',desc:'Monthly safety briefing for all Jolshiri site workers (mandatory attendance)',tags:['Safety','Training']},
+  {id:19,title:'Audit stock inventory - cement & steel',status:'Review',priority:'Medium',project:'All',assignee:'Nazma Akhter',deadline:'2026-06-22',desc:'Physical verification of all cement and steel stock at Muktodhara store',tags:['Inventory','Audit']},
+  {id:20,title:'Approve variation order VO-004',status:'To Do',priority:'Medium',project:'Muktodhara',assignee:'Mizanur Rahman',deadline:'2026-06-23',desc:'VO-004: Additional brick work for boundary wall extension (Tk 2.5 Lac)',tags:['Construction','Variation']},
+  {id:21,title:'Finalize handover checklist Apt 7A',status:'To Do',priority:'High',project:'Jolshiri',assignee:'Shamim Reza',deadline:'2026-07-01',desc:'Pre-handover quality checklist for Jolshiri Apt 7A (Nazma Akhter)',tags:['Handover','QC']},
+  {id:22,title:'Submit VAT return June 2026',status:'In Progress',priority:'High',project:'All',assignee:'Nazma Akhter',deadline:'2026-07-12',desc:'Monthly VAT return filing for June. Deadline: 15th of following month',tags:['Finance','Compliance']},
+  {id:23,title:'Update project Gantt chart',status:'To Do',priority:'Low',project:'All',assignee:'Shamim Reza',deadline:'2026-07-05',desc:'Update milestone timeline for all active projects with current progress %',tags:['Planning','Reporting']},
+  {id:24,title:'Follow up with Dr. Rubina Ali — installment',status:'To Do',priority:'High',project:'Jolshiri',assignee:'Iftekhar Ahmad',deadline:'2026-06-19',desc:'3rd installment of 5 Lac due Jun 20. NRB client — confirm via WhatsApp',tags:['CRM','Collection']},
+  {id:25,title:'QC check — concrete test results',status:'Review',priority:'Medium',project:'Muktodhara',assignee:'Mizanur Rahman',deadline:'2026-06-21',desc:'Review 28-day cylinder test results for Block C slab pour (target: C30)',tags:['QC','Testing']}
 ]);
 window.mockCampaigns = DB.init('campaigns', [
   {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:150000,spent:135000,leads:45,conversions:8,roi:320,startDate:'Jun 01, 2026',endDate:'Aug 31, 2026',status:'Active',target:'5 Katha Plots',notes:'Facebook + Instagram campaign targeting NRB buyers.'},
@@ -4200,62 +4209,132 @@ function renderHR(el){
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${pE.items.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('hr',pE.total,pE.page,pE.totalPages,pE.perPage)}</div></div></div></div>`;
 }
 
+function tasksFilterSet(v){document.getElementById('tasksFilter').value=v;renderModule();}
 function renderTasks(el){
   var tf=(document.getElementById('tasksFilter')||{}).value||'all';
   var pf=(document.getElementById('tasksPriority')||{}).value||'';
+  var projF=(document.getElementById('tasksProject')||{}).value||'';
+  var assignF=(document.getElementById('tasksAssignee')||{}).value||'';
+  var searchQ=(document.getElementById('tasksSearch')||{}).value||'';
   var filtered=mockTasks.filter(function(x){
     if(tf==='active'&&x.status==='Done')return false;
     if(tf==='done'&&x.status!=='Done')return false;
     if(pf&&x.priority!==pf)return false;
+    if(projF&&x.project!==projF)return false;
+    if(assignF&&x.assignee!==assignF)return false;
+    if(searchQ&&!x.title.toLowerCase().includes(searchQ.toLowerCase())&&!x.project.toLowerCase().includes(searchQ.toLowerCase())&&!x.assignee.toLowerCase().includes(searchQ.toLowerCase()))return false;
     return true;
   });
-  el.innerHTML='<div class="fade-in"><div class="page-title">Task Management</div><div class="page-subtitle">'+mockTasks.length+' tasks · '+mockTasks.filter(function(x){return x.priority==='High'}).length+' high priority</div>'+
-    '<div class="stats-row" style="margin-bottom:8px">'+[
+  var uniqueProjects={};mockTasks.forEach(function(t){uniqueProjects[t.project]=1});
+  var uniqueAssignees={};mockTasks.forEach(function(t){uniqueAssignees[t.assignee]=1});
+  var now=new Date();
+  var overdueCount=mockTasks.filter(function(t){return t.deadline&&t.status!=='Done'&&new Date(t.deadline)<now}).length;
+  var colMap=['To Do','In Progress','Review','Done'];
+  var colStatus=['todo','progress','review','done'];
+  var stageTarget={'To Do':'In Progress','In Progress':'Review','Review':'Done'};
+  el.innerHTML='<div class="fade-in">'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="page-title">📋 Task Management</div><div class="page-subtitle">'+mockTasks.length+' tasks · '+overdueCount+' overdue · '+(mockTasks.filter(function(t){return t.priority==='High'&&t.status!=='Done'}).length)+' high priority</div></div>'+
+    '<div class="stats-row" style="margin-bottom:6px">'+[
       ['Total',mockTasks.length,''],
-      ['To Do',mockTasks.filter(function(x){return x.status==='To Do'}).length,'#e65100'],
-      ['In Progress',mockTasks.filter(function(x){return x.status==='In Progress'}).length,'#1565c0'],
-      ['Review',mockTasks.filter(function(x){return x.status==='Review'}).length,'#7b1fa2'],
-      ['Done',mockTasks.filter(function(x){return x.status==='Done'}).length,'#2e7d32'],
-      ['High Priority',mockTasks.filter(function(x){return x.priority==='High'}).length,'#c62828']
-    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value"'+(s[2]?' style="color:'+s[2]+'"':'')+'>'+s[1]+'</div></div>'}).join('')+'</div>'+
-    '<div class="toolbar" style="margin-bottom:6px">'+
-      '<div class="tabs"><div class="tab '+(tf==='all'?'active':'')+'" onclick="document.getElementById(\'tasksFilter\').value=\'all\';renderModule()">All</div><div class="tab '+(tf==='active'?'active':'')+'" onclick="document.getElementById(\'tasksFilter\').value=\'active\';renderModule()">Active</div><div class="tab '+(tf==='done'?'active':'')+'" onclick="document.getElementById(\'tasksFilter\').value=\'done\';renderModule()">Completed</div></div>'+
-      '<select id="tasksPriority" onchange="renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option></select>'+
+      ['To Do',mockTasks.filter(function(t){return t.status==='To Do'}).length,'#e65100'],
+      ['In Progress',mockTasks.filter(function(t){return t.status==='In Progress'}).length,'#1565c0'],
+      ['Review',mockTasks.filter(function(t){return t.status==='Review'}).length,'#7b1fa2'],
+      ['Done',mockTasks.filter(function(t){return t.status==='Done'}).length,'#2e7d32'],
+      ['Overdue',overdueCount,'#c62828'],
+      ['High Priority',mockTasks.filter(function(t){return t.priority==='High'&&t.status!=='Done'}).length,'#c62828'],
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="'+(s[2]?'color:'+s[2]:'')+(s[1]===overdueCount&&overdueCount>0?';font-weight:800':'')+'">'+s[1]+'</div></div>'}).join('')+'</div>'+
+    '<div class="toolbar" style="margin-bottom:6px;flex-wrap:wrap">'+
+      '<div class="tabs"><div class="tab '+(tf==='all'?'active':'')+'" onclick="tasksFilterSet(\'all\')">All</div><div class="tab '+(tf==='active'?'active':'')+'" onclick="tasksFilterSet(\'active\')">Active</div><div class="tab '+(tf==='done'?'active':'')+'" onclick="tasksFilterSet(\'done\')">Completed</div></div>'+
+      '<input id="tasksSearch" placeholder="Search tasks..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px;background:transparent"/>'+
+      '<select id="tasksPriority" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px;background:transparent"><option value="">Priority</option><option>High</option><option>Medium</option><option>Low</option></select>'+
+      '<select id="tasksProject" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px;background:transparent"><option value="">Project</option>'+Object.keys(uniqueProjects).sort().map(function(p){return '<option>'+p+'</option>'}).join('')+'</select>'+
+      '<select id="tasksAssignee" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px;background:transparent"><option value="">Assignee</option>'+Object.keys(uniqueAssignees).sort().map(function(a){return '<option>'+a+'</option>'}).join('')+'</select>'+
       '<div class="spacer"></div>'+
+      '<button class="action-btn secondary" onclick="tasksExportCSV()" style="padding:3px 7px;font-size:9px">📥</button>'+
+      '<button class="action-btn primary" onclick="taskCrudQuick()" style="padding:3px 7px;font-size:9px">+ Task</button>'+
     '</div>'+
-    '<div style="display:flex;gap:10px;flex:1;min-height:280px;overflow-x:auto">'+['To Do','In Progress','Review','Done'].map(function(st){
-      var t=filtered.filter(function(x){return x.status===st});
-      return '<div class="kanban-col"><div style="padding:6px 8px;font-size:10px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between"><span>'+st+'</span><span style="background:#e0e0e0;border-radius:10px;padding:0 5px;font-size:9px">'+t.length+'</span></div><div style="flex:1;overflow-y:auto;padding:4px 6px">'+
-      t.map(function(x){return '<div class="kanban-card"><div style="display:flex;align-items:flex-start;gap:5px;margin-bottom:3px"><span style="margin-top:2px;width:7px;height:7px;border-radius:50%;background:'+(x.priority==='High'?'#e53935':x.priority==='Medium'?'#ff9800':'#999')+'"></span><div style="flex:1;font-size:11px;font-weight:500;word-break:break-word">'+x.title+'</div><div style="display:flex;gap:3px;white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();editTask('+x.id+')">&#9998;</span><span style="color:#e53935;cursor:pointer;font-size:9px;margin-left:2px" onclick="event.stopPropagation();deleteTask('+x.id+')">&#10005;</span></div></div><div style="font-size:9px;color:#888;display:flex;gap:6px"><span>#'+x.id+'</span><span style="color:'+(x.priority==='High'?'#e53935':x.priority==='Medium'?'#ff9800':'#999')+'">'+x.priority+'</span>'+
-      (x.status!=='Done'?'<span style="color:#2e7d32;cursor:pointer" onclick="event.stopPropagation();toggleTaskStatus('+x.id+')">&#9654; '+{toDo:'In Progress','In Progress':'Review',Review:'Done'}[x.status]||''+'</span>':'')+'</div></div>';}).join('')+
-      '</div></div>';
+    (!filtered.length?'<div style="padding:40px;text-align:center;color:#999;font-size:12px">No tasks match your filters</div>':'')+
+    '<div style="display:flex;gap:8px;min-height:320px;overflow-x:auto">'+
+    colMap.map(function(st,ci){
+      var items=filtered.filter(function(t){return t.status===st});
+      return '<div class="kanban-col" style="min-width:240px"><div style="padding:6px 8px;font-size:10px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center"><span>'+st+'</span><span style="background:#e0e0e0;border-radius:10px;padding:0 6px;font-size:9px">'+items.length+'</span></div>'+
+        '<div style="flex:1;overflow-y:auto;padding:4px 6px;display:flex;flex-direction:column;gap:4px">'+
+        items.map(function(t){
+          var isOverdue=t.deadline&&t.status!=='Done'&&new Date(t.deadline)<now;
+          var dueToday=t.deadline&&t.status!=='Done'&&!isOverdue&&new Date(t.deadline).toDateString()===now.toDateString();
+          var initials=t.assignee.split(' ').map(function(s){return s[0]}).join('').slice(0,2).toUpperCase();
+          return '<div class="kanban-card" style="cursor:pointer;padding:8px" onclick="openTaskDetail('+t.id+')">'+
+            '<div style="display:flex;align-items:flex-start;gap:5px;margin-bottom:4px">'+
+              '<span style="margin-top:3px;width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+(t.priority==='High'?'#e53935':t.priority==='Medium'?'#ff9800':'#999')+'"></span>'+
+              '<div style="flex:1;font-size:11px;font-weight:500;word-break:break-word;line-height:1.3">'+t.title+'</div>'+
+              '<div style="display:flex;gap:2px;flex-shrink:0"><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();editTask('+t.id+')">✎</span><span style="color:#e53935;cursor:pointer;font-size:9px" onclick="event.stopPropagation();deleteTask('+t.id+')">✕</span></div>'+
+            '</div>'+
+            '<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:3px">'+
+              '<span style="font-size:8px;padding:1px 5px;border-radius:3px;background:#f0f4ff;color:#1565c0">'+t.project+'</span>'+
+              '<span style="font-size:8px;padding:1px 5px;border-radius:3px;background:#f5f5f5;color:#555">👤 '+t.assignee+'</span>'+
+              (t.deadline?'<span style="font-size:8px;padding:1px 5px;border-radius:3px;background:'+(isOverdue?'#fce4ec':dueToday?'#fff3e0':'#f5f5f5')+';color:'+(isOverdue?'#c62828':dueToday?'#e65100':'#888')+';font-weight:'+(isOverdue||dueToday?'600':'400')+'">'+(isOverdue?'⚠️ ':'')+t.deadline+'</span>':'')+
+            '</div>'+
+            '<div style="display:flex;justify-content:space-between;align-items:center">'+
+              '<div style="display:flex;gap:2px">'+(t.tags||[]).slice(0,3).map(function(tag){return '<span style="font-size:7px;padding:0 4px;border-radius:2px;background:#f0f0f0;color:#888">'+tag+'</span>';}).join('')+'</div>'+
+              (t.status!=='Done'?'<span style="font-size:8px;color:#2e7d32;cursor:pointer" onclick="event.stopPropagation();toggleTaskStatus('+t.id+')">▶ '+stageTarget[t.status]+'</span>':'<span style="font-size:8px;color:#2e7d32">✓ Done</span>')+
+            '</div></div>';
+        }).join('')+
+        '</div></div>';
     }).join('')+'</div>'+
-    '<div class="card" style="margin-top:10px"><div class="card-header"><h3>Quick Add</h3></div><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap"><input id="newTaskInput" placeholder="Task title..." style="flex:1;min-width:150px;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px"/>'+
-    '<select id="newTaskPriority" style="padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px"><option>Medium</option><option>High</option><option>Low</option></select>'+
-    '<select id="newTaskStatus" style="padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px"><option>To Do</option><option>In Progress</option><option>Review</option><option>Done</option></select>'+
-    '<button class="action-btn primary" onclick="addTask()">+ Add</button></div></div></div>';
+    '<div class="card" style="margin-top:10px"><div class="card-header"><h3>➕ Quick Add</h3></div><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">'+
+      '<input id="newTaskInput" placeholder="Task title..." style="flex:1;min-width:140px;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px;background:transparent"/>'+
+      '<select id="newTaskPriority" style="padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:10px;background:transparent"><option>Medium</option><option>High</option><option>Low</option></select>'+
+      '<select id="newTaskStatus" style="padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:10px;background:transparent"><option>To Do</option><option>In Progress</option><option>Review</option><option>Done</option></select>'+
+      '<button class="action-btn primary" onclick="addTask()">+ Add</button></div></div></div>';
 }
-function addTask(){
-  var i=document.getElementById('newTaskInput');if(!i||!i.value.trim())return;
-  var p=document.getElementById('newTaskPriority');var s=document.getElementById('newTaskStatus');
-  mockTasks.push({id:Date.now(),title:i.value.trim(),status:(s?s.value:'To Do'),priority:(p?p.value:'Medium')});
-  DB.save('tasks');i.value='';showToast('Task added!');
-  renderModule();
-}
-function editTask(id){
-  var x=mockTasks.find(function(t){return t.id===id});if(!x)return;
-  openModal('Edit Task',
-    inputField('Title','et_title',x.title,'',true)+
-    selectField('Status','et_status',x.status,['To Do','In Progress','Review','Done'])+
-    selectField('Priority','et_priority',x.priority,['High','Medium','Low']),
-    function(){var d={title:g('et_title'),status:g('et_status'),priority:g('et_priority')};updateItem(mockTasks,id,d,'tasks');}
+function openTaskDetail(id){
+  var t=mockTasks.find(function(x){return x.id===id});
+  if(!t)return;
+  var pi={'High':'🔴','Medium':'🟡','Low':'⚪'};
+  var isOverdue=t.deadline&&t.status!=='Done'&&new Date(t.deadline)<new Date();
+  var now=new Date();
+  var dueToday=t.deadline&&t.status!=='Done'&&!isOverdue&&new Date(t.deadline).toDateString()===now.toDateString();
+  showDetailPanel('📋 #'+t.id+' '+t.title,
+    '<div style="margin-bottom:10px"><div style="font-size:11px;color:#888;line-height:1.5">'+(t.desc||'No description provided.')+'</div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+
+      '<div class="stat-card"><div class="label">Status</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+t.status+'</div></div>'+
+      '<div class="stat-card"><div class="label">Priority</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+pi[t.priority]+' '+t.priority+'</div></div>'+
+      '<div class="stat-card"><div class="label">Project</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:#1565c0">'+t.project+'</div></div>'+
+      '<div class="stat-card"><div class="label">Assignee</div><div style="font-size:12px;font-weight:600;margin-top:2px">👤 '+t.assignee+'</div></div>'+
+      '<div class="stat-card"><div class="label">Deadline</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:'+(isOverdue?'#c62828':dueToday?'#e65100':'inherit')+'">'+(t.deadline||'No deadline')+(isOverdue?' ⚠️ Overdue':'')+(dueToday?' 📅 Today':'')+'</div></div>'+
+      '<div class="stat-card"><div class="label">Task ID</div><div style="font-size:12px;font-weight:600;margin-top:2px;font-family:monospace;color:#888">#'+t.id+'</div></div>'+
+    '</div>'+
+    (t.tags&&t.tags.length?'<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:#555;margin-bottom:4px">🏷️ Tags</div><div style="display:flex;gap:3px;flex-wrap:wrap">'+t.tags.map(function(tag){return '<span style="padding:2px 8px;font-size:9px;background:#f0f4ff;color:#1565c0;border-radius:4px">'+tag+'</span>';}).join('')+'</div></div>':'')+
+    '<div style="background:#f9f9f9;border-radius:6px;padding:10px;text-align:center;color:#999;font-size:11px">📝 Comments & attachments coming soon</div>',
+    '<div class="lead-footer">'+
+      '<button class="lead-foot-btn primary" onclick="editTask('+t.id+');closeLeadPanel()">✎ Edit</button>'+
+      (t.status!=='Done'?'<button class="lead-foot-btn success" onclick="toggleTaskStatus('+t.id+');closeLeadPanel()">▶ '+{toDo:'In Progress','In Progress':'Review',Review:'Done'}[t.status.toLowerCase().replace(/\s/g,'')]+'</button>':'')+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
   );
 }
-function deleteTask(id){if(!confirm('Delete this task?'))return;deleteItem(mockTasks,id,'task','tasks');}
-function toggleTaskStatus(id){
-  var x=mockTasks.find(function(t){return t.id===id});if(!x)return;
-  var next={toDo:'In Progress','In Progress':'Review',Review:'Done'}[x.status.toLowerCase().replace(/\s/g,'')]||'Done';
-  x.status=next;DB.save('tasks');renderModule();showToast('&#9654; '+next,'info');
+function tasksExportCSV(){
+  var csv='ID,Title,Status,Priority,Project,Assignee,Deadline,Tags\n';
+  mockTasks.forEach(function(t){csv+='"'+t.id+'","'+t.title+'","'+t.status+'","'+t.priority+'","'+(t.project||'')+'","'+(t.assignee||'')+'","'+(t.deadline||'')+'","'+((t.tags||[]).join('; '))+'"\n';});
+  var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Tasks_Export.csv';a.click();
+  showToast('Exported '+mockTasks.length+' tasks','success');
+}
+function taskCrudQuick(){
+  openModal('New Task',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div style="grid-column:1/-1">'+inputField('Title','qt_title','','',true)+'</div>'+
+      '<div style="grid-column:1/-1">'+inputField('Description','qt_desc','','Brief description')+'</div>'+
+      selectField('Status','qt_status','To Do',['To Do','In Progress','Review','Done'],true)+
+      selectField('Priority','qt_priority','Medium',['High','Medium','Low'],true)+
+      selectField('Project','qt_project','All',['All','Jolshiri','Muktodhara','Skyline Towers','Green Valley','Land'])+
+      selectField('Assignee','qt_assignee','Hasanul Banna',['Hasanul Banna','Iftekhar Ahmad','Mizanur Rahman','Shamim Reza','Nazma Akhter','Md. Hasan Ali'])+
+      inputField('Deadline','qt_deadline','','YYYY-MM-DD')+
+    '</div>',
+    function(){
+      mockTasks.push({id:Date.now(),title:g('qt_title'),status:g('qt_status'),priority:g('qt_priority'),project:g('qt_project'),assignee:g('qt_assignee'),deadline:g('qt_deadline')||'',desc:g('qt_desc'),tags:[]});
+      DB.save('tasks');showToast('Task created!','success');renderModule();
+    }
+  );
 }
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
 
