@@ -537,10 +537,43 @@ window.mockDesigns = DB.init('designs', [
   {id:'DSG-014',name:'Road & Utility Corridor Plan',type:'Infrastructure',typeIcon:'\uD83D\uDEE4\uFE0F',version:'v1.0',status:'Draft',project:'Muktodhara Green Park',designer:'Ar. Hasan Mahmud',description:'Internal road network design with 6m/8m/10m wide roads, underground utility corridor for gas, water, electricity.',submitted:'2024-10-28',approved:'',versions:[{v:'v1.0',date:'2024-10-28',status:'Draft'}],downloadUrl:'#'}
 ]);
 window.mockContractors = DB.init('contractors', [
-  {name:'M/S Rahman Enterprise',type:'Civil Works',contact:'+880****4555',rating:4,status:'Active'},
-  {name:'Alam Construction',type:'Earth Filling',contact:'+880****2333',rating:5,status:'Active'},
-  {name:'Hasan Electricals',type:'Electrical',contact:'+880****5666',rating:3,status:'Inactive'}
+  {id:'CTR-001',name:'M/S Rahman Enterprise',type:'Civil Works',contact:'+880 1711 004555',email:'info@rahmanent.com',rating:4,status:'Active',license:'CIV-2024-001',insurance:'Zurich Insurance',projects:['Muktodhara','Jolshiri']},
+  {id:'CTR-002',name:'Alam Construction',type:'Earth Filling',contact:'+880 1712 002333',email:'alam@construct.com',rating:5,status:'Active',license:'EAR-2024-002',insurance:'Green Delta',projects:['Muktodhara']},
+  {id:'CTR-003',name:'Hasan Electricals',type:'Electrical',contact:'+880 1813 005666',email:'hasan@electra.com',rating:3,status:'Inactive',license:'',insurance:'',projects:['Jolshiri']},
+  {id:'CTR-004',name:'ABC Construction Ltd.',type:'Structural',contact:'+880 1915 007890',email:'info@abcconst.com',rating:5,status:'Active',license:'STR-2024-004',insurance:'Pragati Insurance',projects:['Jolshiri','Muktodhara']},
+  {id:'CTR-005',name:'Dhaka Plumbing Solutions',type:'Plumbing',contact:'+880 1723 001234',email:'plumb@dhaka.com',rating:4,status:'Active',license:'PLB-2024-005',insurance:'Asia Insurance',projects:['Jolshiri']},
+  {id:'CTR-006',name:'Shahin Painters',type:'Painting',contact:'+880 1622 009876',email:'shahin@paint.com',rating:3,status:'Active',license:'',insurance:'',projects:['Muktodhara']},
+  {id:'CTR-007',name:'Premium Finishing Works',type:'Finishing',contact:'+880 1550 003456',email:'premium@finish.com',rating:4,status:'Active',license:'FIN-2024-007',insurance:'Standard Life',projects:['Jolshiri']},
+  {id:'CTR-008',name:'BRB Roofing & Steel',type:'Roofing',contact:'+880 1812 007777',email:'roof@brb.com',rating:4,status:'Active',license:'ROF-2024-008',insurance:'Green Delta',projects:['Muktodhara','Jolshiri']},
+  {id:'CTR-009',name:'Glass Tech BD',type:'Glass & Aluminum',contact:'+880 1700 005555',email:'order@glasstech.com',rating:3,status:'Inactive',license:'',insurance:'',projects:[]},
+  {id:'CTR-010',name:'MEP Solutions Ltd.',type:'MEP',contact:'+880 1711 008888',email:'mep@solution.com',rating:5,status:'Active',license:'MEP-2024-010',insurance:'Zurich Insurance',projects:['Jolshiri']}
 ]);
+window.mockWorkOrders = DB.init('workOrders', [
+  {id:'WO-001',contractor:'CTR-001',project:'Muktodhara Green Park',scope:'Earthwork & Foundation Excavation for Blocks A-D',amount:2850000,date:'2024-08-01',deadline:'2024-09-15',status:'Completed'},
+  {id:'WO-002',contractor:'CTR-002',project:'Muktodhara Green Park',scope:'Land Filling & Compaction - Phase 1',amount:1800000,date:'2024-08-10',deadline:'2024-10-01',status:'Completed'},
+  {id:'WO-003',contractor:'CTR-004',project:'Jolshiri Abason',scope:'Superstructure Concrete Work - Tower A',amount:5200000,date:'2024-09-01',deadline:'2025-01-15',status:'Active'},
+  {id:'WO-004',contractor:'CTR-005',project:'Jolshiri Abason',scope:'Plumbing & Drainage - Tower A Floors 1-6',amount:1450000,date:'2024-09-15',deadline:'2024-11-30',status:'Active'},
+  {id:'WO-005',contractor:'CTR-007',project:'Jolshiri Abason',scope:'Interior Finishing - Show Flat 4B',amount:890000,date:'2024-10-01',deadline:'2024-11-15',status:'Active'},
+  {id:'WO-006',contractor:'CTR-001',project:'Jolshiri Abason',scope:'Retaining Wall Construction - East Boundary',amount:1200000,date:'2024-10-15',deadline:'2024-12-01',status:'Pending'},
+  {id:'WO-007',contractor:'CTR-008',project:'Muktodhara Green Park',scope:'Roofing & Steel Structure - Community Hall',amount:980000,date:'2024-10-20',deadline:'2024-12-15',status:'Pending'},
+  {id:'WO-008',contractor:'CTR-006',project:'Muktodhara Green Park',scope:'Exterior Painting - Phase 1 Boundary Wall',amount:350000,date:'2024-10-25',deadline:'2024-11-20',status:'Pending'},
+  {id:'WO-009',contractor:'CTR-010',project:'Jolshiri Abason',scope:'MEP Installation - Tower A',amount:3800000,date:'2024-10-01',deadline:'2025-02-28',status:'Active'},
+  {id:'WO-010',contractor:'CTR-004',project:'Jolshiri Abason',scope:'Structural Steel - Parking Canopy',amount:650000,date:'2024-10-10',deadline:'2024-11-30',status:'Active'}
+]);
+
+window.mockContractorPayments = DB.init('contractorPayments', [
+  {id:'CTP-001',contractor:'CTR-001',type:'Advance',amount:500000,date:'2024-08-01',workOrder:'WO-001',status:'Paid'},
+  {id:'CTP-002',contractor:'CTR-001',type:'Milestone',amount:1200000,date:'2024-09-01',workOrder:'WO-001',status:'Paid'},
+  {id:'CTP-003',contractor:'CTR-001',type:'Final',amount:1150000,date:'2024-09-20',workOrder:'WO-001',status:'Paid'},
+  {id:'CTP-004',contractor:'CTR-002',type:'Advance',amount:400000,date:'2024-08-10',workOrder:'WO-002',status:'Paid'},
+  {id:'CTP-005',contractor:'CTR-002',type:'Milestone',amount:800000,date:'2024-09-10',workOrder:'WO-002',status:'Paid'},
+  {id:'CTP-006',contractor:'CTR-004',type:'Advance',amount:1500000,date:'2024-09-01',workOrder:'WO-003',status:'Paid'},
+  {id:'CTP-007',contractor:'CTR-004',type:'Milestone',amount:2000000,date:'2024-10-15',workOrder:'WO-003',status:'Paid'},
+  {id:'CTP-008',contractor:'CTR-005',type:'Advance',amount:300000,date:'2024-09-15',workOrder:'WO-004',status:'Paid'},
+  {id:'CTP-009',contractor:'CTR-010',type:'Advance',amount:1000000,date:'2024-10-01',workOrder:'WO-009',status:'Paid'},
+  {id:'CTP-010',contractor:'CTR-007',type:'Advance',amount:200000,date:'2024-10-01',workOrder:'WO-005',status:'Pending'}
+]);
+
 window.mockEquipment = DB.init('equipment', [
   {name:'JCB Excavator',model:'JCB 3DX',site:'Muktodhara',status:'Operational',hours:'1240'},
   {name:'Concrete Mixer',model:'CM-500',site:'Jolshiri',status:'Under Repair',hours:'890'},
@@ -662,7 +695,7 @@ window.mockKnowledgeBase = DB.init('knowledge_base', [
 ]);
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
-let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard';
+let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard';
 
 // ═══ GROUP & TOP BAR NAV ═══
 function switchGroup(group) {
@@ -709,7 +742,7 @@ function switchModule(mod) {
     case 'bookings': renderBookings(el); break;
     case 'customer_portal': renderCustomerPortal(el); break;
     case 'handover': renderHandover(el); break;
-    case 'contractors': renderSubTable(el, 'contractors', mockContractors, ['Name','Type','Rating','Status'], ['name','type','rating','status'], 'Contractors'); break;
+    case 'contractors': renderContractors(el); break;
     case 'boq': renderBOQ(el); break;
     case 'variation_orders': renderVariations(el); break;
     case 'equipment': renderSubTable(el, 'equipment', mockEquipment, ['Name','Model','Site','Status'], ['name','model','site','status'], 'Equipment'); break;
@@ -1607,6 +1640,299 @@ function crudDesign(item){
 
 // Ensure design tab variable is declared
 if(typeof dsType==='undefined') window.dsType='';
+
+/** Contractor Management Module **/
+
+function renderContractors(el){
+  if(typeof ctTab==='undefined') ctTab='dashboard';
+  var ct=ctTab;
+  var total=mockContractors.length;
+  var active=mockContractors.filter(function(c){return c.status==='Active'}).length;
+  var rated4=mockContractors.filter(function(c){return c.rating>=4}).length;
+  var woTotal=mockWorkOrders.length;
+  var woActive=mockWorkOrders.filter(function(w){return w.status==='Active'||w.status==='Pending'}).length;
+  var totalPay=mockContractorPayments.reduce(function(s,p){return s+p.amount},0);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Contractor Management</div><div class="page-subtitle">'+total+' contractors \\u00B7 '+woTotal+' work orders \\u00B7 ৳'+(totalPay/100000).toFixed(1)+'L paid</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','\\uD83D\\uDCCA Dashboard'],
+        ['contractors','\\uD83C\\uDFED Contractors'],
+        ['work_orders','\\uD83D\\uDCDD Work Orders'],
+        ['payments','\\uD83D\\uDCB5 Payments']
+      ].map(function(t){
+        return '<div class="tab '+(ct===t[0]?'active':'')+'" onclick="ctTab=\\x27'+t[0]+'\\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudContractor()" style="padding:3px 8px;font-size:10px;display:'+(ct==='contractors'?'':'none')+'">+ New Contractor</button>'+
+      '<button class="action-btn primary" onclick="crudWorkOrder()" style="padding:3px 8px;font-size:10px;display:'+(ct==='work_orders'?'':'none')+'">+ New Work Order</button>'+
+      '<button class="action-btn primary" onclick="crudPayment()" style="padding:3px 8px;font-size:10px;display:'+(ct==='payments'?'':'none')+'">+ Record Payment</button>'+
+    '</div>'+
+    (ct==='dashboard'?renderContractorDashboard():
+     ct==='contractors'?renderContractorList():
+     ct==='work_orders'?renderWorkOrders():
+     ct==='payments'?renderContractorPayments():'')+
+  '</div>';
+}
+
+function renderContractorDashboard(){
+  var total=mockContractors.length;
+  var active=mockContractors.filter(function(c){return c.status==='Active'}).length;
+  var inactive=mockContractors.filter(function(c){return c.status==='Inactive'}).length;
+  var rated4=mockContractors.filter(function(c){return c.rating>=4}).length;
+  var woTotal=mockWorkOrders.length;
+  var woActive=mockWorkOrders.filter(function(w){return w.status==='Active'}).length;
+  var woComplete=mockWorkOrders.filter(function(w){return w.status==='Completed'}).length;
+  var totalPay=mockContractorPayments.reduce(function(s,p){return s+p.amount},0);
+  var totalPayCr=mockWorkOrders.reduce(function(s,w){return s+(w.amount||0)},0);
+  var top=mockContractors.filter(function(c){return c.status==='Active'}).sort(function(a,b){return b.rating-a.rating}).slice(0,4);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Contractors',total,'#1565c0'],
+    ['Active',active,'#2e7d32'],
+    ['Inactive',inactive,inactive>0?'#c62828':'#999'],
+    ['Rating 4+',rated4,'#7b1fa2'],
+    ['Active WOs',woActive,woActive>0?'#e65100':'#999'],
+    ['Completed WOs',woComplete,'#00838f']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Top Rated Contractors</h3></div><div class="card-body" style="padding:6px">'+
+    top.map(function(c,i){
+      var stars='\\u2B50'.repeat(c.rating)+(c.rating<5?'\\u2606'.repeat(5-c.rating):'');
+      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="ctTab=\\x27contractors\\x27;renderModule()"><div style="width:22px;height:22px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:10px;font-weight:500">'+c.name+'</div><div style="font-size:8px;color:#888">'+c.type+' \\u00B7 '+stars+'</div></div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Payment Summary</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
+      '<div style="font-size:22px;font-weight:700;color:#2e7d32">\\u09F3 '+(totalPay/100000).toFixed(1)+'L</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:2px">Total Paid to Contractors</div>'+
+      '<div style="margin-top:8px;display:flex;gap:6px;justify-content:center">'+
+        '<div style="padding:4px 8px;background:#e8f5e9;border-radius:4px"><div style="font-size:12px;font-weight:600;color:#2e7d32">'+woComplete+'</div><div style="font-size:8px;color:#666">Completed WOs</div></div>'+
+        '<div style="padding:4px 8px;background:#fff3e0;border-radius:4px"><div style="font-size:12px;font-weight:600;color:#e65100">'+woActive+'</div><div style="font-size:8px;color:#666">Active WOs</div></div>'+
+        '<div style="padding:4px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:12px;font-weight:600;color:#1565c0">\\u09F3 '+(totalPayCr/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Total Contracted</div></div>'+
+      '</div>'+
+    '</div></div>'+
+  '</div>';
+}
+
+function renderContractorList(){
+  var q=(document.getElementById('ctSearch')||{}).value||'';
+  var tf=(document.getElementById('ctType')||{}).value||'';
+  var filtered=mockContractors.filter(function(c){
+    if(tf&&c.type!==tf)return false;
+    if(q&&!c.name.toLowerCase().includes(q.toLowerCase())&&!c.type.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pC=_pg('ct',filtered);
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="ctSearch" placeholder="Search contractors..." oninput="_PG.ct={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="ctType" onchange="_PG.ct={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option>Civil Works</option><option>Earth Filling</option><option>Electrical</option><option>Plumbing</option><option>Painting</option><option>Finishing</option><option>Structural</option><option>MEP</option></select>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">'+
+  pC.items.map(function(c){
+    var stars='';for(var si=0;si<5;si++)stars+=si<c.rating?'\\u2B50':'\\u2606';
+    return '<div class="ct-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openContractor(\\x27'+c.id+'\\x27)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-weight:700;color:#2F80ED">'+c.name.charAt(0)+'</div>'+
+          '<div><div style="font-size:11px;font-weight:600;color:#222">'+c.name+'</div><div style="font-size:9px;color:#2F80ED">'+c.type+'</div></div>'+
+        '</div>'+
+        '<span class="badge-status '+(c.status==='Active'?'badge-active':'badge-closed')+'">'+c.status+'</span>'+
+      '</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:4px">'+stars+'</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:2px">'+c.contact+(c.email?' \\u00B7 '+c.email:'')+'</div>'+
+      '<div style="display:flex;gap:4px;margin-top:6px">'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e3f2fd;color:#1565c0">'+(c.license?'License: '+c.license:'No license')+'</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(c.insurance?'#e8f5e9':'#ffebee')+';color:'+(c.insurance?'#2e7d32':'#c62828')+'">'+(c.insurance?'Insured':'No insurance')+'</span>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
+        '<span style="font-size:8px;color:#999">'+(c.projects?c.projects.length+' projects':'0 projects')+'</span>'+
+        '<div style="display:flex;gap:4px">'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudContractor(mockContractors.find(function(x){return x.id===\\x27'+c.id+'\\x27}))">\\u270E</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+c.name+'?\\x27)){var idx=mockContractors.findIndex(function(x){return x.id===\\x27'+c.id+'\\x27});if(idx>=0)mockContractors.splice(idx,1);DB.save(\\x27contractors\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('')+'</div>'+
+  (filtered.length>_pgPerPage?_pgHtml('ct',pC.total,pC.page,pC.totalPages,pC.perPage):'');
+}
+
+function renderWorkOrders(){
+  var q=(document.getElementById('woSearch')||{}).value||'';
+  var sf=(document.getElementById('woStatus')||{}).value||'';
+  var cf=(document.getElementById('woContractor')||{}).value||'';
+  var filtered=mockWorkOrders.filter(function(w){
+    if(sf&&w.status!==sf)return false;
+    if(cf&&w.contractor!==cf)return false;
+    if(q&&!w.scope.toLowerCase().includes(q.toLowerCase())&&!w.project.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pW=_pg('wo',filtered);
+  var ctNames={};mockContractors.forEach(function(c){ctNames[c.id]=c.name});
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="woSearch" placeholder="Search work orders..." oninput="_PG.wo={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="woStatus" onchange="_PG.wo={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Pending</option><option>Active</option><option>Completed</option><option>Cancelled</option></select>'+
+    '<select id="woContractor" onchange="_PG.wo={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Contractors</option>'+mockContractors.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('')+'</select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>WO ID</th><th>Contractor</th><th>Project</th><th>Scope</th><th class="num">Amount</th><th>Issue Date</th><th>Deadline</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pW.items.map(function(w){
+    var sc={'Pending':'#ff8f00','Active':'#1565c0','Completed':'#2e7d32','Cancelled':'#c62828'}[w.status]||'#888';
+    var sbg={'Pending':'#fff8e1','Active':'#e3f2fd','Completed':'#e8f5e9','Cancelled':'#ffebee'}[w.status]||'#f5f5f5';
+    return '<tr style="cursor:pointer" onclick="openWorkOrder(\\x27'+w.id+'\\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+w.id+'</td><td style="font-weight:500">'+(ctNames[w.contractor]||w.contractor)+'</td><td>'+w.project+'</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.scope+'</td><td class="num" style="font-weight:600">\\u09F3 '+(w.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+w.date+'</td><td style="font-size:9px;color:#888">'+w.deadline+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+w.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\\x27'+w.id+'\\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete WO '+w.id+'?\\x27)){var idx=mockWorkOrders.findIndex(function(x){return x.id===\\x27'+w.id+'\\x27});if(idx>=0)mockWorkOrders.splice(idx,1);DB.save(\\x27workOrders\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('wo',pW.total,pW.page,pW.totalPages,pW.perPage)+'</div></div></div>';
+}
+
+function renderContractorPayments(){
+  var pP=_pg('ctp',mockContractorPayments);
+  var ctNames={};mockContractors.forEach(function(c){ctNames[c.id]=c.name});
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Paid','\\u09F3 '+(mockContractorPayments.reduce(function(s,p){return s+p.amount},0)/100000).toFixed(1)+'L','#2e7d32'],
+    ['Transactions',mockContractorPayments.length,'#1565c0'],
+    ['Advance',mockContractorPayments.filter(function(p){return p.type==='Advance'}).reduce(function(s,p){return s+p.amount},0)/100000+'L','#e65100'],
+    ['Milestone',mockContractorPayments.filter(function(p){return p.type==='Milestone'}).reduce(function(s,p){return s+p.amount},0)/100000+'L','#7b1fa2'],
+    ['Final',mockContractorPayments.filter(function(p){return p.type==='Final'}).reduce(function(s,p){return s+p.amount},0)/100000+'L','#00838f'],
+    ['Retention',mockContractorPayments.filter(function(p){return p.type==='Retention'}).reduce(function(s,p){return s+p.amount},0)/100000+'L','#c62828']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Contractor</th><th>Type</th><th class="num">Amount</th><th>Date</th><th>Work Order</th><th>Status</th></tr></thead><tbody>'+
+  pP.items.map(function(p){
+    return '<tr><td style="font-family:monospace;font-size:9px">'+p.id+'</td><td style="font-weight:500">'+(ctNames[p.contractor]||'---')+'</td><td><span class="badge-status" style="background:'+(p.type==='Advance'?'#fff3e0':p.type==='Milestone'?'#e8f5e9':p.type==='Final'?'#e3f2fd':'#ffebee')+';color:'+(p.type==='Advance'?'#e65100':p.type==='Milestone'?'#2e7d32':p.type==='Final'?'#1565c0':'#c62828')+'">'+p.type+'</span></td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+p.date+'</td><td style="font-family:monospace;font-size:9px;color:#888">'+p.workOrder+'</td><td><span class="badge-status '+(p.status==='Paid'?'badge-active':'badge-pending')+'">'+p.status+'</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('ctp',pP.total,pP.page,pP.totalPages,pP.perPage)+'</div></div></div>';
+}
+
+function openContractor(id){
+  var c=mockContractors.find(function(x){return x.id===id});
+  if(!c)return;
+  var stars='';for(var si=0;si<5;si++)stars+=si<c.rating?'\\u2B50':'\\u2606';
+  var wis=mockWorkOrders.filter(function(w){return w.contractor===c.id});
+  var cPay=mockContractorPayments.filter(function(p){return p.contractor===c.id});
+  var totalPay=cPay.reduce(function(s,p){return s+p.amount},0);
+  var wisHtml=wis.length>0?wis.map(function(w){
+    var sc={'Pending':'#ff8f00','Active':'#1565c0','Completed':'#2e7d32','Cancelled':'#c62828'}[w.status]||'#888';
+    return '<div style="display:flex;justify-content:space-between;font-size:9px;padding:4px 0;border-bottom:1px solid #f0f0f0"><span style="font-weight:500;color:#2F80ED">'+w.scope.substring(0,30)+'</span><span style="background:'+sc+';color:#fff;padding:0 4px;border-radius:2px;font-size:7px">'+w.status+'</span></div>';
+  }).join(''):'<div style="font-size:9px;color:#888;padding:6px;text-align:center">No work orders</div>';
+  showDetailPanel('Contractor: '+c.name,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:44px;height:44px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#2F80ED">'+c.name.charAt(0)+'</div>'+
+      '<div><span class="badge-status '+(c.status==='Active'?'badge-active':'badge-closed')+'">'+c.status+'</span><div style="font-size:9px;color:#888;margin-top:2px">'+stars+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['Type',c.type],
+      ['Contact',c.contact],
+      ['Email',c.email||'---'],
+      ['License',c.license||'None'],
+      ['Insurance',c.insurance?'\\u2705 '+c.insurance:'\\u274C No insurance'],
+      ['Rating',c.rating+'/5 '+(c.rating>=4?'\\uD83C\\uDFC6':'')]
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;margin-bottom:4px">Work Orders ('+wis.length+')</div>'+
+    '<div style="padding:6px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+wisHtml+'</div></div>'+
+    '<div><div style="font-size:11px;font-weight:600;margin-bottom:4px">Payment Summary</div>'+
+    '<div class="stats-row" style="grid-template-columns:repeat(3,1fr)">'+[
+      ['Total Paid','\\u09F3 '+(totalPay/100000).toFixed(1)+'L','#2e7d32'],
+      ['Payments',cPay.length,'#1565c0'],
+      ['Avg','\\u09F3 '+(cPay.length>0?((totalPay/cPay.length)/100000).toFixed(1):'0')+'L','#7b1fa2']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+';font-size:13px">'+s[1]+'</div></div>';}).join('')+'</div></div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudContractor(mockContractors.find(function(x){return x.id===\\x27'+c.id+'\\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="ctTab=\\x27work_orders\\x27;closeLeadPanel();renderModule()">Work Orders</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+
+function openWorkOrder(id){
+  var w=mockWorkOrders.find(function(x){return x.id===id});
+  if(!w)return;
+  var ctNames={};mockContractors.forEach(function(c){ctNames[c.id]=c.name});
+  var sc={'Pending':'#ff8f00','Active':'#1565c0','Completed':'#2e7d32','Cancelled':'#c62828'}[w.status]||'#888';
+  showDetailPanel('Work Order: '+w.id,
+    '<div style="margin-bottom:10px"><span class="badge-status" style="background:'+(w.status==='Pending'?'#fff8e1':w.status==='Active'?'#e3f2fd':w.status==='Completed'?'#e8f5e9':'#ffebee')+';color:'+sc+';font-size:10px">'+w.status+'</span></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['WO ID',w.id],
+      ['Contractor',ctNames[w.contractor]||'---'],
+      ['Project',w.project],
+      ['Scope',w.scope],
+      ['Amount','\\u09F3 '+(w.amount/100000).toFixed(1)+'L'],
+      ['Issue Date',w.date],
+      ['Deadline',w.deadline],
+      ['Status',w.status]
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:10px">'+
+      '<div style="font-size:9px;color:#888;margin-bottom:4px">Completion Progress</div>'+
+      '<div style="height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+(w.status==='Completed'?'100':w.status==='Active'?'60':'10')+'%;background:'+sc+';border-radius:3px;transition:width .3s"></div></div>'+
+      '<div style="font-size:10px;font-weight:600;margin-top:4px;color:'+sc+'">'+(w.status==='Completed'?'100% Complete':w.status==='Active'?'60% In Progress':w.status==='Pending'?'Pending Start':'Cancelled')+'</div>'+
+    '</div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\\x27'+w.id+'\\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn success" onclick="event.stopPropagation();w.status=\\x27Completed\\x27;DB.save(\\x27workOrders\\x27);closeLeadPanel();renderModule();showToast(\\x27WO marked complete\\x27,\\x27success\\x27)">Mark Complete</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+
+function crudContractor(item){
+  var n=!item;
+  var c=n?{id:'CTR-'+String(mockContractors.length+1).padStart(3,'0'),name:'',type:'Civil Works',contact:'',email:'',rating:4,status:'Active',license:'',insurance:'',projects:[]}:item;
+  var types=['Civil Works','Earth Filling','Electrical','Plumbing','Painting','Finishing','Structural','MEP','Roofing','Glass & Aluminum'];
+  openModal(n?'New Contractor':'Edit Contractor',
+    formRow(inputField('Name','cf_name',c.name,'',true),selectField('Type','cf_type',c.type,types,true))+
+    formRow(inputField('Contact','cf_contact',c.contact,'',true),inputField('Email','cf_email',c.email))+
+    formRow(inputField('License','cf_license',c.license),inputField('Insurance','cf_insurance',c.insurance))+
+    formRow(selectField('Rating','cf_rating',String(c.rating),['5','4','3','2','1'],true),selectField('Status','cf_status',c.status,['Active','Inactive'],true)),
+    function(){
+      var d={
+        id:c.id,
+        name:g('cf_name'),
+        type:g('cf_type'),
+        contact:g('cf_contact'),
+        email:g('cf_email'),
+        rating:parseInt(g('cf_rating'))||4,
+        status:g('cf_status'),
+        license:g('cf_license'),
+        insurance:g('cf_insurance'),
+        projects:c.projects||[]
+      };
+      if(n){mockContractors.push(d);DB.save('contractors');showToast('Contractor created','success');}
+      else{var idx=mockContractors.findIndex(function(x){return x.id===c.id});if(idx>=0){mockContractors[idx]=d;DB.save('contractors');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
+function crudWorkOrder(item){
+  var n=!item;
+  var w=n?{id:'WO-'+String(mockWorkOrders.length+1).padStart(3,'0'),contractor:mockContractors.length>0?mockContractors[0].id:'',project:'Muktodhara Green Park',scope:'',amount:0,date:new Date().toISOString().split('T')[0],deadline:'',status:'Pending'}:item;
+  var projs=['Muktodhara Green Park','Jolshiri Abason'];
+  openModal(n?'New Work Order':'Edit Work Order',
+    formRow(selectField('Contractor','wo_contractor',w.contractor,mockContractors.map(function(c){return c.id+'|'+c.name}),true),selectField('Project','wo_project',w.project,projs,true))+
+    formRow(inputField('Scope of Work','wo_scope',w.scope,'',true),inputField('Amount (Tk)','wo_amount',String(w.amount),''))+
+    formRow(inputField('Issue Date','wo_date',w.date),inputField('Deadline','wo_deadline',w.deadline,''))+
+    selectField('Status','wo_status',w.status,['Pending','Active','Completed','Cancelled'],true),
+    function(){
+      var sel=g('wo_contractor');
+      var ctId=sel.split('|')[0];
+      var d={id:w.id,contractor:ctId,project:g('wo_project'),scope:g('wo_scope'),amount:parseInt(g('wo_amount'))||0,date:g('wo_date')||w.date,deadline:g('wo_deadline'),status:g('wo_status')};
+      if(n){mockWorkOrders.push(d);DB.save('workOrders');showToast('Work order created','success');}
+      else{var idx=mockWorkOrders.findIndex(function(x){return x.id===w.id});if(idx>=0){mockWorkOrders[idx]=d;DB.save('workOrders');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
+function crudPayment(item){
+  // Simple payment recorder
+  var n=!item;
+  var p=n?{id:'CTP-'+String(mockContractorPayments.length+1).padStart(3,'0'),contractor:mockContractors.length>0?mockContractors[0].id:'',type:'Milestone',amount:0,date:new Date().toISOString().split('T')[0],workOrder:'',status:'Pending'}:item;
+  openModal(n?'Record Payment':'Edit Payment',
+    formRow(selectField('Contractor','cp_contractor',p.contractor,mockContractors.map(function(c){return c.id+'|'+c.name}),true),selectField('Type','cp_type',p.type,['Advance','Milestone','Final','Retention'],true))+
+    formRow(inputField('Amount (Tk)','cp_amount',String(p.amount),'',true),inputField('Date','cp_date',p.date))+
+    formRow(inputField('Work Order ID','cp_wo',p.workOrder),selectField('Status','cp_status',p.status,['Pending','Paid'],true)),
+    function(){
+      var sel=g('cp_contractor');
+      var ctId=sel.split('|')[0];
+      var d={id:p.id,contractor:ctId,type:g('cp_type'),amount:parseInt(g('cp_amount'))||0,date:g('cp_date')||p.date,workOrder:g('cp_wo'),status:g('cp_status')};
+      if(n){mockContractorPayments.push(d);DB.save('contractorPayments');showToast('Payment recorded','success');}
+      else{var idx=mockContractorPayments.findIndex(function(x){return x.id===p.id});if(idx>=0){mockContractorPayments[idx]=d;DB.save('contractorPayments');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
 
 
 function renderKB(el){
