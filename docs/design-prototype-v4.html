@@ -576,12 +576,44 @@ window.mockHandover = DB.init('handover', [
   {id:'HND-002',unit:'Muktodhara - Plot M-103',customer:'Tariqul Islam',status:'Handover Scheduled',date:'2025-02-01',snags:0,'pos_date':'2025-01-25'},
   {id:'HND-003',unit:'Jolshiri - Apt 4B',customer:'Dr. Rubina Ali',status:'Construction Ongoing',date:'2025-06-30',snags:0,'pos_date':null}
 ]);
+window.wsChannels = [{id:'general',label:'# general',icon:'#'},{id:'announcements',label:'\uD83D\uDCE2 announcements',icon:'\uD83D\uDCE2'},{id:'sales',label:'\uD83D\uDCC8 sales',icon:'\uD83D\uDCC8'},{id:'engineering',label:'\uD83D\uDD27 engineering',icon:'\uD83D\uDD27'},{id:'finance',label:'\uD83D\uDCB0 finance',icon:'\uD83D\uDCB0'}];
+window.wsTeam = [
+  {name:'MD Hasanul Banna',role:'Director',color:'#2F80ED',status:'online',activity:'Active now'},
+  {name:'Iftekhar Ahmad',role:'Admin',color:'#2e7d32',status:'online',activity:'Active now'},
+  {name:'Shamim Reza',role:'Sales Manager',color:'#e65100',status:'online',activity:'Typing...'},
+  {name:'Nazma Akhter',role:'Finance Lead',color:'#7b1fa2',status:'away',activity:'Last seen 10m ago'},
+  {name:'Rofiqul Islam',role:'Senior Engineer',color:'#00838f',status:'online',activity:'Active now'},
+  {name:'Tanvir Ahmed',role:'Junior Engineer',color:'#37474f',status:'away',activity:'Last seen 30m ago'},
+  {name:'Fatima Begum',role:'Sales Executive',color:'#c62828',status:'online',activity:'Active now'},
+  {name:'Kamrul Hasan',role:'Customer Support',color:'#1565c0',status:'offline',activity:'Last seen 2h ago'}
+];
 window.mockWorkspaceChat = DB.init('workspace_chat', [
-  {sender:'MD Hasanul Banna',msg:'Invoice INV-24-001 has been approved.',time:'10:32 AM',role:'Director'},
-  {sender:'Iftekhar Ahmad',msg:'Updated the CRM pipeline. 3 new leads added today.',time:'10:28 AM',role:'Admin'},
-  {sender:'Rofiqul Islam',msg:'Jolshiri site progress — plastering 60% complete.',time:'9:45 AM',role:'Engineer'},
-  {sender:'Shamim Reza',msg:'Client Dr. Rubina Ali confirmed site visit tomorrow at 11 AM.',time:'9:30 AM',role:'Sales'},
-  {sender:'Nazma Akhter',msg:'PO-24-089 payment processed. Awaiting confirmation.',time:'9:15 AM',role:'Finance'}
+  {id:1,sender:'MD Hasanul Banna',msg:'Good morning team! Quick update - the Muktodhara Phase 2 land acquisition has moved to Negotiation stage. The initial term sheet looks promising.',time:'09:02 AM',channel:'general',role:'Director'},
+  {id:2,sender:'Iftekhar Ahmad',msg:'Great progress! I have prepared the feasibility report for Tejgaon Industrial Area. Shared it on Drive. Please review by Friday.',time:'09:05 AM',channel:'general',role:'Admin'},
+  {id:3,sender:'Rofiqul Islam',msg:'Thanks Iftekhar. I will review the report this afternoon. Also, Jolshiri Tower A concrete work for slab 5 is scheduled for Nov 10.',time:'09:08 AM',channel:'general',role:'Engineer'},
+  {id:4,sender:'Shamim Reza',msg:'Excellent! That aligns with our handover timeline. Dr. Rubina Ali called - she wants to visit the site this weekend. Can we arrange?',time:'09:12 AM',channel:'general',role:'Sales Manager'},
+  {id:5,sender:'Rofiqul Islam',msg:'Yes, Saturday at 10 AM works. Site will be ready for inspection. I will have the safety officer on standby.',time:'09:15 AM',channel:'general',role:'Engineer'},
+  {id:6,sender:'Nazma Akhter',msg:'PO-24-089 (Shah Cement) payment of \u09F3 5,50,000 has been processed. Receipt uploaded. Also, Invoice INV-24-001 for \u09F3 5,00,000 was approved yesterday.',time:'09:20 AM',channel:'general',role:'Finance Lead'},
+  {id:7,sender:'MD Hasanul Banna',msg:'Noted. Please add it to the monthly cash flow report. We need to track utilization vs budget.',time:'09:25 AM',channel:'general',role:'Director'},
+  {id:8,sender:'Iftekhar Ahmad',msg:'Updated the CRM. 3 new leads today - 2 hot, 1 warm. Follow-ups scheduled for this week.',time:'09:28 AM',channel:'general',role:'Admin'},
+  {id:9,sender:'Shamim Reza',msg:'I will handle the hot leads personally. Both are corporate clients interested in Jolshiri commercial units.',time:'09:32 AM',channel:'general',role:'Sales Manager'},
+  {id:10,sender:'Nazma Akhter',msg:'\uD83D\uDCC8 Q3 Financials are ready for review. Revenue target achieved at 112%. Expense ratio slightly above target. Full report attached.',time:'09:35 AM',channel:'general',role:'Finance Lead'},
+  {id:11,sender:'MD Hasanul Banna',msg:'Excellent quarter! Let us review in the board meeting on Monday. Prepare the variance analysis.',time:'09:38 AM',channel:'general',role:'Director'},
+  {id:12,sender:'Tanvir Ahmed',msg:'QC inspection report for Muktodhara Phase 1 is complete. All structural tests passed. Report uploaded to the Knowledge Base.',time:'09:42 AM',channel:'general',role:'Engineer'},
+  {id:13,sender:'Rofiqul Islam',msg:'Great work Tanvir! Please also schedule the fire safety drill for next month as per compliance requirements.',time:'09:45 AM',channel:'general',role:'Engineer'},
+  {id:14,sender:'Iftekhar Ahmad',msg:'\uD83C\uDF89 Congrats to the sales team! Crossed 85% annual target with 2 months remaining. Highest performer this month: Shamim Reza with \u09F3 2.2 Cr in bookings.',time:'09:50 AM',channel:'announcements',role:'Admin'},
+  {id:15,sender:'Shamim Reza',msg:'Thank you! Credit goes to the whole team. Special thanks to Rofiqul for the excellent site presentations that sealed the deals.',time:'09:52 AM',channel:'announcements',role:'Sales Manager'},
+  {id:16,sender:'MD Hasanul Banna',msg:'Well done everyone! Let us keep this momentum for Q4. Year-end target of \u09F3 50 Cr is within reach. Keep pushing!',time:'09:55 AM',channel:'announcements',role:'Director'},
+  {id:17,sender:'Shamim Reza',msg:'Update: Corporate client from Dhaka Bank wants a site tour tomorrow at 3 PM. They are interested in 3 commercial units at Jolshiri. Potential deal value: \u09F3 5.5 Cr.',time:'10:05 AM',channel:'sales',role:'Sales Manager'},
+  {id:18,sender:'Fatima Begum',msg:'I will prepare the proposal package. Client needs financing options - should I include the installment plan?',time:'10:08 AM',channel:'sales',role:'Sales Executive'},
+  {id:19,sender:'Shamim Reza',msg:'Yes, include both 12-month and 24-month installment options with downpayment scenarios. Also attach the floor plans.',time:'10:10 AM',channel:'sales',role:'Sales Manager'},
+  {id:20,sender:'Fatima Begum',msg:'On it! Will have it ready by lunch.',time:'10:12 AM',channel:'sales',role:'Sales Executive'},
+  {id:21,sender:'Rofiqul Islam',msg:'Jolshiri Tower B foundation design approved by structural consultant. Excavation can start next week. Need to order 500 MT of steel rebar.',time:'10:15 AM',channel:'engineering',role:'Engineer'},
+  {id:22,sender:'Tanvir Ahmed',msg:'I will prepare the BOQ for steel reinforcement and send to procurement for quotation. Estimated cost: \u09F3 35-38 Lakh.',time:'10:18 AM',channel:'engineering',role:'Engineer'},
+  {id:23,sender:'Rofiqul Islam',msg:'Make sure to specify Fe-500 grade with BSTI certification. We do not compromise on material quality.',time:'10:20 AM',channel:'engineering',role:'Engineer'},
+  {id:24,sender:'Nazma Akhter',msg:'\uD83D\uDCC5 Reminder: Monthly VAT return due by Nov 15. All department heads please submit expense reports by Nov 10 for reconciliation.',time:'10:22 AM',channel:'finance',role:'Finance Lead'},
+  {id:25,sender:'Iftekhar Ahmad',msg:'Admin department expenses submitted. Total for October: \u09F3 2,85,000. Includes office supplies, utilities, and staff transport.',time:'10:25 AM',channel:'finance',role:'Admin'},
+  {id:26,sender:'Nazma Akhter',msg:'Received. Also, the annual audit preparation will start next week. Please keep all vouchers and supporting documents ready.',time:'10:28 AM',channel:'finance',role:'Finance Lead'}
 ]);
 window.mockBIReports = DB.init('bi_reports', [
   {name:'Monthly Sales Overview',type:'Chart',period:'Oct 2024',updated:'2024-10-28',status:'Auto'},
@@ -1569,21 +1601,43 @@ function crudArticle(item){
 }
 
 function renderWorkspace(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Team Workspace</div><div class="page-subtitle">Team collaboration & chat</div>
-    <div style="display:flex;gap:12px;flex:1">
-      <div style="width:200px;flex-shrink:0">
-        <div class="card"><div class="card-header"><h3>Team</h3></div><div class="card-body" style="padding:8px">${[
-          ['MD Hasanul Banna','Director','#2F80ED','online'],['Iftekhar Ahmad','Admin','#2e7d32','online'],
-          ['Shamim Reza','Sales','#2e7d32','online'],['Nazma Akhter','Finance','#999','away'],
-          ['Rofiqul Islam','Engineer','#2e7d32','online'],['Tanvir Ahmed','Engineer','#999','away']
-        ].map(([n,r,c,s])=>`<div style="padding:5px 6px;display:flex;align-items:center;gap:6px;border-radius:4px;margin-bottom:2px"><div style="width:6px;height:6px;border-radius:50%;background:${s==='online'?'#4caf50':'#999'}"></div><div><div style="font-size:10px;font-weight:500">${n}</div><div style="font-size:8px;color:#888">${r}</div></div></div>`).join('')}</div></div>
+  var msgs=mockWorkspaceChat.filter(function(m){return m.channel===(wsChannel||'general');});
+  var ch=wsChannel||'general';
+  var chLabel=(wsChannels.find(function(c){return c.id===ch})||{}).label||'# general';
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Team Workspace</div><div class="page-subtitle">${mockWorkspaceChat.length} messages \u00B7 ${wsChannels.length} channels \u00B7 ${wsTeam.filter(t=>t.status==='online').length} online</div>
+    <div style="display:flex;gap:10px;flex:1">
+      <div style="width:170px;flex-shrink:0">
+        <div class="card"><div class="card-header"><h3>Channels</h3><span style="font-size:9px;color:#888">${wsChannels.length}</span></div><div class="card-body" style="padding:4px">${wsChannels.map(function(c){
+          var cnt=mockWorkspaceChat.filter(function(m){return m.channel===c.id;}).length;
+          return '<div style="padding:4px 6px;display:flex;align-items:center;gap:4px;border-radius:4px;margin-bottom:1px;cursor:pointer;background:'+(ch===c.id?'#eef3ff':'transparent')+'" onclick="wsChannel=\x27'+c.id+'\x27;renderModule()"><span style="width:4px;height:4px;border-radius:50%;background:'+(cnt>0?'#4caf50':'#ccc')+'"></span><span style="font-size:10px;font-weight:'+(ch===c.id?'600':'400')+'">'+c.label+'</span><span style="font-size:8px;color:#888;margin-left:auto">'+cnt+'</span></div>';
+        }).join('')}</div></div>
+        <div class="card" style="margin-top:6px"><div class="card-header"><h3>Team</h3><span style="font-size:9px;color:#888">${wsTeam.filter(t=>t.status==='online').length} online</span></div><div class="card-body" style="padding:4px">${wsTeam.map(function(t){
+          return '<div style="padding:3px 5px;display:flex;align-items:center;gap:5px;border-radius:4px;margin-bottom:1px"><div style="position:relative"><div style="width:22px;height:22px;border-radius:50%;background:'+t.color+'15;color:'+t.color+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700">'+t.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2)+'</div><div style="position:absolute;bottom:0;right:-1px;width:6px;height:6px;border-radius:50%;background:'+(t.status==='online'?'#4caf50':t.status==='away'?'#ff9800':'#ccc')+';border:1px solid #fff"></div></div><div><div style="font-size:9px;font-weight:500">'+t.name+'</div><div style="font-size:7px;color:#888">'+(t.status==='online'?t.activity:t.activity)+'</div></div></div>';
+        }).join('')}</div></div>
       </div>
       <div style="flex:1;display:flex;flex-direction:column">
-        <div class="card" style="flex:1;display:flex;flex-direction:column"><div class="card-header"><h3>#general</h3></div>
-        <div style="flex:1;overflow-y:auto;padding:10px">${mockWorkspaceChat.map(w=>`<div style="display:flex;gap:8px;margin-bottom:8px"><div style="width:28px;height:28px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${w.sender.split(' ').map(w=>w[0]).join('').slice(0,2)}</div><div><div style="font-size:10px"><span style="font-weight:600">${w.sender}</span> <span style="color:#999">${w.role} · ${w.time}</span></div><div style="font-size:11px;color:#333;margin-top:2px">${w.msg}</div></div></div>`).join('')}</div>
-        <div style="padding:8px;border-top:1px solid #e8e8e8;display:flex;gap:6px"><input placeholder="Type a message..." style="flex:1;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px;outline:none"/><button class="action-btn primary" onclick="showToast('Message sent!','info')" style="padding:5px 10px">Send</button></div></div>
+        <div class="card" style="flex:1;display:flex;flex-direction:column"><div class="card-header"><h3>${chLabel}</h3><span style="font-size:9px;color:#888">${msgs.length} messages</span></div>
+        <div id="wsMsgArea" style="flex:1;overflow-y:auto;padding:8px 10px">${msgs.length===0?'<div style="padding:20px;text-align:center;color:#ccc;font-size:11px">No messages yet. Start the conversation!</div>':msgs.map(function(m){
+          var t=wsTeam.find(function(t){return t.name===m.sender;})||{color:'#2F80ED',status:'online'};
+          var initials=m.sender.split(' ').map(function(w){return w[0];}).join('').slice(0,2);
+          return '<div style="display:flex;gap:7px;margin-bottom:7px"><div style="width:26px;height:26px;border-radius:50%;background:'+t.color+'20;color:'+t.color+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+initials+'</div><div style="flex:1;min-width:0"><div style="font-size:10px"><span style="font-weight:600">'+m.sender+'</span> <span style="color:#999;font-size:8px">'+m.role+' \u00B7 '+m.time+'</span></div><div style="font-size:11px;color:#333;margin-top:1px;line-height:1.4">'+m.msg+'</div></div></div>';
+        }).join('')}</div>
+        <div style="padding:6px 8px;border-top:1px solid #e8e8e8;display:flex;gap:6px;align-items:center"><input id="wsInput" placeholder="Type a message..." onkeydown="if(event.key===\x27Enter\x27)wsSend()" style="flex:1;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:10px;outline:none"/><button class="action-btn primary" onclick="wsSend()" style="padding:5px 10px;font-size:9px">Send</button></div></div>
       </div>
     </div></div>`;
+}
+
+var wsChannel='general';
+function wsSend(){
+  var inp=document.getElementById('wsInput');
+  if(!inp||!inp.value.trim())return;
+  var msg=inp.value.trim();
+  var now=new Date();
+  var h=now.getHours(),m=now.getMinutes();
+  var time=(h%12||12)+':'+(m<10?'0':'')+m+' '+(h<12?'AM':'PM');
+  mockWorkspaceChat.push({id:Date.now(),sender:'Current User',msg:msg,time:time,channel:wsChannel||'general',role:'User'});
+  inp.value='';
+  renderModule();
 }
 
 function renderBIReports(el){
