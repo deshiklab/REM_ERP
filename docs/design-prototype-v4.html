@@ -1323,7 +1323,12 @@ window.mockBIReports = DB.init('bi_reports', [
   {id:'BIR-013',name:'Customer Satisfaction Trends',type:'Line Chart',category:'CRM',period:'H1 2026',updated:'2026-06-11',status:'Manual',desc:'Quarterly customer satisfaction scores from post-handover surveys',metrics:{surveys:124,'avg score':'4.2/5','positive':'78%','neutral':'15%','negative':'7%'},chart:{type:'line',labels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026'],values:[3.8,4.0,4.1,3.9,4.2,4.3],color:'#1565c0'}},
   {id:'BIR-014',name:'Land Acquisition Pipeline',type:'Funnel',category:'Land',period:'Jun 2026',updated:'2026-06-09',status:'Manual',desc:'Land acquisition tracking — from identification to registration',metrics:{identified:15,'under eval':8,'legal review':5,'mutation':3,registered:2,total:'45 bigha'},chart:{type:'funnel',labels:['Identified','Under Eval','Legal Review','Mutation','Registered'],values:[15,8,5,3,2],color:'#4e342e'}},
   {id:'BIR-015',name:'Marketing ROI Analysis',type:'Bar Chart',category:'Sales',period:'Q2 2026',updated:'2026-06-10',status:'Auto',desc:'Channel-wise marketing spend vs lead generation ROI',metrics:{totalSpend:'৳45 Lac',leadsGenerated:320,'cost per lead':'৳1,406','avg deal value':'৳1.2 Cr','roi':'853%'},chart:{type:'bar',labels:['Facebook','Google Ads','Billboard','TV','Events','Print'],values:[120,85,45,30,28,12],color:'#e65100'}},
-  {id:'BIR-016',name:'Safety & Incident Report',type:'Table',category:'Construction',period:'Q2 2026',updated:'2026-06-06',status:'Manual',desc:'Construction site safety metrics and incident tracking',metrics:{totalHours:'85,000','incidents':4,'lost time':2,'severity rate':'0.47','safety score':'94.6%'},chart:{type:'table',headers:['Site','Incidents','Severity','Status','Score'],rows:[['Jolshiri Abason',1,'Minor','Resolved','97%'],['Muktodhara Green Park',0,'None','Clear','100%'],['Skyline Towers',2,'Moderate','Monitoring','91%'],['Green Valley',1,'Minor','Resolved','96%'],['Riverside',0,'None','Clear','99%']],color:'#e65100'}}
+  {id:'BIR-016',name:'Safety & Incident Report',type:'Table',category:'Construction',period:'Q2 2026',updated:'2026-06-06',status:'Manual',desc:'Construction site safety metrics and incident tracking',metrics:{totalHours:'85,000','incidents':4,'lost time':2,'severity rate':'0.47','safety score':'94.6%'},chart:{type:'table',headers:['Site','Incidents','Severity','Status','Score'],rows:[['Jolshiri Abason',1,'Minor','Resolved','97%'],['Muktodhara Green Park',0,'None','Clear','100%'],['Skyline Towers',2,'Moderate','Monitoring','91%'],['Green Valley',1,'Minor','Resolved','96%'],['Riverside',0,'None','Clear','99%']],color:'#e65100'}},
+  // ═══ LIVE FINANCIAL REPORTS (computed from live data) ═══
+  {id:'FIN-001',name:'Profit & Loss Statement',type:'Table',category:'Finance',period:'Current',updated:'Live',status:'Auto',desc:'Revenue vs expenses computed from live transactions, bookings & POs',metrics:{revenue:'',expenses:'',net:'',margin:''},chart:{type:'table',headers:['Category','Inflow (৳)','Outflow (৳)','Net (৳)'],rows:[['Bookings','--','--','--'],['Installments','--','--','--'],['Materials','--','--','--'],['Labor','--','--','--'],['Marketing','--','--','--'],['Admin','--','--','--'],['Legal','--','--','--'],['Total','--','--','--']],color:'#2e7d32'},live:true},
+  {id:'FIN-002',name:'Cash Flow Statement',type:'Table',category:'Finance',period:'Monthly',updated:'Live',status:'Auto',desc:'Monthly cash inflows vs outflows from transactions across all projects',metrics:{inflow:'',outflow:'',net:'',months:''},chart:{type:'table',headers:['Month','Inflow (৳)','Outflow (৳)','Net (৳)'],rows:[['Jan 2026','--','--','--'],['Feb 2026','--','--','--'],['Mar 2026','--','--','--'],['Apr 2026','--','--','--'],['May 2026','--','--','--'],['Jun 2026','--','--','--'],['Total','--','--','--']],color:'#1565c0'},live:true},
+  {id:'FIN-003',name:'Installment Aging Report',type:'Table',category:'Finance',period:'Current',updated:'Live',status:'Auto',desc:'Overdue installments by customer with aging buckets (0-30d, 31-60d, 61-90d, 90+)',metrics:{total:'','0-30d':'','31-60d':'','61-90d':'','90+':'','delinquency':''},chart:{type:'table',headers:['Customer','Project','Amount Due','Due Date','Days Overdue','Aging Bucket'],rows:[['--','--','--','--','--','--']],color:'#c62828'},live:true},
+  {id:'FIN-004',name:'Balance Sheet (Summary)',type:'Table',category:'Finance',period:'Current',updated:'Live',status:'Auto',desc:'Assets vs Liabilities computed from inventory value, receivables, payables & advances',metrics:{totalAssets:'',totalLiab:'',equity:'','d:e':''},chart:{type:'table',headers:['Category','Amount (৳)','% of Total'],rows:[['ASSETS','--','--'],['  Inventory Value','--','--'],['  Receivables','--','--'],['  Bank Balance','--','--'],['LIABILITIES','--','--'],['  Payables (POs)','--','--'],['  Customer Advances','--','--'],['  Salaries Payable','--','--'],['EQUITY','--','--']],color:'#7b1fa2'},live:true}
 ]);
 window.mockSystemDocs = DB.init('systemDocs', [
   {id:'DOC-001',title:'Getting Started with REM ERP',category:'Getting Started',icon:'\uD83D\uDCD6',content:'REM ERP is a comprehensive real estate management system designed for Mars Constech Ltd.\n\nThis guide will help you get started with the system:\n\n1. LOGGING IN\nUse your company credentials to log in. Contact the system administrator if you do not have an account.\n\n2. NAVIGATION\nThe system is organized into module groups accessible from the sidebar. Each group contains related modules. Use the top navigation bar to switch between modules within a group.\n\n3. DASHBOARD\nThe Executive Dashboard provides an overview of key metrics including task counts, recent bookings, hot leads, revenue charts, and project progress.\n\n4. QUICK ACTIONS\nUse the + button (Alt+N) in the top bar for quick access to create new records across all modules. The global search bar (Ctrl+K) lets you search across all data.',excerpt:'REM ERP is a comprehensive real estate management system designed for Mars Constech Ltd. This guide will help you get started...',updated:'2025-01-15',readTime:5},
@@ -3854,6 +3859,86 @@ function _biMiniChart(chart){
 function openBIReport(id){
   var r=mockBIReports.find(function(x){return x.id===id});
   if(!r)return;
+  // ═══ Live Data Computation ═══
+  if(r.live){
+    var monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var numFmt=function(n){return '৳'+Math.round(n).toLocaleString('en-IN')};
+    var pctFmt=function(n){return Math.round(n)+'%'};
+    if(r.id==='FIN-001'){
+      // P&L: Revenue from bookings+installments, Expenses from POs/transactions
+      var revBookings=mockBookings.filter(function(b){return b.status==='Confirmed'}).length*0; // count
+      var revInst=mockLeads.reduce(function(s,l){return s+(l.installments?l.installments.filter(function(i){return i.status==='Paid'}).length:0)*500000},0);
+      var txIn=mockTransactions.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(parseInt(String(t.amount).replace(/[^0-9]/g,''))||0)},0);
+      var txOut=mockTransactions.filter(function(t){return t.type==='Outflow'}).reduce(function(s,t){return s+(parseInt(String(t.amount).replace(/[^0-9]/g,''))||0)},0);
+      var poTotal=mockPOs.filter(function(p){return p.status==='Approved'||p.status==='Delivered'}).reduce(function(s,p){return s+(p.amount||0)},0);
+      var inflow=txIn+revInst+revBookings*5000000;
+      var outflow=txOut+poTotal;
+      var net=inflow-outflow;
+      r.metrics={revenue:numFmt(inflow),expenses:numFmt(outflow),net:net>=0?numFmt(net):'( '+numFmt(Math.abs(net))+' )',margin:inflow>0?pctFmt(net/inflow*100):'—'};
+      var matCost=Math.round(poTotal*0.55), labCost=Math.round(poTotal*0.2), mktCost=Math.round(poTotal*0.12), admCost=Math.round(poTotal*0.08), legCost=Math.round(poTotal*0.05);
+      r.chart.rows=[['Bookings',numFmt(revBookings*5000000),numFmt(0),numFmt(revBookings*5000000)],['Installments',numFmt(revInst),numFmt(0),numFmt(revInst)],['Materials',numFmt(0),numFmt(matCost),'( '+numFmt(matCost)+' )'],['Labor',numFmt(0),numFmt(labCost),'( '+numFmt(labCost)+' )'],['Marketing',numFmt(0),numFmt(mktCost),'( '+numFmt(mktCost)+' )'],['Admin',numFmt(0),numFmt(admCost),'( '+numFmt(admCost)+' )'],['Legal',numFmt(0),numFmt(legCost),'( '+numFmt(legCost)+' )'],['Total',numFmt(inflow),numFmt(outflow),net>=0?numFmt(net):'( '+numFmt(Math.abs(net))+' )']];
+      r.updated=monthNames[(new Date()).getMonth()]+' '+((new Date()).getDate())+', '+((new Date()).getFullYear());
+    }else if(r.id==='FIN-002'){
+      // Cash Flow: monthly from transactions
+      var months=[];
+      for(var m=0;m<6;m++){var d=new Date();d.setMonth(d.getMonth()-5+m);months.push({m:d.getMonth(),y:d.getFullYear()});}
+      var rows=[];
+      var totIn=0,totOut=0;
+      months.forEach(function(mo){
+        var ms=mo.m+1<10?'0'+(mo.m+1):''+(mo.m+1);
+        var txns=mockTransactions.filter(function(t){return t.date&&t.date.slice(4,7)===ms});
+        var mIn=txns.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(parseInt(String(t.amount).replace(/[^0-9]/g,''))||0)},0);
+        var mOut=txns.filter(function(t){return t.type==='Outflow'}).reduce(function(s,t){return s+(parseInt(String(t.amount).replace(/[^0-9]/g,''))||0)},0);
+        totIn+=mIn;totOut+=mOut;
+        rows.push([monthNames[mo.m]+' '+mo.y,numFmt(mIn),numFmt(mOut),numFmt(mIn-mOut)]);
+      });
+      rows.push(['Total',numFmt(totIn),numFmt(totOut),numFmt(totIn-totOut)]);
+      r.chart.rows=rows;
+      r.metrics={inflow:numFmt(totIn),outflow:numFmt(totOut),net:numFmt(totIn-totOut),months:'6 months'};
+    }else if(r.id==='FIN-003'){
+      // Aging: overdue installments from leads
+      var agingRows=[];
+      var now=new Date();
+      mockLeads.forEach(function(l){
+        if(!l.installments)return;
+        l.installments.forEach(function(inst){
+          if(inst.status!=='Paid'&&inst.status!=='Upcoming'){
+            var dueDate=new Date(inst.date);
+            var days=Math.round((now-dueDate)/86400000);
+            if(days<0)return;
+            var bucket=days<=30?'0-30d':days<=60?'31-60d':days<=90?'61-90d':'90+';
+            agingRows.push([l.name,l.property||'—',inst.amount,inst.date,days+'d',bucket]);
+          }
+        });
+      });
+      agingRows.sort(function(a,b){return parseInt(b[4])-parseInt(a[4])});
+      if(agingRows.length===0)agingRows=[['No overdue installments','—','—','—','—','—']];
+      r.chart.rows=agingRows;
+      var totalDue=0,b0=0,b1=0,b2=0,b3=0;
+      agingRows.forEach(function(a){
+        var amt=parseInt(String(a[2]).replace(/[^0-9]/g,''))||0;
+        totalDue+=amt;
+        if(a[5]==='0-30d')b0+=amt;else if(a[5]==='31-60d')b1+=amt;else if(a[5]==='61-90d')b2+=amt;else b3+=amt;
+      });
+      r.metrics={total:numFmt(totalDue),'0-30d':numFmt(b0),'31-60d':numFmt(b1),'61-90d':numFmt(b2),'90+':numFmt(b3),delinquency:agingRows.length+' overdue'};
+    }else if(r.id==='FIN-004'){
+      // Balance Sheet
+      var invValue=mockInventory.reduce(function(s,i){return s+(i.value||0)},0);
+      var txns=mockTransactions;
+      var receivable=mockLeads.reduce(function(s,l){return s+(parseInt(String(l.value).replace(/[^0-9]/g,''))||0)*0.3},0);
+      var payable=mockPOs.filter(function(p){return p.status==='Approved'||p.status==='Pending Approval'}).reduce(function(s,p){return s+(p.amount||0)},0);
+      var bankBal=txns.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(parseInt(String(t.amount).replace(/[^0-9]/g,''))||0)},0)-txns.filter(function(t){return t.type==='Outflow'}).reduce(function(s,t){return s+(parseInt(String(t.amount).replace(/[^0-9]/g,''))||0)},0);
+      var advances=mockBookings.filter(function(b){return b.status==='Confirmed'}).length*500000;
+      var salaries=mockEmployees.length*50000;
+      var assets=invValue+receivable+Math.max(bankBal,0);
+      var liab=payable+advances+salaries;
+      var equity=assets-liab;
+      var total=assets+liab+Math.abs(equity);
+      function pct(v){return total>0?pctFmt(v/total*100):'—'};
+      r.chart.rows=[['ASSETS','—','—'],[  'Inventory Value',numFmt(invValue),pct(invValue)],[  'Receivables',numFmt(receivable),pct(receivable)],[  'Bank Balance',numFmt(Math.max(bankBal,0)),pct(Math.max(bankBal,0))],['LIABILITIES','—','—'],[  'Payables (POs)',numFmt(payable),pct(payable)],[  'Customer Advances',numFmt(advances),pct(advances)],[  'Salaries Payable',numFmt(salaries),pct(salaries)],['EQUITY',numFmt(equity),pct(equity)]];
+      r.metrics={totalAssets:numFmt(assets),totalLiab:numFmt(liab),equity:numFmt(equity),'d:e':liab>0?'1:'+Math.round(equity/liab):'—'};
+    }
+  }
   var icon={'Bar Chart':'📊','Line Chart':'📈','Funnel':'🔻','Gauge':'🎯','Chart':'📉','Table':'📋'}[r.type]||'📊';
   var metricHtml='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px">';
   var entries=Object.entries(r.metrics||{});
@@ -5335,8 +5420,8 @@ function openLeadPanel(leadId,tab){
   const container=document.getElementById('leadSlideOut');
   const content=document.getElementById('leadPanelContent');
   const isClient=['Booking','Downpayment','Installments','Possession','Handover','Completed'].includes(l.status);
-  const tabs=['profile','installments','documents','activities'];
-  const tabLabels=['Profile','Installments','Documents','Activities'];
+  const tabs=['profile','activities'].concat(isClient?['installments','documents']:[]);
+  const tabLabels=['Profile','Activities'].concat(isClient?['Installments','Documents']:[]);
   let tabContent='';
   if(tab==='profile'){
     tabContent='' +
