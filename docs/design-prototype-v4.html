@@ -440,11 +440,21 @@ window.mockTasks = DB.init('tasks', [
   {id:8,title:'Vendor payment (Shah Cement)',status:'Done',priority:'Low'}
 ]);
 window.mockCampaigns = DB.init('campaigns', [
-  {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:'Tk 1,50,000',leads:45,conversions:8,roi:'320%',status:'Active'},
-  {id:'CAM-002',name:'Jolshiri Launch Event',channel:'On-site Event',budget:'Tk 3,00,000',leads:78,conversions:12,roi:'450%',status:'Completed'},
-  {id:'CAM-003',name:'Billboard - Dhaka EPZ',channel:'Billboard',budget:'Tk 2,40,000',leads:22,conversions:3,roi:'180%',status:'Active'},
-  {id:'CAM-004',name:'Referral Program Q3',channel:'Referral',budget:'Tk 50,000',leads:15,conversions:5,roi:'520%',status:'Active'},
-  {id:'CAM-005',name:'Newspaper Ad - Prothom Alo',channel:'Print',budget:'Tk 1,80,000',leads:30,conversions:4,roi:'210%',status:'Completed'}
+  {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:150000,spent:135000,leads:45,conversions:8,roi:320,startDate:'Jun 01, 2026',endDate:'Aug 31, 2026',status:'Active',target:'5 Katha Plots',notes:'Facebook + Instagram campaign targeting NRB buyers.'},
+  {id:'CAM-002',name:'Jolshiri Launch Event',channel:'On-site Event',budget:300000,spent:285000,leads:78,conversions:12,roi:450,startDate:'Sep 15, 2026',endDate:'Sep 15, 2026',status:'Completed',target:'Apt Bookings',notes:'Grand opening event at Jolshiri site. 120 attendees.'},
+  {id:'CAM-003',name:'Billboard - Dhaka EPZ',channel:'Billboard',budget:240000,spent:240000,leads:22,conversions:3,roi:180,startDate:'Jul 01, 2026',endDate:'Dec 31, 2026',status:'Active',target:'General Awareness',notes:'Signage at 3 key locations near EPZ.'},
+  {id:'CAM-004',name:'Referral Program Q3',channel:'Referral',budget:50000,spent:32000,leads:15,conversions:5,roi:520,startDate:'Jul 01, 2026',endDate:'Sep 30, 2026',status:'Active',target:'All Projects',notes:'Referral bonus: Tk 25,000 per successful booking.'},
+  {id:'CAM-005',name:'Newspaper - Prothom Alo',channel:'Print',budget:180000,spent:180000,leads:30,conversions:4,roi:210,startDate:'Oct 01, 2026',endDate:'Oct 15, 2026',status:'Completed',target:'Muktodhara Plots',notes:'Half-page ad in real estate section.'},
+  {id:'CAM-006',name:'Google Ads - Retargeting',channel:'Online',budget:80000,spent:55000,leads:35,conversions:6,roi:380,startDate:'Aug 01, 2026',endDate:'Oct 31, 2026',status:'Active',target:'Website Visitors',notes:'Retargeting campaign for site visitors.'},
+  {id:'CAM-007',name:'Radio FM Ad',channel:'Radio',budget:120000,spent:90000,leads:18,conversions:2,roi:160,startDate:'Sep 01, 2026',endDate:'Sep 30, 2026',status:'Completed',target:'Brand Awareness',notes:'60-sec spots on Radio Foorti.'},
+  {id:'CAM-008',name:'Agent Partner Program',channel:'Agent',budget:200000,spent:165000,leads:40,conversions:10,roi:400,startDate:'Aug 15, 2026',endDate:'Dec 31, 2026',status:'Active',target:'Referral Network',notes:'Partner agent network with 5% commission.'}
+]);
+window.mockSalesAgents = DB.init('sales_agents', [
+  {id:1,name:'Hasanul Banna',phone:'+880 1711 111111',leads:32,conversions:8,deals:60000000,commission:1800000,rating:4.8,status:'Active',team:'Sales A'},
+  {id:2,name:'Iftekhar Ahmad',phone:'+880 1711 222222',leads:28,conversions:6,deals:42000000,commission:1260000,rating:4.5,status:'Active',team:'Sales A'},
+  {id:3,name:'Sales Team A',phone:'+880 1711 333333',leads:45,conversions:10,deals:75000000,commission:2250000,rating:4.6,status:'Active',team:'Sales A'},
+  {id:4,name:'Shamim Reza',phone:'+880 1711 444444',leads:18,conversions:3,deals:18000000,commission:540000,rating:4.2,status:'Active',team:'Sales B'},
+  {id:5,name:'Nazma Akhter',phone:'+880 1711 555555',leads:12,conversions:2,deals:12000000,commission:360000,rating:3.8,status:'Active',team:'Sales B'}
 ]);
 window.mockDues = DB.init('dues', [
   {id:'BKG-008',customer:'Dr. Rubina Ali',phone:'+1 415 555 0198',project:'Jolshiri Abason',unit:'Apt 4B',totalPrice:6500000,paid:5500000,due:1000000,dueDate:'2026-06-30',daysOverdue:28,status:'Overdue',bucket:'30 Days',lastFollowUp:'3 days ago',promises:[],lateFee:15000,notes:'Client out of country. Will pay on return.'},
@@ -822,38 +832,156 @@ function assignLeadModal(id){
   );
 }
 
+var smTab='dashboard';
 function renderSalesMarketing(el){
-  const act=mockCampaigns.filter(function(c){return c.status==="Active"}).length;
-  const tL=mockCampaigns.reduce(function(s,c){return s+c.leads},0);
-  const tC=mockCampaigns.reduce(function(s,c){return s+c.conversions},0);
-  var pagSM=_pg('campaigns',mockCampaigns);
-  var h="<div class=\"fade-in\"><div class=\"page-title\">Sales & Marketing</div><div class=\"page-subtitle\">"+mockCampaigns.length+" campaigns</div>";
-  h+="<div class=\"stats-row\" style=\"margin-bottom:8px\">";
-  [["Campaigns",mockCampaigns.length,""],["Active",act,"#2e7d32"],["Total Leads",tL,"#1565c0"],["Conversions",tC,"#e65100"]].forEach(function(s){
-    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
-    if(s[2])h+=" style=\"color:"+s[2]+"\"";
-    h+=">"+s[1]+"</div></div>";
-  });
-  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Campaigns</h3><button class=\"action-btn primary\" onclick=\"showToast('New campaign form coming soon','info')\" style=\"padding:4px 8px;font-size:10px\">+ New</button></div>";
-  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Leads</th><th>Conv.</th><th>Rate</th><th>ROI</th><th>Status</th></tr></thead><tbody>";
-  var _cARR=pagSM.items;
-  for(var ci=0;ci<_cARR.length;ci++){
-    var c=_cARR[ci];
-    var roiP=parseInt(c.roi);
-    var roiCol=roiP>=300?"#2e7d32":roiP>=200?"#e65100":"#c62828";
-    h+="<tr><td style=\"font-weight:500\">"+c.name+"<div style=\"font-size:9px;color:#888\">"+c.id+"</div></td>";
-    h+="<td><span style=\"padding:2px 7px;border-radius:4px;font-size:9px;background:#f0f4ff;color:#1565c0\">"+c.channel+"</span></td>";
-    h+="<td>"+c.budget+"</td><td style=\"color:#1565c0;font-weight:600\">"+c.leads+"</td>";
-    h+="<td style=\"color:#2e7d32;font-weight:600\">"+c.conversions+"</td>";
-    h+="<td>"+(c.leads>0?Math.round(c.conversions/c.leads*100):0)+"%</td>";
-    h+="<td style=\"color:"+roiCol+";font-weight:600\">"+c.roi+"</td>";
-    h+="<td><span class=\"badge-status "+(c.status==="Active"?"badge-active":"badge-closed")+"\">"+c.status+"</span></td></tr>";
-  }
-  h+="</tbody></table>"+_pgHtml('campaigns',pagSM.total,pagSM.page,pagSM.totalPages,pagSM.perPage)+"</div></div></div>";
-  el.innerHTML=h;
+  const totalBudget=mockCampaigns.reduce((s,c)=>s+(c.budget||0),0);
+  const totalSpent=mockCampaigns.reduce((s,c)=>s+(c.spent||0),0);
+  const totalLeads=mockCampaigns.reduce((s,c)=>s+(c.leads||0),0);
+  const totalConv=mockCampaigns.reduce((s,c)=>s+(c.conversions||0),0);
+  const activeCamp=mockCampaigns.filter(c=>c.status==='Active').length;
+  const totalDeals=mockSalesAgents.reduce((s,a)=>s+(a.deals||0),0);
+  const totalComm=mockSalesAgents.reduce((s,a)=>s+(a.commission||0),0);
+  const convRate=totalLeads>0?Math.round(totalConv/totalLeads*100):0;
+
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Sales & Marketing</div><div class="page-subtitle">${mockCampaigns.length} campaigns \u00B7 ${totalLeads} leads \u00B7 ${convRate}% conversion \u00B7 \u09F3 ${totalDeals.toLocaleString('en-IN')} in deals</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <div class="tabs">${['dashboard','campaigns','agents','sources'].map(t=>`<div class="tab ${smTab===t?'active':''}" onclick="smTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','campaigns':'\uD83D\uDCE2 Campaigns','agents':'\uD83D\uDC64 Agents','sources':'\uD83D\uDD0D Sources'}[t]}</div>`).join('')}</div>
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="crudCampaign()" style="padding:3px 8px;font-size:10px">+ New Campaign</button>
+    </div>
+    ${smTab==='dashboard'?renderSMDashboard(totalBudget,totalSpent,totalLeads,totalConv,activeCamp,totalDeals,totalComm,convRate):
+      smTab==='campaigns'?renderSMCampaigns():
+      smTab==='agents'?renderSMAgents():
+      smTab==='sources'?renderSMSources():''}
+  </div>`;
 }
 
-var duesTab='dashboard';
+function renderSMDashboard(tB,tS,tL,tC,aC,tD,tCm,cR){
+  const avgROI=mockCampaigns.length>0?Math.round(mockCampaigns.reduce((s,c)=>s+(c.roi||0),0)/mockCampaigns.length):0;
+  return `<div class="stats-row" style="margin-bottom:6px">${[
+    ['Total Budget','\u09F3 '+tB.toLocaleString('en-IN'),'#1565c0'],
+    ['Total Spent','\u09F3 '+tS.toLocaleString('en-IN'),'#e65100'],
+    ['Active Campaigns',aC,'#2e7d32'],
+    ['Total Leads',tL,'#1565c0'],
+    ['Conversions',tC,'#2e7d32'],
+    ['Conv. Rate',cR+'%','#7b1fa2'],
+    ['Avg ROI',avgROI+'%',avgROI>=300?'#2e7d32':avgROI>=200?'#e65100':'#c62828'],
+    ['Agent Deals','\u09F3 '+tD.toLocaleString('en-IN'),'#2e7d32']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+      <div class="card"><div class="card-header"><h3>ROI by Campaign</h3></div><div class="card-body" style="padding:8px">${mockCampaigns.sort((a,b)=>b.roi-a.roi).slice(0,5).map(c=>{
+        const pct=Math.min(100,Math.round(c.roi/5));
+        return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px"><span>'+c.name+'</span><span style="font-weight:600;color:'+(c.roi>=300?'#2e7d32':c.roi>=200?'#e65100':'#c62828')+'">'+c.roi+'%</span></div><div style="height:5px;background:#e0e0e0;border-radius:3px"><div style="width:'+pct+'%;height:5px;background:'+(c.roi>=300?'#2e7d32':c.roi>=200?'#e65100':'#c62828')+';border-radius:3px"></div></div></div>';
+      }).join('')}</div></div>
+      <div class="card"><div class="card-header"><h3>Budget Utilization</h3></div><div class="card-body" style="padding:10px;font-size:10px"><table style="width:100%"><thead><tr><th>Channel</th><th class="num">Budget</th><th class="num">Spent</th><th class="num">Used</th></tr></thead><tbody>${['Social Media','On-site Event','Billboard','Referral','Print','Online','Radio','Agent'].map(function(ch){
+        const items=mockCampaigns.filter(c=>c.channel===ch);
+        const b=items.reduce((s,c)=>s+(c.budget||0),0);
+        const s=items.reduce((s,c)=>s+(c.spent||0),0);
+        if(b===0)return '';
+        return '<tr><td>'+ch+'</td><td class="num">\u09F3 '+b.toLocaleString('en-IN')+'</td><td class="num">\u09F3 '+s.toLocaleString('en-IN')+'</td><td class="num"><span style="color:'+(s/b>0.9?'#c62828':s/b<0.5?'#2e7d32':'#e65100')+'">'+Math.round(s/b*100)+'%</span></td></tr>';
+      }).join('')}</tbody></table></div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>Top Sales Agents</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Agent</th><th>Team</th><th class="num">Leads</th><th class="num">Conversions</th><th>Conv.%</th><th class="num">Deals Value</th><th class="num">Commission</th><th>Rating</th></tr></thead><tbody>${mockSalesAgents.sort((a,b)=>b.deals-a.deals).map(a=>{
+        const ar=a.leads>0?Math.round(a.conversions/a.leads*100):0;
+        return '<tr><td style="font-weight:500">'+a.name+'</td><td style="font-size:9px">'+a.team+'</td><td class="num">'+a.leads+'</td><td class="num" style="font-weight:600;color:#2e7d32">'+a.conversions+'</td><td class="num">'+ar+'%</td><td class="num" style="font-weight:600">\u09F3 '+a.deals.toLocaleString('en-IN')+'</td><td class="num" style="color:#e65100">\u09F3 '+a.commission.toLocaleString('en-IN')+'</td><td><span style="font-weight:600;color:'+(a.rating>=4.5?'#2e7d32':a.rating>=4?'#1565c0':'#e65100')+'">'+a.rating+'</span></td></tr>';
+      }).join('')}</tbody></table></div></div>`;
+}
+
+function renderSMCampaigns(){
+  const sf=(document.getElementById('smFStatus')||{}).value||'';
+  const cf=(document.getElementById('smFChannel')||{}).value||'';
+  var filtered=mockCampaigns.filter(function(c){
+    if(sf&&c.status!==sf)return false;
+    if(cf&&c.channel!==cf)return false;
+    return true;
+  });
+  const pC=_pg('campaigns',filtered);
+  const chs=[...new Set(mockCampaigns.map(c=>c.channel))];
+  return `<div class="toolbar" style="margin-bottom:6px">
+    <select id="smFStatus" onchange="_PG['campaigns']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option>${['Active','Completed'].map(s=>'<option value="'+s+'"'+(sf===s?' selected':'')+'>'+s+'</option>').join('')}</select>
+    <select id="smFChannel" onchange="_PG['campaigns']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Channels</option>${chs.map(c=>'<option value="'+c+'"'+(cf===c?' selected':'')+'>'+c+'</option>').join('')}</select>
+    <div class="spacer"></div>
+    <button class="action-btn primary" onclick="crudCampaign()" style="padding:3px 8px;font-size:10px">+ New Campaign</button>
+  </div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Campaign</th><th>Channel</th><th class="num">Budget</th><th class="num">Spent</th><th>Period</th><th class="num">Leads</th><th class="num">Conv.</th><th class="num">Conv.%</th><th>ROI</th><th>Status</th></tr></thead><tbody>${
+    pC.items.map(function(c){
+      const cr=c.leads>0?Math.round(c.conversions/c.leads*100):0;
+      return '<tr style="cursor:pointer" onclick="openCampaign(\''+c.id+'\')"><td style="font-weight:500">'+c.name+'<div style="font-size:8px;color:#888">'+c.id+'</div></td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+c.channel+'</span></td><td class="num">\u09F3 '+c.budget.toLocaleString('en-IN')+'</td><td class="num">\u09F3 '+c.spent.toLocaleString('en-IN')+'</td><td style="font-size:8px;color:#888">'+c.startDate+'\u2013'+c.endDate+'</td><td class="num" style="font-weight:600;color:#1565c0">'+c.leads+'</td><td class="num" style="font-weight:600;color:#2e7d32">'+c.conversions+'</td><td class="num">'+cr+'%</td><td style="font-weight:600;color:'+(c.roi>=300?'#2e7d32':c.roi>=200?'#e65100':'#c62828')+'">'+c.roi+'%</td><td><span class="badge-status '+(c.status==='Active'?'badge-active':'badge-closed')+'">'+c.status+'</span></td></tr>';
+    }).join('')
+  }</tbody></table>${_pgHtml('campaigns',pC.total,pC.page,pC.totalPages,pC.perPage)}</div></div></div>`;
+}
+
+function renderSMAgents(){
+  const pA=_pg('agents',mockSalesAgents);
+  return `<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">${[
+    ['Total Agents',mockSalesAgents.length,'#1565c0'],
+    ['Total Deals','\u09F3 '+mockSalesAgents.reduce((s,a)=>s+(a.deals||0),0).toLocaleString('en-IN'),'#2e7d32'],
+    ['Avg Deals/Agent','\u09F3 '+Math.round(mockSalesAgents.reduce((s,a)=>s+(a.deals||0),0)/mockSalesAgents.length).toLocaleString('en-IN'),'#7b1fa2'],
+    ['Total Commission','\u09F3 '+mockSalesAgents.reduce((s,a)=>s+(a.commission||0),0).toLocaleString('en-IN'),'#e65100']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div class="card"><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Agent</th><th>Team</th><th>Phone</th><th class="num">Leads</th><th class="num">Conversions</th><th>Rate</th><th class="num">Deals Value</th><th class="num">Commission</th><th>Rating</th><th>Status</th></tr></thead><tbody>${
+    pA.items.map(a=>{
+      const ar=a.leads>0?Math.round(a.conversions/a.leads*100):0;
+      return '<tr><td style="font-weight:500">'+a.name+'</td><td style="font-size:9px">'+a.team+'</td><td style="font-size:9px;color:#555">'+a.phone+'</td><td class="num">'+a.leads+'</td><td class="num" style="font-weight:600;color:#2e7d32">'+a.conversions+'</td><td class="num">'+ar+'%</td><td class="num" style="font-weight:600">\u09F3 '+a.deals.toLocaleString('en-IN')+'</td><td class="num" style="color:#e65100">\u09F3 '+a.commission.toLocaleString('en-IN')+'</td><td><span style="font-weight:600;color:'+(a.rating>=4.5?'#2e7d32':a.rating>=4?'#1565c0':'#e65100')+'">'+a.rating+'</span></td><td><span class="badge-status badge-active">'+a.status+'</span></td></tr>';
+    }).join('')
+  }</tbody></table>${_pgHtml('agents',pA.total,pA.page,pA.totalPages,pA.perPage)}</div></div></div>`;
+}
+
+function renderSMSources(){
+  const srcMap={};mockCampaigns.forEach(function(c){srcMap[c.channel]=(srcMap[c.channel]||0)+c.leads;});
+  const convMap={};mockCampaigns.forEach(function(c){convMap[c.channel]=(convMap[c.channel]||0)+c.conversions;});
+  const roiMap={};mockCampaigns.forEach(function(c){roiMap[c.channel]=(roiMap[c.channel]||0)+c.roi;});
+  const chCount={};mockCampaigns.forEach(function(c){chCount[c.channel]=(chCount[c.channel]||0)+1;});
+  const total=Object.values(srcMap).reduce((s,v)=>s+v,0);
+  return `<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">${
+    Object.keys(srcMap).map(function(ch){
+      const leads=srcMap[ch],conv=convMap[ch]||0,cr=leads>0?Math.round(conv/leads*100):0,roi=Math.round((roiMap[ch]||0)/chCount[ch]);
+      return '<div class="stat-card" style="text-align:left;padding:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-weight:600;font-size:10px">'+ch+'</span><span style="font-size:8px;color:#888">'+chCount[ch]+' campaigns</span></div><div style="display:flex;gap:8px;font-size:9px"><span style="color:#1565c0">'+leads+' leads</span><span style="font-weight:600;color:#2e7d32">'+cr+'% CR</span><span style="font-weight:600;color:'+(roi>=300?'#2e7d32':roi>=200?'#e65100':'#c62828')+'">'+roi+'% ROI</span></div></div>';
+    }).join('')
+  }</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+    <div class="card"><div class="card-header"><h3>Lead Sources</h3></div><div class="card-body" style="padding:10px">${Object.keys(srcMap).sort((a,b)=>srcMap[b]-srcMap[a]).slice(0,6).map(ch=>{
+      const pct=total>0?Math.round(srcMap[ch]/total*100):0;
+      return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:1px"><span>'+ch+'</span><span style="font-weight:600">'+srcMap[ch]+' ('+pct+'%)</span></div><div style="height:5px;background:#e0e0e0;border-radius:3px"><div style="width:'+pct+'%;height:5px;background:#1565c0;border-radius:3px"></div></div></div>';
+    }).join('')}</div></div>
+    <div class="card"><div class="card-header"><h3>Conversion by Source</h3></div><div class="card-body" style="padding:10px">${Object.keys(convMap).sort((a,b)=>srcMap[b]-srcMap[a]).slice(0,6).map(ch=>{
+      const leads=srcMap[ch]||0,conv=convMap[ch]||0,cr=leads>0?Math.round(conv/leads*100):0;
+      return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:1px"><span>'+ch+'</span><span style="font-weight:600;color:'+(cr>=15?'#2e7d32':cr>=10?'#e65100':'#c62828')+'">'+conv+'/'+leads+' ('+cr+'%)</span></div><div style="height:5px;background:#e0e0e0;border-radius:3px"><div style="width:'+Math.min(100,cr*5)+'%;height:5px;background:'+(cr>=15?'#2e7d32':cr>=10?'#e65100':'#c62828')+';border-radius:3px"></div></div></div>';
+    }).join('')}</div></div>
+  </div>`;
+}
+
+function crudCampaign(item){
+  const n=!item;
+  const c=n?{id:null,name:'',channel:'Social Media',budget:0,spent:0,leads:0,conversions:0,roi:0,startDate:'',endDate:'',status:'Active',target:'',notes:''}:item;
+  openModal(n?'New Campaign':'Edit Campaign',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Campaign Name','cam_name',c.name,'',true)+selectField('Channel','cam_ch',c.channel,['Social Media','On-site Event','Billboard','Referral','Print','Online','Radio','Agent'],true)+inputField('Budget (\u09F3)','cam_bgt',c.budget,'number',true)+inputField('Spent (\u09F3)','cam_spent',c.spent,'number')+inputField('Leads Generated','cam_leads',c.leads,'number')+inputField('Conversions','cam_conv',c.conversions,'number')+inputField('Start Date','cam_sd',c.startDate)+inputField('End Date','cam_ed',c.endDate)+selectField('Status','cam_stat',c.status,['Active','Completed'])+inputField('Target Audience','cam_target',c.target)+'</div>'+inputField('Notes','cam_notes',c.notes),
+    function(){
+      const leads=parseInt(g('cam_leads'))||0;
+      const conv=parseInt(g('cam_conv'))||0;
+      const budget=parseInt(g('cam_bgt'))||0;
+      const spent=parseInt(g('cam_spent'))||0;
+      const d={name:g('cam_name'),channel:g('cam_ch'),budget:budget,spent:spent,leads:leads,conversions:conv,roi:budget>0?Math.round(conv*100000/budget):0,startDate:g('cam_sd'),endDate:g('cam_ed'),status:g('cam_stat'),target:g('cam_target'),notes:g('cam_notes')};
+      n?addItem(mockCampaigns,Object.assign({id:'CAM-'+(100+Math.floor(Math.random()*900))},d),'campaigns'):updateItem(mockCampaigns,c.id,d,'campaigns');
+      showToast('Campaign '+(n?'created':'updated')+'!','success');renderModule();
+    }
+  );
+}
+
+function openCampaign(id){
+  const c=mockCampaigns.find(function(x){return x.id===id});if(!c)return;
+  const cr=c.leads>0?Math.round(c.conversions/c.leads*100):0;
+  const util=c.budget>0?Math.round(c.spent/c.budget*100):0;
+  showDetailPanel('Campaign: '+c.name,
+    '<div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">'+
+      [['ID',c.id],['Channel',c.channel],['Budget','\u09F3 '+c.budget.toLocaleString('en-IN')],['Spent','\u09F3 '+c.spent.toLocaleString('en-IN')],['Utilization',util+'%'],['Leads',c.leads],['Conversions',c.conversions],['Conv. Rate',cr+'%'],['ROI',c.roi+'%'],['Target',c.target],['Period',c.startDate+'\u2013'+c.endDate],['Status',c.status]].map(x=>'<div class="stat-card"><div class="label">'+x[0]+'</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:'+(x[0]==='ROI'?(c.roi>=300?'#2e7d32':c.roi>=200?'#e65100':'#c62828'):'#555')+'">'+x[1]+'</div></div>').join('')+
+    '</div>'+
+    (c.notes?'<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Notes</h3><div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;font-size:10px;color:#555">'+c.notes+'</div></div>':'')+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Performance</h3><div style="display:flex;gap:10px"><div style="flex:1"><div style="font-size:9px;color:#888;margin-bottom:2px">Budget Utilization</div><div style="height:6px;background:#e0e0e0;border-radius:3px"><div style="width:'+Math.min(100,util)+'%;height:6px;background:'+(util>90?'#c62828':util>50?'#e65100':'#2e7d32')+';border-radius:3px"></div></div></div><div style="flex:1"><div style="font-size:9px;color:#888;margin-bottom:2px">ROI</div><div style="height:6px;background:#e0e0e0;border-radius:3px"><div style="width:'+Math.min(100,Math.round(c.roi/5))+'%;height:6px;background:'+(c.roi>=300?'#2e7d32':c.roi>=200?'#e65100':'#c62828')+';border-radius:3px"></div></div></div></div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudCampaign(mockCampaigns.find(function(x){return x.id===\''+c.id+'\'}));closeLeadPanel()">\u270E Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+  );
+}
+
 function renderDues(el){
   const totalDue=mockDues.reduce((s,d)=>s+(d.due||0),0);
   const totalPaid=mockDues.reduce((s,d)=>s+(d.paid||0),0);
