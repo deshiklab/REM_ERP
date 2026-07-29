@@ -447,10 +447,14 @@ window.mockCampaigns = DB.init('campaigns', [
   {id:'CAM-005',name:'Newspaper Ad - Prothom Alo',channel:'Print',budget:'Tk 1,80,000',leads:30,conversions:4,roi:'210%',status:'Completed'}
 ]);
 window.mockDues = DB.init('dues', [
-  {id:'BKG-008',customer:'Dr. Rubina Ali',project:'Jolshiri Abason',unit:'Apt 4B',totalPrice:'Tk 65,00,000',paid:'Tk 55,00,000',due:'Tk 10,00,000',dueDate:'2026-06-30',daysOverdue:28,status:'Overdue',bucket:'30 Days'},
-  {id:'BKG-012',customer:'Md. Taher Uddin',project:'Muktodhara Green Park',unit:'Plot 17',totalPrice:'Tk 28,00,000',paid:'Tk 20,00,000',due:'Tk 8,00,000',dueDate:'2026-07-15',daysOverdue:13,status:'Overdue',bucket:'15 Days'},
-  {id:'BKG-015',customer:'Engr. Salahuddin',project:'Muktodhara Green Park',unit:'Plot 22',totalPrice:'Tk 32,00,000',paid:'Tk 24,00,000',due:'Tk 8,00,000',dueDate:'2026-05-15',daysOverdue:74,status:'Critical',bucket:'60+ Days'},
-  {id:'BKG-010',customer:'Mrs. Jahanara Begum',project:'Jolshiri Abason',unit:'Apt 3C',totalPrice:'Tk 58,00,000',paid:'Tk 48,00,000',due:'Tk 10,00,000',dueDate:'2026-08-15',daysOverdue:-18,status:'Upcoming',bucket:'Future'}
+  {id:'BKG-008',customer:'Dr. Rubina Ali',phone:'+1 415 555 0198',project:'Jolshiri Abason',unit:'Apt 4B',totalPrice:6500000,paid:5500000,due:1000000,dueDate:'2026-06-30',daysOverdue:28,status:'Overdue',bucket:'30 Days',lastFollowUp:'3 days ago',promises:[],lateFee:15000,notes:'Client out of country. Will pay on return.'},
+  {id:'BKG-012',customer:'Md. Taher Uddin',phone:'+880 1713 444444',project:'Muktodhara Green Park',unit:'Plot 17',totalPrice:2800000,paid:2000000,due:800000,dueDate:'2026-07-15',daysOverdue:13,status:'Overdue',bucket:'15 Days',lastFollowUp:'Yesterday',promises:[{date:'2026-07-20',amount:400000,kept:true}],lateFee:8000,notes:'Paid partial. Promised balance by end of month.'},
+  {id:'BKG-015',customer:'Engr. Salahuddin',phone:'+880 1714 555555',project:'Muktodhara Green Park',unit:'Plot 22',totalPrice:3200000,paid:2400000,due:800000,dueDate:'2026-05-15',daysOverdue:74,status:'Critical',bucket:'60+ Days',lastFollowUp:'1 week ago',promises:[{date:'2026-06-01',amount:800000,kept:false},{date:'2026-07-01',amount:400000,kept:false}],lateFee:45000,notes:'Legal notice sent. Escalate to collection agent.'},
+  {id:'BKG-010',customer:'Mrs. Jahanara Begum',phone:'+880 1712 333333',project:'Jolshiri Abason',unit:'Apt 3C',totalPrice:5800000,paid:4800000,due:1000000,dueDate:'2026-08-15',daysOverdue:-18,status:'Upcoming',bucket:'Future',lastFollowUp:'—',promises:[],lateFee:0,notes:'On schedule. Next installment due Aug 15.'},
+  {id:'BKG-018',customer:'Shamim Reza',phone:'+880 1700 111111',project:'Muktodhara Green Park',unit:'Plot 5',totalPrice:4500000,paid:3500000,due:1000000,dueDate:'2026-07-28',daysOverdue:0,status:'Due Today',bucket:'Due Today',lastFollowUp:'2 days ago',promises:[],lateFee:0,notes:'Reminder sent via SMS. Awaiting confirmation.'},
+  {id:'BKG-020',customer:'Mr. Abdul Karim',phone:'+971 55 777 8888',project:'Jolshiri Abason',unit:'Apt 12B',totalPrice:8000000,paid:5000000,due:3000000,dueDate:'2026-05-01',daysOverdue:88,status:'Critical',bucket:'60+ Days',lastFollowUp:'2 weeks ago',promises:[{date:'2026-06-15',amount:1000000,kept:false},{date:'2026-07-15',amount:500000,kept:false}],lateFee:90000,notes:'NRB client. Difficult to reach. Consider legal action.'},
+  {id:'BKG-022',customer:'Fatima Begum',phone:'+880 1711 543210',project:'Jolshiri Abason',unit:'3 Katha Plot',totalPrice:3500000,paid:3000000,due:500000,dueDate:'2026-07-10',daysOverdue:18,status:'Overdue',bucket:'15 Days',lastFollowUp:'5 days ago',promises:[{date:'2026-07-25',amount:500000,kept:null}],lateFee:5000,notes:'Promised full payment by July 25. Following up.'},
+  {id:'BKG-025',customer:'Nazma Akhter',phone:'+880 1715 666666',project:'Jolshiri Abason',unit:'Apt 7A',totalPrice:4200000,paid:3500000,due:700000,dueDate:'2026-09-01',daysOverdue:-33,status:'Upcoming',bucket:'Future',lastFollowUp:'—',promises:[],lateFee:0,notes:'First installment due Sep 1, 2026.'}
 ]);
 window.mockEmployees = DB.init('employees', [
   {id:1,name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',status:'active'},
@@ -849,38 +853,200 @@ function renderSalesMarketing(el){
   el.innerHTML=h;
 }
 
+var duesTab='dashboard';
 function renderDues(el){
-  var crit=mockDues.filter(function(d){return d.status==="Critical"}).length;
-  var over=mockDues.filter(function(d){return d.status==="Overdue"}).length;
-  var tot=mockDues.reduce(function(s,d){return s+parseInt(d.due.replace(/[^0-9]/g,""))},0);
-  var pagD=_pg('dues',mockDues);
-  var h="<div class=\"fade-in\"><div class=\"page-title\">Dues & Recovery</div><div class=\"page-subtitle\">"+mockDues.length+" accounts</div>";
-  h+="<div class=\"stats-row\" style=\"margin-bottom:8px\">";
-  [["Total Dues",mockDues.length,""],["Critical",crit,"#c62828"],["Overdue",over,"#e65100"],["Due Amount","Tk "+tot.toLocaleString(),""]].forEach(function(s){
-    h+="<div class=\"stat-card\"><div class=\"label\">"+s[0]+"</div><div class=\"value\"";
-    if(s[2])h+=" style=\"color:"+s[2]+"\"";
-    h+=">"+s[1]+"</div></div>";
+  const totalDue=mockDues.reduce((s,d)=>s+(d.due||0),0);
+  const totalPaid=mockDues.reduce((s,d)=>s+(d.paid||0),0);
+  const totalLateFee=mockDues.reduce((s,d)=>s+(d.lateFee||0),0);
+  const critical=mockDues.filter(d=>d.status==='Critical').length;
+  const overdue=mockDues.filter(d=>d.status==='Overdue').length;
+  const upcoming=mockDues.filter(d=>d.status==='Upcoming'||d.status==='Due Today').length;
+  const promiseSum=mockDues.reduce((s,d)=>{const p=d.promises||[];return s+p.filter(x=>x.kept===null).reduce((a,x)=>a+(x.amount||0),0);},0);
+  const keptPromises=mockDues.reduce((s,d)=>{const p=d.promises||[];return s+p.filter(x=>x.kept===true).length;},0);
+
+  el.innerHTML=`<div class="fade-in">
+    <div class="page-title">Dues & Recovery</div><div class="page-subtitle">${mockDues.length} accounts · \u09F3 ${totalDue.toLocaleString('en-IN')} outstanding · \u09F3 ${totalLateFee.toLocaleString('en-IN')} late fees</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <div class="tabs">${['dashboard','all_dues','promises'].map(t=>`<div class="tab ${duesTab===t?'active':''}" onclick="duesTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','all_dues':'\uD83D\uDCCB All Dues','promises':'\uD83E\uDD1D Promises'}[t]}</div>`).join('')}</div>
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="recordDuesPayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button>
+    </div>
+    ${duesTab==='dashboard'?renderDuesDashboard(totalDue,totalPaid,totalLateFee,critical,overdue,upcoming):
+      duesTab==='all_dues'?renderDuesList():
+      duesTab==='promises'?renderDuesPromises():''}
+  </div>`;
+}
+
+function renderDuesDashboard(tDue,tPaid,tLF,crit,over,upc){
+  const buckets={'60+ Days':mockDues.filter(d=>d.bucket==='60+ Days').reduce((s,d)=>s+d.due,0),
+    '30 Days':mockDues.filter(d=>d.bucket==='30 Days').reduce((s,d)=>s+d.due,0),
+    '15 Days':mockDues.filter(d=>d.bucket==='15 Days').reduce((s,d)=>s+d.due,0),
+    'Future':mockDues.filter(d=>d.bucket==='Future'||d.bucket==='Due Today').reduce((s,d)=>s+d.due,0)};
+  const totCollected=mockDues.reduce((s,d)=>s+(d.paid||0),0);
+  const collEff=tDue>0?Math.round(totCollected/(totCollected+tDue)*100):0;
+  const dso=mockDues.length>0?Math.round(tDue/(tPaid/mockDues.length)):0;
+  return `<div class="stats-row" style="margin-bottom:6px">${[
+    ['Outstanding','\u09F3 '+tDue.toLocaleString('en-IN'),'#c62828'],
+    ['Collected','\u09F3 '+totCollected.toLocaleString('en-IN'),'#2e7d32'],
+    ['Coll. Efficiency',collEff+'%','#1565c0'],
+    ['Late Fees','\u09F3 '+tLF.toLocaleString('en-IN'),'#e65100'],
+    ['Critical',crit,'#c62828'],
+    ['Overdue',over,'#e65100'],
+    ['Upcoming',upc,'#1565c0'],
+    ['DSO',dso+' days','#7b1fa2']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+      <div class="card"><div class="card-header"><h3>\uD83D\uDCCA Aging Buckets</h3></div><div class="card-body" style="padding:10px">
+        <table style="font-size:10px;width:100%"><thead><tr><th>Bucket</th><th class="num">Amount</th><th class="num">%</th><th></th></tr></thead><tbody>${
+          Object.keys(buckets).map(function(k){
+            const amt=buckets[k],pct=tDue>0?Math.round(amt/tDue*100):0;
+            return '<tr><td style="font-weight:500;color:'+(k==='60+ Days'?'#c62828':k==='30 Days'?'#e65100':k==='15 Days'?'#ff9800':'#1565c0')+'">'+k+'</td><td class="num" style="font-weight:600">\u09F3 '+amt.toLocaleString('en-IN')+'</td><td class="num">'+pct+'%</td><td><div style="width:80px;height:5px;background:#e0e0e0;border-radius:3px"><div style="width:'+pct+'%;height:5px;background:'+(k==='60+ Days'?'#c62828':k==='30 Days'?'#e65100':k==='15 Days'?'#ff9800':'#1565c0')+';border-radius:3px"></div></div></td></tr>';
+          }).join('')
+        }</tbody></table>
+      </div></div>
+      <div class="card"><div class="card-header"><h3>\uD83E\uDD1D Payment Promises</h3></div><div class="card-body" style="padding:10px">
+        ${mockDues.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===null);}).length>0?
+          '<table style="font-size:10px;width:100%"><thead><tr><th>Customer</th><th class="num">Promised</th><th>By</th><th>Status</th></tr></thead><tbody>'+
+          mockDues.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===null);}).map(function(d){
+            const p=d.promises.find(x=>x.kept===null);
+            return '<tr><td style="font-weight:500">'+d.customer+'</td><td class="num" style="font-weight:600">\u09F3 '+p.amount.toLocaleString('en-IN')+'</td><td style="font-size:9px">'+p.date+'</td><td><span class="badge-status badge-pending">Pending</span></td></tr>';
+          }).join('')+'</tbody></table>'
+        :'<div style="text-align:center;padding:12px;color:#888;font-size:10px">No active promises</div>'}
+      </div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>\u26A0\uFE0F Critical Accounts</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Customer</th><th>Phone</th><th>Project</th><th class="num">Due</th><th>Overdue</th><th>Late Fee</th><th>Last Follow-up</th><th>Status</th></tr></thead><tbody>${
+      mockDues.filter(d=>d.status==='Critical').sort((a,b)=>b.daysOverdue-a.daysOverdue).map(function(d){
+        return '<tr style="cursor:pointer" onclick="openDuesDetail(\''+d.id+'\')"><td style="font-weight:500">'+d.customer+'</td><td style="font-size:9px;color:#555">'+d.phone+'</td><td>'+d.project+'</td><td class="num" style="font-weight:600;color:#c62828">\u09F3 '+d.due.toLocaleString('en-IN')+'</td><td style="font-weight:600;color:#c62828">'+d.daysOverdue+'d</td><td class="num" style="color:#e65100">\u09F3 '+d.lateFee.toLocaleString('en-IN')+'</td><td style="font-size:9px;color:#888">'+(d.lastFollowUp||'\u2014')+'</td><td><span class="badge-status badge-sold">'+d.status+'</span></td></tr>';
+      }).join('')
+    }</tbody></table></div></div>`;
+}
+
+function renderDuesList(){
+  const sf=(document.getElementById('duesFStatus')||{}).value||'';
+  const bf=(document.getElementById('duesFBucket')||{}).value||'';
+  var filtered=mockDues.filter(function(d){
+    if(sf&&d.status!==sf)return false;
+    if(bf&&d.bucket!==bf)return false;
+    return true;
   });
-  h+="</div><div class=\"card\"><div class=\"card-header\"><h3>Dues Tracker</h3>";
-  h+="<div style=\"display:flex;gap:5px\"><button class=\"action-btn secondary\" onclick=\"showToast('Export coming soon','info')\" style=\"padding:3px 7px;font-size:9px\">Export</button>";
-  h+="<button class=\"action-btn primary\" onclick=\"showToast('Sending reminders...','info')\" style=\"padding:3px 7px;font-size:9px\">Send Reminders</button></div></div>";
-  h+="<div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table><thead><tr><th>Customer</th><th>Project/Unit</th><th>Total</th><th>Paid</th><th>Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Status</th></tr></thead><tbody>";
-  var _dARR=pagD.items;
-  for(var di=0;di<_dARR.length;di++){
-    var d=_dARR[di];
-    var odCol=d.daysOverdue>0?"#c62828":"#2e7d32";
-    var bCl=d.bucket==="60+ Days"?"badge-sold":d.bucket==="30 Days"?"badge-sold":d.bucket==="15 Days"?"badge-pending":"badge-active";
-    var sCl=d.status==="Critical"?"badge-sold":d.status==="Overdue"?"badge-pending":"badge-active";
-    h+="<tr><td style=\"font-weight:500\">"+d.customer+"<div style=\"font-size:9px;color:#888\">"+d.id+"</div></td>";
-    h+="<td>"+d.project+"<br><span style=\"font-size:9px;color:#888\">"+d.unit+"</span></td>";
-    h+="<td>"+d.totalPrice+"</td><td style=\"color:#2e7d32\">"+d.paid+"</td>";
-    h+="<td style=\"color:#c62828;font-weight:600\">"+d.due+"</td><td style=\"font-size:10px\">"+d.dueDate+"</td>";
-    h+="<td style=\"color:"+odCol+";font-weight:600\">"+(d.daysOverdue>0?d.daysOverdue+"d":"On track")+"</td>";
-    h+="<td><span class=\"badge-status "+bCl+"\">"+d.bucket+"</span></td>";
-    h+="<td><span class=\"badge-status "+sCl+"\">"+d.status+"</span></td></tr>";
+  const pD=_pg('dues',filtered);
+  return `<div class="toolbar" style="margin-bottom:6px">
+    <select id="duesFStatus" onchange="_PG['dues']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option>${['Upcoming','Due Today','Overdue','Critical'].map(s=>'<option value="'+s+'"'+(sf===s?' selected':'')+'>'+s+'</option>').join('')}</select>
+    <select id="duesFBucket" onchange="_PG['dues']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Buckets</option>${['Future','Due Today','15 Days','30 Days','60+ Days'].map(s=>'<option value="'+s+'"'+(bf===s?' selected':'')+'>'+s+'</option>').join('')}</select>
+    <button class="action-btn secondary" onclick="showToast('Export coming soon','info')" style="padding:3px 7px;font-size:9px">Export</button>
+    <button class="action-btn secondary" onclick="showToast('Sending reminders...','info')" style="padding:3px 7px;font-size:9px">Send Reminders</button>
+    <div class="spacer"></div>
+    <button class="action-btn primary" onclick="recordDuesPayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button>
+  </div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Contact</th><th>Project/Unit</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Promises</th><th>Status</th></tr></thead><tbody>${
+    pD.items.map(function(d){
+      const pCount=(d.promises||[]).filter(x=>x.kept===null).length;
+      return '<tr style="cursor:pointer" onclick="openDuesDetail(\''+d.id+'\')"><td style="font-weight:500">'+d.customer+'<div style="font-size:8px;color:#888">'+d.id+'</div></td><td style="font-size:9px;color:#555">'+d.phone+'</td><td>'+d.project+'<br><span style="font-size:8px;color:#888">'+d.unit+'</span></td><td class="num">\u09F3 '+d.totalPrice.toLocaleString('en-IN')+'</td><td class="num" style="color:#2e7d32">\u09F3 '+d.paid.toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:'+(d.status==='Critical'||d.status==='Overdue'?'#c62828':'#1565c0')+'">\u09F3 '+d.due.toLocaleString('en-IN')+'</td><td style="font-size:9px">'+d.dueDate+'</td><td style="font-weight:600;color:'+(d.daysOverdue>0?'#c62828':'#2e7d32')+'">'+(d.daysOverdue>0?d.daysOverdue+'d':'On track')+'</td><td><span class="badge-status '+(d.bucket==='60+ Days'?'badge-sold':d.bucket==='30 Days'||d.bucket==='15 Days'?'badge-pending':'badge-active')+'" style="font-size:8px">'+d.bucket+'</span></td><td style="text-align:center">'+(pCount>0?'<span style="background:#e8f5e9;color:#2e7d32;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">'+pCount+'</span>':'\u2014')+'</td><td><span class="badge-status '+(d.status==='Critical'?'badge-sold':d.status==='Overdue'?'badge-pending':'badge-active')+'">'+d.status+'</span></td></tr>';
+    }).join('')
+  }</tbody></table>${_pgHtml('dues',pD.total,pD.page,pD.totalPages,pD.perPage)}</div></div></div>`;
+}
+
+function renderDuesPromises(){
+  const all=mockDues.filter(d=>{const p=d.promises||[];return p.length>0;});
+  const active=all.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===null);});
+  const kept=all.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===true);});
+  const broken=all.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===false);});
+  return `<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">${[
+    ['Active Promises',active.length,'#e65100'],
+    ['Kept Promises',kept.length,'#2e7d32'],
+    ['Broken Promises',broken.length,'#c62828'],
+    ['Promise Amount','\u09F3 '+active.reduce((s,d)=>{const p=d.promises||[];const a=p.find(x=>x.kept===null);return s+(a?a.amount:0);},0).toLocaleString('en-IN'),'#1565c0']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div class="card"><div class="card-header"><h3>\uD83D\uDCCB Payment Promises</h3><button class="action-btn primary" onclick="recordPromise()" style="padding:3px 8px;font-size:10px">+ Record Promise</button></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Customer</th><th class="num">Promised Amount</th><th>Promise Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
+    active.map(function(d){
+      const p=d.promises.find(x=>x.kept===null);
+      return '<tr><td style="font-weight:500">'+d.customer+'</td><td class="num" style="font-weight:600">\u09F3 '+p.amount.toLocaleString('en-IN')+'</td><td>'+p.date+'</td><td><span class="badge-status badge-pending">Awaiting</span></td><td><span style="color:#2e7d32;cursor:pointer;font-size:10px" onclick="markPromiseKept(\''+d.id+'\')">\u2713 Keep</span> <span style="color:#c62828;cursor:pointer;font-size:10px" onclick="markPromiseBroken(\''+d.id+'\')">\u2715 Break</span></td></tr>';
+    }).join('')
+  }</tbody></table></div></div>
+  ${broken.length>0?`<div class="card" style="margin-top:8px"><div class="card-header"><h3>\u274C Broken Promises</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Customer</th><th class="num">Amount</th><th>Date</th><th>Follow-up</th></tr></thead><tbody>${
+    broken.map(function(d){
+      const p=d.promises.filter(x=>x.kept===false).slice(-1)[0];
+      return '<tr><td style="font-weight:500">'+d.customer+'</td><td class="num" style="font-weight:600;color:#c62828">\u09F3 '+p.amount.toLocaleString('en-IN')+'</td><td>'+p.date+'</td><td style="font-size:9px;color:#888">'+(d.lastFollowUp||'\u2014')+'</td></tr>';
+    }).join('')
+  }</tbody></table></div></div>`:''}`;
+}
+
+function recordDuesPayment(){
+  const customers=mockDues.map(function(d){return d.customer+' ('+d.id+')';});
+  openModal('Record Payment',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+selectField('Account','rp_dues_cust',customers[0],customers,true)+inputField('Amount (৳)','rp_dues_amt','','number',true)+selectField('Payment Mode','rp_dues_mode','Bank Transfer',['Cash','Bank Transfer','Cheque','bKash','Nagad','Card'])+inputField('Reference','rp_dues_ref','')+inputField('Date','rp_dues_date',new Date().toISOString().slice(0,10))+'</div>',
+    function(){
+      const amt=parseInt(document.getElementById('rp_dues_amt').value)||0;
+      if(!amt)return showToast('Enter a valid amount','error');
+      const sel=document.getElementById('rp_dues_cust').value;
+      const id=sel.match(/\(([^)]+)\)/);
+      if(!id)return showToast('Invalid account','error');
+      const d=mockDues.find(function(x){return x.id===id[1]});
+      if(!d)return showToast('Account not found','error');
+      d.paid+=amt;d.due-=amt;
+      if(d.due<=0){d.status='Upcoming';d.bucket='Future';d.daysOverdue=0;}
+      d.notes+=' | Payment of \u09F3 '+amt.toLocaleString('en-IN')+' on '+document.getElementById('rp_dues_date').value+' via '+document.getElementById('rp_dues_mode').value;
+      DB.save('dues');
+      showToast('Payment recorded!','success');renderModule();
+    }
+  );
+}
+
+function recordPromise(){
+  const customers=mockDues.map(function(d){return d.customer+' ('+d.id+')';});
+  openModal('Record Payment Promise',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+selectField('Customer','rp_cust',customers[0],customers,true)+inputField('Promised Amount (৳)','rp_p_amt','','number',true)+inputField('Promise Date','rp_p_date','','date',true)+inputField('Notes','rp_p_notes','')+'</div>',
+    function(){
+      const amt=parseInt(document.getElementById('rp_p_amt').value)||0;
+      if(!amt)return showToast('Enter a valid amount','error');
+      const sel=document.getElementById('rp_cust').value;
+      const id=sel.match(/\(([^)]+)\)/);
+      if(!id)return showToast('Invalid account','error');
+      const d=mockDues.find(function(x){return x.id===id[1]});
+      if(!d)return showToast('Account not found','error');
+      d.promises=d.promises||[];
+      d.promises.push({date:document.getElementById('rp_p_date').value||new Date().toISOString().slice(0,10),amount:amt,kept:null});
+      d.notes+=' | Promise: \u09F3 '+amt.toLocaleString('en-IN')+' by '+document.getElementById('rp_p_date').value;
+      DB.save('dues');
+      showToast('Promise recorded!','success');renderModule();
+    }
+  );
+}
+
+function markPromiseKept(id){
+  const d=mockDues.find(function(x){return x.id===id});if(!d)return;
+  const p=d.promises.find(function(x){return x.kept===null});if(!p)return;
+  p.kept=true;
+  d.notes+=' | Promise of \u09F3 '+p.amount.toLocaleString('en-IN')+' kept on '+new Date().toISOString().slice(0,10);
+  DB.save('dues');renderModule();showToast('\u2713 Promise kept!','success');
+}
+
+function markPromiseBroken(id){
+  const d=mockDues.find(function(x){return x.id===id});if(!d)return;
+  const p=d.promises.find(function(x){return x.kept===null});if(!p)return;
+  p.kept=false;
+  d.daysOverdue+=7;d.status='Critical';d.bucket='60+ Days';
+  d.notes+=' | Promise broken: \u09F3 '+p.amount.toLocaleString('en-IN');
+  DB.save('dues');renderModule();showToast('Promise marked as broken','error');
+}
+
+function openDuesDetail(id){
+  const d=mockDues.find(function(x){return x.id===id});if(!d)return;
+  var pHtml='';
+  if(d.promises&&d.promises.length>0){
+    pHtml='<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Promises</h3><table style="font-size:10px;width:100%"><thead><tr><th>Date</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>';
+    d.promises.forEach(function(p){
+      pHtml+='<tr><td>'+p.date+'</td><td class="num">\u09F3 '+p.amount.toLocaleString('en-IN')+'</td><td><span style="color:'+(p.kept===true?'#2e7d32':p.kept===false?'#c62828':'#e65100')+'">'+(p.kept===true?'\u2713 Kept':p.kept===false?'\u2715 Broken':'Awaiting')+'</span></td></tr>';
+    });
+    pHtml+='</tbody></table></div>';
   }
-  h+="</tbody></table>"+_pgHtml('dues',pagD.total,pagD.page,pagD.totalPages,pagD.perPage)+"</div></div></div>";
-  el.innerHTML=h;
+  showDetailPanel('Dues: '+d.customer,
+    '<div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">'+
+      [['Customer',d.customer],['Phone',d.phone],['Project',d.project],['Unit',d.unit],['Total Price','\u09F3 '+d.totalPrice.toLocaleString('en-IN')],['Paid','\u09F3 '+d.paid.toLocaleString('en-IN')],['Due','\u09F3 '+d.due.toLocaleString('en-IN')],['Due Date',d.dueDate],['Overdue',d.daysOverdue>0?d.daysOverdue+' days':'On track'],['Late Fee','\u09F3 '+d.lateFee.toLocaleString('en-IN')],['Bucket',d.bucket],['Status',d.status]].map(x=>'<div class="stat-card"><div class="label">'+x[0]+'</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:'+(x[0]==='Due'?'#c62828':x[0]==='Paid'?'#2e7d32':'inherit')+'">'+x[1]+'</div></div>').join('')+
+    '</div>'+pHtml+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Notes</h3><div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;font-size:10px;color:#555">'+(d.notes||'No notes')+'</div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="recordDuesPayment();closeLeadPanel()">\u09F3 Record Payment</button><button class="lead-foot-btn success" onclick="recordPromise();closeLeadPanel()">\uD83E\uDD1D Record Promise</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+  );
 }
 
 function renderPlots(el){
