@@ -482,12 +482,31 @@ window.mockLeads = DB.init('leads', [
   {id:11,name:'Nazma Akhter',phone:'+880 1715 666666',email:'nazma@example.com',property:'Jolshiri - Apt 7A',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳1.6 Cr',lastContact:'3d ago',owner:'Sales Team A',nextFollowUp:'Tomorrow, 10:00 AM',paymentStatus:'—',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team A',date:'3 days ago',text:'Referred by Kamrul Hasan. Interested in 3BR apartment.'}]},
   {id:12,name:'Mr. Abdul Karim',phone:'+971 55 777 8888',email:'karim@example.com',property:'Jolshiri - Apt 12B',status:'Installments',priority:'High',type:'NRB',source:'Facebook',value:'৳2.8 Cr',lastContact:'5h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 2:00 PM',paymentStatus:'Up to Date',
    installments:[{date:'Oct 05, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Nov 05, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Dec 05, 2024',amount:'৳5,00,000',status:'Upcoming'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'Passport_Copy.pdf',type:'ID Document'}],activities:[{type:'Payment',user:'System',date:'Nov 05, 2024',text:'2nd installment of 5 Lac received.'},{type:'Call',user:'Hasanul Banna',date:'1 week ago',text:'Client confirmed 3rd installment schedule.'}]}
+,
+  {id:13,name:'Nadia Akhter',phone:'+880 1712 545454',email:'nadia.a@gmail.com',property:'Jolshiri - 5 Katha',status:'New Inquiry',priority:'Medium',type:'NRB',source:'Facebook',value:'₹3.2 Cr',lastContact:'1h ago',owner:'Sales Team A',nextFollowUp:'Today, 4:00 PM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:14,name:'Shahidul Islam',phone:'+880 1913 232323',email:'shahidul@outlook.com',property:'Muktodhara - Plot 15',status:'Site Visit',priority:'High',type:'Local',source:'Referral',value:'₹1.8 Cr',lastContact:'3h ago',owner:'Hasanul Banna',nextFollowUp:'Tomorrow, 10:00 AM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:15,name:'Farzana Yasmin',phone:'+880 1814 565656',email:'farzana.y@gmail.com',property:'Jolshiri - Apt 7B',status:'Contacted',priority:'Low',type:'NRB',source:'Website',value:'₹2.5 Cr',lastContact:'6h ago',owner:'Sales Team B',nextFollowUp:'Wed, 2:00 PM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:16,name:'Md. Jahangir Alam',phone:'+880 1715 787878',email:'jahangir@bizmail.com',property:'Green Valley - 3 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Walk-in',value:'₹1.2 Cr',lastContact:'Yesterday',owner:'Hasanul Banna',nextFollowUp:'Thu, 11:00 AM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:17,name:'Shamima Sultana',phone:'+880 1916 898989',email:'shamima.s@gmail.com',property:'Jolshiri - 8 Katha',status:'New Inquiry',priority:'Medium',type:'Local',source:'Billboard',value:'₹4.5 Cr',lastContact:'2h ago',owner:'Sales Team A',nextFollowUp:'Fri, 3:00 PM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:18,name:'Delwar Hossain',phone:'+880 1817 909090',email:'delwar.h@yahoo.com',property:'Muktodhara - Apt 4C',status:'Downpayment',priority:'Medium',type:'NRB',source:'Agent',value:'₹1.6 Cr',lastContact:'4h ago',owner:'Sales Team B',nextFollowUp:'Sat, 12:00 PM',paymentStatus:'Partial',notes:[],activities:[]},
+  {id:19,name:'Rashida Begum',phone:'+880 1718 121212',email:'rashida.b@email.com',property:'Skyline - Apt 12A',status:'Installments',priority:'Low',type:'Local',source:'Referral',value:'₹3.8 Cr',lastContact:'Yesterday',owner:'Sales Team A',nextFollowUp:'Mon, 10:30 AM',paymentStatus:'Up to Date',notes:[],activities:[{type:'Note',user:'Sales Team A',date:'Yesterday, 4:30 PM',text:'Client made 2nd installment payment.'}]},
+  {id:20,name:'Mizanur Rahman',phone:'+880 1919 343434',email:'mizan.r@gmail.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'High',type:'Local',source:'Facebook',value:'₹2.0 Cr',lastContact:'30m ago',owner:'Hasanul Banna',nextFollowUp:'Today, 5:30 PM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:21,name:'Nasrin Akter',phone:'+880 1820 565656',email:'nasrin.a@outlook.com',property:'Green Valley - 5 Katha',status:'New Inquiry',priority:'Low',type:'NRB',source:'Website',value:'₹2.8 Cr',lastContact:'1d ago',owner:'Sales Team B',nextFollowUp:'Wed, 11:00 AM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:22,name:'Abdur Rahim',phone:'+880 1711 778899',email:'arahim@email.com',property:'Muktodhara - 8 Katha',status:'Contacted',priority:'Medium',type:'Local',source:'Walk-in',value:'₹5.0 Cr',lastContact:'5h ago',owner:'Sales Team A',nextFollowUp:'Thu, 2:00 PM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:23,name:'Selina Begum',phone:'+880 1912 334455',email:'selina@gmail.com',property:'Jolshiri - Apt 5C',status:'Negotiation',priority:'High',type:'Local',source:'Referral',value:'₹2.2 Cr',lastContact:'2d ago',owner:'Hasanul Banna',nextFollowUp:'Fri, 10:00 AM',paymentStatus:'Pending',notes:[],activities:[{type:'Meeting',user:'Hasanul Banna',date:'2d ago',text:'Client visited project site. Very interested.'}]},
+  {id:24,name:'Kazi Nizam',phone:'+880 1813 667788',email:'kazi.n@bizmail.com',property:'Skyline - Penthouse',status:'New Inquiry',priority:'High',type:'NRB',source:'Agent',value:'₹7.5 Cr',lastContact:'1h ago',owner:'Sales Team B',nextFollowUp:'Today, 6:00 PM',paymentStatus:'Pending',notes:[],activities:[]},
+  {id:25,name:'Laily Akhter',phone:'+880 1714 990011',email:'laily@gmail.com',property:'Muktodhara - 3 Katha',status:'Booked',priority:'Low',type:'Local',source:'Facebook',value:'₹95 Lac',lastContact:'3d ago',owner:'Sales Team A',nextFollowUp:'—',paymentStatus:'Partial',notes:[],activities:[{type:'Note',user:'System',date:'3d ago',text:'Booking converted successfully.'}]}
 ]);
 window.mockProjects = DB.init('projects', [
   {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
   {id:'P-102',name:'Jolshiri Abason',type:'flat',location:'Rupganj, Narayanganj',status:'In Progress',progress:42,budget:'৳120.0 Cr',manager:'Iftekhar Ahmad',units:48,stats:{sold:36,reserved:2,available:10}},
   {id:'P-103',name:'Green Valley Estate',type:'land',location:'Savar, Dhaka',status:'Planning',progress:10,budget:'৳25.0 Cr',manager:'Tariqul Islam',plots:80,stats:{sold:20,reserved:10,available:50}},
   {id:'P-104',name:'Skyline Towers',type:'flat',location:'Bashundhara, Dhaka',status:'Near Completion',progress:85,budget:'৳80.0 Cr',manager:'Rubina Ali',units:36,stats:{sold:30,reserved:4,available:2}}
+,
+  {id:'P-105',name:'Riverside Heights',type:'land',location:'Keraniganj, Dhaka',status:'Planning',progress:10,budget:'₹35.0 Cr',manager:'Mohiuddin Sir',plots:80,stats:{sold:0,reserved:10,available:70},start:'2026-Q3',desc:'Premium riverfront plotted development with 80 residential plots'},
+  {id:'P-106',name:'Uttara Lake View',type:'land',location:'Uttara Sector 18, Dhaka',status:'Planning',progress:5,budget:'₹28.0 Cr',manager:'MD Hasanul Banna',plots:60,stats:{sold:5,reserved:8,available:47},start:'2026-Q4',desc:'Lake view plots with modern amenities'},
+  {id:'P-107',name:'Ashulia Smart Town',type:'land',location:'Ashulia, Savar',status:'Planning',progress:3,budget:'₹60.0 Cr',manager:'Mohiuddin Sir',plots:200,stats:{sold:0,reserved:15,available:185},start:'2027-Q1',desc:'Large-scale smart township with integrated facilities'},
+  {id:'P-108',name:'Mirpur Garden Residency',type:'apartment',location:'Mirpur 12, Dhaka',status:'Planning',progress:8,budget:'₹22.0 Cr',manager:'Engr. Khan',units:48,stats:{sold:4,reserved:6,available:38},start:'2026-Q3',desc:'Mid-rise apartment complex with garden'}
 ]);
 window.mockPlots = DB.init('plots', [
   {id:'M-101',type:'3 Katha',status:'sold',block:'A'},{id:'M-102',type:'3 Katha',status:'available',block:'A'},{id:'M-103',type:'5 Katha',status:'reserved',block:'A'},{id:'M-104',type:'5 Katha',status:'not_acquired',block:'A'},
@@ -498,6 +517,13 @@ window.mockBookings = DB.init('bookings', [
   {id:'BKG-102',client:'Dr. Rubina Ali',date:'Oct 15, 2024',property:'Jolshiri Abason',unit:'Apt 4B',price:'৳2.2 Cr',advance:'৳2,00,000',status:'Pending Review',type:'Flat'},
   {id:'BKG-103',client:'Tariqul Islam',date:'Nov 1, 2024',property:'Muktodhara',unit:'Plot M-103',price:'৳46.0L',advance:'৳11,50,000',status:'Confirmed',type:'Plot'},
   {id:'BKG-104',client:'Fatima Begum',date:'Nov 5, 2024',property:'Green Valley',unit:'Plot G-22',price:'৳32.0L',advance:'৳8,00,000',status:'Pending Review',type:'Plot'}
+,
+  {id:'BKG-105',client:'Shahidul Islam',date:'Jun 10, 2026',property:'Muktodhara Green Park',unit:'Plot 15',price:'₹1.8 Cr',advance:'₹5,00,000',status:'Confirmed',type:'Plot'},
+  {id:'BKG-106',client:'Mizanur Rahman',date:'Jun 08, 2026',property:'Jolshiri Abason',unit:'3 Katha',price:'₹2.0 Cr',advance:'₹6,00,000',status:'Pending Review',type:'Plot'},
+  {id:'BKG-107',client:'Delwar Hossain',date:'Jun 05, 2026',property:'Muktodhara Green Park',unit:'Apt 4C',price:'₹1.6 Cr',advance:'₹8,00,000',status:'Confirmed',type:'Flat'},
+  {id:'BKG-108',client:'Laily Akhter',date:'Jun 03, 2026',property:'Muktodhara Green Park',unit:'3 Katha',price:'₹95 Lac',advance:'₹4,75,000',status:'Confirmed',type:'Plot'},
+  {id:'BKG-109',client:'Nadia Akhter',date:'May 28, 2026',property:'Jolshiri Abason',unit:'5 Katha',price:'₹3.2 Cr',advance:'₹10,00,000',status:'Pending Review',type:'Plot'},
+  {id:'BKG-110',client:'Kazi Nizam',date:'May 25, 2026',property:'Skyline Towers',unit:'Penthouse',price:'₹7.5 Cr',advance:'₹25,00,000',status:'Pending Review',type:'Flat'}
 ]);
 window.mockInventory = DB.init('inventory', [
   {id:1,site:'Muktodhara',item:'BSRM Steel 500W',category:'Construction Material',qty:45,unit:'Tons',price:410000,value:18450000,status:'Adequate',reorder:20,lastReceived:'Oct 23, 2024',supplier:'BSRM Steels Ltd.'},
@@ -510,6 +536,15 @@ window.mockInventory = DB.init('inventory', [
   {id:8,site:'Muktodhara',item:'Ceramic Tiles (2x2)',category:'Finishes',qty:350,unit:'Boxes',price:950,value:332500,status:'Adequate',reorder:100,lastReceived:'Oct 10, 2024',supplier:'RFL Building Products'},
   {id:9,site:'Jolshiri',item:'Safety Helmets',category:'Safety',qty:45,unit:'Pcs',price:250,value:11250,status:'Critical',reorder:60,lastReceived:'Sep 20, 2024',supplier:'Delta Electricals'},
   {id:10,site:'Muktodhara',item:'Paint (Asian 10L)',category:'Finishes',qty:60,unit:'Buckets',price:3200,value:192000,status:'Adequate',reorder:20,lastReceived:'Oct 08, 2024',supplier:'RFL Building Products'}
+,
+  {id:11,site:'Jolshiri',item:'PVC Pipe 4 inch',category:'Plumbing',qty:200,unit:'Pcs',price:350,value:70000,status:'Adequate',reorder:50,lastReceived:'Jun 05, 2026',supplier:'RFL Plastics'},
+  {id:12,site:'Muktodhara',item:'Electrical Cable 6mm',category:'Electrical',qty:500,unit:'Meters',price:85,value:42500,status:'Adequate',reorder:200,lastReceived:'Jun 01, 2026',supplier:'BDS Electricals'},
+  {id:13,site:'Jolshiri',item:'Ceramic Tile 2x2',category:'Finishes',qty:850,unit:'Pcs',price:185,value:157250,status:'Adequate',reorder:300,lastReceived:'May 28, 2026',supplier:'Mirpur Ceramics'},
+  {id:14,site:'Corporate',item:'A4 Paper (Box)',category:'Admin',qty:25,unit:'Boxes',price:1200,value:30000,status:'Adequate',reorder:10,lastReceived:'Jun 10, 2026',supplier:'Office Depot BD'},
+  {id:15,site:'Muktodhara',item:'Safety Helmet',category:'Safety',qty:45,unit:'Pcs',price:250,value:11250,status:'Low',reorder:50,lastReceived:'Apr 15, 2026',supplier:'Safety First BD'},
+  {id:16,site:'Jolshiri',item:'Sand (Coarse)',category:'Construction Material',qty:350,unit:'CFT',price:55,value:19250,status:'Critical',reorder:500,lastReceived:'Jun 02, 2026',supplier:'Shah Cement Ltd.'},
+  {id:17,site:'Muktodhara',item:'Paint - White Emulsion',category:'Finishes',qty:120,unit:'Buckets',price:1250,value:150000,status:'Adequate',reorder:40,lastReceived:'May 20, 2026',supplier:'Asian Paints BD'},
+  {id:18,site:'Jolshiri',item:'GI Pipe 2 inch',category:'Plumbing',qty:80,unit:'Pcs',price:450,value:36000,status:'Low',reorder:50,lastReceived:'May 10, 2026',supplier:'RFL Plastics'}
 ]);
 window.mockPOs = DB.init('pos', [
   {id:'PO-24-089',date:'Oct 25, 2024',vendor:'Shah Cement Ltd.',site:'Muktodhara',items:'Cement (1000 Bags)',amount:550000,fmt:'৳5,50,000',dueDate:'Nov 10, 2024',status:'Pending Approval',category:'Material',approvedBy:'—'},
@@ -547,6 +582,17 @@ window.mockTransactions = DB.init('transactions', [
   {id:'RCP-8831',date:'2024-09-22',desc:'Downpayment - Dr. Rubina',client:'Dr. Rubina Ali',project:'Jolshiri',type:'Inflow',category:'Booking',status:'Received',amount:800000,fmt:'+ \u09F38,00,000'},
   {id:'EXP-9904',date:'2024-09-20',desc:'Generator Fuel - Jolshiri Site',project:'Jolshiri',type:'Outflow',category:'Utilities',status:'Paid',amount:32000,fmt:'- \u09F332,000'},
   {id:'EXP-9903',date:'2024-09-18',desc:'VAT Payment - NBR',type:'Outflow',category:'Tax',status:'Paid',amount:185000,fmt:'- \u09F31,85,000'}
+,
+  {id:'RCP-8840',date:'2026-06-12',desc:'Booking payment - Mizanur Rahman',client:'Mizanur Rahman',project:'Jolshiri',type:'Inflow',category:'Booking',status:'Received',amount:600000,fmt:'+ ₹6,00,000'},
+  {id:'RCP-8841',date:'2026-06-11',desc:'Installment - Kamrul Hasan',client:'Kamrul Hasan',project:'Jolshiri',type:'Inflow',category:'Installment',status:'Received',amount:250000,fmt:'+ ₹2,50,000'},
+  {id:'PAY-3312',date:'2026-06-10',desc:'Brick supply payment',client:'',project:'Muktodhara',type:'Outflow',category:'Materials',status:'Paid',amount:450000,fmt:'- ₹4,50,000'},
+  {id:'RCP-8842',date:'2026-06-09',desc:'Booking - Shahidul Islam',client:'Shahidul Islam',project:'Muktodhara',type:'Inflow',category:'Booking',status:'Received',amount:500000,fmt:'+ ₹5,00,000'},
+  {id:'PAY-3313',date:'2026-06-09',desc:'Monthly labor payroll',client:'',project:'Jolshiri',type:'Outflow',category:'Labor',status:'Paid',amount:1280000,fmt:'- ₹12,80,000'},
+  {id:'PAY-3314',date:'2026-06-08',desc:'Marketing billboard rental',client:'',project:'',type:'Outflow',category:'Marketing',status:'Pending',amount:350000,fmt:'- ₹3,50,000'},
+  {id:'RCP-8843',date:'2026-06-07',desc:'Installment - Dr. Rubina Ali',client:'Dr. Rubina Ali',project:'Jolshiri',type:'Inflow',category:'Installment',status:'Received',amount:300000,fmt:'+ ₹3,00,000'},
+  {id:'PAY-3315',date:'2026-06-06',desc:'Legal fees - Muktodhara mutation',client:'',project:'Muktodhara',type:'Outflow',category:'Legal',status:'Paid',amount:85000,fmt:'- ₹85,000'},
+  {id:'RCP-8844',date:'2026-06-05',desc:'Booking - Laily Akhter',client:'Laily Akhter',project:'Muktodhara',type:'Inflow',category:'Booking',status:'Received',amount:475000,fmt:'+ ₹4,75,000'},
+  {id:'PAY-3316',date:'2026-06-04',desc:'Office utilities & rent',client:'',project:'',type:'Outflow',category:'Admin',status:'Paid',amount:125000,fmt:'- ₹1,25,000'}
 ]);
 window.mockProjectBudgets = DB.init('project_budgets', [
   {id:'BGT-001',name:'Muktodhara Green Park',type:'Land Plotting',budget:50000000,allocated:{materials:15000000,labor:8000000,legal:3000000,marketing:2000000,admin:4000000,contingency:8000000},spent:{materials:10500000,labor:5200000,legal:1800000,marketing:1500000,admin:2800000,contingency:1200000},progress:54},
@@ -568,6 +614,14 @@ window.mockTasks = DB.init('tasks', [
   {id:6,title:'Update CRM lead statuses',status:'In Progress',priority:'Medium'},
   {id:7,title:'Review Q3 Financials',status:'Review',priority:'High'},
   {id:8,title:'Vendor payment (Shah Cement)',status:'Done',priority:'Low'}
+,
+  {id:9,title:'Prepare Jolshiri Phase 2 BOQ',status:'To Do',priority:'High'},
+  {id:10,title:'Follow up on Kazi Nizam penthouse inquiry',status:'To Do',priority:'High'},
+  {id:11,title:'Inspect foundation work at Muktodhara Block C',status:'In Progress',priority:'Medium'},
+  {id:12,title:'Prepare monthly sales report for June',status:'To Do',priority:'Medium'},
+  {id:13,title:'Renew equipment insurance for JCB and Crane',status:'To Do',priority:'Low'},
+  {id:14,title:'Resolve water connection complaint for Apt 3B',status:'In Progress',priority:'High'},
+  {id:15,title:'Update contractor evaluation scorecards',status:'To Do',priority:'Medium'}
 ]);
 window.mockCampaigns = DB.init('campaigns', [
   {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:150000,spent:135000,leads:45,conversions:8,roi:320,startDate:'Jun 01, 2026',endDate:'Aug 31, 2026',status:'Active',target:'5 Katha Plots',notes:'Facebook + Instagram campaign targeting NRB buyers.'},
@@ -603,6 +657,13 @@ window.mockEmployees = DB.init('employees', [
   {id:4,name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',status:'active'},
   {id:5,name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',status:'active'},
   {id:6,name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',status:'active'}
+,
+  {id:7,name:'Nazmul Huda',designation:'Project Manager',dept:'Construction',phone:'01810112233',status:'active'},
+  {id:8,name:'Sultana Razia',designation:'HR Manager',dept:'HR',phone:'01710223344',status:'active'},
+  {id:9,name:'Jahir Uddin',designation:'Accountant',dept:'Finance',phone:'01910334455',status:'active'},
+  {id:10,name:'Faruk Hossain',designation:'Site Supervisor',dept:'Construction',phone:'01710445566',status:'active'},
+  {id:11,name:'Morshed Alam',designation:'Legal Officer',dept:'Management',phone:'01810556677',status:'active'},
+  {id:12,name:'Shahnaz Parvin',designation:'Marketing Executive',dept:'Sales',phone:'01710667788',status:'active'}
 ]);
 window.mockUsers = DB.init('users', [
   {name:'MD Hasanul Banna',email:'banna@mars.com',role:'Super Admin',dept:'Management',status:'Active',initials:'HB'},
@@ -622,6 +683,15 @@ window.mockContacts = DB.init('contacts', [
   {id:10,name:'Bashundhara Group',type:'Broker',designation:'Senior Broker',phone:'+880 1622 005678',email:'broker@bashundhara.com',company:'Bashundhara Real Estate',address:'Bashundhara R/A, Dhaka',notes:'Land broker for Purbachal sector deals. Has leads on 10 bigha plot.',priority:'High'},
   {id:11,name:'Dhaka Bank Ltd.',type:'Others',designation:'Relationship Manager',phone:'+880 1550 009012',email:'corporate@dhakabank.com',company:'Dhaka Bank Ltd.',address:'Motijheel, Dhaka',notes:'Construction loan relation manager. Limit: 50 Cr.',priority:'Normal'},
   {id:12,name:'RAJUK',type:'Government',designation:'Assistant Engineer',phone:'+880 2834 5678',email:'info@rajuk.gov.bd',company:'RAJUK',address:'Sher-e-Bangla Nagar, Dhaka',notes:'Approval authority for Muktodhara layout plan.',priority:'Normal'}
+,
+  {id:13,name:'Delwar Hossain',type:'Buyer',designation:'Businessman',phone:'+880 1817 909090',email:'delwar.h@yahoo.com',company:'Delwar Enterprise',address:'House 5, Road 2, Dhanmondi, Dhaka',notes:'Looking for 2 units in Jolshiri',source:'Agent'},
+  {id:14,name:'Shamima Sultana',type:'Buyer',designation:'Doctor',phone:'+880 1916 898989',email:'shamima.s@gmail.com',company:'Shaheed Suhrawardy Hospital',address:'Flat 3A, Rupayan Tower, Mirpur',notes:'NRB returning from UK',source:'Billboard'},
+  {id:15,name:'Mizanur Rahman',type:'Buyer',designation:'Software Engineer',phone:'+880 1919 343434',email:'mizan.r@gmail.com',company:'Tech Solutions Ltd.',address:'Uttara Sector 7, Dhaka',notes:'Interested in 3 katha plot for family home',source:'Facebook'},
+  {id:16,name:'Shahidul Islam',type:'Buyer',designation:'Government Officer',phone:'+880 1913 232323',email:'shahidul@outlook.com',company:'Ministry of Finance',address:'Segunbagicha, Dhaka',notes:'Prefer Muktodhara location',source:'Referral'},
+  {id:17,name:'Nasrin Akter',type:'Buyer',designation:'Teacher',phone:'+880 1820 565656',email:'nasrin.a@outlook.com',company:'Viqarunnisa Noon School',address:'Banani, Dhaka',notes:'NRB in Australia - investing from abroad',source:'Website'},
+  {id:18,name:'Kazi Nizam',type:'Buyer',designation:'CEO',phone:'+880 1813 667788',email:'kazi.n@bizmail.com',company:'Nizam Group',address:'Gulshan 2, Dhaka',notes:'Premium client - looking at penthouse',source:'Agent'},
+  {id:19,name:'Selina Begum',type:'Buyer',designation:'Banker',phone:'+880 1912 334455',email:'selina@gmail.com',company:'Dutch Bangla Bank',address:'Motijheel, Dhaka',notes:'Need 2BR apartment, budget 2-2.5 Cr',source:'Referral'},
+  {id:20,name:'Abdur Rahim',type:'Buyer',designation:'Real Estate Developer',phone:'+880 1711 778899',email:'arahim@email.com',company:'Rahim Properties',address:'Khilgaon, Dhaka',notes:'Looking for large plot for development project',source:'Walk-in'}
 ]);
 window.mockDocuments = DB.init('documents', [
   {id:1,title:'Muktodhara CS Khatiyan',type:'CS Khatiyan',date:'2023-10-12',property:'Muktodhara',status:'Verified'},
@@ -1023,6 +1093,12 @@ window.mockBIReports = DB.init('bi_reports', [
   {name:'Project Budget vs Actual',type:'Bar Chart',period:'Ongoing',updated:'2024-10-27',status:'Manual'},
   {name:'Cash Flow Forecast',type:'Line Chart',period:'Nov 2024',updated:'2024-10-25',status:'Auto'},
   {name:'Installment Collection Efficiency',type:'Gauge',period:'Oct 2024',updated:'2024-10-28',status:'Auto'}
+,
+  {name:'Lead Conversion Funnel',type:'Chart',period:'Jun 2026',updated:'2026-06-12',status:'Auto'},
+  {name:'Project Cost Variance',type:'Chart',period:'May 2026',updated:'2026-06-05',status:'Auto'},
+  {name:'Sales Target vs Achievement',type:'Chart',period:'Jun 2026',updated:'2026-06-10',status:'Auto'},
+  {name:'Contractor Performance Ranking',type:'Table',period:'Q2 2026',updated:'2026-06-01',status:'Manual'},
+  {name:'Accounts Receivable Aging',type:'Table',period:'Jun 2026',updated:'2026-06-12',status:'Auto'}
 ]);
 window.kbCategories = [
   {id:'legal',label:'Legal & Compliance',icon:'⚖️',color:'#1565c0'},
@@ -3818,6 +3894,11 @@ window.mockBankAccounts = DB.init('bank_accounts', [
   {name:'BRAC Bank Ltd.',account:'BRAC-1234-5678',branch:'Gulshan',type:'Current',balance:'₹85,00,000'},
   {name:'Dutch Bangla Bank',account:'DBBL-9876-5432',branch:'Motijheel',type:'SME',balance:'₹1,20,00,000'},
   {name:'Cash in Hand',account:'CASH-001',branch:'—',type:'Petty Cash',balance:'₹2,50,000'}
+,
+  {name:'Eastern Bank Ltd.',account:'EBL-9876-5432',branch:'Gulshan',type:'Current',balance:'₹42,00,000'},
+  {name:'Islami Bank BD',account:'IBL-4567-8901',branch:'Motijheel',type:'SME',balance:'₹28,50,000'},
+  {name:'HSBC Bangladesh',account:'HSBC-1122-3344',branch:'Gulshan',type:'Current',balance:'₹15,00,000'},
+  {name:'Agrani Bank Ltd.',account:'AGN-7788-9900',branch:'Karwan Bazar',type:'Savings',balance:'₹5,25,000'}
 ]);
 window.mockCOA = DB.init('coa', [
   {code:'1-1000',name:'Cash & Bank',type:'Asset',balance:'₹2,07,50,000'},{code:'1-2000',name:'Accounts Receivable',type:'Asset',balance:'₹1,15,00,000'},
@@ -3825,8 +3906,23 @@ window.mockCOA = DB.init('coa', [
   {code:'2-2000',name:'Accounts Payable',type:'Liability',balance:'₹85,00,000'},{code:'3-1000',name:'Revenue - Booking',type:'Income',balance:'₹7,80,00,000'},
   {code:'3-2000',name:'Revenue - Installments',type:'Income',balance:'₹2,30,00,000'},{code:'4-1000',name:'Construction Costs',type:'Expense',balance:'₹4,10,00,000'},
   {code:'4-2000',name:'Admin Expenses',type:'Expense',balance:'₹55,00,000'}
+,
+  {code:'1-1050',name:'RUPALI BANK - SME',type:'Asset',balance:'₹18,00,000'},
+  {code:'1-1060',name:'EASTERN BANK - PAYROLL',type:'Asset',balance:'₹5,50,000'},
+  {code:'2-1000',name:'ACCOUNTS PAYABLE - MATERIALS',type:'Liability',balance:'₹32,00,000'},
+  {code:'2-1010',name:'CUSTOMER ADVANCES',type:'Liability',balance:'₹85,00,000'},
+  {code:'2-1020',name:'RETAINED EARNINGS',type:'Liability',balance:'₹2,15,00,000'},
+  {code:'3-1000',name:'PROJECT REVENUE - MUKTODHARA',type:'Income',balance:'₹45,50,00,000'},
+  {code:'3-1010',name:'PROJECT REVENUE - JOLSHIRI',type:'Income',balance:'₹92,00,00,000'},
+  {code:'3-1020',name:'INTEREST INCOME',type:'Income',balance:'₹12,50,000'},
+  {code:'4-1000',name:'CONSTRUCTION MATERIALS',type:'Expense',balance:'₹18,50,00,000'},
+  {code:'4-1010',name:'LABOUR COST',type:'Expense',balance:'₹7,20,00,000'},
+  {code:'4-1020',name:'MARKETING EXPENSE',type:'Expense',balance:'₹2,10,00,000'},
+  {code:'4-1030',name:'ADMIN & OVERHEAD',type:'Expense',balance:'₹1,80,00,000'}
 ]);
-window.mockMasterLists = DB.init('master_lists', {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
+window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
+  {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Land Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
+],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
 const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Layout','Projects','Compliance','Bookings','Customer Portal','Handover','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Finance','Stock & Procurement','HR','Data Vault','Knowledge Base','Tasks','Workspace'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export'];
 const MOCK_PERMISSIONS = {
