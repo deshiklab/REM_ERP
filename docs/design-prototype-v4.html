@@ -678,9 +678,47 @@ window.mockPayroll = DB.init('payroll', [
   {id:'PRL-020',workerId:'WRK-020',workerName:'Nur Mohammad',month:'May',year:2026,daysWorked:22,grossPay:26000,deductions:1600,netPay:24400,status:'Pending',paidDate:''}
 ]);
 window.mockQC = DB.init('qc', [
-  {id:1,project:'Muktodhara',item:'Concrete Test',date:'2024-10-20',result:'Pass',inspector:'Tanvir Ahmed'},
-  {id:2,project:'Jolshiri',item:'Steel Reinforcement',date:'2024-10-18',result:'Pass',inspector:'Rofiqul Islam'},
-  {id:3,project:'Muktodhara',item:'Brick Quality Check',date:'2024-10-15',result:'Fail',inspector:'Tanvir Ahmed'}
+  {id:'QC-001',project:'Muktodhara',item:'Concrete Cylinder Test - Ground Floor',category:'Concrete',date:'2026-05-20',result:'Pass',inspector:'Tanvir Ahmed',severity:'Critical',remarks:'28-day strength 3,200 psi - exceeds 3,000 psi req'},
+  {id:'QC-002',project:'Jolshiri',item:'Steel Reinforcement - Column B12',category:'Steel',date:'2026-05-18',result:'Pass',inspector:'Rofiqul Islam',severity:'Critical',remarks:'TMT 500D rods - spacing within tolerance'},
+  {id:'QC-003',project:'Muktodhara',item:'Brick Quality Check - 1st Batch',category:'Masonry',date:'2026-05-15',result:'Fail',inspector:'Tanvir Ahmed',severity:'Major',remarks:'7% breakage rate - exceed 5% threshold. 2nd batch ordered'},
+  {id:'QC-004',project:'Jolshiri',item:'Slab Formwork Check - Roof',category:'Formwork',date:'2026-05-22',result:'Pass',inspector:'Shahidul Islam',severity:'Critical',remarks:'Alignment OK, props at 4ft spacing, camber correct'},
+  {id:'QC-005',project:'Muktodhara',item:'Plumbing Pressure Test - Block A',category:'Plumbing',date:'2026-05-23',result:'Pass',inspector:'Tanvir Ahmed',severity:'Major',remarks:'Tested at 8 bar for 30 min - no leakage'},
+  {id:'QC-006',project:'Jolshiri',item:'Soil Compaction Test - Zone 3',category:'Earthwork',date:'2026-05-19',result:'Pass',inspector:'Rofiqul Islam',severity:'Major',remarks:'95% MDD achieved - meets spec'},
+  {id:'QC-007',project:'Muktodhara',item:'Welding Inspection - Roof Truss',category:'Steel',date:'2026-05-24',result:'Fail',inspector:'Shahidul Islam',severity:'Critical',remarks:'2 of 12 joints showed porosity - rework required'},
+  {id:'QC-008',project:'Jolshiri',item:'Plastering Finish - Floor 3',category:'Finishing',date:'2026-05-21',result:'Pass',inspector:'Rofiqul Islam',severity:'Minor',remarks:'Surface evenness within 2mm tolerance'},
+  {id:'QC-009',project:'Muktodhara',item:'Electrical Continuity Test - DB Panel',category:'Electrical',date:'2026-05-25',result:'Pending',inspector:'Tanvir Ahmed',severity:'Critical',remarks:'Awaiting test equipment calibration'},
+  {id:'QC-010',project:'Jolshiri',item:'Waterproofing Test - Terrace',category:'Waterproofing',date:'2026-05-22',result:'Pass',inspector:'Shahidul Islam',severity:'Major',remarks:'Ponding test - 48hr, no leakage observed'},
+  {id:'QC-011',project:'Muktodhara',item:'Tile Bonding Test - Lobby',category:'Finishing',date:'2026-05-26',result:'Fail',inspector:'Rofiqul Islam',severity:'Major',remarks:'Pull-off test - 3 of 10 tiles below 50 psi threshold'},
+  {id:'QC-012',project:'Jolshiri',item:'Concrete Slump Test - Pour #4',category:'Concrete',date:'2026-05-24',result:'Pass',inspector:'Tanvir Ahmed',severity:'Major',remarks:'Slump 4.5" - within 3-5" spec'},
+  {id:'QC-013',project:'Muktodhara',item:'Door Frame Alignment - Unit 201',category:'Joinery',date:'2026-05-27',result:'Pass',inspector:'Shahidul Islam',severity:'Minor',remarks:'All 6 frames within 2mm plumb'},
+  {id:'QC-014',project:'Jolshiri',item:'Fire Extinguisher Inspection',category:'Safety',date:'2026-05-20',result:'Pass',inspector:'Rofiqul Islam',severity:'Critical',remarks:'All 24 extinguishers tagged and charged'},
+  {id:'QC-015',project:'Muktodhara',item:'Glass Balustrade Load Test',category:'Structural',date:'2026-05-28',result:'Pending',inspector:'Tanvir Ahmed',severity:'Critical',remarks:'Scheduled for June 1st'}
+]);
+window.mockQCChecklist = DB.init('qcChecklist', [
+  {id:'CHK-001',project:'Muktodhara',stage:'Foundation',item:'Excavation depth verification',standard:'Min 5ft',status:'Pass',checkedBy:'Tanvir Ahmed',date:'2026-04-10',remarks:''},
+  {id:'CHK-002',project:'Muktodhara',stage:'Foundation',item:'Concrete mix ratio check',standard:'1:1.5:3',status:'Pass',checkedBy:'Tanvir Ahmed',date:'2026-04-12',remarks:'Tested in lab - 28-day target 3,000 psi'},
+  {id:'CHK-003',project:'Muktodhara',stage:'Column',item:'Reinforcement cover',standard:'1.5" min',status:'Pass',checkedBy:'Shahidul Islam',date:'2026-04-20',remarks:'Spot check - 10 columns OK'},
+  {id:'CHK-004',project:'Muktodhara',stage:'Column',item:'Vertical alignment check',standard:'±0.5"',status:'Pass',checkedBy:'Shahidul Islam',date:'2026-04-22',remarks:''},
+  {id:'CHK-005',project:'Muktodhara',stage:'Slab',item:'Formwork camber',standard:'0.5" rise',status:'Pass',checkedBy:'Tanvir Ahmed',date:'2026-05-01',remarks:'All 4 slabs checked'},
+  {id:'CHK-006',project:'Muktodhara',stage:'Slab',item:'Steel spacing verification',standard:'6" c/c',status:'Fail',checkedBy:'Tanvir Ahmed',date:'2026-05-02',remarks:'North section had 7.5" spacing - rework done'},
+  {id:'CHK-007',project:'Muktodhara',stage:'Finishing',item:'Plaster thickness check',standard:'12mm',status:'Pass',checkedBy:'Shahidul Islam',date:'2026-05-15',remarks:'Random 10 points averaged 11.8mm'},
+  {id:'CHK-008',project:'Jolshiri',stage:'Foundation',item:'Excavation depth verification',standard:'Min 6ft',status:'Pass',checkedBy:'Rofiqul Islam',date:'2026-04-05',remarks:''},
+  {id:'CHK-009',project:'Jolshiri',stage:'Foundation',item:'Pile cap reinforcement',standard:'As per drwg ST-04',status:'Pass',checkedBy:'Rofiqul Islam',date:'2026-04-08',remarks:''},
+  {id:'CHK-010',project:'Jolshiri',stage:'Column',item:'Concrete vibrator usage',standard:'Every pour',status:'Fail',checkedBy:'Shahidul Islam',date:'2026-04-18',remarks:'Worker skipped 2 columns - re-training done'},
+  {id:'CHK-011',project:'Jolshiri',stage:'Column',item:'Curing duration',standard:'7 days min',status:'Pass',checkedBy:'Shahidul Islam',date:'2026-04-25',remarks:'Daily water spray logs verified'},
+  {id:'CHK-012',project:'Jolshiri',stage:'Slab',item:'Slab thickness check',standard:'5"',status:'Pass',checkedBy:'Rofiqul Islam',date:'2026-05-08',remarks:'Core samples averaged 4.95" - acceptable'},
+  {id:'CHK-013',project:'Jolshiri',stage:'Slab',item:'Waterproofing application',standard:'2 coats min',status:'Pass',checkedBy:'Rofiqul Islam',date:'2026-05-10',remarks:'2 coats applied, minimum 40 mils dry film'},
+  {id:'CHK-014',project:'Jolshiri',stage:'Finishing',item:'Tile grouting inspection',standard:'Full coverage',status:'Pass',checkedBy:'Shahidul Islam',date:'2026-05-20',remarks:'Grout depth 3mm consistent'},
+  {id:'CHK-015',project:'Jolshiri',stage:'Finishing',item:'Paint primer application',standard:'1 coat primer + 2 coats',status:'Pending',checkedBy:'Rofiqul Islam',date:'2026-05-25',remarks:'In progress'}
+]);
+window.mockQCReports = DB.init('qcReports', [
+  {id:'QCR-001',project:'Muktodhara',type:'Weekly QC Summary',date:'2026-05-22',preparedBy:'Tanvir Ahmed',status:'Submitted',findings:8,passed:6,failed:2,pending:0},
+  {id:'QCR-002',project:'Jolshiri',type:'Weekly QC Summary',date:'2026-05-22',preparedBy:'Rofiqul Islam',status:'Submitted',findings:7,passed:6,failed:0,pending:1},
+  {id:'QCR-003',project:'Muktodhara',type:'Monthly QC Report',date:'2026-05-31',preparedBy:'Tanvir Ahmed',status:'Draft',findings:35,passed:28,failed:5,pending:2},
+  {id:'QCR-004',project:'Jolshiri',type:'Monthly QC Report',date:'2026-05-31',preparedBy:'Rofiqul Islam',status:'Draft',findings:30,passed:26,failed:2,pending:2},
+  {id:'QCR-005',project:'Muktodhara',type:'Non-Conformance Report',date:'2026-05-26',preparedBy:'Shahidul Islam',status:'Open',findings:1,passed:0,failed:1,pending:0},
+  {id:'QCR-006',project:'Both',type:'Material Test Summary',date:'2026-05-28',preparedBy:'Tanvir Ahmed',status:'Submitted',findings:12,passed:10,failed:2,pending:0},
+  {id:'QCR-007',project:'Jolshiri',type:'Non-Conformance Report',date:'2026-05-20',preparedBy:'Shahidul Islam',status:'Closed',findings:1,passed:0,failed:1,pending:0}
 ]);
 window.mockCompliance = DB.init('compliance', [
   {id:1,name:'RAJUK Approval',project:'Muktodhara',type:'Regulatory',due:'2025-01-15',status:'Compliant'},
@@ -846,7 +884,7 @@ function switchModule(mod) {
     case 'variation_orders': renderVariations(el); break;
     case 'equipment': renderEquipment(el); break;
     case 'labor': renderLabor(el); break;
-    case 'qc': renderSubTable(el, 'qc', mockQC, ['Project','Item','Result','Inspector'], ['project','item','result','inspector'], 'QC & Inspection'); break;
+    case 'qc': renderQC(el); break;
     case 'designs': renderDesigns(el); break;
     case 'finance': renderFinance(el); break;
     case 'stock': renderStock(el); break;
@@ -3952,6 +3990,274 @@ function crudPayrollRecord(item){
     }
   );
 }
+
+// ═══ QC & INSPECTION MODULE ═══
+var qcTab='dashboard';
+function renderQC(el){
+  qcTab=qcTab||'dashboard';
+  var total=mockQC.length,pass=mockQC.filter(function(i){return i.result==='Pass'}).length;
+  var fail=mockQC.filter(function(i){return i.result==='Fail'}).length;
+  var pend=mockQC.filter(function(i){return i.result==='Pending'}).length;
+  var chkTotal=mockQCChecklist.length,chkPass=mockQCChecklist.filter(function(c){return c.status==='Pass'}).length;
+  var chkFail=mockQCChecklist.filter(function(c){return c.status==='Fail'}).length;
+  var passRate=total>0?Math.round(pass/total*100):0;
+  el.innerHTML='<div class="fade-in"><div class="page-title">QC & Inspection</div><div class="page-subtitle">'+total+' inspections · '+passRate+'% pass rate · '+chkTotal+' checklist items</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','📊 Dashboard'],
+        ['inspections','🔍 Inspections'],
+        ['checklists','✅ Checklists'],
+        ['reports','📄 Reports']
+      ].map(function(t){
+        return '<div class="tab '+(qcTab===t[0]?'active':'')+'" onclick="qcTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudQCItem()" style="padding:3px 8px;font-size:10px;display:'+(qcTab==='inspections'?'':'none')+'\">+ New Inspection</button>'+
+      '<button class="action-btn primary" onclick="crudQCChecklist()" style="padding:3px 8px;font-size:10px;display:'+(qcTab==='checklists'?'':'none')+'\">+ Checklist Item</button>'+
+      '<button class="action-btn primary" onclick="crudQCReport()" style="padding:3px 8px;font-size:10px;display:'+(qcTab==='reports'?'':'none')+'\">+ New Report</button>'+
+    '</div>'+
+    (qcTab==='dashboard'?renderQCDashboard():
+     qcTab==='inspections'?renderQCInspections():
+     qcTab==='checklists'?renderQCChecklists():
+     qcTab==='reports'?renderQCReports():'')+
+  '</div>';
+}
+function renderQCDashboard(){
+  var total=mockQC.length,pass=mockQC.filter(function(i){return i.result==='Pass'}).length;
+  var fail=mockQC.filter(function(i){return i.result==='Fail'}).length;
+  var pend=mockQC.filter(function(i){return i.result==='Pending'}).length;
+  var critical=mockQC.filter(function(i){return i.severity==='Critical'}).length;
+  var major=mockQC.filter(function(i){return i.severity==='Major'}).length;
+  var minor=mockQC.filter(function(i){return i.severity==='Minor'}).length;
+  var chkTotal=mockQCChecklist.length,chkPass=mockQCChecklist.filter(function(c){return c.status==='Pass'}).length;
+  var chkFail=mockQCChecklist.filter(function(c){return c.status==='Fail'}).length;
+  var rptTotal=mockQCReports.length,submitted=mockQCReports.filter(function(r){return r.status==='Submitted'}).length;
+  var chkRate=chkTotal>0?Math.round(chkPass/chkTotal*100):0;
+  var catPass={};mockQC.forEach(function(i){if(i.result==='Pass')catPass[i.category]=(catPass[i.category]||0)+1});
+  var catTotal={};mockQC.forEach(function(i){catTotal[i.category]=(catTotal[i.category]||0)+1});
+  var catKeys=Object.keys(catTotal).sort();
+  var topInspectors={};mockQC.forEach(function(i){topInspectors[i.inspector]=(topInspectors[i.inspector]||0)+1});
+  var topInsp=Object.keys(topInspectors).sort(function(a,b){return topInspectors[b]-topInspectors[a]}).slice(0,4);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Inspections',total,'#1565c0'],
+    ['Passed',pass,'#2e7d32'],
+    ['Failed',fail,fail>0?'#c62828':'#999'],
+    ['Pending',pend,pend>0?'#ff8f00':'#999'],
+    ['Pass Rate',pass+'/'+total+' ('+Math.round(pass/total*100)+'%)','#7b1fa2'],
+    ['Critical Items',critical,critical>0?'#c62828':'#999']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Results by Category</h3></div><div class="card-body" style="padding:8px">'+
+    catKeys.map(function(c){
+      var cTotal=catTotal[c]||0,cPass=catPass[c]||0,cRate=cTotal>0?Math.round(cPass/cTotal*100):0;
+      var color=cRate>=80?'#2e7d32':cRate>=50?'#ff8f00':'#c62828';
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+cRate+'%;background:'+color+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right;color:'+color+'">'+cRate+'%</div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Checklist Overview</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
+      '<div style="display:flex;justify-content:center;gap:16px;margin-bottom:8px">'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#2e7d32">'+chkPass+'</div><div style="font-size:8px;color:#888">Passed</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#c62828">'+chkFail+'</div><div style="font-size:8px;color:#888">Failed</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#ff8f00">'+(chkTotal-chkPass-chkFail)+'</div><div style="font-size:8px;color:#888">Pending</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1565c0">'+chkTotal+'</div><div style="font-size:8px;color:#888">Total</div></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;justify-content:center;margin-top:4px">'+
+        '<div style="padding:3px 8px;background:#e8f5e9;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#2e7d32">'+chkRate+'%</div><div style="font-size:7px;color:#666">Checklist Pass Rate</div></div>'+
+        '<div style="padding:3px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#1565c0">'+rptTotal+'</div><div style="font-size:7px;color:#666">Reports</div></div>'+
+        '<div style="padding:3px 8px;background:#f3e5f5;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#7b1fa2">'+submitted+'</div><div style="font-size:7px;color:#666">Submitted</div></div>'+
+      '</div>'+
+    '</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>Top Inspectors</h3></div><div class="card-body" style="padding:4px 8px">'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px">'+
+  topInsp.map(function(n,i){
+    var cnt=topInspectors[n];
+    var np=mockQC.filter(function(x){return x.inspector===n&&x.result==='Pass'}).length;
+    var nr=Math.round(np/cnt*100);
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:#f9fafb;border-radius:6px;cursor:pointer" onclick="qcTab=\x27inspections\x27;renderModule()">'+
+      '<div style="width:24px;height:24px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500">'+n+'</div><div style="font-size:8px;color:#888">'+cnt+' inspections · '+nr+'% pass</div></div>'+
+      '</div>';
+  }).join('')+'</div></div></div>';
+}
+function renderQCInspections(){
+  var q=(document.getElementById('qcSearch')||{}).value||'';
+  var rf=(document.getElementById('qcResult')||{}).value||'';
+  var cf=(document.getElementById('qcCat')||{}).value||'';
+  var filtered=mockQC.filter(function(i){
+    if(rf&&i.result!==rf)return false;
+    if(cf&&i.category!==cf)return false;
+    if(q&&!i.item.toLowerCase().includes(q.toLowerCase())&&!i.project.toLowerCase().includes(q.toLowerCase())&&!i.inspector.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pI=_pg('qci',filtered);
+  var cats={};mockQC.forEach(function(i){cats[i.category]=1});
+  var catList=Object.keys(cats).sort();
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="qcSearch" placeholder="Search inspections..." oninput="_PG.qci={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="qcResult" onchange="_PG.qci={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Results</option><option>Pass</option><option>Fail</option><option>Pending</option></select>'+
+    '<select id="qcCat" onchange="_PG.qci={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>'+catList.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('')+'</select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Inspection Item</th><th>Project</th><th>Category</th><th>Date</th><th>Inspector</th><th>Severity</th><th>Result</th><th></th></tr></thead><tbody>'+
+  pI.items.map(function(i){
+    var rc={'Pass':'#2e7d32','Fail':'#c62828','Pending':'#ff8f00'}[i.result]||'#888';
+    var rbg={'Pass':'#e8f5e9','Fail':'#ffebee','Pending':'#fff8e1'}[i.result]||'#f5f5f5';
+    var sc={'Critical':'#c62828','Major':'#e65100','Minor':'#888'}[i.severity]||'#888';
+    var sbg={'Critical':'#ffebee','Major':'#fff3e0','Minor':'#f5f5f5'}[i.severity]||'#f5f5f5';
+    return '<tr style="cursor:pointer" onclick="openQCItem(\x27'+i.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+i.id+'</td><td style="font-weight:500;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+i.item+'">'+i.item+'</td><td>'+i.project+'</td><td style="font-size:9px">'+i.category+'</td><td style="font-size:9px;color:#888">'+i.date+'</td><td style="font-size:9px">'+i.inspector+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+i.severity+'</span></td><td><span class="badge-status" style="background:'+rbg+';color:'+rc+'">'+i.result+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCItem(mockQC.find(function(x){return x.id===\x27'+i.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQC.findIndex(function(x){return x.id===\x27'+i.id+'\x27});if(idx>=0)mockQC.splice(idx,1);DB.save(\x27qc\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('qci',pI.total,pI.page,pI.totalPages,pI.perPage)+'</div></div></div>';
+}
+function renderQCChecklists(){
+  var q=(document.getElementById('chkSearch')||{}).value||'';
+  var sf=(document.getElementById('chkStatus')||{}).value||'';
+  var ps=(document.getElementById('chkProject')||{}).value||'';
+  var filtered=mockQCChecklist.filter(function(c){
+    if(sf&&c.status!==sf)return false;
+    if(ps&&c.project!==ps)return false;
+    if(q&&!c.item.toLowerCase().includes(q.toLowerCase())&&!c.stage.toLowerCase().includes(q.toLowerCase())&&!c.checkedBy.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pC=_pg('chk',filtered);
+  var chkPass=mockQCChecklist.filter(function(c){return c.status==='Pass'}).length;
+  var chkFail=mockQCChecklist.filter(function(c){return c.status==='Fail'}).length;
+  var chkPend=mockQCChecklist.filter(function(c){return c.status==='Pending'}).length;
+  var projs={};mockQCChecklist.forEach(function(c){projs[c.project]=1});
+  var projList=Object.keys(projs).sort();
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Items',mockQCChecklist.length,'#1565c0'],
+    ['Passed',chkPass,'#2e7d32'],
+    ['Failed',chkFail,chkFail>0?'#c62828':'#999'],
+    ['Pending',chkPend,chkPend>0?'#ff8f00':'#999']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="chkSearch" placeholder="Search checklists..." oninput="_PG.chk={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="chkProject" onchange="_PG.chk={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Projects</option>'+projList.map(function(p){return '<option value="'+p+'">'+p+'</option>';}).join('')+'</select>'+
+    '<select id="chkStatus" onchange="_PG.chk={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Pass</option><option>Fail</option><option>Pending</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Item</th><th>Project</th><th>Stage</th><th>Standard</th><th>Checked By</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pC.items.map(function(c){
+    var sc={'Pass':'#2e7d32','Fail':'#c62828','Pending':'#ff8f00'}[c.status]||'#888';
+    var sbg={'Pass':'#e8f5e9','Fail':'#ffebee','Pending':'#fff8e1'}[c.status]||'#f5f5f5';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.item+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px;color:#888">'+c.stage+'</td><td style="font-size:9px;color:#888">'+c.standard+'</td><td style="font-size:9px">'+c.checkedBy+'</td><td style="font-size:9px;color:#888">'+c.date+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCChecklist(mockQCChecklist.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQCChecklist.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockQCChecklist.splice(idx,1);DB.save(\x27qcChecklist\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('chk',pC.total,pC.page,pC.totalPages,pC.perPage)+'</div></div></div>';
+}
+function renderQCReports(){
+  var q=(document.getElementById('rptSearch')||{}).value||'';
+  var ts=(document.getElementById('rptType')||{}).value||'';
+  var ss=(document.getElementById('rptStatus')||{}).value||'';
+  var filtered=mockQCReports.filter(function(r){
+    if(ts&&r.type!==ts)return false;
+    if(ss&&r.status!==ss)return false;
+    if(q&&!r.project.toLowerCase().includes(q.toLowerCase())&&!r.type.toLowerCase().includes(q.toLowerCase())&&!r.preparedBy.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pR=_pg('rpt',filtered);
+  var totRpt=mockQCReports.length,sub=mockQCReports.filter(function(r){return r.status==='Submitted'}).length;
+  var drf=mockQCReports.filter(function(r){return r.status==='Draft'}).length;
+  var opn=mockQCReports.filter(function(r){return r.status==='Open'}).length;
+  var cls=mockQCReports.filter(function(r){return r.status==='Closed'}).length;
+  var types={};mockQCReports.forEach(function(r){types[r.type]=1});
+  var typeList=Object.keys(types).sort();
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Reports',totRpt,'#1565c0'],
+    ['Submitted',sub,'#2e7d32'],
+    ['Draft',drf,drf>0?'#ff8f00':'#999'],
+    ['Open NCRs',opn,opn>0?'#c62828':'#999'],
+    ['Closed NCRs',cls,'#00838f'],
+    ['Total Findings',mockQCReports.reduce(function(s,r){return s+r.findings},0),'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="rptSearch" placeholder="Search reports..." oninput="_PG.rpt={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="rptType" onchange="_PG.rpt={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+typeList.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('')+'</select>'+
+    '<select id="rptStatus" onchange="_PG.rpt={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Submitted</option><option>Draft</option><option>Open</option><option>Closed</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Type</th><th>Project</th><th>Date</th><th>Prepared By</th><th class="num">Findings</th><th class="num">Passed</th><th class="num">Failed</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pR.items.map(function(r){
+    var ss={'Submitted':'#2e7d32','Draft':'#ff8f00','Open':'#c62828','Closed':'#888'}[r.status]||'#888';
+    var sbg={'Submitted':'#e8f5e9','Draft':'#fff8e1','Open':'#ffebee','Closed':'#f5f5f5'}[r.status]||'#f5f5f5';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+r.id+'</td><td style="font-weight:500">'+r.type+'</td><td style="font-size:9px">'+r.project+'</td><td style="font-size:9px;color:#888">'+r.date+'</td><td style="font-size:9px">'+r.preparedBy+'</td><td class="num">'+r.findings+'</td><td class="num" style="color:#2e7d32">'+r.passed+'</td><td class="num" style="color:#c62828">'+r.failed+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+ss+'">'+r.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCReport(mockQCReports.find(function(x){return x.id===\x27'+r.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQCReports.findIndex(function(x){return x.id===\x27'+r.id+'\x27});if(idx>=0)mockQCReports.splice(idx,1);DB.save(\x27qcReports\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('rpt',pR.total,pR.page,pR.totalPages,pR.perPage)+'</div></div></div>';
+}
+function openQCItem(id){
+  var i=mockQC.find(function(x){return x.id===id});
+  if(!i)return;
+  var rc={'Pass':'#2e7d32','Fail':'#c62828','Pending':'#ff8f00'}[i.result]||'#888';
+  var sc={'Critical':'#c62828','Major':'#e65100','Minor':'#888'}[i.severity]||'#888';
+  var ncr=mockQCReports.filter(function(r){return r.project===i.project&&(r.type==='Non-Conformance Report')&&r.status==='Open'});
+  showDetailPanel('Inspection: '+i.item,
+    '<div style="margin-bottom:10px"><span class="badge-status" style="background:'+(i.result==='Pass'?'#e8f5e9':i.result==='Fail'?'#ffebee':'#fff8e1')+';color:'+rc+';font-size:10px">'+i.result+'</span> <span class="badge-status" style="background:'+(i.severity==='Critical'?'#ffebee':i.severity==='Major'?'#fff3e0':'#f5f5f5')+';color:'+sc+';font-size:10px">'+i.severity+'</span></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['ID',i.id],
+      ['Category',i.category],
+      ['Project',i.project],
+      ['Inspector',i.inspector],
+      ['Date',i.date],
+      ['Result',i.result],
+      ['Severity',i.severity],
+      ['Open NCRs',ncr.length>0?ncr.length+' open':'None']
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px"><div style="font-size:9px;color:#888;margin-bottom:4px">Remarks</div><div style="font-size:10px">'+(i.remarks||'No remarks')+'</div></div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudQCItem(mockQC.find(function(x){return x.id===\x27'+i.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+function crudQCItem(item){
+  var n=!item;
+  var projects=['Muktodhara','Jolshiri'];
+  var cats=['Concrete','Steel','Masonry','Formwork','Plumbing','Earthwork','Finishing','Electrical','Waterproofing','Joinery','Safety','Structural'];
+  var inspectors=['Tanvir Ahmed','Rofiqul Islam','Shahidul Islam'];
+  var i=n?{id:'QC-'+String(mockQC.length+1).padStart(3,'0'),project:'Muktodhara',item:'',category:'Concrete',date:new Date().toISOString().split('T')[0],result:'Pass',inspector:'Tanvir Ahmed',severity:'Major',remarks:''}:item;
+  openModal(n?'New Inspection':'Edit Inspection',
+    formRow(inputField('Inspection Item','qi_item',i.item,'',true),selectField('Category','qi_cat',i.category,cats,true))+
+    formRow(selectField('Project','qi_proj',i.project,projects,true),inputField('Date','qi_date',i.date))+
+    formRow(selectField('Inspector','qi_insp',i.inspector,['Tanvir Ahmed','Rofiqul Islam','Shahidul Islam'],true),selectField('Result','qi_result',i.result,['Pass','Fail','Pending'],true))+
+    formRow(selectField('Severity','qi_sev',i.severity,['Critical','Major','Minor'],true),inputField('Remarks','qi_rem',i.remarks)),
+    function(){
+      var d={id:i.id,project:g('qi_proj'),item:g('qi_item'),category:g('qi_cat'),date:g('qi_date')||i.date,result:g('qi_result'),inspector:g('qi_insp'),severity:g('qi_sev'),remarks:g('qi_rem')};
+      if(n){mockQC.push(d);DB.save('qc');showToast('Inspection added','success');}
+      else{var idx=mockQC.findIndex(function(x){return x.id===i.id});if(idx>=0){mockQC[idx]=d;DB.save('qc');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudQCChecklist(item){
+  var n=!item;
+  var stages=['Foundation','Column','Slab','Finishing'];
+  var c=n?{id:'CHK-'+String(mockQCChecklist.length+1).padStart(3,'0'),project:'Muktodhara',stage:'Foundation',item:'',standard:'',status:'Pending',checkedBy:'Tanvir Ahmed',date:new Date().toISOString().split('T')[0],remarks:''}:item;
+  openModal(n?'Add Checklist Item':'Edit Checklist Item',
+    formRow(inputField('Item','chk_item',c.item,'',true),inputField('Standard','chk_std',c.standard,'',true))+
+    formRow(selectField('Project','chk_proj',c.project,['Muktodhara','Jolshiri'],true),selectField('Stage','chk_stage',c.stage,stages,true))+
+    formRow(selectField('Checked By','chk_by',c.checkedBy,['Tanvir Ahmed','Rofiqul Islam','Shahidul Islam'],true),inputField('Date','chk_date',c.date))+
+    formRow(selectField('Status','chk_status',c.status,['Pass','Fail','Pending'],true),inputField('Remarks','chk_rem',c.remarks)),
+    function(){
+      var d={id:c.id,project:g('chk_proj'),stage:g('chk_stage'),item:g('chk_item'),standard:g('chk_std'),status:g('chk_status'),checkedBy:g('chk_by'),date:g('chk_date')||c.date,remarks:g('chk_rem')};
+      if(n){mockQCChecklist.push(d);DB.save('qcChecklist');showToast('Checklist item added','success');}
+      else{var idx=mockQCChecklist.findIndex(function(x){return x.id===c.id});if(idx>=0){mockQCChecklist[idx]=d;DB.save('qcChecklist');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudQCReport(item){
+  var n=!item;
+  var types=['Weekly QC Summary','Monthly QC Report','Non-Conformance Report','Material Test Summary'];
+  var r=n?{id:'QCR-'+String(mockQCReports.length+1).padStart(3,'0'),project:'Muktodhara',type:'Weekly QC Summary',date:new Date().toISOString().split('T')[0],preparedBy:'Tanvir Ahmed',status:'Draft',findings:0,passed:0,failed:0,pending:0}:item;
+  openModal(n?'New Report':'Edit Report',
+    formRow(selectField('Type','rpt_type',r.type,types,true),selectField('Project','rpt_proj',r.project,['Muktodhara','Jolshiri','Both'],true))+
+    formRow(inputField('Date','rpt_date',r.date),selectField('Prepared By','rpt_by',r.preparedBy,['Tanvir Ahmed','Rofiqul Islam','Shahidul Islam'],true))+
+    formRow(selectField('Status','rpt_status',r.status,['Draft','Submitted','Open','Closed'],true),inputField('Findings','rpt_find',String(r.findings),'',true))+
+    formRow(inputField('Passed','rpt_pass',String(r.passed),'',true),inputField('Failed','rpt_fail',String(r.failed),'',true)),
+    function(){
+      var d={id:r.id,project:g('rpt_proj'),type:g('rpt_type'),date:g('rpt_date')||r.date,preparedBy:g('rpt_by'),status:g('rpt_status'),findings:parseInt(g('rpt_find'))||0,passed:parseInt(g('rpt_pass'))||0,failed:parseInt(g('rpt_fail'))||0,pending:0};
+      if(n){mockQCReports.push(d);DB.save('qcReports');showToast('Report created','success');}
+      else{var idx=mockQCReports.findIndex(function(x){return x.id===r.id});if(idx>=0){mockQCReports[idx]=d;DB.save('qcReports');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
 </script>
 </body>
 </html>
