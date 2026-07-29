@@ -216,6 +216,15 @@
     html.dark .tooltip-el.bottom::after{border-bottom-color:#37474f}
     html.dark .tooltip-el.left::after{border-left-color:#37474f}
     html.dark .tooltip-el.right::after{border-right-color:#37474f}
+    /* Inline edit styles */
+    .ie-input{position:absolute;padding:2px 6px;border:1px solid #2F80ED;border-radius:4px;font-size:10px;font-family:inherit;background:#fff;z-index:100;outline:none;min-width:60px;box-shadow:0 2px 8px rgba(47,128,237,.2)}
+    .ie-input:focus{border-color:#1565c0;box-shadow:0 0 0 2px rgba(47,128,237,.15)}
+    td[data-field]{cursor:pointer;position:relative}
+    td[data-field]:hover{background:#f0f7ff!important}
+    td[data-field]::after{content:'\u270E';position:absolute;right:2px;top:1px;font-size:7px;color:#2F80ED;opacity:0;transition:opacity .15s}
+    td[data-field]:hover::after{opacity:1}
+    html.dark td[data-field]:hover{background:#1a2332!important}
+    html.dark .ie-input{background:#1f2937;color:#e0e0e0;border-color:#4a6fa5}
   </style>
 </head>
 <body>
@@ -2300,7 +2309,7 @@ function renderBOQItems(){
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>BOQ ID</th><th>Item</th><th>Category</th><th>Project</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th><th></th></tr></thead><tbody>'+
   pB.items.map(function(b){
     var itemTotal=b.qtyNum*b.rateNum;
-    return '<tr style="cursor:pointer" onclick="openBOQItem(\x27'+b.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+b.id+'</td><td style="font-weight:500;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(b.catColor||'#eef3ff')+'15;color:'+(b.catColor||'#2F80ED')+'">'+b.category+'</span></td><td style="font-size:9px;color:#888">'+b.project+'</td><td class="num">'+b.qty+'</td><td>'+b.unit+'</td><td class="num">\\u09F3 '+(b.rateNum).toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+itemTotal.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudBOQ(mockBOQ.find(function(x){return x.id===\x27'+b.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+b.item+'?\x27)){var idx=mockBOQ.findIndex(function(x){return x.id===\x27'+b.id+'\x27});if(idx>=0)mockBOQ.splice(idx,1);DB.save(\x27boq\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openBOQItem(\x27'+b.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+b.id+'</td><td style="font-weight:500;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(b.catColor||'#eef3ff')+'15;color:'+(b.catColor||'#2F80ED')+'">'+b.category+'</span></td><td style="font-size:9px;color:#888">'+b.project+'</td><td class="num">'+b.qty+'</td><td>'+b.unit+'</td><td class="num">\\u09F3 '+(b.rateNum).toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+itemTotal.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudBOQ(mockBOQ.find(function(x){return x.id===\x27'+b.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+b.item+'?\x27)){var idx=mockBOQ.findIndex(function(x){return x.id===\x27'+b.id+'\x27});if(idx>=0)mockBOQ.splice(idx,1);DB.save(\x27boq\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('boq',pB.total,pB.page,pB.totalPages,pB.perPage)+'</div></div></div>'+
   '<div style="margin-top:4px;text-align:right;font-size:9px;color:#888;padding:0 4px">Total BOQ Value: \\u09F3 '+filtered.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0).toLocaleString('en-IN')+'</div>';
 }
@@ -2497,7 +2506,7 @@ function renderEqList(){
         '<span style="font-size:8px;color:#999">'+(e.operator?'Operator: '+e.operator:'No operator')+'</span>'+
         '<div style="display:flex;gap:4px">'+
           '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEquipment(mockEquipment.find(function(x){return x.id===\x27'+e.id+'\x27}))">\\u270E</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+e.name+'?\x27)){var idx=mockEquipment.findIndex(function(x){return x.id===\x27'+e.id+'\x27});if(idx>=0)mockEquipment.splice(idx,1);DB.save(\x27equipment\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+e.name+'?\x27)){var idx=mockEquipment.findIndex(function(x){return x.id===\x27'+e.id+'\x27});if(idx>=0)mockEquipment.splice(idx,1);DB.save(\x27equipment\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -2521,9 +2530,9 @@ function renderEqMaintenance(){
     '<select id="maintType" onchange="_PG.maint={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option>Service</option><option>Repair</option><option>Fuel</option><option>Inspection</option><option>Parts</option></select>'+
     '<select id="maintStatus" onchange="_PG.maint={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Completed</option><option>Scheduled</option><option>In Progress</option></select>'+
   '</div>'+
-  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Date</th><th>Equipment</th><th>Type</th><th class="num">Cost (\\u09F3)</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table data-array="mockMaintenanceLog" style="font-size:10px"><thead><tr><th>Date</th><th>Equipment</th><th>Type</th><th class="num">Cost (Tk)</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>'+
   pM.items.map(function(m){
-    return '<tr><td style="font-size:9px;color:#888">'+m.date+'</td><td style="font-weight:500">'+m.equipment+'</td><td><span class="badge-status" style="background:'+(m.type==='Fuel'?'#fff8e1':m.type==='Repair'?'#ffebee':m.type==='Service'?'#e3f2fd':m.type==='Inspection'?'#e8f5e9':'#f3e5f5')+';color:'+(m.type==='Fuel'?'#ff8f00':m.type==='Repair'?'#c62828':m.type==='Service'?'#1565c0':m.type==='Inspection'?'#2e7d32':'#7b1fa2')+'">'+m.type+'</span></td><td class="num" style="font-weight:600">\\u09F3 '+m.cost.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(m.status==='Completed'?'badge-active':'badge-pending')+'">'+m.status+'</span></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;color:#888">'+m.notes+'</td><td><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="if(confirm(\x27Delete log?\x27)){var idx=mockMaintenanceLog.findIndex(function(x){return x.id===\x27'+m.id+'\x27});if(idx>=0)mockMaintenanceLog.splice(idx,1);DB.save(\x27maintenanceLog\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span></td></tr>';
+    return '<tr data-id="'+m.id+'"><td data-field="date" style="font-size:9px;color:#888">'+m.date+'</td><td data-field="equipment" style="font-weight:500">'+m.equipment+'</td><td data-field="type"><span class="badge-status" style="background:'+(m.type==='Fuel'?'#fff8e1':m.type==='Repair'?'#ffebee':m.type==='Service'?'#e3f2fd':m.type==='Inspection'?'#e8f5e9':'#f3e5f5')+';color:'+(m.type==='Fuel'?'#ff8f00':m.type==='Repair'?'#c62828':m.type==='Service'?'#1565c0':m.type==='Inspection'?'#2e7d32':'#7b1fa2')+'">'+m.type+'</span></td><td data-field="cost" data-type="number" class="num" style="font-weight:600">Tk '+m.cost.toLocaleString('en-IN')+'</td><td data-field="status"><span class="badge-status '+(m.status==='Completed'?'badge-active':'badge-pending')+'">'+m.status+'</span></td><td data-field="notes" style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;color:#888">'+m.notes+'</td><td><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="if(confirm(\x27Delete log?\x27)){var idx=mockMaintenanceLog.findIndex(function(x){return x.id===\x27'+m.id+'\x27});if(idx>=0)mockMaintenanceLog.splice(idx,1);DB.save(\x27maintenanceLog\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('maint',pM.total,pM.page,pM.totalPages,pM.perPage)+'</div></div></div>';
 }
 
@@ -2664,7 +2673,7 @@ function renderDesignCards(){
         '<div style="font-size:8px;color:#999">Submitted: '+d.submitted+'</div>'+
         '<div style="display:flex;gap:4px">'+
           '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudDesign(mockDesigns.find(function(x){return x.id===\x27'+d.id+'\x27}))">\\u270E Edit</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+d.name+'?\x27)){var idx=mockDesigns.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockDesigns.splice(idx,1);DB.save(\x27designs\x27);showToast(\x27Design deleted\x27,\x27info\x27);renderModule()}">\\u2715 Delete</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+d.name+'?\x27)){var idx=mockDesigns.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockDesigns.splice(idx,1);DB.save(\x27designs\x27);showToast(\x27Design deleted\x27,\x27info\x27);renderModule()}">\u2715 Delete</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -2861,7 +2870,7 @@ function renderContractorList(){
         '<span style="font-size:8px;color:#999">'+(c.projects?c.projects.length+' projects':'0 projects')+'</span>'+
         '<div style="display:flex;gap:4px">'+
           '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudContractor(mockContractors.find(function(x){return x.id===\x27'+c.id+'\x27}))">\\u270E</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+c.name+'?\x27)){var idx=mockContractors.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockContractors.splice(idx,1);DB.save(\x27contractors\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+c.name+'?\x27)){var idx=mockContractors.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockContractors.splice(idx,1);DB.save(\x27contractors\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -2890,7 +2899,7 @@ function renderWorkOrders(){
   pW.items.map(function(w){
     var sc={'Pending':'#ff8f00','Active':'#1565c0','Completed':'#2e7d32','Cancelled':'#c62828'}[w.status]||'#888';
     var sbg={'Pending':'#fff8e1','Active':'#e3f2fd','Completed':'#e8f5e9','Cancelled':'#ffebee'}[w.status]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openWorkOrder(\x27'+w.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+w.id+'</td><td style="font-weight:500">'+(ctNames[w.contractor]||w.contractor)+'</td><td>'+w.project+'</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.scope+'</td><td class="num" style="font-weight:600">\\u09F3 '+(w.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+w.date+'</td><td style="font-size:9px;color:#888">'+w.deadline+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+w.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\x27'+w.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete WO '+w.id+'?\x27)){var idx=mockWorkOrders.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockWorkOrders.splice(idx,1);DB.save(\x27workOrders\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openWorkOrder(\x27'+w.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+w.id+'</td><td style="font-weight:500">'+(ctNames[w.contractor]||w.contractor)+'</td><td>'+w.project+'</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.scope+'</td><td class="num" style="font-weight:600">\\u09F3 '+(w.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+w.date+'</td><td style="font-size:9px;color:#888">'+w.deadline+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+w.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\x27'+w.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete WO '+w.id+'?\x27)){var idx=mockWorkOrders.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockWorkOrders.splice(idx,1);DB.save(\x27workOrders\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('wo',pW.total,pW.page,pW.totalPages,pW.perPage)+'</div></div></div>';
 }
 
@@ -4311,15 +4320,74 @@ function initTooltips(){
   });
 }
 
+
+// ═══ INLINE EDIT ═══
+var _ieActive=null;
+function enableInlineEdit(){
+  var mc=document.getElementById('mainContent');
+  if(!mc)return;
+  mc.ondblclick=function(e){
+    var td=e.target.closest('td[data-field]');
+    if(!td||td.querySelector('input,select,button,a,.badge-status'))return;
+    var tr=td.closest('tr');
+    var tbl=td.closest('table');
+    if(!tr||!tbl)return;
+    var arrName=tbl.getAttribute('data-array');
+    var recordId=tr.getAttribute('data-id');
+    var field=td.getAttribute('data-field');
+    var fType=td.getAttribute('data-type')||'text';
+    var opts=td.getAttribute('data-options')||'';
+    if(!arrName||!recordId||!field)return;
+    var arr=window[arrName];
+    if(!arr)return;
+    var idx=arr.findIndex(function(r){return (r.id||r.code||'')==recordId;});
+    if(idx<0)return;
+    if(_ieActive){_ieActive.parentNode.innerHTML=_ieActive._origVal;_ieActive=null;}
+    var oldVal=arr[idx][field];
+    var inp;
+    if(fType==='select'&&opts){
+      inp=document.createElement('select');inp.className='ie-input';
+      opts.split(',').forEach(function(o){var opt=document.createElement('option');opt.value=o;opt.textContent=o;if(o.trim()===String(oldVal).trim())opt.selected=true;inp.appendChild(opt);});
+    }else{
+      inp=document.createElement('input');inp.className='ie-input';inp.type=fType;inp.value=oldVal;
+    }
+    inp.style.width=(Math.max(60,rect.width-4))+'px';
+    inp._arrName=arrName;inp._idx=idx;inp._field=field;inp._fType=fType;
+    inp._origVal=td.innerHTML;
+    td.innerHTML='';td.appendChild(inp);
+    _ieActive=inp;
+    inp.focus();if(inp.select)inp.select();
+    inp.onkeydown=function(ev){
+      if(ev.key==='Enter'){ev.preventDefault();saveInlineEdit(inp);}
+      else if(ev.key==='Escape'){ev.preventDefault();cancelInlineEdit(inp);}
+    };
+    inp.onblur=function(){setTimeout(function(){if(_ieActive===inp)saveInlineEdit(inp);},150);};
+  };
+}
+function saveInlineEdit(inp){
+  var arr=window[inp._arrName];if(!arr)return;
+  var item=arr[inp._idx];if(!item)return;
+  var val=inp.tagName==='SELECT'?inp.options[inp.selectedIndex].value:inp.value;
+  if(inp._fType==='number')val=parseFloat(val)||0;
+  item[inp._field]=val;
+  DB.save(inp._arrName.replace('mock','').toLowerCase());
+  _ieActive=null;
+  renderModule();
+}
+function cancelInlineEdit(inp){
+  inp.parentNode.innerHTML=inp._origVal;
+  _ieActive=null;
+}
+
 // ═══ INIT ═══
 switchGroup('executive');
 // Enhance tables after init
-setTimeout(function(){enhanceAllTables();initTooltips();},100);
-// Override render to also enhance tables and tooltips
+setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();},100);
+// Override render to also enhance tables, tooltips and inline edit
 var origRender=renderModule;
-renderModule=function(){origRender();setTimeout(function(){enhanceAllTables();initTooltips();},50);};
+renderModule=function(){origRender();setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();},50);};
 var origSwitch=switchModule;
-switchModule=function(mod){currentModule=mod;origSwitch(mod);setTimeout(function(){enhanceAllTables();initTooltips();},50);};
+switchModule=function(mod){currentModule=mod;origSwitch(mod);setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();},50);};
 function resetAllAppData(){if(confirm("Reset ALL app data? This cannot be undone.")){localStorage.clear();location.reload()}}
 
 // ═══ LABOR MANAGEMENT MODULE ═══
