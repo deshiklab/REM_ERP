@@ -605,10 +605,77 @@ window.mockMaintenanceLog = DB.init('maintenanceLog', [
   {id:14,equipment:'Welding Machine',type:'Repair',date:'2024-08-15',cost:4000,status:'Completed',notes:'Cable replacement, tip change'}
 ]);
 window.mockLabor = DB.init('labor', [
-  {name:'Skilled Mason',count:12,site:'Muktodhara',rate:'৳800/day',status:'Present'},
-  {name:'Rod Binder',count:8,site:'Jolshiri',rate:'৳700/day',status:'Present'},
-  {name:'Carpenter',count:5,site:'Muktodhara',rate:'৳750/day',status:'Present'},
-  {name:'General Labor',count:20,site:'Jolshiri',rate:'৳500/day',status:'Present'}
+  {id:'WRK-001',name:'Md. Rofiqul Islam',category:'Skilled Mason',site:'Muktodhara',phone:'01711-123456',salary:28000,status:'Present',rating:5,joinDate:'2023-01-15'},
+  {id:'WRK-002',name:'Abdur Rashid',category:'Rod Binder',site:'Jolshiri',phone:'01722-234567',salary:24000,status:'Present',rating:4,joinDate:'2023-03-01'},
+  {id:'WRK-003',name:'Shahidul Islam',category:'Carpenter',site:'Muktodhara',phone:'01733-345678',salary:26000,status:'Present',rating:4,joinDate:'2022-11-20'},
+  {id:'WRK-004',name:'Khalilur Rahman',category:'General Labor',site:'Jolshiri',phone:'01744-456789',salary:18000,status:'Present',rating:3,joinDate:'2024-01-10'},
+  {id:'WRK-005',name:'Monir Hossain',category:'Electrician',site:'Muktodhara',phone:'01755-567890',salary:30000,status:'Present',rating:5,joinDate:'2022-06-01'},
+  {id:'WRK-006',name:'Sirajul Islam',category:'Plumber',site:'Jolshiri',phone:'01766-678901',salary:27000,status:'Absent',rating:4,joinDate:'2023-08-15'},
+  {id:'WRK-007',name:'Jahangir Alam',category:'General Labor',site:'Muktodhara',phone:'01777-789012',salary:18000,status:'Present',rating:3,joinDate:'2024-02-01'},
+  {id:'WRK-008',name:'Mizanur Rahman',category:'Rod Binder',site:'Muktodhara',phone:'01788-890123',salary:23000,status:'Present',rating:4,joinDate:'2023-05-10'},
+  {id:'WRK-009',name:'Shafiqul Islam',category:'Skilled Mason',site:'Jolshiri',phone:'01799-901234',salary:28000,status:'Absent',rating:4,joinDate:'2023-02-20'},
+  {id:'WRK-010',name:'Rafiq Uddin',category:'Carpenter',site:'Jolshiri',phone:'01800-012345',salary:26000,status:'Present',rating:4,joinDate:'2023-04-05'},
+  {id:'WRK-011',name:'Shamsul Alam',category:'Heavy Equipment Operator',site:'Muktodhara',phone:'01811-123456',salary:35000,status:'Present',rating:5,joinDate:'2022-09-01'},
+  {id:'WRK-012',name:'Nurul Islam',category:'Welder',site:'Jolshiri',phone:'01822-234567',salary:22000,status:'Present',rating:3,joinDate:'2024-03-15'},
+  {id:'WRK-013',name:'Fazlul Haque',category:'General Labor',site:'Muktodhara',phone:'01833-345678',salary:18000,status:'Present',rating:3,joinDate:'2024-04-01'},
+  {id:'WRK-014',name:'Azizur Rahman',category:'Electrician',site:'Jolshiri',phone:'01844-456789',salary:30000,status:'Present',rating:4,joinDate:'2023-07-10'},
+  {id:'WRK-015',name:'Hasan Ali',category:'Plumber',site:'Muktodhara',phone:'01855-567890',salary:27000,status:'Absent',rating:4,joinDate:'2024-01-20'},
+  {id:'WRK-016',name:'Belal Hossain',category:'Rod Binder',site:'Jolshiri',phone:'01866-678901',salary:23000,status:'Present',rating:3,joinDate:'2024-05-01'},
+  {id:'WRK-017',name:'Tofazzal Hossain',category:'Skilled Mason',site:'Muktodhara',phone:'01877-789012',salary:28000,status:'Present',rating:5,joinDate:'2023-10-01'},
+  {id:'WRK-018',name:'Salah Uddin',category:'General Labor',site:'Jolshiri',phone:'01888-890123',salary:18000,status:'Present',rating:2,joinDate:'2024-06-01'},
+  {id:'WRK-019',name:'Abul Kalam',category:'Welder',site:'Muktodhara',phone:'01899-901234',salary:22000,status:'Present',rating:3,joinDate:'2024-03-20'},
+  {id:'WRK-020',name:'Nur Mohammad',category:'Carpenter',site:'Jolshiri',phone:'01900-012345',salary:26000,status:'Absent',rating:4,joinDate:'2023-09-01'}
+]);
+window.mockAttendance = DB.init('attendance', [
+  {id:'ATT-001',workerId:'WRK-001',workerName:'Md. Rofiqul Islam',date:'2026-06-01',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-002',workerId:'WRK-002',workerName:'Abdur Rashid',date:'2026-06-01',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-003',workerId:'WRK-005',workerName:'Monir Hossain',date:'2026-06-01',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-004',workerId:'WRK-006',workerName:'Sirajul Islam',date:'2026-06-01',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-005',workerId:'WRK-008',workerName:'Mizanur Rahman',date:'2026-06-01',status:'Half-Day',site:'Muktodhara',remarks:'Left early - family emergency'},
+  {id:'ATT-006',workerId:'WRK-001',workerName:'Md. Rofiqul Islam',date:'2026-06-02',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-007',workerId:'WRK-002',workerName:'Abdur Rashid',date:'2026-06-02',status:'Absent',site:'Jolshiri',remarks:'Sick leave'},
+  {id:'ATT-008',workerId:'WRK-005',workerName:'Monir Hossain',date:'2026-06-02',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-009',workerId:'WRK-009',workerName:'Shafiqul Islam',date:'2026-06-02',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-010',workerId:'WRK-003',workerName:'Shahidul Islam',date:'2026-06-02',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-011',workerId:'WRK-001',workerName:'Md. Rofiqul Islam',date:'2026-06-03',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-012',workerId:'WRK-002',workerName:'Abdur Rashid',date:'2026-06-03',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-013',workerId:'WRK-020',workerName:'Nur Mohammad',date:'2026-06-03',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-014',workerId:'WRK-005',workerName:'Monir Hossain',date:'2026-06-03',status:'Half-Day',site:'Muktodhara',remarks:'Doctor appointment'},
+  {id:'ATT-015',workerId:'WRK-006',workerName:'Sirajul Islam',date:'2026-06-03',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-016',workerId:'WRK-004',workerName:'Khalilur Rahman',date:'2026-06-01',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-017',workerId:'WRK-004',workerName:'Khalilur Rahman',date:'2026-06-02',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-018',workerId:'WRK-004',workerName:'Khalilur Rahman',date:'2026-06-03',status:'Absent',site:'Jolshiri',remarks:'Personal leave'},
+  {id:'ATT-019',workerId:'WRK-007',workerName:'Jahangir Alam',date:'2026-06-01',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-020',workerId:'WRK-007',workerName:'Jahangir Alam',date:'2026-06-02',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-021',workerId:'WRK-007',workerName:'Jahangir Alam',date:'2026-06-03',status:'Present',site:'Muktodhara',remarks:''},
+  {id:'ATT-022',workerId:'WRK-010',workerName:'Rafiq Uddin',date:'2026-06-01',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-023',workerId:'WRK-010',workerName:'Rafiq Uddin',date:'2026-06-02',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-024',workerId:'WRK-010',workerName:'Rafiq Uddin',date:'2026-06-03',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-025',workerId:'WRK-012',workerName:'Nurul Islam',date:'2026-06-01',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-026',workerId:'WRK-012',workerName:'Nurul Islam',date:'2026-06-02',status:'Present',site:'Jolshiri',remarks:''},
+  {id:'ATT-027',workerId:'WRK-012',workerName:'Nurul Islam',date:'2026-06-03',status:'Absent',site:'Jolshiri',remarks:'Medical leave'}
+]);
+window.mockPayroll = DB.init('payroll', [
+  {id:'PRL-001',workerId:'WRK-001',workerName:'Md. Rofiqul Islam',month:'May',year:2026,daysWorked:26,grossPay:28000,deductions:1800,netPay:26200,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-002',workerId:'WRK-002',workerName:'Abdur Rashid',month:'May',year:2026,daysWorked:25,grossPay:24000,deductions:1400,netPay:22600,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-003',workerId:'WRK-003',workerName:'Shahidul Islam',month:'May',year:2026,daysWorked:26,grossPay:26000,deductions:1600,netPay:24400,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-004',workerId:'WRK-004',workerName:'Khalilur Rahman',month:'May',year:2026,daysWorked:24,grossPay:18000,deductions:1000,netPay:17000,status:'Paid',paidDate:'2026-05-30'},
+  {id:'PRL-005',workerId:'WRK-005',workerName:'Monir Hossain',month:'May',year:2026,daysWorked:26,grossPay:30000,deductions:2000,netPay:28000,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-006',workerId:'WRK-006',workerName:'Sirajul Islam',month:'May',year:2026,daysWorked:23,grossPay:27000,deductions:1700,netPay:25300,status:'Pending',paidDate:''},
+  {id:'PRL-007',workerId:'WRK-007',workerName:'Jahangir Alam',month:'May',year:2026,daysWorked:25,grossPay:18000,deductions:1000,netPay:17000,status:'Paid',paidDate:'2026-05-30'},
+  {id:'PRL-008',workerId:'WRK-008',workerName:'Mizanur Rahman',month:'May',year:2026,daysWorked:25,grossPay:23000,deductions:1300,netPay:21700,status:'Paid',paidDate:'2026-05-30'},
+  {id:'PRL-009',workerId:'WRK-009',workerName:'Shafiqul Islam',month:'May',year:2026,daysWorked:22,grossPay:28000,deductions:1800,netPay:26200,status:'Pending',paidDate:''},
+  {id:'PRL-010',workerId:'WRK-010',workerName:'Rafiq Uddin',month:'May',year:2026,daysWorked:26,grossPay:26000,deductions:1600,netPay:24400,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-011',workerId:'WRK-011',workerName:'Shamsul Alam',month:'May',year:2026,daysWorked:24,grossPay:35000,deductions:2500,netPay:32500,status:'Paid',paidDate:'2026-05-29'},
+  {id:'PRL-012',workerId:'WRK-012',workerName:'Nurul Islam',month:'May',year:2026,daysWorked:24,grossPay:22000,deductions:1200,netPay:20800,status:'Pending',paidDate:''},
+  {id:'PRL-013',workerId:'WRK-013',workerName:'Fazlul Haque',month:'May',year:2026,daysWorked:25,grossPay:18000,deductions:1000,netPay:17000,status:'Paid',paidDate:'2026-05-30'},
+  {id:'PRL-014',workerId:'WRK-014',workerName:'Azizur Rahman',month:'May',year:2026,daysWorked:26,grossPay:30000,deductions:2000,netPay:28000,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-015',workerId:'WRK-015',workerName:'Hasan Ali',month:'May',year:2026,daysWorked:22,grossPay:27000,deductions:1700,netPay:25300,status:'Pending',paidDate:''},
+  {id:'PRL-016',workerId:'WRK-016',workerName:'Belal Hossain',month:'May',year:2026,daysWorked:26,grossPay:23000,deductions:1300,netPay:21700,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-017',workerId:'WRK-017',workerName:'Tofazzal Hossain',month:'May',year:2026,daysWorked:25,grossPay:28000,deductions:1800,netPay:26200,status:'Paid',paidDate:'2026-05-31'},
+  {id:'PRL-018',workerId:'WRK-018',workerName:'Salah Uddin',month:'May',year:2026,daysWorked:26,grossPay:18000,deductions:1000,netPay:17000,status:'Paid',paidDate:'2026-05-30'},
+  {id:'PRL-019',workerId:'WRK-019',workerName:'Abul Kalam',month:'May',year:2026,daysWorked:23,grossPay:22000,deductions:1200,netPay:20800,status:'Paid',paidDate:'2026-05-30'},
+  {id:'PRL-020',workerId:'WRK-020',workerName:'Nur Mohammad',month:'May',year:2026,daysWorked:22,grossPay:26000,deductions:1600,netPay:24400,status:'Pending',paidDate:''}
 ]);
 window.mockQC = DB.init('qc', [
   {id:1,project:'Muktodhara',item:'Concrete Test',date:'2024-10-20',result:'Pass',inspector:'Tanvir Ahmed'},
@@ -778,7 +845,7 @@ function switchModule(mod) {
     case 'boq': renderBOQ(el); break;
     case 'variation_orders': renderVariations(el); break;
     case 'equipment': renderEquipment(el); break;
-    case 'labor': renderSubTable(el, 'labor', mockLabor, ['Name','Count','Site','Status'], ['name','count','site','status'], 'Labor Management'); break;
+    case 'labor': renderLabor(el); break;
     case 'qc': renderSubTable(el, 'qc', mockQC, ['Project','Item','Result','Inspector'], ['project','item','result','inspector'], 'QC & Inspection'); break;
     case 'designs': renderDesigns(el); break;
     case 'finance': renderFinance(el); break;
@@ -3578,6 +3645,313 @@ renderModule=function(){origRender();setTimeout(function(){enhanceAllTables();},
 var origSwitch=switchModule;
 switchModule=function(mod){currentModule=mod;origSwitch(mod);setTimeout(function(){enhanceAllTables();},50);};
 function resetAllAppData(){if(confirm("Reset ALL app data? This cannot be undone.")){localStorage.clear();location.reload()}}
+
+// ═══ LABOR MANAGEMENT MODULE ═══
+var ltTab='dashboard';
+function renderLabor(el){
+  ltTab=ltTab||'dashboard';
+  var total=mockLabor.length;
+  var present=mockLabor.filter(function(w){return w.status==='Present'}).length;
+  var absent=mockLabor.filter(function(w){return w.status==='Absent'}).length;
+  var totalPayroll=mockPayroll.reduce(function(s,p){return s+(p.status==='Paid'?p.netPay:0)},0);
+  var pendingPay=mockPayroll.filter(function(p){return p.status==='Pending'}).reduce(function(s,p){return s+p.netPay},0);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Labor Management</div><div class="page-subtitle">'+total+' workers · '+present+' present · ৳'+(totalPayroll/100000).toFixed(1)+'L paid this month</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','📊 Dashboard'],
+        ['workers','👷 Workers'],
+        ['attendance','📋 Attendance'],
+        ['payroll','💰 Payroll']
+      ].map(function(t){
+        return '<div class="tab '+(ltTab===t[0]?'active':'')+'" onclick="ltTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudWorker()" style="padding:3px 8px;font-size:10px;display:'+(ltTab==='workers'?'':'none')+'\">+ Add Worker</button>'+
+      '<button class="action-btn primary" onclick="crudAttendanceRecord()" style="padding:3px 8px;font-size:10px;display:'+(ltTab==='attendance'?'':'none')+'\">+ Record</button>'+
+      '<button class="action-btn primary" onclick="crudPayrollRecord()" style="padding:3px 8px;font-size:10px;display:'+(ltTab==='payroll'?'':'none')+'\">+ Process Payroll</button>'+
+    '</div>'+
+    (ltTab==='dashboard'?renderLaborDashboard():
+     ltTab==='workers'?renderWorkers():
+     ltTab==='attendance'?renderAttendance():
+     ltTab==='payroll'?renderPayroll():'')+
+  '</div>';
+}
+function renderLaborDashboard(){
+  var total=mockLabor.length;
+  var present=mockLabor.filter(function(w){return w.status==='Present'}).length;
+  var absent=mockLabor.filter(function(w){return w.status==='Absent'}).length;
+  var attTotal=mockAttendance.length;
+  var attPresent=mockAttendance.filter(function(a){return a.status==='Present'}).length;
+  var attHalf=mockAttendance.filter(function(a){return a.status==='Half-Day'}).length;
+  var attAbsent=mockAttendance.filter(function(a){return a.status==='Absent'}).length;
+  var totalPayroll=mockPayroll.reduce(function(s,p){return s+(p.status==='Paid'?p.netPay:0)},0);
+  var pending=mockPayroll.filter(function(p){return p.status==='Pending'});
+  var pendingAmt=pending.reduce(function(s,p){return s+p.netPay},0);
+  var categories={};mockLabor.forEach(function(w){categories[w.category]=(categories[w.category]||0)+1});
+  var catSorted=Object.keys(categories).sort(function(a,b){return categories[b]-categories[a]});
+  var topCat=catSorted.slice(0,5);
+  var siteCounts={};mockLabor.forEach(function(w){siteCounts[w.site]=(siteCounts[w.site]||0)+1});
+  var topWorkers=mockLabor.filter(function(w){return w.status==='Present'}).sort(function(a,b){return b.rating-a.rating}).slice(0,5);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Workers',total,'#1565c0'],
+    ['Present',present,'#2e7d32'],
+    ['Absent',absent,absent>0?'#c62828':'#999'],
+    ['Attendance %',attTotal>0?Math.round(attPresent/attTotal*100)+'%':'0%','#7b1fa2'],
+    ['Monthly Payroll','৳'+(totalPayroll/100000).toFixed(1)+'L','#e65100'],
+    ['Pending Pay','৳'+(pendingAmt/100000).toFixed(1)+'L',pendingAmt>0?'#c62828':'#999']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Workforce by Category</h3></div><div class="card-body" style="padding:8px">'+
+    topCat.map(function(c,i){
+      var pct=Math.round(categories[c]/total*100);
+      var colors=['#1565c0','#2e7d32','#e65100','#7b1fa2','#00838f'];
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+colors[i%5]+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+categories[c]+'</div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Attendance Summary (Jun)</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
+      '<div style="display:flex;justify-content:center;gap:16px;margin-bottom:8px">'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#2e7d32">'+attPresent+'</div><div style="font-size:8px;color:#888">Present</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#ff8f00">'+attHalf+'</div><div style="font-size:8px;color:#888">Half-Day</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#c62828">'+attAbsent+'</div><div style="font-size:8px;color:#888">Absent</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1565c0">'+attTotal+'</div><div style="font-size:8px;color:#888">Records</div></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;justify-content:center;margin-top:4px">'+
+        '<div style="padding:3px 8px;background:#e8f5e9;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(totalPayroll/100000).toFixed(1)+'L</div><div style="font-size:7px;color:#666">Paid</div></div>'+
+        '<div style="padding:3px 8px;background:#fff3e0;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#e65100">৳'+(pendingAmt/100000).toFixed(1)+'L</div><div style="font-size:7px;color:#666">Pending</div></div>'+
+        '<div style="padding:3px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#1565c0">'+present+'/'+total+'</div><div style="font-size:7px;color:#666">On Site</div></div>'+
+      '</div>'+
+    '</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>Top Rated Workers</h3></div><div class="card-body" style="padding:4px 8px">'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px">'+
+  topWorkers.map(function(w,i){
+    var stars='';for(var si=0;si<5;si++)stars+=si<w.rating?'★':'☆';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:#f9fafb;border-radius:6px;cursor:pointer" onclick="ltTab=\x27workers\x27;renderModule()">'+
+      '<div style="width:24px;height:24px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.name+'</div><div style="font-size:8px;color:#888">'+w.category+' · '+stars+'</div></div>'+
+      '<span style="font-size:9px;font-weight:600;color:#2e7d32;white-space:nowrap">৳'+(w.salary/1000).toFixed(0)+'K</span></div>';
+  }).join('')+'</div></div></div>';
+}
+function renderWorkers(){
+  var q=(document.getElementById('wrkSearch')||{}).value||'';
+  var cf=(document.getElementById('wrkCat')||{}).value||'';
+  var sf=(document.getElementById('wrkSite')||{}).value||'';
+  var filtered=mockLabor.filter(function(w){
+    if(cf&&w.category!==cf)return false;
+    if(sf&&w.site!==sf)return false;
+    if(q&&!w.name.toLowerCase().includes(q.toLowerCase())&&!w.category.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pW=_pg('wrk',filtered);
+  var cats={};mockLabor.forEach(function(w){cats[w.category]=1});
+  var catList=Object.keys(cats).sort();
+  var sites={};mockLabor.forEach(function(w){sites[w.site]=1});
+  var siteList=Object.keys(sites).sort();
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="wrkSearch" placeholder="Search workers..." oninput="_PG.wrk={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="wrkCat" onchange="_PG.wrk={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>'+catList.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('')+'</select>'+
+    '<select id="wrkSite" onchange="_PG.wrk={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Sites</option>'+siteList.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('')+'</select>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px">'+
+  pW.items.map(function(w){
+    var stars='';for(var si=0;si<5;si++)stars+=si<w.rating?'★':'☆';
+    var payroll=mockPayroll.filter(function(p){return p.workerId===w.id&&p.status==='Paid'});
+    var totalPaid=payroll.reduce(function(s,p){return s+p.netPay},0);
+    var att=mockAttendance.filter(function(a){return a.workerId===w.id});
+    var wrkAtt=att.length,wrkPre=att.filter(function(a){return a.status==='Present'}).length;
+    return '<div class="worker-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openWorker(\x27'+w.id+'\x27)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-weight:700;color:#2F80ED">'+w.name.charAt(0)+'</div>'+
+          '<div><div style="font-size:11px;font-weight:600;color:#222">'+w.name+'</div><div style="font-size:9px;color:#2F80ED">'+w.category+'</div></div>'+
+        '</div>'+
+        '<span class="badge-status '+(w.status==='Present'?'badge-active':'badge-closed')+'">'+w.status+'</span>'+
+      '</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:4px">'+stars+'</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:2px">'+w.site+(w.phone?' · '+w.phone:'')+'</div>'+
+      '<div style="display:flex;gap:4px;margin-top:6px">'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e3f2fd;color:#1565c0">৳'+(w.salary/1000).toFixed(0)+'K/mo</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(wrkAtt>0?'#e8f5e9':'#f5f5f5')+';color:'+(wrkAtt>0?'#2e7d32':'#888')+'">'+(wrkAtt>0?Math.round(wrkPre/wrkAtt*100)+'% att':'No att')+'</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#fff3e0;color:#e65100">৳'+(totalPaid/1000).toFixed(0)+'K paid</span>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
+        '<span style="font-size:8px;color:#999">Joined '+w.joinDate+'</span>'+
+        '<div style="display:flex;gap:4px">'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorker(mockLabor.find(function(x){return x.id===\x27'+w.id+'\x27}))">✎</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+w.name+'?\x27)){var idx=mockLabor.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockLabor.splice(idx,1);DB.save(\x27labor\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('')+'</div>'+
+  (filtered.length>_pgPerPage?_pgHtml('wrk',pW.total,pW.page,pW.totalPages,pW.perPage):'');
+}
+function renderAttendance(){
+  var q=(document.getElementById('attSearch')||{}).value||'';
+  var df=(document.getElementById('attDate')||{}).value||'';
+  var sf=(document.getElementById('attStatus')||{}).value||'';
+  var filtered=mockAttendance.filter(function(a){
+    if(sf&&a.status!==sf)return false;
+    if(df&&a.date!==df)return false;
+    if(q&&!a.workerName.toLowerCase().includes(q.toLowerCase())&&!a.site.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pA=_pg('att',filtered);
+  var tot=mockAttendance.length;
+  var pre=mockAttendance.filter(function(a){return a.status==='Present'}).length;
+  var half=mockAttendance.filter(function(a){return a.status==='Half-Day'}).length;
+  var abs=mockAttendance.filter(function(a){return a.status==='Absent'}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Records',tot,'#1565c0'],
+    ['Present',pre,'#2e7d32'],
+    ['Half-Day',half,'#ff8f00'],
+    ['Absent',abs,abs>0?'#c62828':'#999']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="attSearch" placeholder="Search worker/site..." oninput="_PG.att={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<input id="attDate" type="date" onchange="_PG.att={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"/>'+
+    '<select id="attStatus" onchange="_PG.att={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Present</option><option>Absent</option><option>Half-Day</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Worker</th><th>Date</th><th>Site</th><th>Status</th><th>Remarks</th><th></th></tr></thead><tbody>'+
+  pA.items.map(function(a){
+    var sc={'Present':'#2e7d32','Absent':'#c62828','Half-Day':'#ff8f00'}[a.status]||'#888';
+    var sbg={'Present':'#e8f5e9','Absent':'#ffebee','Half-Day':'#fff8e1'}[a.status]||'#f5f5f5';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.workerName+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.site+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+a.status+'</span></td><td style="font-size:9px;color:#888;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(a.remarks||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAttendanceRecord(mockAttendance.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete record?\x27)){var idx=mockAttendance.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAttendance.splice(idx,1);DB.save(\x27attendance\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('att',pA.total,pA.page,pA.totalPages,pA.perPage)+'</div></div></div>';
+}
+function renderPayroll(){
+  var q=(document.getElementById('prSearch')||{}).value||'';
+  var ms=(document.getElementById('prMonth')||{}).value||'';
+  var ps=(document.getElementById('prStatus')||{}).value||'';
+  var filtered=mockPayroll.filter(function(p){
+    if(ps&&p.status!==ps)return false;
+    if(ms&&p.month!==ms)return false;
+    if(q&&!p.workerName.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pP=_pg('pr',filtered);
+  var totPay=mockPayroll.reduce(function(s,p){return s+p.netPay},0);
+  var paidAmt=mockPayroll.filter(function(p){return p.status==='Paid'}).reduce(function(s,p){return s+p.netPay},0);
+  var pendAmt=mockPayroll.filter(function(p){return p.status==='Pending'}).reduce(function(s,p){return s+p.netPay},0);
+  var pendCount=mockPayroll.filter(function(p){return p.status==='Pending'}).length;
+  var totDed=mockPayroll.reduce(function(s,p){return s+p.deductions},0);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Payroll','৳'+(totPay/100000).toFixed(2)+'L','#1565c0'],
+    ['Paid','৳'+(paidAmt/100000).toFixed(2)+'L','#2e7d32'],
+    ['Pending','৳'+(pendAmt/100000).toFixed(2)+'L',pendAmt>0?'#c62828':'#999'],
+    ['Pending Workers',pendCount,pendCount>0?'#e65100':'#999'],
+    ['Total Deductions','৳'+(totDed/1000).toFixed(1)+'K','#7b1fa2'],
+    ['Avg Salary','৳'+(Math.round(totPay/mockPayroll.length/1000))+'K','#00838f']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="prSearch" placeholder="Search worker..." oninput="_PG.pr={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="prMonth" onchange="_PG.pr={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Months</option><option>May</option><option>June</option></select>'+
+    '<select id="prStatus" onchange="_PG.pr={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Paid</option><option>Pending</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Worker</th><th>Month</th><th class="num">Days</th><th class="num">Gross</th><th class="num">Deductions</th><th class="num">Net Pay</th><th>Status</th><th>Paid Date</th></tr></thead><tbody>'+
+  pP.items.map(function(p){
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+p.id+'</td><td style="font-weight:500">'+p.workerName+'</td><td style="font-size:9px">'+p.month+' '+p.year+'</td><td class="num">'+p.daysWorked+'</td><td class="num" style="font-weight:500">৳'+(p.grossPay/1000).toFixed(0)+'K</td><td class="num" style="color:#c62828">৳'+(p.deductions/1000).toFixed(0)+'K</td><td class="num" style="font-weight:600;color:#2e7d32">৳'+(p.netPay/1000).toFixed(0)+'K</td><td><span class="badge-status '+(p.status==='Paid'?'badge-active':'badge-pending')+'">'+p.status+'</span></td><td style="font-size:9px;color:#888">'+(p.paidDate||'---')+'</td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('pr',pP.total,pP.page,pP.totalPages,pP.perPage)+'</div></div></div>';
+}
+function openWorker(id){
+  var w=mockLabor.find(function(x){return x.id===id});
+  if(!w)return;
+  var stars='';for(var si=0;si<5;si++)stars+=si<w.rating?'★':'☆';
+  var payroll=mockPayroll.filter(function(p){return p.workerId===w.id});
+  var totalPaid=payroll.reduce(function(s,p){return s+p.netPay},0);
+  var att=mockAttendance.filter(function(a){return a.workerId===w.id});
+  var wrkPre=att.filter(function(a){return a.status==='Present'}).length;
+  var wrkHalf=att.filter(function(a){return a.status==='Half-Day'}).length;
+  var wrkAbs=att.filter(function(a){return a.status==='Absent'}).length;
+  var attHtml=att.slice(0,6).map(function(a){
+    var sc={'Present':'#2e7d32','Absent':'#c62828','Half-Day':'#ff8f00'}[a.status]||'#888';
+    return '<div style="display:flex;justify-content:space-between;font-size:9px;padding:3px 0;border-bottom:1px solid #f0f0f0"><span>'+a.date+'</span><span style="color:'+sc+';font-weight:500">'+a.status+'</span>'+(a.remarks?' <span style="color:#888">· '+a.remarks+'</span>':'')+'</div>';
+  }).join('');
+  showDetailPanel('Worker: '+w.name,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:44px;height:44px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#2F80ED">'+w.name.charAt(0)+'</div>'+
+      '<div><span class="badge-status '+(w.status==='Present'?'badge-active':'badge-closed')+'">'+w.status+'</span><div style="font-size:9px;color:#888;margin-top:2px">'+stars+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['Category',w.category],
+      ['Site',w.site],
+      ['Phone',w.phone||'---'],
+      ['Salary','৳'+(w.salary/1000).toFixed(0)+'K/mo'],
+      ['Joined',w.joinDate],
+      ['Rating',w.rating+'/5 '+(w.rating>=4?'🏆':'')]
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;margin-bottom:4px">Attendance ('+att.length+')</div>'+
+    '<div><div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:6px">'+[
+      ['Present',wrkPre,'#2e7d32'],
+      ['Half-Day',wrkHalf,'#ff8f00'],
+      ['Absent',wrkAbs,'#c62828']
+    ].map(function(s){return '<div class="stat-card" style="padding:4px"><div class="label" style="font-size:7px">'+s[0]+'</div><div class="value" style="font-size:13px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div></div>'+
+    '<div style="padding:6px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+(attHtml||'<div style="font-size:9px;color:#888;text-align:center;padding:6px">No attendance records</div>')+'</div></div>'+
+    '<div><div style="font-size:11px;font-weight:600;margin-bottom:4px">Payroll Summary</div>'+
+    '<div class="stats-row" style="grid-template-columns:repeat(3,1fr)">'+[
+      ['Total Paid','৳'+(totalPaid/1000).toFixed(0)+'K','#2e7d32'],
+      ['Transactions',payroll.length,'#1565c0'],
+      ['Avg','৳'+(payroll.length>0?Math.round((totalPaid/payroll.length)/1000):0)+'K','#7b1fa2']
+    ].map(function(s){return '<div class="stat-card" style="padding:4px"><div class="label" style="font-size:7px">'+s[0]+'</div><div class="value" style="font-size:13px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div></div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudWorker(mockLabor.find(function(x){return x.id===\x27'+w.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="ltTab=\x27attendance\x27;closeLeadPanel();renderModule()">Attendance</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+function crudWorker(item){
+  var n=!item;
+  var w=n?{id:'WRK-'+String(mockLabor.length+1).padStart(3,'0'),name:'',category:'General Labor',site:'Muktodhara',phone:'',salary:18000,status:'Present',rating:3,joinDate:new Date().toISOString().split('T')[0]}:item;
+  var cats=['General Labor','Skilled Mason','Rod Binder','Carpenter','Electrician','Plumber','Welder','Heavy Equipment Operator','Painter','Glass Worker','Helper'];
+  var sites=['Muktodhara','Jolshiri'];
+  openModal(n?'Add Worker':'Edit Worker',
+    formRow(inputField('Name','wf_name',w.name,'',true),selectField('Category','wf_cat',w.category,cats,true))+
+    formRow(inputField('Phone','wf_phone',w.phone),inputField('Salary (Tk)','wf_salary',String(w.salary),'',true))+
+    formRow(selectField('Site','wf_site',w.site,sites,true),selectField('Status','wf_status',w.status,['Present','Absent'],true))+
+    formRow(selectField('Rating','wf_rating',String(w.rating),['5','4','3','2','1'],true),inputField('Join Date','wf_join',w.joinDate)),
+    function(){
+      var d={id:w.id,name:g('wf_name'),category:g('wf_cat'),phone:g('wf_phone'),salary:parseInt(g('wf_salary'))||18000,site:g('wf_site'),status:g('wf_status'),rating:parseInt(g('wf_rating'))||3,joinDate:g('wf_join')||w.joinDate};
+      if(n){mockLabor.push(d);DB.save('labor');showToast('Worker added','success');}
+      else{var idx=mockLabor.findIndex(function(x){return x.id===w.id});if(idx>=0){mockLabor[idx]=d;DB.save('labor');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudAttendanceRecord(item){
+  var n=!item;
+  var a=n?{id:'ATT-'+String(mockAttendance.length+1).padStart(3,'0'),workerId:mockLabor.length>0?mockLabor[0].id:'',workerName:mockLabor.length>0?mockLabor[0].name:'',date:new Date().toISOString().split('T')[0],status:'Present',site:mockLabor.length>0?mockLabor[0].site:'Muktodhara',remarks:''}:item;
+  openModal(n?'Record Attendance':'Edit Attendance',
+    formRow(selectField('Worker','af_worker',a.workerId,mockLabor.map(function(w){return w.id+'|'+w.name}),true),inputField('Date','af_date',a.date))+
+    formRow(selectField('Status','af_status',a.status,['Present','Absent','Half-Day'],true),selectField('Site','af_site',a.site,['Muktodhara','Jolshiri'],true))+
+    inputField('Remarks','af_remarks',a.remarks),
+    function(){
+      var sel=g('af_worker');var wid=sel.split('|')[0];
+      var wObj=mockLabor.find(function(x){return x.id===wid});
+      var d={id:a.id,workerId:wid,workerName:wObj?wObj.name:'Unknown',date:g('af_date')||a.date,status:g('af_status'),site:g('af_site'),remarks:g('af_remarks')};
+      if(n){mockAttendance.push(d);DB.save('attendance');showToast('Record saved','success');}
+      else{var idx=mockAttendance.findIndex(function(x){return x.id===a.id});if(idx>=0){mockAttendance[idx]=d;DB.save('attendance');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudPayrollRecord(item){
+  var n=!item;
+  var p=n?{id:'PRL-'+String(mockPayroll.length+1).padStart(3,'0'),workerId:mockLabor.length>0?mockLabor[0].id:'',workerName:mockLabor.length>0?mockLabor[0].name:'',month:'June',year:2026,daysWorked:26,grossPay:0,deductions:0,netPay:0,status:'Pending',paidDate:''}:item;
+  openModal(n?'Process Payroll':'Edit Payroll',
+    formRow(selectField('Worker','pf_worker',p.workerId,mockLabor.map(function(w){return w.id+'|'+w.name+' (৳'+w.salary+'/mo)'}),true),selectField('Month','pf_month',p.month,['January','February','March','April','May','June','July','August','September','October','November','December'],true))+
+    formRow(inputField('Days Worked','pf_days',String(p.daysWorked),'',true),inputField('Gross Pay (Tk)','pf_gross',String(p.grossPay),'',true))+
+    formRow(inputField('Deductions (Tk)','pf_ded',String(p.deductions),'',true),inputField('Net Pay (Tk)','pf_net',String(p.netPay),'',true))+
+    formRow(selectField('Status','pf_status',p.status,['Pending','Paid'],true),inputField('Paid Date','pf_paid',p.paidDate)),
+    function(){
+      var sel=g('pf_worker');var wid=sel.split('|')[0];
+      var wObj=mockLabor.find(function(x){return x.id===wid});
+      var d={id:p.id,workerId:wid,workerName:wObj?wObj.name:'Unknown',month:g('pf_month'),year:2026,daysWorked:parseInt(g('pf_days'))||0,grossPay:parseInt(g('pf_gross'))||0,deductions:parseInt(g('pf_ded'))||0,netPay:parseInt(g('pf_net'))||0,status:g('pf_status'),paidDate:g('pf_paid')};
+      if(n){mockPayroll.push(d);DB.save('payroll');showToast('Payroll processed','success');}
+      else{var idx=mockPayroll.findIndex(function(x){return x.id===p.id});if(idx>=0){mockPayroll[idx]=d;DB.save('payroll');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
 </script>
 </body>
 </html>
