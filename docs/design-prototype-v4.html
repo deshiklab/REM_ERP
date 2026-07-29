@@ -721,9 +721,41 @@ window.mockQCReports = DB.init('qcReports', [
   {id:'QCR-007',project:'Jolshiri',type:'Non-Conformance Report',date:'2026-05-20',preparedBy:'Shahidul Islam',status:'Closed',findings:1,passed:0,failed:1,pending:0}
 ]);
 window.mockCompliance = DB.init('compliance', [
-  {id:1,name:'RAJUK Approval',project:'Muktodhara',type:'Regulatory',due:'2025-01-15',status:'Compliant'},
-  {id:2,name:'Environmental Clearance',project:'Jolshiri',type:'Environmental',due:'2025-03-20',status:'Pending'},
-  {id:3,name:'Fire Safety Certificate',project:'Jolshiri',type:'Safety',due:'2025-02-01',status:'Compliant'}
+  {id:'CMP-001',name:'RAJUK Building Plan Approval',project:'Muktodhara',type:'Regulatory',authority:'RAJUK',due:'2025-06-30',status:'Compliant',assignedTo:'Tanvir Ahmed',priority:'High',remarks:'Approved - Plan No. RAJUK/2024/1245',renewal:'2027-06-30'},
+  {id:'CMP-002',name:'Environmental Clearance Certificate',project:'Jolshiri',type:'Environmental',authority:'DoE',due:'2025-08-15',status:'Pending',assignedTo:'Rofiqul Islam',priority:'High',remarks:'Application submitted - awaiting inspection',renewal:''},
+  {id:'CMP-003',name:'Fire Safety Certificate',project:'Jolshiri',type:'Safety',authority:'Fire Service & Civil Defence',due:'2025-05-01',status:'Expired',assignedTo:'Shahidul Islam',priority:'Critical',remarks:'Renewal application in progress',renewal:'2025-06-15'},
+  {id:'CMP-004',name:'Construction Permit Renewal',project:'Muktodhara',type:'Regulatory',authority:'City Corporation',due:'2025-07-01',status:'Compliant',assignedTo:'Tanvir Ahmed',priority:'Medium',remarks:'Valid until Sep 2025',renewal:'2025-09-01'},
+  {id:'CMP-005',name:'Water Connection Approval',project:'Jolshiri',type:'Utility',authority:'WASA',due:'2025-09-20',status:'Pending',assignedTo:'Rofiqul Islam',priority:'Medium',remarks:'Documentation submitted',renewal:''},
+  {id:'CMP-006',name:'Elevator Safety Certificate',project:'Muktodhara',type:'Safety',authority:'BUET Lift Inspectorate',due:'2025-04-30',status:'Expired',assignedTo:'Shahidul Islam',priority:'Critical',remarks:'Overdue - penalty notice received',renewal:''},
+  {id:'CMP-007',name:'Gas Line Safety Approval',project:'Muktodhara',type:'Utility',authority:'Titas Gas',due:'2025-10-15',status:'Compliant',assignedTo:'Tanvir Ahmed',priority:'Medium',remarks:'All connections inspected and approved',renewal:'2026-10-15'},
+  {id:'CMP-008',name:'Electrical Substation Approval',project:'Jolshiri',type:'Regulatory',authority:'REB',due:'2025-11-01',status:'Pending',assignedTo:'Rofiqul Islam',priority:'High',remarks:'Load calculation submitted - awaiting approval',renewal:''},
+  {id:'CMP-009',name:'Occupancy Certificate',project:'Muktodhara',type:'Regulatory',authority:'City Corporation',due:'2025-12-15',status:'Pending',assignedTo:'Tanvir Ahmed',priority:'High',remarks:'To be applied after completion of block A',renewal:''},
+  {id:'CMP-010',name:'Soil & Water Pollution Report',project:'Jolshiri',type:'Environmental',authority:'DoE',due:'2025-06-30',status:'Compliant',assignedTo:'Rofiqul Islam',priority:'Low',remarks:'Annual report submitted - all clear',renewal:'2026-06-30'},
+  {id:'CMP-011',name:'Boiler Inspection Certificate',project:'Muktodhara',type:'Safety',authority:'Inspector of Boilers',due:'2025-03-31',status:'Expired',assignedTo:'Shahidul Islam',priority:'Critical',remarks:'Boiler not in use - certificate lapsed',renewal:''},
+  {id:'CMP-012',name:'Waste Management License',project:'Jolshiri',type:'Environmental',authority:'City Corporation',due:'2025-08-01',status:'Compliant',assignedTo:'Rofiqul Islam',priority:'Medium',remarks:'Annual waste disposal contract active',renewal:'2026-08-01'},
+  {id:'CMP-013',name:'Labour Law Compliance Certificate',project:'Both',type:'Labour',authority:'Director of Labour',due:'2025-07-31',status:'Compliant',assignedTo:'HR Department',priority:'High',remarks:'All worker registrations up to date',renewal:'2026-07-31'},
+  {id:'CMP-014',name:'Lift/Escalator Annual Inspection',project:'Jolshiri',type:'Safety',authority:'BUET Lift Inspectorate',due:'2025-09-01',status:'Pending',assignedTo:'Shahidul Islam',priority:'High',remarks:'Scheduled for Aug 2025',renewal:''},
+  {id:'CMP-015',name:'Structural Safety Audit Report',project:'Muktodhara',type:'Regulatory',authority:'IAB',due:'2025-11-30',status:'Pending',assignedTo:'Tanvir Ahmed',priority:'High',remarks:'To be conducted post-handover of Block A',renewal:''}
+]);
+window.mockAudits = DB.init('audits', [
+  {id:'AUD-001',project:'Muktodhara',type:'Safety Audit',date:'2025-02-15',auditor:'Fire Service',status:'Completed',findings:4,score:87,remarks:'2 critical, 2 minor - action plan submitted'},
+  {id:'AUD-002',project:'Jolshiri',type:'Safety Audit',date:'2025-03-10',auditor:'Fire Service',status:'Completed',findings:3,score:92,remarks:'1 critical, 2 minor - all resolved'},
+  {id:'AUD-003',project:'Muktodhara',type:'Environmental Audit',date:'2025-01-20',auditor:'DoE',status:'Completed',findings:2,score:95,remarks:'Dust control measures need improvement'},
+  {id:'AUD-004',project:'Jolshiri',type:'Environmental Audit',date:'2025-04-05',auditor:'DoE',status:'Completed',findings:0,score:98,remarks:'No violations found'},
+  {id:'AUD-005',project:'Muktodhara',type:'Labour Inspection',date:'2025-05-12',auditor:'Labour Directorate',status:'Completed',findings:4,score:82,remarks:'Overtime record issues - corrected'},
+  {id:'AUD-006',project:'Jolshiri',type:'Labour Inspection',date:'2025-06-01',auditor:'Labour Directorate',status:'Scheduled',findings:0,score:0,remarks:'Scheduled for June 15'},
+  {id:'AUD-007',project:'Muktodhara',type:'Structural Audit',date:'2025-04-20',auditor:'IAB',status:'Completed',findings:1,score:96,remarks:'Minor crack observed in column B7 - monitoring recommended'},
+  {id:'AUD-008',project:'Jolshiri',type:'Quality Audit',date:'2025-05-28',auditor:'Internal QC Team',status:'Completed',findings:2,score:90,remarks:'Painting thickness below spec in 2 units'}
+]);
+window.mockCertificates = DB.init('certificates', [
+  {id:'CERT-001',name:'RAJUK Plan Approval Certificate',project:'Muktodhara',type:'Regulatory',issued:'2024-06-30',expires:'2027-06-30',status:'Active',authority:'RAJUK',remarks:'Original plan approval document'},
+  {id:'CERT-002',name:'Environmental Clearance',project:'Jolshiri',type:'Environmental',issued:'2024-08-15',expires:'2027-08-15',status:'Pending',authority:'DoE',remarks:'Awaiting issuance'},
+  {id:'CERT-003',name:'Fire Safety Certificate',project:'Jolshiri',type:'Safety',issued:'2024-05-01',expires:'2025-05-01',status:'Expired',authority:'Fire Service',remarks:'Renewal in progress'},
+  {id:'CERT-004',name:'Construction Permit',project:'Muktodhara',type:'Regulatory',issued:'2023-09-01',expires:'2025-09-01',status:'Active',authority:'City Corporation',remarks:'Original permit valid'},
+  {id:'CERT-005',name:'Water Connection Certificate',project:'Jolshiri',type:'Utility',issued:'',expires:'',status:'Pending',authority:'WASA',remarks:'Not yet issued'},
+  {id:'CERT-006',name:'Elevator Safety Certificate',project:'Muktodhara',type:'Safety',issued:'2024-04-30',expires:'2025-04-30',status:'Expired',authority:'BUET Lift Inspectorate',remarks:'Overdue penalty notice received'},
+  {id:'CERT-007',name:'Titas Gas Safety Approval',project:'Muktodhara',type:'Utility',issued:'2024-10-15',expires:'2026-10-15',status:'Active',authority:'Titas Gas',remarks:'All connections inspected'},
+  {id:'CERT-008',name:'Labour Compliance Certificate',project:'Both',type:'Labour',issued:'2024-07-31',expires:'2026-07-31',status:'Active',authority:'Labour Directorate',remarks:'Worker registration up to date'}
 ]);
 // NEW MODULE DATA
 window.mockBOQ = DB.init('boq', [
@@ -875,7 +907,7 @@ function switchModule(mod) {
     case 'land_mgmt': renderLandMgmt(el); break;
     case 'plots': renderPlots(el); break;
     case 'projects': renderProjects(el); break;
-    case 'compliance': renderSubTable(el, 'compliance', mockCompliance, ['Name','Type','Due','Status'], ['name','type','due','status'], 'Compliance'); break;
+    case 'compliance': renderCompliance(el); break;
     case 'bookings': renderBookings(el); break;
     case 'customer_portal': renderCustomerPortal(el); break;
     case 'handover': renderHandover(el); break;
@@ -1629,7 +1661,7 @@ function renderBOQ(el){
         ['items','\\uD83D\\uDCCB BOQ Items'],
         ['rate_analysis','\\uD83D\\uDCC8 Rate Analysis']
       ].map(function(t){
-        return '<div class="tab '+(bt===t[0]?'active':'')+'" onclick="boqTab=\\x27'+t[0]+'\\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+        return '<div class="tab '+(bt===t[0]?'active':'')+'" onclick="boqTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
       '<div class="spacer"></div>'+
       '<button class="action-btn primary" onclick="crudBOQ()" style="padding:3px 8px;font-size:10px;display:'+(bt==='items'?'':'none')+'">+ Add Item</button>'+
@@ -1698,7 +1730,7 @@ function renderBOQItems(){
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>BOQ ID</th><th>Item</th><th>Category</th><th>Project</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th><th></th></tr></thead><tbody>'+
   pB.items.map(function(b){
     var itemTotal=b.qtyNum*b.rateNum;
-    return '<tr style="cursor:pointer" onclick="openBOQItem(\\x27'+b.id+'\\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+b.id+'</td><td style="font-weight:500;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(b.catColor||'#eef3ff')+'15;color:'+(b.catColor||'#2F80ED')+'">'+b.category+'</span></td><td style="font-size:9px;color:#888">'+b.project+'</td><td class="num">'+b.qty+'</td><td>'+b.unit+'</td><td class="num">\\u09F3 '+(b.rateNum).toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+itemTotal.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudBOQ(mockBOQ.find(function(x){return x.id===\\x27'+b.id+'\\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+b.item+'?\\x27)){var idx=mockBOQ.findIndex(function(x){return x.id===\\x27'+b.id+'\\x27});if(idx>=0)mockBOQ.splice(idx,1);DB.save(\\x27boq\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openBOQItem(\x27'+b.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+b.id+'</td><td style="font-weight:500;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(b.catColor||'#eef3ff')+'15;color:'+(b.catColor||'#2F80ED')+'">'+b.category+'</span></td><td style="font-size:9px;color:#888">'+b.project+'</td><td class="num">'+b.qty+'</td><td>'+b.unit+'</td><td class="num">\\u09F3 '+(b.rateNum).toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+itemTotal.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudBOQ(mockBOQ.find(function(x){return x.id===\x27'+b.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+b.item+'?\x27)){var idx=mockBOQ.findIndex(function(x){return x.id===\x27'+b.id+'\x27});if(idx>=0)mockBOQ.splice(idx,1);DB.save(\x27boq\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('boq',pB.total,pB.page,pB.totalPages,pB.perPage)+'</div></div></div>'+
   '<div style="margin-top:4px;text-align:right;font-size:9px;color:#888;padding:0 4px">Total BOQ Value: \\u09F3 '+filtered.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0).toLocaleString('en-IN')+'</div>';
 }
@@ -1747,7 +1779,7 @@ function openBOQItem(id){
       '<div style="font-size:9px;color:#888;margin-top:4px">'+b.qty+' '+b.unit+' \\u00D7 \\u09F3 '+b.rateNum.toLocaleString('en-IN')+'</div>'+
     '</div>',
     '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
-      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudBOQ(mockBOQ.find(function(x){return x.id===\\x27'+b.id+'\\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudBOQ(mockBOQ.find(function(x){return x.id===\x27'+b.id+'\x27}))">Edit</button>'+
       '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
     '</div>'
   );
@@ -1806,7 +1838,7 @@ function renderEquipment(el){
         ['equipment','\\u2699\\uFE0F Equipment'],
         ['maintenance','\\uD83D\\uDD27 Maintenance']
       ].map(function(t){
-        return '<div class="tab '+(et===t[0]?'active':'')+'" onclick="eqTab=\\x27'+t[0]+'\\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+        return '<div class="tab '+(et===t[0]?'active':'')+'" onclick="eqTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
       '<div class="spacer"></div>'+
       '<button class="action-btn primary" onclick="crudEquipment()" style="padding:3px 8px;font-size:10px;display:'+(et==='equipment'?'':'none')+'">+ Add Equipment</button>'+
@@ -1878,7 +1910,7 @@ function renderEqList(){
   pE.items.map(function(e){
     var sc={'Operational':'#2e7d32','Idle':'#ff8f00','Under Repair':'#c62828','Maintenance':'#e65100'}[e.status]||'#888';
     var sbg={'Operational':'#e8f5e9','Idle':'#fff8e1','Under Repair':'#ffebee','Maintenance':'#fff3e0'}[e.status]||'#f5f5f5';
-    return '<div style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openEquipment(\\x27'+e.id+'\\x27)">'+
+    return '<div style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openEquipment(\x27'+e.id+'\x27)">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="display:flex;align-items:center;gap:6px">'+
           '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(e.icon||'\\uD83D\\uDD27')+'</div>'+
@@ -1894,8 +1926,8 @@ function renderEqList(){
       '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
         '<span style="font-size:8px;color:#999">'+(e.operator?'Operator: '+e.operator:'No operator')+'</span>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEquipment(mockEquipment.find(function(x){return x.id===\\x27'+e.id+'\\x27}))">\\u270E</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+e.name+'?\\x27)){var idx=mockEquipment.findIndex(function(x){return x.id===\\x27'+e.id+'\\x27});if(idx>=0)mockEquipment.splice(idx,1);DB.save(\\x27equipment\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEquipment(mockEquipment.find(function(x){return x.id===\x27'+e.id+'\x27}))">\\u270E</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+e.name+'?\x27)){var idx=mockEquipment.findIndex(function(x){return x.id===\x27'+e.id+'\x27});if(idx>=0)mockEquipment.splice(idx,1);DB.save(\x27equipment\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -1921,7 +1953,7 @@ function renderEqMaintenance(){
   '</div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Date</th><th>Equipment</th><th>Type</th><th class="num">Cost (\\u09F3)</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>'+
   pM.items.map(function(m){
-    return '<tr><td style="font-size:9px;color:#888">'+m.date+'</td><td style="font-weight:500">'+m.equipment+'</td><td><span class="badge-status" style="background:'+(m.type==='Fuel'?'#fff8e1':m.type==='Repair'?'#ffebee':m.type==='Service'?'#e3f2fd':m.type==='Inspection'?'#e8f5e9':'#f3e5f5')+';color:'+(m.type==='Fuel'?'#ff8f00':m.type==='Repair'?'#c62828':m.type==='Service'?'#1565c0':m.type==='Inspection'?'#2e7d32':'#7b1fa2')+'">'+m.type+'</span></td><td class="num" style="font-weight:600">\\u09F3 '+m.cost.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(m.status==='Completed'?'badge-active':'badge-pending')+'">'+m.status+'</span></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;color:#888">'+m.notes+'</td><td><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="if(confirm(\\x27Delete log?\\x27)){var idx=mockMaintenanceLog.findIndex(function(x){return x.id===\\x27'+m.id+'\\x27});if(idx>=0)mockMaintenanceLog.splice(idx,1);DB.save(\\x27maintenanceLog\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span></td></tr>';
+    return '<tr><td style="font-size:9px;color:#888">'+m.date+'</td><td style="font-weight:500">'+m.equipment+'</td><td><span class="badge-status" style="background:'+(m.type==='Fuel'?'#fff8e1':m.type==='Repair'?'#ffebee':m.type==='Service'?'#e3f2fd':m.type==='Inspection'?'#e8f5e9':'#f3e5f5')+';color:'+(m.type==='Fuel'?'#ff8f00':m.type==='Repair'?'#c62828':m.type==='Service'?'#1565c0':m.type==='Inspection'?'#2e7d32':'#7b1fa2')+'">'+m.type+'</span></td><td class="num" style="font-weight:600">\\u09F3 '+m.cost.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(m.status==='Completed'?'badge-active':'badge-pending')+'">'+m.status+'</span></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;color:#888">'+m.notes+'</td><td><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="if(confirm(\x27Delete log?\x27)){var idx=mockMaintenanceLog.findIndex(function(x){return x.id===\x27'+m.id+'\x27});if(idx>=0)mockMaintenanceLog.splice(idx,1);DB.save(\x27maintenanceLog\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('maint',pM.total,pM.page,pM.totalPages,pM.perPage)+'</div></div></div>';
 }
 
@@ -1949,8 +1981,8 @@ function openEquipment(id){
     '<div><div style="font-size:11px;font-weight:600;margin-bottom:4px">Maintenance History ('+logs.length+')</div>'+
     '<div style="padding:6px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+logHtml+'</div></div>',
     '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
-      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudEquipment(mockEquipment.find(function(x){return x.id===\\x27'+e.id+'\\x27}))">Edit</button>'+
-      '<button class="lead-foot-btn" onclick="eqTab=\\x27maintenance\\x27;closeLeadPanel();renderModule()">Service Log</button>'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudEquipment(mockEquipment.find(function(x){return x.id===\x27'+e.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="eqTab=\x27maintenance\x27;closeLeadPanel();renderModule()">Service Log</button>'+
       '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
     '</div>'
   );
@@ -2024,7 +2056,7 @@ function renderDesigns(el){
     '<div class="toolbar" style="margin-bottom:6px">'+
       '<div class="tabs">'+['All'].concat(dsgTypes).map(function(t){
         var active=(t==='All'&&!window.dsType)||window.dsType===t;
-        return '<div class="tab '+(active?'active':'')+'" onclick="dsType='+(t==='All'?"''":'\\x27'+t+'\\x27')+';Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t+'</div>';
+        return '<div class="tab '+(active?'active':'')+'" onclick="dsType='+(t==='All'?"''":'\x27'+t+'\x27')+';Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t+'</div>';
       }).join('')+'</div>'+
       '<input id="dsSearch" placeholder="Search designs..." oninput="_PG.ds={page:1,perPage:_pgPerPage};renderModule()" style="margin-left:8px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
       '<div class="spacer"></div>'+
@@ -2045,7 +2077,7 @@ function renderDesignCards(){
   var cards=pD.items.map(function(d){
     var sc={'Draft':'#ff8f00','In Review':'#e65100','Approved':'#2e7d32','Rejected':'#c62828'}[d.status]||'#888';
     var sbg={'Draft':'#fff8e1','In Review':'#fff3e0','Approved':'#e8f5e9','Rejected':'#ffebee'}[d.status]||'#f5f5f5';
-    return '<div class="ds-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px;cursor:pointer" onclick="openDesign(\\x27'+d.id+'\\x27)">'+
+    return '<div class="ds-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px;cursor:pointer" onclick="openDesign(\x27'+d.id+'\x27)">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="display:flex;align-items:center;gap:6px">'+
           '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(d.typeIcon||'\\uD83D\\uDCCB')+'</div>'+
@@ -2061,8 +2093,8 @@ function renderDesignCards(){
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">'+
         '<div style="font-size:8px;color:#999">Submitted: '+d.submitted+'</div>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudDesign(mockDesigns.find(function(x){return x.id===\\x27'+d.id+'\\x27}))">\\u270E Edit</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+d.name+'?\\x27)){var idx=mockDesigns.findIndex(function(x){return x.id===\\x27'+d.id+'\\x27});if(idx>=0)mockDesigns.splice(idx,1);DB.save(\\x27designs\\x27);showToast(\\x27Design deleted\\x27,\\x27info\\x27);renderModule()}">\\u2715 Delete</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudDesign(mockDesigns.find(function(x){return x.id===\x27'+d.id+'\x27}))">\\u270E Edit</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+d.name+'?\x27)){var idx=mockDesigns.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockDesigns.splice(idx,1);DB.save(\x27designs\x27);showToast(\x27Design deleted\x27,\x27info\x27);renderModule()}">\\u2715 Delete</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -2096,7 +2128,7 @@ function openDesign(id){
       ['Type',d.type],
       ['Submitted',d.submitted||'---'],
       ['Approved',d.approved||'---'],
-      ['Download','<span style="color:#2F80ED;cursor:pointer" onclick="showToast(\\x27Download started\\x27,\\x27info\\x27)">Download PDF \\u2193</span>']
+      ['Download','<span style="color:#2F80ED;cursor:pointer" onclick="showToast(\x27Download started\x27,\x27info\x27)">Download PDF \\u2193</span>']
     ].map(function(r){
       return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';
     }).join('')+'</div>'+
@@ -2105,8 +2137,8 @@ function openDesign(id){
     '<div><div style="font-size:11px;font-weight:600;margin-bottom:4px">Version History</div>'+
     '<div style="padding:6px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+verHtml+'</div></div>',
     '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
-      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudDesign(mockDesigns.find(function(x){return x.id===\\x27'+d.id+'\\x27}))">Edit Design</button>'+
-      '<button class="lead-foot-btn" onclick="showToast(\\x27Download started\\x27,\\x27info\\x27)">Download PDF</button>'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudDesign(mockDesigns.find(function(x){return x.id===\x27'+d.id+'\x27}))">Edit Design</button>'+
+      '<button class="lead-foot-btn" onclick="showToast(\x27Download started\x27,\x27info\x27)">Download PDF</button>'+
       '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
     '</div>'
   );
@@ -2174,7 +2206,7 @@ function renderContractors(el){
         ['work_orders','\\uD83D\\uDCDD Work Orders'],
         ['payments','\\uD83D\\uDCB5 Payments']
       ].map(function(t){
-        return '<div class="tab '+(ct===t[0]?'active':'')+'" onclick="ctTab=\\x27'+t[0]+'\\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+        return '<div class="tab '+(ct===t[0]?'active':'')+'" onclick="ctTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
       '<div class="spacer"></div>'+
       '<button class="action-btn primary" onclick="crudContractor()" style="padding:3px 8px;font-size:10px;display:'+(ct==='contractors'?'':'none')+'">+ New Contractor</button>'+
@@ -2211,7 +2243,7 @@ function renderContractorDashboard(){
     '<div class="card"><div class="card-header"><h3>Top Rated Contractors</h3></div><div class="card-body" style="padding:6px">'+
     top.map(function(c,i){
       var stars='\\u2B50'.repeat(c.rating)+(c.rating<5?'\\u2606'.repeat(5-c.rating):'');
-      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="ctTab=\\x27contractors\\x27;renderModule()"><div style="width:22px;height:22px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:10px;font-weight:500">'+c.name+'</div><div style="font-size:8px;color:#888">'+c.type+' \\u00B7 '+stars+'</div></div></div>';
+      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="ctTab=\x27contractors\x27;renderModule()"><div style="width:22px;height:22px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:10px;font-weight:500">'+c.name+'</div><div style="font-size:8px;color:#888">'+c.type+' \\u00B7 '+stars+'</div></div></div>';
     }).join('')+'</div></div>'+
     '<div class="card"><div class="card-header"><h3>Payment Summary</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
       '<div style="font-size:22px;font-weight:700;color:#2e7d32">\\u09F3 '+(totalPay/100000).toFixed(1)+'L</div>'+
@@ -2241,7 +2273,7 @@ function renderContractorList(){
   '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">'+
   pC.items.map(function(c){
     var stars='';for(var si=0;si<5;si++)stars+=si<c.rating?'\\u2B50':'\\u2606';
-    return '<div class="ct-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openContractor(\\x27'+c.id+'\\x27)">'+
+    return '<div class="ct-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openContractor(\x27'+c.id+'\x27)">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="display:flex;align-items:center;gap:6px">'+
           '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-weight:700;color:#2F80ED">'+c.name.charAt(0)+'</div>'+
@@ -2258,8 +2290,8 @@ function renderContractorList(){
       '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
         '<span style="font-size:8px;color:#999">'+(c.projects?c.projects.length+' projects':'0 projects')+'</span>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudContractor(mockContractors.find(function(x){return x.id===\\x27'+c.id+'\\x27}))">\\u270E</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+c.name+'?\\x27)){var idx=mockContractors.findIndex(function(x){return x.id===\\x27'+c.id+'\\x27});if(idx>=0)mockContractors.splice(idx,1);DB.save(\\x27contractors\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudContractor(mockContractors.find(function(x){return x.id===\x27'+c.id+'\x27}))">\\u270E</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+c.name+'?\x27)){var idx=mockContractors.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockContractors.splice(idx,1);DB.save(\x27contractors\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -2288,7 +2320,7 @@ function renderWorkOrders(){
   pW.items.map(function(w){
     var sc={'Pending':'#ff8f00','Active':'#1565c0','Completed':'#2e7d32','Cancelled':'#c62828'}[w.status]||'#888';
     var sbg={'Pending':'#fff8e1','Active':'#e3f2fd','Completed':'#e8f5e9','Cancelled':'#ffebee'}[w.status]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openWorkOrder(\\x27'+w.id+'\\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+w.id+'</td><td style="font-weight:500">'+(ctNames[w.contractor]||w.contractor)+'</td><td>'+w.project+'</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.scope+'</td><td class="num" style="font-weight:600">\\u09F3 '+(w.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+w.date+'</td><td style="font-size:9px;color:#888">'+w.deadline+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+w.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\\x27'+w.id+'\\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete WO '+w.id+'?\\x27)){var idx=mockWorkOrders.findIndex(function(x){return x.id===\\x27'+w.id+'\\x27});if(idx>=0)mockWorkOrders.splice(idx,1);DB.save(\\x27workOrders\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openWorkOrder(\x27'+w.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+w.id+'</td><td style="font-weight:500">'+(ctNames[w.contractor]||w.contractor)+'</td><td>'+w.project+'</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.scope+'</td><td class="num" style="font-weight:600">\\u09F3 '+(w.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+w.date+'</td><td style="font-size:9px;color:#888">'+w.deadline+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+w.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\x27'+w.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete WO '+w.id+'?\x27)){var idx=mockWorkOrders.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockWorkOrders.splice(idx,1);DB.save(\x27workOrders\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('wo',pW.total,pW.page,pW.totalPages,pW.perPage)+'</div></div></div>';
 }
 
@@ -2342,8 +2374,8 @@ function openContractor(id){
       ['Avg','\\u09F3 '+(cPay.length>0?((totalPay/cPay.length)/100000).toFixed(1):'0')+'L','#7b1fa2']
     ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+';font-size:13px">'+s[1]+'</div></div>';}).join('')+'</div></div>',
     '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
-      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudContractor(mockContractors.find(function(x){return x.id===\\x27'+c.id+'\\x27}))">Edit</button>'+
-      '<button class="lead-foot-btn" onclick="ctTab=\\x27work_orders\\x27;closeLeadPanel();renderModule()">Work Orders</button>'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudContractor(mockContractors.find(function(x){return x.id===\x27'+c.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="ctTab=\x27work_orders\x27;closeLeadPanel();renderModule()">Work Orders</button>'+
       '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
     '</div>'
   );
@@ -2372,8 +2404,8 @@ function openWorkOrder(id){
       '<div style="font-size:10px;font-weight:600;margin-top:4px;color:'+sc+'">'+(w.status==='Completed'?'100% Complete':w.status==='Active'?'60% In Progress':w.status==='Pending'?'Pending Start':'Cancelled')+'</div>'+
     '</div>',
     '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
-      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\\x27'+w.id+'\\x27}))">Edit</button>'+
-      '<button class="lead-foot-btn success" onclick="event.stopPropagation();w.status=\\x27Completed\\x27;DB.save(\\x27workOrders\\x27);closeLeadPanel();renderModule();showToast(\\x27WO marked complete\\x27,\\x27success\\x27)">Mark Complete</button>'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\x27'+w.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn success" onclick="event.stopPropagation();w.status=\x27Completed\x27;DB.save(\x27workOrders\x27);closeLeadPanel();renderModule();showToast(\x27WO marked complete\x27,\x27success\x27)">Mark Complete</button>'+
       '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
     '</div>'
   );
@@ -2492,7 +2524,7 @@ function renderKBDashboard(){
   </div>
   <div class="card"><div class="card-header"><h3>Articles by Category</h3></div><div class="card-body" style="padding:8px;font-size:10px"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px">${catStats.map(c=>{
     const pct=total>0?Math.round(byCat[c.id]/total*100):0;
-    return '<div style="padding:6px;border:1px solid #e0e0e0;border-radius:6px;cursor:pointer" onclick="kbTab=\\x27categories\x27;renderModule()"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><span>'+c.icon+'</span><span style="font-weight:500;font-size:10px;color:'+c.color+'">'+c.label+'</span></div><div style="display:flex;justify-content:space-between;font-size:9px"><span>'+byCat[c.id]+' articles</span><span style="color:#888">'+pct+'%</span></div><div style="height:3px;background:#e0e0e0;border-radius:2px;margin-top:3px"><div style="width:'+pct+'%;height:3px;background:'+c.color+';border-radius:2px"></div></div></div>';
+    return '<div style="padding:6px;border:1px solid #e0e0e0;border-radius:6px;cursor:pointer" onclick="kbTab=\x27categories\x27;renderModule()"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><span>'+c.icon+'</span><span style="font-weight:500;font-size:10px;color:'+c.color+'">'+c.label+'</span></div><div style="display:flex;justify-content:space-between;font-size:9px"><span>'+byCat[c.id]+' articles</span><span style="color:#888">'+pct+'%</span></div><div style="height:3px;background:#e0e0e0;border-radius:2px;margin-top:3px"><div style="width:'+pct+'%;height:3px;background:'+c.color+';border-radius:2px"></div></div></div>';
   }).join('')}</div></div></div>`;
 }
 
@@ -2531,7 +2563,7 @@ function renderKBCategories(){
     const arts=byCat[c.id];
     const pubArts=arts.filter(a=>a.status==='Published').length;
     const totalV=arts.reduce((s,a)=>s+(a.views||0),0);
-    return '<div class="card" style="cursor:pointer" onclick="kbTab=\\x27articles\\x27;document.getElementById(\\x27kbFCat\\x27)&&(document.getElementById(\\x27kbFCat\\x27).value=\\x27'+c.id+'\\x27);_PG={};renderModule()"><div class="card-header"><h3 style="color:'+c.color+'">'+c.icon+' '+c.label+'</h3><span style="font-size:10px;color:#888">'+arts.length+' articles</span></div><div class="card-body" style="padding:8px;font-size:9px">'+arts.slice(0,4).map(a=>'<div style="padding:3px 0;display:flex;justify-content:space-between;border-bottom:1px solid #f5f5f5"><span style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openArticle('+a.id+')">'+a.title.substring(0,32)+(a.title.length>32?'...':'')+'</span><span style="color:#888">'+a.views+' views</span></div>').join('')+'</div><div style="padding:5px 8px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#888"><span>'+pubArts+' published</span><span>'+totalV.toLocaleString('en-IN')+' total views</span></div></div>';
+    return '<div class="card" style="cursor:pointer" onclick="kbTab=\x27articles\x27;document.getElementById(\x27kbFCat\x27)&&(document.getElementById(\x27kbFCat\x27).value=\x27'+c.id+'\x27);_PG={};renderModule()"><div class="card-header"><h3 style="color:'+c.color+'">'+c.icon+' '+c.label+'</h3><span style="font-size:10px;color:#888">'+arts.length+' articles</span></div><div class="card-body" style="padding:8px;font-size:9px">'+arts.slice(0,4).map(a=>'<div style="padding:3px 0;display:flex;justify-content:space-between;border-bottom:1px solid #f5f5f5"><span style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openArticle('+a.id+')">'+a.title.substring(0,32)+(a.title.length>32?'...':'')+'</span><span style="color:#888">'+a.views+' views</span></div>').join('')+'</div><div style="padding:5px 8px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#888"><span>'+pubArts+' published</span><span>'+totalV.toLocaleString('en-IN')+' total views</span></div></div>';
   }).join('')}</div>`;
 }
 
@@ -4253,6 +4285,267 @@ function crudQCReport(item){
       var d={id:r.id,project:g('rpt_proj'),type:g('rpt_type'),date:g('rpt_date')||r.date,preparedBy:g('rpt_by'),status:g('rpt_status'),findings:parseInt(g('rpt_find'))||0,passed:parseInt(g('rpt_pass'))||0,failed:parseInt(g('rpt_fail'))||0,pending:0};
       if(n){mockQCReports.push(d);DB.save('qcReports');showToast('Report created','success');}
       else{var idx=mockQCReports.findIndex(function(x){return x.id===r.id});if(idx>=0){mockQCReports[idx]=d;DB.save('qcReports');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
+// ═══ COMPLIANCE MODULE ═══
+var cmpTab='dashboard';
+function renderCompliance(el){
+  cmpTab=cmpTab||'dashboard';
+  var total=mockCompliance.length,compliant=mockCompliance.filter(function(c){return c.status==='Compliant'}).length;
+  var expired=mockCompliance.filter(function(c){return c.status==='Expired'}).length;
+  var pending=mockCompliance.filter(function(c){return c.status==='Pending'}).length;
+  var critical=mockCompliance.filter(function(c){return c.priority==='Critical'}).length;
+  el.innerHTML='<div class="fade-in"><div class="page-title">Regulatory Compliance</div><div class="page-subtitle">'+total+' items · '+compliant+' compliant · '+expired+' expired</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','📊 Dashboard'],
+        ['items','📋 Compliance Items'],
+        ['audits','🔎 Audits'],
+        ['certificates','📜 Certificates']
+      ].map(function(t){
+        return '<div class="tab '+(cmpTab===t[0]?'active':'')+'" onclick="cmpTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudCompliance()" style="padding:3px 8px;font-size:10px;display:'+(cmpTab==='items'?'':'none')+'\">+ Add Item</button>'+
+      '<button class="action-btn primary" onclick="crudAudit()" style="padding:3px 8px;font-size:10px;display:'+(cmpTab==='audits'?'':'none')+'\">+ Schedule Audit</button>'+
+      '<button class="action-btn primary" onclick="crudCertificate()" style="padding:3px 8px;font-size:10px;display:'+(cmpTab==='certificates'?'':'none')+'\">+ Add Certificate</button>'+
+    '</div>'+
+    (cmpTab==='dashboard'?renderCmpDashboard():
+     cmpTab==='items'?renderCmpItems():
+     cmpTab==='audits'?renderCmpAudits():
+     cmpTab==='certificates'?renderCmpCertificates():'')+
+  '</div>';
+}
+function renderCmpDashboard(){
+  var total=mockCompliance.length,compliant=mockCompliance.filter(function(c){return c.status==='Compliant'}).length;
+  var expired=mockCompliance.filter(function(c){return c.status==='Expired'}).length;
+  var pending=mockCompliance.filter(function(c){return c.status==='Pending'}).length;
+  var critical=mockCompliance.filter(function(c){return c.priority==='Critical'}).length;
+  var high=mockCompliance.filter(function(c){return c.priority==='High'}).length;
+  var audTotal=mockAudits.length,audComp=mockAudits.filter(function(a){return a.status==='Completed'}).length;
+  var certTotal=mockCertificates.length,certActive=mockCertificates.filter(function(c){return c.status==='Active'}).length;
+  var certExp=mockCertificates.filter(function(c){return c.status==='Expired'}).length;
+  var avgScore=audComp>0?Math.round(mockAudits.filter(function(a){return a.status==='Completed'}).reduce(function(s,a){return s+a.score},0)/audComp):0;
+  var types={};mockCompliance.forEach(function(c){types[c.type]=(types[c.type]||0)+1});
+  var typeKeys=Object.keys(types).sort(function(a,b){return types[b]-types[a]});
+  var upcoming=mockCompliance.filter(function(c){return c.status!=='Compliant'}).sort(function(a,b){return a.due>b.due?1:-1}).slice(0,5);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Items',total,'#1565c0'],
+    ['Compliant',compliant,'#2e7d32'],
+    ['Expired',expired,expired>0?'#c62828':'#999'],
+    ['Pending',pending,pending>0?'#ff8f00':'#999'],
+    ['Critical',critical,critical>0?'#c62828':'#999'],
+    ['Avg Audit Score',audComp>0?avgScore+'%':'N/A','#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Items by Type</h3></div><div class="card-body" style="padding:8px">'+
+    typeKeys.map(function(t){
+      var pct=Math.round(types[t]/total*100);
+      var colors={'Regulatory':'#1565c0','Safety':'#c62828','Environmental':'#2e7d32','Utility':'#e65100','Labour':'#7b1fa2'};
+      var color=colors[t]||'#888';
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+types[t]+'</div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Certificate Overview</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
+      '<div style="display:flex;justify-content:center;gap:16px;margin-bottom:8px">'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#2e7d32">'+certActive+'</div><div style="font-size:8px;color:#888">Active</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#c62828">'+certExp+'</div><div style="font-size:8px;color:#888">Expired</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#ff8f00">'+(certTotal-certActive-certExp)+'</div><div style="font-size:8px;color:#888">Pending</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1565c0">'+certTotal+'</div><div style="font-size:8px;color:#888">Total</div></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;justify-content:center;margin-top:4px">'+
+        '<div style="padding:3px 8px;background:#e8f5e9;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#2e7d32">'+audComp+'</div><div style="font-size:7px;color:#666">Completed Audits</div></div>'+
+        '<div style="padding:3px 8px;background:#fff3e0;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#e65100">'+critical+'</div><div style="font-size:7px;color:#666">Critical Items</div></div>'+
+        '<div style="padding:3px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#1565c0">'+avgScore+'%</div><div style="font-size:7px;color:#666">Avg Score</div></div>'+
+      '</div>'+
+    '</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>Upcoming Deadlines</h3></div><div class="card-body" style="padding:4px 8px">'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px">'+
+  upcoming.map(function(c,i){
+    var sc=c.priority==='Critical'?'#c62828':c.priority==='High'?'#e65100':'#ff8f00';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:#f9fafb;border-radius:6px;cursor:pointer" onclick="cmpTab=\x27items\x27;renderModule()">'+
+      '<div style="width:24px;height:24px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c.name.substring(0,25)+'</div><div style="font-size:8px;color:#888">Due: '+c.due+' · '+c.project+'</div></div>'+
+      '<span style="font-size:9px;font-weight:600;color:'+sc+'">'+c.priority+'</span></div>';
+  }).join('')+'</div></div></div>';
+}
+function renderCmpItems(){
+  var q=(document.getElementById('cmpSearch')||{}).value||'';
+  var tf=(document.getElementById('cmpType')||{}).value||'';
+  var sf=(document.getElementById('cmpStatus')||{}).value||'';
+  var pf=(document.getElementById('cmpPriority')||{}).value||'';
+  var filtered=mockCompliance.filter(function(c){
+    if(tf&&c.type!==tf)return false;
+    if(sf&&c.status!==sf)return false;
+    if(pf&&c.priority!==pf)return false;
+    if(q&&!c.name.toLowerCase().includes(q.toLowerCase())&&!c.project.toLowerCase().includes(q.toLowerCase())&&!c.authority.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pC=_pg('cmp',filtered);
+  var types={};mockCompliance.forEach(function(c){types[c.type]=1});
+  var typeList=Object.keys(types).sort();
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="cmpSearch" placeholder="Search..." oninput="_PG.cmp={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="cmpType" onchange="_PG.cmp={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+typeList.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('')+'</select>'+
+    '<select id="cmpStatus" onchange="_PG.cmp={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Compliant</option><option>Pending</option><option>Expired</option></select>'+
+    '<select id="cmpPriority" onchange="_PG.cmp={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Priority</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Item</th><th>Project</th><th>Type</th><th>Authority</th><th>Due</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pC.items.map(function(c){
+    var sc={'Compliant':'#2e7d32','Pending':'#ff8f00','Expired':'#c62828'}[c.status]||'#888';
+    var sbg={'Compliant':'#e8f5e9','Pending':'#fff8e1','Expired':'#ffebee'}[c.status]||'#f5f5f5';
+    var pc={'Critical':'#c62828','High':'#e65100','Medium':'#ff8f00','Low':'#888'}[c.priority]||'#888';
+    var pbg={'Critical':'#ffebee','High':'#fff3e0','Medium':'#fff8e1','Low':'#f5f5f5'}[c.priority]||'#f5f5f5';
+    return '<tr style="cursor:pointer" onclick="openComplianceItem(\x27'+c.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.name+'">'+c.name+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px">'+c.type+'</td><td style="font-size:9px;color:#888;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.authority+'">'+c.authority+'</td><td style="font-size:9px;color:'+(c.status==='Expired'?'#c62828':'#888')+'">'+c.due+'</td><td><span class="badge-status" style="background:'+pbg+';color:'+pc+'">'+c.priority+'</span></td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCompliance(mockCompliance.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCompliance.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCompliance.splice(idx,1);DB.save(\x27compliance\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('cmp',pC.total,pC.page,pC.totalPages,pC.perPage)+'</div></div></div>';
+}
+function renderCmpAudits(){
+  var q=(document.getElementById('audSearch')||{}).value||'';
+  var ts=(document.getElementById('audType')||{}).value||'';
+  var ss=(document.getElementById('audStatus')||{}).value||'';
+  var filtered=mockAudits.filter(function(a){
+    if(ts&&a.type!==ts)return false;
+    if(ss&&a.status!==ss)return false;
+    if(q&&!a.project.toLowerCase().includes(q.toLowerCase())&&!a.auditor.toLowerCase().includes(q.toLowerCase())&&!a.type.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pA=_pg('aud',filtered);
+  var audTotal=mockAudits.length,comp=mockAudits.filter(function(a){return a.status==='Completed'}).length;
+  var sched=mockAudits.filter(function(a){return a.status==='Scheduled'}).length;
+  var avgS=comp>0?Math.round(mockAudits.filter(function(a){return a.status==='Completed'}).reduce(function(s,a){return s+a.score},0)/comp):0;
+  var types={};mockAudits.forEach(function(a){types[a.type]=1});
+  var typeList=Object.keys(types).sort();
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Audits',audTotal,'#1565c0'],
+    ['Completed',comp,'#2e7d32'],
+    ['Scheduled',sched,sched>0?'#ff8f00':'#999'],
+    ['Avg Score',avgS+'%','#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="audSearch" placeholder="Search..." oninput="_PG.aud={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="audType" onchange="_PG.aud={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+typeList.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('')+'</select>'+
+    '<select id="audStatus" onchange="_PG.aud={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Completed</option><option>Scheduled</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Type</th><th>Project</th><th>Date</th><th>Auditor</th><th class="num">Findings</th><th class="num">Score</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pA.items.map(function(a){
+    var sc=a.status==='Completed'?'#2e7d32':'#ff8f00';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.type+'</td><td style="font-size:9px">'+a.project+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.auditor+'</td><td class="num">'+a.findings+'</td><td class="num" style="font-weight:600;color:'+(a.score>=90?'#2e7d32':a.score>=70?'#ff8f00':'#c62828')+'">'+(a.score>0?a.score+'%':'---')+'</td><td><span class="badge-status '+(a.status==='Completed'?'badge-active':'badge-pending')+'">'+a.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAudit(mockAudits.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockAudits.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAudits.splice(idx,1);DB.save(\x27audits\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('aud',pA.total,pA.page,pA.totalPages,pA.perPage)+'</div></div></div>';
+}
+function renderCmpCertificates(){
+  var q=(document.getElementById('certSearch')||{}).value||'';
+  var ts=(document.getElementById('certType')||{}).value||'';
+  var ss=(document.getElementById('certStatus')||{}).value||'';
+  var filtered=mockCertificates.filter(function(c){
+    if(ts&&c.type!==ts)return false;
+    if(ss&&c.status!==ss)return false;
+    if(q&&!c.name.toLowerCase().includes(q.toLowerCase())&&!c.project.toLowerCase().includes(q.toLowerCase())&&!c.authority.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pC=_pg('cert',filtered);
+  var active=mockCertificates.filter(function(c){return c.status==='Active'}).length;
+  var expired=mockCertificates.filter(function(c){return c.status==='Expired'}).length;
+  var pendCert=mockCertificates.filter(function(c){return c.status==='Pending'}).length;
+  var types={};mockCertificates.forEach(function(c){types[c.type]=1});
+  var typeList=Object.keys(types).sort();
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total',mockCertificates.length,'#1565c0'],
+    ['Active',active,'#2e7d32'],
+    ['Expired',expired,expired>0?'#c62828':'#999'],
+    ['Pending',pendCert,pendCert>0?'#ff8f00':'#999']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="certSearch" placeholder="Search..." oninput="_PG.cert={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="certType" onchange="_PG.cert={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+typeList.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('')+'</select>'+
+    '<select id="certStatus" onchange="_PG.cert={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Active</option><option>Expired</option><option>Pending</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Certificate</th><th>Project</th><th>Type</th><th>Authority</th><th>Issued</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pC.items.map(function(c){
+    var sc={'Active':'#2e7d32','Expired':'#c62828','Pending':'#ff8f00'}[c.status]||'#888';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.name+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px">'+c.type+'</td><td style="font-size:9px;color:#888;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.authority+'">'+c.authority+'</td><td style="font-size:9px;color:#888">'+(c.issued||'---')+'</td><td style="font-size:9px;color:'+(c.status==='Expired'?'#c62828':'#888')+'">'+(c.expires||'---')+'</td><td><span class="badge-status" style="background:'+(c.status==='Active'?'#e8f5e9':c.status==='Expired'?'#ffebee':'#fff8e1')+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCertificate(mockCertificates.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCertificates.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCertificates.splice(idx,1);DB.save(\x27certificates\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('cert',pC.total,pC.page,pC.totalPages,pC.perPage)+'</div></div></div>';
+}
+function openComplianceItem(id){
+  var c=mockCompliance.find(function(x){return x.id===id});
+  if(!c)return;
+  var sc={'Compliant':'#2e7d32','Pending':'#ff8f00','Expired':'#c62828'}[c.status];
+  var pc={'Critical':'#c62828','High':'#e65100','Medium':'#ff8f00','Low':'#888'}[c.priority];
+  var audits=mockAudits.filter(function(a){return a.project===c.project});
+  var certs=mockCertificates.filter(function(cr){return cr.project===c.project||cr.project==='Both'});
+  showDetailPanel('Compliance: '+c.name,
+    '<div style="margin-bottom:10px"><span class="badge-status" style="background:'+(c.status==='Compliant'?'#e8f5e9':c.status==='Pending'?'#fff8e1':'#ffebee')+';color:'+sc+';font-size:10px">'+c.status+'</span> <span class="badge-status" style="background:'+(c.priority==='Critical'?'#ffebee':c.priority==='High'?'#fff3e0':'#fff8e1')+';color:'+pc+';font-size:10px">'+c.priority+'</span></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['ID',c.id],
+      ['Type',c.type],
+      ['Project',c.project],
+      ['Authority',c.authority],
+      ['Due Date',c.due],
+      ['Assigned To',c.assignedTo],
+      ['Renewal',c.renewal||'N/A'],
+      ['Related Audits',audits.length],
+      ['Related Certs',certs.length]
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px"><div style="font-size:9px;color:#888;margin-bottom:4px">Remarks</div><div style="font-size:10px">'+(c.remarks||'No remarks')+'</div></div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudCompliance(mockCompliance.find(function(x){return x.id===\x27'+c.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+function crudCompliance(item){
+  var n=!item;
+  var types=['Regulatory','Safety','Environmental','Utility','Labour'];
+  var priorities=['Critical','High','Medium','Low'];
+  var projects=['Muktodhara','Jolshiri','Both'];
+  var c=n?{id:'CMP-'+String(mockCompliance.length+1).padStart(3,'0'),name:'',project:'Muktodhara',type:'Regulatory',authority:'',due:new Date().toISOString().split('T')[0],status:'Pending',assignedTo:'',priority:'Medium',remarks:'',renewal:''}:item;
+  openModal(n?'Add Compliance Item':'Edit Compliance Item',
+    formRow(inputField('Item Name','cf_name',c.name,'',true),selectField('Type','cf_type',c.type,types,true))+
+    formRow(selectField('Project','cf_proj',c.project,projects,true),inputField('Authority','cf_auth',c.authority,'',true))+
+    formRow(inputField('Due Date','cf_due',c.due),inputField('Assigned To','cf_asgn',c.assignedTo))+
+    formRow(selectField('Priority','cf_pri',c.priority,priorities,true),selectField('Status','cf_stat',c.status,['Compliant','Pending','Expired'],true))+
+    formRow(inputField('Remarks','cf_rem',c.remarks),inputField('Renewal Date','cf_ren',c.renewal)),
+    function(){
+      var d={id:c.id,name:g('cf_name'),project:g('cf_proj'),type:g('cf_type'),authority:g('cf_auth'),due:g('cf_due')||c.due,status:g('cf_stat'),assignedTo:g('cf_asgn'),priority:g('cf_pri'),remarks:g('cf_rem'),renewal:g('cf_ren')};
+      if(n){mockCompliance.push(d);DB.save('compliance');showToast('Item added','success');}
+      else{var idx=mockCompliance.findIndex(function(x){return x.id===c.id});if(idx>=0){mockCompliance[idx]=d;DB.save('compliance');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudAudit(item){
+  var n=!item;
+  var types=['Safety Audit','Environmental Audit','Labour Inspection','Structural Audit','Quality Audit'];
+  var a=n?{id:'AUD-'+String(mockAudits.length+1).padStart(3,'0'),project:'Muktodhara',type:'Safety Audit',date:new Date().toISOString().split('T')[0],auditor:'',status:'Scheduled',findings:0,score:0,remarks:''}:item;
+  openModal(n?'Schedule Audit':'Edit Audit',
+    formRow(selectField('Type','af_type',a.type,types,true),selectField('Project','af_proj',a.project,['Muktodhara','Jolshiri'],true))+
+    formRow(inputField('Date','af_date',a.date),inputField('Auditor','af_aud',a.auditor,'',true))+
+    formRow(selectField('Status','af_stat',a.status,['Scheduled','Completed'],true),inputField('Findings','af_find',String(a.findings)))+
+    formRow(inputField('Score (%)','af_score',String(a.score)),inputField('Remarks','af_rem',a.remarks)),
+    function(){
+      var d={id:a.id,project:g('af_proj'),type:g('af_type'),date:g('af_date')||a.date,auditor:g('af_aud'),status:g('af_stat'),findings:parseInt(g('af_find'))||0,score:parseInt(g('af_score'))||0,remarks:g('af_rem')};
+      if(n){mockAudits.push(d);DB.save('audits');showToast('Audit saved','success');}
+      else{var idx=mockAudits.findIndex(function(x){return x.id===a.id});if(idx>=0){mockAudits[idx]=d;DB.save('audits');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudCertificate(item){
+  var n=!item;
+  var types=['Regulatory','Safety','Environmental','Utility','Labour'];
+  var cert=n?{id:'CERT-'+String(mockCertificates.length+1).padStart(3,'0'),name:'',project:'Muktodhara',type:'Regulatory',issued:'',expires:'',status:'Pending',authority:'',remarks:''}:item;
+  openModal(n?'Add Certificate':'Edit Certificate',
+    formRow(inputField('Certificate Name','cert_name',cert.name,'',true),selectField('Type','cert_type',cert.type,types,true))+
+    formRow(selectField('Project','cert_proj',cert.project,['Muktodhara','Jolshiri','Both'],true),inputField('Authority','cert_auth',cert.authority,'',true))+
+    formRow(inputField('Issue Date','cert_iss',cert.issued),inputField('Expiry Date','cert_exp',cert.expires))+
+    formRow(selectField('Status','cert_stat',cert.status,['Active','Expired','Pending'],true),inputField('Remarks','cert_rem',cert.remarks)),
+    function(){
+      var d={id:cert.id,name:g('cert_name'),project:g('cert_proj'),type:g('cert_type'),issued:g('cert_iss'),expires:g('cert_exp'),status:g('cert_stat'),authority:g('cert_auth'),remarks:g('cert_rem')};
+      if(n){mockCertificates.push(d);DB.save('certificates');showToast('Certificate added','success');}
+      else{var idx=mockCertificates.findIndex(function(x){return x.id===cert.id});if(idx>=0){mockCertificates[idx]=d;DB.save('certificates');showToast('Updated','info');}}
       renderModule();
     }
   );
