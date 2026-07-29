@@ -522,7 +522,7 @@ const GROUPS = {
   construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
   finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'bi_reports',label:'BI Reports',badge:true},{id:'notifications_page',label:'Notifications'}] },
-  system:        { label:'System',       icon:'⚙️', mods:[{id:'settings',     label:'Settings'}] }
+  system:        { label:'System',       icon:'⚙️', mods:[{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'}] }
 };
 const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','collaboration','system'];
 
@@ -1184,6 +1184,25 @@ window.mockBIReports = DB.init('bi_reports', [
   {name:'Contractor Performance Ranking',type:'Table',period:'Q2 2026',updated:'2026-06-01',status:'Manual'},
   {name:'Accounts Receivable Aging',type:'Table',period:'Jun 2026',updated:'2026-06-12',status:'Auto'}
 ]);
+window.mockSystemDocs = DB.init('systemDocs', [
+  {id:'DOC-001',title:'Getting Started with REM ERP',category:'Getting Started',icon:'\uD83D\uDCD6',content:'REM ERP is a comprehensive real estate management system designed for Mars Constech Ltd.\n\nThis guide will help you get started with the system:\n\n1. LOGGING IN\nUse your company credentials to log in. Contact the system administrator if you do not have an account.\n\n2. NAVIGATION\nThe system is organized into module groups accessible from the sidebar. Each group contains related modules. Use the top navigation bar to switch between modules within a group.\n\n3. DASHBOARD\nThe Executive Dashboard provides an overview of key metrics including task counts, recent bookings, hot leads, revenue charts, and project progress.\n\n4. QUICK ACTIONS\nUse the + button (Alt+N) in the top bar for quick access to create new records across all modules. The global search bar (Ctrl+K) lets you search across all data.',excerpt:'REM ERP is a comprehensive real estate management system designed for Mars Constech Ltd. This guide will help you get started...',updated:'2025-01-15',readTime:5},
+  {id:'DOC-002',title:'CRM Module User Guide',category:'User Guide',icon:'\uD83D\uDCD8',content:'The CRM module helps you manage leads, track interactions, and convert prospects into bookings.\n\nKEY FEATURES:\n\nLEAD MANAGEMENT\n- Create leads with contact details, property interest, and source tracking\n- Track lead status through pipeline: New Inquiry \u2192 Contacted \u2192 Site Visit \u2192 Negotiation \u2192 Booked \u2192 Downpayment \u2192 Installments\n- Lead scoring based on priority, value, engagement, and recency\n- Bulk actions for advancing stages, assigning owners, setting priorities\n\nFILTERS & VIEWS\n- List view with sortable columns\n- Pipeline kanban view for visual stage tracking\n- Filter by status, priority, type (Local/NRB), value range, score, and owner\n- Smart filters for quick navigation\n\nCONVERSION\n- Convert leads directly to bookings from the CRM interface\n- Track all lead activities (calls, meetings, notes)',excerpt:'The CRM module helps you manage leads, track interactions, and convert prospects into bookings.',updated:'2025-01-10',readTime:8},
+  {id:'DOC-003',title:'Finance Module Guide',category:'User Guide',icon:'\uD83D\uDCB0',content:'The Finance module provides comprehensive financial management for real estate operations.\n\nDASHBOARD\n- Gross income, operating expenses, net profit overview\n- Bank balance summary across all accounts\n- Income vs expense charts for visual analysis\n\nTRANSACTIONS\n- Record incoming payments (booking fees, installments)\n- Record outgoing expenses (materials, labor, admin)\n- Categorize transactions for better tracking\n- Search and filter transaction history\n\nBANK ACCOUNTS\n- Manage multiple bank accounts\n- Track balances across accounts\n- Add new bank accounts\n\nBUDGETS\n- Set project budgets\n- Track spend vs budget\n- Variance analysis\n\nTAX\n- Record tax entries\n- Track VAT, income tax, and other adjustments',excerpt:'The Finance module provides comprehensive financial management for real estate operations.',updated:'2025-01-08',readTime:10},
+  {id:'DOC-004',title:'Admin Configuration Guide',category:'Admin Guide',icon:'\uD83D\uDD27',content:'System administration guide for configuring and managing REM ERP.\n\nUSER MANAGEMENT\n- Add, edit, and deactivate users\n- Assign roles and permissions\n- Bulk user actions (activate/suspend)\n\nROLE-BASED ACCESS\n- Super Admin: Full access to all modules\n- System Admin: System configuration and user management\n- Sales Agent: CRM, Bookings, Contacts\n- Site Engineer: Projects, BOQ, Construction modules\n- Finance: Finance, Stock, HR modules\n\nCOMPANY PROFILE\n- Update company information\n- Configure system settings\n\nINTEGRATIONS\n- SMS gateway configuration\n- Email settings\n- API integrations',excerpt:'System administration guide for configuring and managing REM ERP.',updated:'2025-01-12',readTime:7},
+  {id:'DOC-005',title:'Data Backup & Recovery',category:'Admin Guide',icon:'\uD83D\uDEE0\uFE0F',content:'This document explains the backup and recovery procedures for REM ERP.\n\nAUTOMATED BACKUPS\n- Daily backups run at 02:00 AM\n- Backups include database, documents, and media files\n- 30-day retention policy\n- Backups stored locally and in cloud storage\n\nMANUAL BACKUPS\n- Create on-demand backups from the Backup & Restore module\n- Choose what to include: database only, documents only, or full system\n\nRESTORE\n- Select any backup point to restore from\n- Restore wizard guides through the process\n- Verify backup integrity before restore\n\nBEST PRACTICES\n- Verify backups regularly\n- Keep at least 3 recovery points\n- Test restore procedure quarterly',excerpt:'This document explains the backup and recovery procedures for REM ERP.',updated:'2025-01-14',readTime:4},
+  {id:'DOC-006',title:'Installment & Payment Tracking',category:'User Guide',icon:'\uD83D\uDCB3',content:'Guide for tracking customer installments and payments.\n\nINSTALLMENT SCHEDULES\n- Create installment plans for bookings\n- Track payment status (Paid/Due/Upcoming/Overdue)\n- Automatic overdue detection\n\nPAYMENT COLLECTION\n- Record payments against installments\n- Track downpayments and advance payments\n- Generate payment receipts\n\nDUES MANAGEMENT\n- View all pending dues\n- Critical, overdue, and upcoming filters\n- Payment promise tracking\n- Customer follow-up system\n\nREPORTING\n- Collection efficiency reports\n- Aging analysis\n- Payment history per customer',excerpt:'Guide for tracking customer installments and payments.',updated:'2025-01-05',readTime:6},
+  {id:'DOC-007',title:'Common Issues & Troubleshooting',category:'Troubleshooting',icon:'\uD83D\uDD27',content:'Common issues and their solutions when using REM ERP.\n\nLOGIN ISSUES\n- Problem: Cannot log in\n- Solution: Check credentials, ensure account is active, contact admin\n\nDATA NOT SAVING\n- Problem: Changes are not persisted\n- Solution: Check browser localStorage settings, clear cache, retry\n\nSLOW PERFORMANCE\n- Problem: System is responding slowly\n- Solution: Close unused tabs, reduce displayed records, use filters\n\nCHART NOT DISPLAYING\n- Problem: Dashboard charts show blank areas\n- Solution: Ensure Chart.js is loaded, check browser console for errors\n\nEXPORT ISSUES\n- Problem: CSV export not working\n- Solution: Popup blocker may be active, allow popups for this site',excerpt:'Common issues and their solutions when using REM ERP.',updated:'2025-01-13',readTime:3},
+]);
+window.mockBackups = DB.init('backups', [
+  {id:'BAK-0001',date:'2025-01-15 02:00 AM',type:'Auto',size:'256.5 MB',sizeBytes:268959744,included:'Database, Documents',status:'Success',notes:'Automated daily backup'},
+  {id:'BAK-0002',date:'2025-01-14 02:00 AM',type:'Auto',size:'251.2 MB',sizeBytes:263402291,included:'Database, Documents',status:'Success',notes:'Automated daily backup'},
+  {id:'BAK-0003',date:'2025-01-13 02:00 AM',type:'Auto',size:'248.8 MB',sizeBytes:260866048,included:'Database, Documents',status:'Success',notes:'Automated daily backup'},
+  {id:'BAK-0004',date:'2025-01-12 14:30 PM',type:'Manual',size:'512.0 MB',sizeBytes:536870912,included:'Database, Documents, Media, Config',status:'Success',notes:'Pre-upgrade full backup'},
+  {id:'BAK-0005',date:'2025-01-12 02:00 AM',type:'Auto',size:'245.1 MB',sizeBytes:257000000,included:'Database, Documents',status:'Success',notes:'Automated daily backup'},
+  {id:'BAK-0006',date:'2025-01-11 02:00 AM',type:'Auto',size:'242.3 MB',sizeBytes:254000000,included:'Database, Documents',status:'Failed',notes:'Connection timeout during upload'},
+  {id:'BAK-0007',date:'2025-01-10 02:00 AM',type:'Auto',size:'240.0 MB',sizeBytes:251658240,included:'Database, Documents',status:'Success',notes:'Automated daily backup'},
+  {id:'BAK-0008',date:'2024-12-31 23:59 PM',type:'Manual',size:'1024.0 MB',sizeBytes:1073741824,included:'Full System',status:'Success',notes:'Year-end full archival backup'},
+]);
 window.kbCategories = [
   {id:'legal',label:'Legal & Compliance',icon:'⚖️',color:'#1565c0'},
   {id:'sales',label:'Sales & Marketing',icon:'📊',color:'#e65100'},
@@ -1282,6 +1301,8 @@ function switchModule(mod) {
     case 'bi_reports': renderBIReports(el); break;
     case 'notifications_page': renderNotificationsPage(el); break;
     case 'settings': renderSettings(el); break;
+    case 'system_docs': renderSystemDocs(el); break;
+    case 'backup_restore': renderBackupRestore(el); break;
     default: renderDashboard(el);
   }
 }
@@ -1326,7 +1347,7 @@ function renderDashboard(el){
   var dbLeadsSorted = mockLeads.slice().sort(function(a,b){var p={High:0,Medium:1,Low:2};return (p[a.priority]||9)-(p[b.priority]||9)});
   var dbLeadsTop = dbLeadsSorted.slice(0,4);
   const a=mockPlots.filter(p=>p.status==='available').length, s=mockPlots.filter(p=>p.status==='sold').length, r=mockPlots.filter(p=>p.status==='reserved').length;
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v4.1 · Role: ${currentRole} · 26 Modules</div>
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v4.1 · Role: ${currentRole} · 28 Modules</div>
     <div class="stats-row" style="margin-bottom:12px">${[
       ['Available Plots',a,'#4caf50','+2 this month'],['Sold Plots',s,'#e53935',''],['Reserved',r,'#1e88e5',''],
       ['Revenue','৳12.5Cr','','+18%'],['Active Bookings',mockBookings.filter(b=>b.status==='Confirmed').length,'',''],['Hot Leads',mockLeads.filter(l=>l.priority==='High').length,'','+3 this week']
@@ -4047,6 +4068,140 @@ const MOCK_PERMISSIONS = {
   'Site Engineer':PERMISSION_MODULES.map(m=>m.includes('Dashboard')||m.includes('Projects')||m.includes('Contractors')||m.includes('BOQ')||m.includes('Equipment')||m.includes('Labor')||m.includes('QC')||m.includes('Design')||m.includes('Compliance')?['✓','✓','✓','','']:['✓','','','','']),
   'Finance':PERMISSION_MODULES.map(m=>m.includes('Dashboard')||m.includes('Finance')||m.includes('Dues')||m.includes('Stock')?['✓','✓','✓','✓','']:['✓','','','',''])
 };
+
+function renderSystemDocs(el){
+  var q=(document.getElementById('sdSearch')||{}).value||'';
+  var fc=(document.getElementById('sdFCat')||{}).value||'';
+  var filtered=mockSystemDocs.filter(function(d){
+    if(fc&&d.category!==fc)return false;
+    if(q&&!d.title.toLowerCase().includes(q.toLowerCase())&&!d.content.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var cats=mockSystemDocs.reduce(function(a,d){if(a.indexOf(d.category)<0)a.push(d.category);return a;},[]);
+  var pS=_pg('sysdocs',filtered);
+  el.innerHTML='<div class="fade-in"><div class="page-title">System Manual</div><div class="page-subtitle">'+mockSystemDocs.length+' articles · User & Admin documentation</div>'+
+    '<div class="stats-row" style="margin-bottom:8px">'+[
+      ['Articles',mockSystemDocs.length,'#1565c0'],
+      ['Categories',cats.length,'#2e7d32'],
+      ['Last Updated',mockSystemDocs.reduce(function(l,d){return d.updated>l?d.updated:l;},''),'#7b1fa2']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<input id="sdSearch" placeholder="Search documentation..." oninput="_PG.sysdocs={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/>'+
+      '<select id="sdFCat" onchange="_PG.sysdocs={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>'+cats.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('')+'</select>'+
+      '<div class="spacer"></div><button class="action-btn primary" onclick="crudSystemDoc()" style="padding:3px 8px;font-size:10px">+ New Article</button>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">'+
+    pS.items.map(function(d){
+      var catColors={'Getting Started':'#1565c0','User Guide':'#2e7d32','Admin Guide':'#e65100','Integration':'#7b1fa2','Troubleshooting':'#c62828','FAQ':'#00838f'};
+      var cc=catColors[d.category]||'#2F80ED';
+      return '<div class="card" style="cursor:pointer" onclick="openSystemDoc(\x27'+d.id+'\x27)"><div class="card-body"><div style="display:flex;gap:6px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:6px;background:'+cc+'15;color:'+cc+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+d.icon+'</div><div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:#333">'+d.title+'</div><div style="font-size:9px;color:#888;margin-top:2px">'+d.category+' \u00B7 '+d.updated+'</div></div></div>'+
+      '<div style="font-size:10px;color:#555;margin-top:4px;line-height:1.4;max-height:32px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+d.excerpt+'</div>'+
+      '<div style="margin-top:6px;display:flex;gap:4px;justify-content:space-between;align-items:center"><span style="font-size:8px;color:#999">'+d.readTime+' min read</span><span style="display:flex;gap:4px"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudSystemDoc(mockSystemDocs.find(function(x){return x.id===\x27'+d.id+'\x27}))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+d.title+'?\x27)){var idx=mockSystemDocs.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockSystemDocs.splice(idx,1);DB.save(\x27systemDocs\x27);showToast(\x27Deleted\x27,\x27info\x27);renderModule()}">\u2715</span></span></div></div></div>';
+    }).join('')+'</div>'+
+    (filtered.length>_pgPerPage?_pgHtml('sysdocs',pS.total,pS.page,pS.totalPages,pS.perPage):'');
+}
+function openSystemDoc(id){
+  var d=mockSystemDocs.find(function(x){return x.id===id});if(!d)return;
+  var catColors={'Getting Started':'#1565c0','User Guide':'#2e7d32','Admin Guide':'#e65100','Integration':'#7b1fa2','Troubleshooting':'#c62828','FAQ':'#00838f'};
+  var cc=catColors[d.category]||'#2F80ED';
+  showDetailPanel(d.icon+' '+d.title,
+    '<div style="margin-bottom:10px"><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:600;background:'+cc+'15;color:'+cc+'">'+d.category+'</span><span style="margin-left:6px;font-size:9px;color:#888">'+d.readTime+' min read \u00B7 Updated '+d.updated+'</span></div>'+
+    '<div style="font-size:12px;line-height:1.6;color:#333;white-space:pre-wrap">'+d.content+'</div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudSystemDoc(mockSystemDocs.find(function(x){return x.id===\x27'+d.id+'\x27}));closeLeadPanel()">\u270E Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+  );
+}
+function crudSystemDoc(item){
+  var n=!item;
+  var cats=['Getting Started','User Guide','Admin Guide','Integration','Troubleshooting','FAQ'];
+  var icons=['\uD83D\uDCD6','\uD83D\uDCD8','\uD83D\uDD27','\uD83D\uDD17','\uD83D\uDEE0\uFE0F','\u2753'];
+  var d=n?{id:'DOC-'+String(mockSystemDocs.length+1).padStart(3,'0'),title:'',category:cats[0],icon:icons[0],content:'',excerpt:'',updated:new Date().toISOString().split('T')[0],readTime:5}:item;
+  openModal(n?'New Article':'Edit Article',
+    formRow(inputField('Title','sdt_title',d.title,'',true),selectField('Category','sdt_cat',d.category,cats,true))+
+    formRow(selectField('Icon','sdt_icon',d.icon,icons,true),inputField('Read Time (min)','sdt_read',String(d.readTime),'number'))+
+    '<div class="form-group"><label class="form-label">Content *</label><textarea id="sdt_content" rows="8" class="form-input" style="resize:vertical;font-family:inherit;font-size:11px">'+d.content+'</textarea></div>',
+    function(){
+      var title=(document.getElementById('sdt_title').value||'').trim();
+      var content=(document.getElementById('sdt_content').value||'').trim();
+      if(!title||!content){showToast('Title and Content are required','error');return;}
+      var excerpt=content.substring(0,120)+(content.length>120?'...':'');
+      var data={id:d.id,title:title,category:document.getElementById('sdt_cat').value,icon:document.getElementById('sdt_icon').value,content:content,excerpt:excerpt,updated:new Date().toISOString().split('T')[0],readTime:parseInt(document.getElementById('sdt_read').value)||5};
+      if(n){mockSystemDocs.push(data);DB.save('systemDocs');showToast('Article created','success');}
+      else{var idx=mockSystemDocs.findIndex(function(x){return x.id===d.id});if(idx>=0){mockSystemDocs[idx]=data;DB.save('systemDocs');showToast('Article updated','info');}}
+      closeModal();_PG={};renderModule();
+    }
+  );
+}
+function renderBackupRestore(el){
+  var pBk=_pg('backups',mockBackups);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Backup & Restore</div><div class="page-subtitle">'+mockBackups.length+' backups · Automated & manual</div>'+
+    '<div class="stats-row" style="margin-bottom:8px">'+[
+      ['Total Backups',mockBackups.length,'#1565c0'],
+      ['Successful',mockBackups.filter(function(b){return b.status==='Success'}).length,'#2e7d32'],
+      ['Failed',mockBackups.filter(function(b){return b.status==='Failed'}).length,'#c62828'],
+      ['Last Backup',mockBackups.length>0?mockBackups[0].date:'—','#7b1fa2'],
+      ['Auto Backup','Daily','#00838f'],
+      ['Retention','30 days','#e65100']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs"><div class="tab active" onclick="backupTab=\'all\';renderModule()">All</div><div class="tab" onclick="backupTab=\'auto\';renderModule()">Auto</div><div class="tab" onclick="backupTab=\'manual\';renderModule()">Manual</div></div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudBackup()" style="padding:3px 8px;font-size:10px">+ New Backup</button>'+
+      '<button class="action-btn secondary" onclick="runAutoBackup()" style="padding:3px 8px;font-size:10px">\u25B6 Run Auto</button>'+
+      '<button class="action-btn secondary" onclick="showToast(\'Backup configuration opened\',\'info\')" style="padding:3px 8px;font-size:10px">\u2699\uFE0F Configure</button>'+
+    '</div>'+
+    '<div class="card"><div class="card-header"><h3>Backup History</h3><div style="font-size:9px;color:#888">Total size: '+formatBackupSize(mockBackups.reduce(function(s,b){return s+b.sizeBytes;},0))+'</div></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Size</th><th>Included</th><th>Status</th><th>Download</th><th></th></tr></thead><tbody>'+
+    mockBackups.map(function(b){
+      var statusColor=b.status==='Success'?'badge-active':b.status==='Failed'?'badge-sold':'badge-pending';
+      return '<tr><td style="font-weight:500;font-size:10px">'+b.date+'</td><td><span class="badge-status '+(b.type==='Auto'?'badge-reserved':'badge-closed')+'">'+b.type+'</span></td><td>'+b.size+'</td><td style="font-size:10px;color:#555">'+b.included+'</td><td><span class="badge-status '+statusColor+'">'+b.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="showToast(\'Downloading '+b.id+'...\',\'info\')">\u2B07 Download</span></td>'+
+      '<td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="crudBackup(mockBackups.find(function(x){return x.id===\x27'+b.id+'\x27}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="if(confirm(\x27Delete backup '+b.id+'?\x27)){var idx=mockBackups.findIndex(function(x){return x.id===\x27'+b.id+'\x27});if(idx>=0)mockBackups.splice(idx,1);DB.save(\x27backups\x27);showToast(\x27Deleted\x27,\x27info\x27);renderModule()}">\u2715</span> <span style="color:#2e7d32;cursor:pointer;font-size:11px" onclick="if(confirm(\x27Restore from '+b.id+'?\x27)){showToast(\x27Restore initiated from '+b.id+'\x27,\x27success\x27)}">\u21A9 Restore</span></td></tr>';
+    }).join('')+
+    '</tbody></table></div></div></div>'+
+    '<div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div class="card"><div class="card-header"><h3>\u2699\uFE0F Auto-Backup Settings</h3></div><div class="card-body" style="padding:8px;font-size:10px">'+
+        '<div style="margin-bottom:6px"><span style="color:#555;font-weight:500">Schedule:</span> <span style="color:#333">Daily at 02:00 AM</span></div>'+
+        '<div style="margin-bottom:6px"><span style="color:#555;font-weight:500">Retention:</span> <span style="color:#333">30 days (latest 30 backups kept)</span></div>'+
+        '<div style="margin-bottom:6px"><span style="color:#555;font-weight:500">Include:</span> <span style="color:#333">Database, Documents, Media</span></div>'+
+        '<div><span style="color:#555;font-weight:500">Storage:</span> <span style="color:#333">Local + Cloud (S3-compatible)</span></div>'+
+      '</div></div>'+
+      '<div class="card"><div class="card-header"><h3>\uD83D\uDED2 Restore Points</h3></div><div class="card-body" style="padding:8px;font-size:10px;text-align:center">'+
+        '<div style="font-size:24px;font-weight:700;color:#2e7d32;margin-bottom:4px">'+mockBackups.filter(function(b){return b.status==='Success'}).length+'</div>'+
+        '<div style="color:#888;margin-bottom:8px">Available restore points</div>'+
+        '<button class="action-btn primary" onclick="showToast(\'Restore wizard opened\',\'info\')" style="padding:4px 12px;font-size:10px">\uD83D\uDEE0\uFE0F Restore Wizard</button>'+
+      '</div></div>'+
+    '</div>';
+}
+function formatBackupSize(bytes){
+  if(bytes<1024)return bytes+' B';
+  if(bytes<1048576)return (bytes/1024).toFixed(1)+' KB';
+  if(bytes<1073741824)return (bytes/1048576).toFixed(1)+' MB';
+  return (bytes/1073741824).toFixed(2)+' GB';
+}
+function runAutoBackup(){
+  var now=new Date();var ds=now.toISOString().split('T')[0]+' '+now.toTimeString().split(' ')[0];
+  var size=Math.floor(Math.random()*500+50);
+  mockBackups.unshift({id:'BAK-'+String(mockBackups.length+1+100).padStart(4,'0'),date:ds,type:'Auto',size:formatBackupSize(size*1024*1024),sizeBytes:size*1024*1024,included:'Database, Documents',status:'Success',notes:'Automated daily backup'});
+  DB.save('backups');renderModule();showToast('Auto backup completed!','success');
+}
+function crudBackup(item){
+  var n=!item;
+  var b=n?{id:'BAK-'+String(mockBackups.length+1+100).padStart(4,'0'),date:new Date().toISOString().split('T')[0]+' '+new Date().toTimeString().split(' ')[0],type:'Manual',size:'—',sizeBytes:0,included:'Database, Documents, Media, Config',status:'Pending',notes:''}:item;
+  openModal(n?'Create Backup':'Edit Backup',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+      selectField('Type','bkp_type',b.type,['Manual','Auto'],true)+
+      selectField('Include','bkp_inc',b.included,['Database, Documents, Media, Config','Database Only','Documents Only','Full System'],true)+
+      inputField('Notes','bkp_notes',b.notes)+
+    '</div>',
+    function(){
+      var type=document.getElementById('bkp_type').value;
+      var inc=document.getElementById('bkp_inc').value;
+      var size=Math.floor(Math.random()*500+50);
+      var data={id:b.id,date:new Date().toISOString().split('T')[0]+' '+new Date().toTimeString().split(' ')[0],type:type,size:formatBackupSize(size*1024*1024),sizeBytes:size*1024*1024,included:inc,status:'Success',notes:document.getElementById('bkp_notes').value||''};
+      if(n){mockBackups.unshift(data);DB.save('backups');showToast('Backup created!','success');}
+      else{var idx=mockBackups.findIndex(function(x){return x.id===b.id});if(idx>=0){mockBackups[idx]=data;DB.save('backups');showToast('Updated','info');}}
+      closeModal();renderModule();
+    }
+  );
+}
 function renderSettings(el){
   const si=[{id:'users',label:'Users',icon:'👤',desc:'Manage users, roles & access'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'roles',label:'Roles & Permissions',icon:'🔐',desc:'Fine-grained permission matrix'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
   const sidebar=si.map(s=>'<div onclick="settingsTab=\''+s.id+'\';renderModule()" style="padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;transition:all .15s;background:'+(settingsTab===s.id?'#eef3ff':'transparent')+';'+(settingsTab===s.id?'font-weight:600;color:#2F80ED':'color:#555')+'"><span style="font-size:14px">'+s.icon+'</span><div><div style="font-size:11px;font-weight:'+(settingsTab===s.id?'600':'500')+'">'+s.label+'</div><div style="font-size:9px;color:#888">'+s.desc+'</div></div></div>').join('');
@@ -4490,6 +4645,7 @@ if(savedRole&&['Super Admin','Sales Agent','Site Engineer','Finance'].indexOf(sa
   var fb=document.getElementById('footerRoleBtn');
   if(fb)fb.textContent=savedRole.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();
 }
+let backupTab='all';
 let currentZoom=100;
 function changeZoom(d){currentZoom+=d;if(currentZoom<60)currentZoom=60;if(currentZoom>150)currentZoom=150;document.getElementById('mainContent').style.zoom=currentZoom+'%';document.getElementById('zoomLabel').textContent=currentZoom+'%'}
 function resetZoom(){currentZoom=100;document.getElementById('mainContent').style.zoom='';document.getElementById('zoomLabel').textContent='100%'}
