@@ -385,6 +385,7 @@
         </div>
         <div class="icon-btn" onclick="openQuickAdd()" title="Quick Add" style="font-weight:700;font-size:16px;color:#2F80ED">+</div>
         <div class="icon-btn" onclick="printReport()" title="Print Report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></div>
+        <div class="icon-btn" onclick="exportAllTables()" title="Export All as CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
         <div class="icon-btn" onclick="toggleNotifications()" title="Notifications" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div id="notifBadge">0</div></div>
         <div class="user-avatar" onclick="toggleRoleMenu()" title="Switch Role">SA</div>
       </div>
@@ -1066,11 +1067,15 @@ function switchGroup(group) {
   const grp = GROUPS[group];
   document.getElementById('footerGroup').textContent = grp.label;
   const nav = document.getElementById('topNav');
-  nav.innerHTML = grp.mods.map((m, i) =>
-    `<div class="top-nav-item ${i===0?'active':''} ${m.badge?'badge-new':''}" onclick="switchModule('${m.id}')">${m.label}</div>`
-  ).join('');
-  // Switch to first module
-  if (grp.mods.length > 0) switchModule(grp.mods[0].id);
+  // Filter modules by role permissions
+  const visibleMods = grp.mods.filter(function(m){return canAccess(m.id);});
+  nav.innerHTML = visibleMods.map(function(m, i){
+    var isFirst=(i===0);
+    return '<div class="top-nav-item'+(isFirst?' active':'')+(m.badge?' badge-new':'')+'" onclick="switchModule(\''+m.id+'\')">'+m.label+'</div>';
+  }).join('');
+  // Switch to first accessible module
+  if (visibleMods.length > 0) switchModule(visibleMods[0].id);
+  else {document.getElementById('mainContent').innerHTML='<div class="fade-in" style="padding:40px;text-align:center;color:#999"><div style="font-size:32px;margin-bottom:10px">🔒</div><div style="font-size:14px;font-weight:500;margin-bottom:4px">No Access</div><div style="font-size:11px">This group has no modules accessible to your role.</div></div>';}
 }
 
 function switchModule(mod) {
@@ -4010,11 +4015,59 @@ function printReport(){
 }
 function toggleRoleMenu(){document.getElementById('roleMenuPanel').classList.toggle('active')}
 function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remove('active')}
+// ═══ ROLE-BASED ACCESS CONTROL ═══
+var _rolePerms = {
+  'Super Admin': {modules:'all',edit:true},
+  'Sales Agent': {modules:['dashboard','crm','sales_marketing','dues_recovery','contacts','plots','projects','bookings','customer_portal','handover','documents','knowledge_base','tasks','workspace','notifications_page','settings'],edit:true},
+  'Site Engineer': {modules:['dashboard','plots','projects','compliance','contractors','boq','variation_orders','equipment','labor','qc','designs','stock','tasks','workspace','knowledge_base','notifications_page','settings'],edit:true},
+  'Finance': {modules:['dashboard','finance','stock','dues_recovery','bookings','hr','documents','projects','tasks','workspace','knowledge_base','notifications_page','settings'],edit:true}
+};
+function canAccess(mod){
+  if(currentRole==='Super Admin')return true;
+  var p=_rolePerms[currentRole];
+  if(!p||!p.modules)return false;
+  return p.modules.indexOf(mod)>=0;
+}
+function canEdit(){
+  if(currentRole==='Super Admin')return true;
+  var p=_rolePerms[currentRole];
+  return p&&p.edit===true;
+}
 function setRole(role){
   currentRole=role; document.getElementById('roleDisplay').textContent=role;
-  document.querySelectorAll('.role-opt').forEach(e=>{e.style.background=e.dataset.role===role?'#eef3ff':'transparent';e.style.fontWeight=e.dataset.role===role?'600':'400'});
-  var fb=document.getElementById('footerRoleBtn');if(fb)fb.textContent=role.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();
-  toggleRoleMenu(); showToast('Switched to '+role,'info'); renderModule();
+  localStorage.setItem('rem_role',role);
+  document.querySelectorAll('.role-opt').forEach(function(e){
+    e.style.background=e.dataset.role===role?'#eef3ff':'transparent';
+    e.style.fontWeight=e.dataset.role===role?'600':'400';
+  });
+  var fb=document.getElementById('footerRoleBtn');
+  if(fb)fb.textContent=role.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();
+  // Rebuild sidebar visibility
+  document.querySelectorAll('#sidebarNav .sidebar-item').forEach(function(el){
+    var g=el.id.replace('s_','');
+    if(!g||g===''||role==='Super Admin'){el.style.display='flex';return}
+    var grp=GROUPS[g];if(!grp){el.style.display='flex';return}
+    var visible=grp.mods.some(function(m){return canAccess(m.id);});
+    el.style.display=visible?'flex':'none';
+  });
+  toggleRoleMenu();
+  // Re-render current module — might need to switch to first accessible
+  var currentGrp=GROUPS[currentGroup];
+  if(currentGrp){
+    var accessible=currentGrp.mods.filter(function(m){return canAccess(m.id);});
+    if(accessible.length===0){
+      // Find first accessible group/module
+      for(var gk in GROUPS){
+        var g=GROUPS[gk];
+        var acc=g.mods.filter(function(m){return canAccess(m.id);});
+        if(acc.length>0){switchGroup(gk);return}
+      }
+    }else if(!canAccess(currentModule)){
+      switchModule(accessible[0].id);return;
+    }
+  }
+  showToast('Switched to '+role,'info');
+  renderModule();
 }
 // ═══ NOTIFICATION SYSTEM ═══
 var mockNotifications = DB.init('notifications', (function(){
@@ -4177,6 +4230,17 @@ function settingsAddList(k){var v=prompt('Add new item to '+k+':');if(v&&v.trim(
 function settingsRemoveList(k,i){if(!confirm('Remove "'+i+'" from '+k+'?'))return;if(mockMasterLists[k]){mockMasterLists[k]=mockMasterLists[k].filter(function(x){return x!==i});DB.save('master_lists');renderModule()}}
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
 if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');
+var savedRole=localStorage.getItem('rem_role');
+if(savedRole&&['Super Admin','Sales Agent','Site Engineer','Finance'].indexOf(savedRole)>=0){
+  currentRole=savedRole;
+  document.getElementById('roleDisplay').textContent=savedRole;
+  document.querySelectorAll('.role-opt').forEach(function(e){
+    e.style.background=e.dataset.role===savedRole?'#eef3ff':'transparent';
+    e.style.fontWeight=e.dataset.role===savedRole?'600':'400';
+  });
+  var fb=document.getElementById('footerRoleBtn');
+  if(fb)fb.textContent=savedRole.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();
+}
 let currentZoom=100;
 function changeZoom(d){currentZoom+=d;if(currentZoom<60)currentZoom=60;if(currentZoom>150)currentZoom=150;document.getElementById('mainContent').style.zoom=currentZoom+'%';document.getElementById('zoomLabel').textContent=currentZoom+'%'}
 function resetZoom(){currentZoom=100;document.getElementById('mainContent').style.zoom='';document.getElementById('zoomLabel').textContent='100%'}
@@ -4618,13 +4682,16 @@ function toggleColumn(tid,ci,show){
     if(td)td.className=show?'':'hidden';
   });
 }
-function exportCSV(tid){
+function exportCSV(tid,label){
   var tbl=document.getElementById(tid);if(!tbl)return;
-  var rows=[];
+  var rows=[],modName='';
+  var pt=document.querySelector('.page-title');
+  if(pt)modName=pt.textContent.replace(/[^a-zA-Z0-9\\s_-]/g,'').trim().replace(/\\s+/g,'_');
+  label=label||modName||'export';
   // Header
   var hdr=[];
   tbl.querySelectorAll('thead th:not(.hidden)').forEach(function(th){
-    var txt=th.textContent.replace('⇅','').replace('▲','').replace('▼','').trim();
+    var txt=th.textContent.replace(/[⇅▲▼]/g,'').trim();
     if(txt)hdr.push('"'+txt.replace(/"/g,'""')+'"');
   });
   if(hdr.length)rows.push(hdr.join(','));
@@ -4639,10 +4706,49 @@ function exportCSV(tid){
     if(cells.length)rows.push(cells.join(','));
   });
   var csv=rows.join('\n');
+  var dateStr=new Date().toISOString().split('T')[0];
   var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=tid+'_export.csv';a.click();URL.revokeObjectURL(a.href);
-  showToast('CSV exported!','success');
+  a.download=label+'_'+dateStr+'.csv';a.click();URL.revokeObjectURL(a.href);
+  showToast('CSV exported: '+label,'success');
+}
+function exportAllTables(){
+  var tables=document.querySelectorAll('#mainContent table');
+  if(tables.length===0){showToast('No tables to export','error');return}
+  var pt=document.querySelector('.page-title');
+  var modName=pt?pt.textContent.replace(/[^a-zA-Z0-9\\s_-]/g,'').trim().replace(/\\s+/g,'_'):'REM_Export';
+  if(tables.length===1){
+    var tid=tables[0].id||'tbl_'+modName;
+    exportCSV(tid,modName);
+    return;
+  }
+  var rows=[];
+  tables.forEach(function(tbl,i){
+    var caption=tbl.querySelector('caption');
+    var sec=caption?caption.textContent.replace(/"/g,'""'):'Section '+(i+1);
+    rows.push('"--- '+sec+' ---"');
+    var hdr=[];
+    tbl.querySelectorAll('thead th:not(.hidden)').forEach(function(th){
+      var txt=th.textContent.replace(/[⇅▲▼]/g,'').trim();
+      if(txt)hdr.push('"'+txt.replace(/"/g,'""')+'"');
+    });
+    if(hdr.length)rows.push(hdr.join(','));
+    tbl.querySelectorAll('tbody tr').forEach(function(tr){
+      if(tr.style.display==='none')return;
+      var cells=[];
+      tr.querySelectorAll('td:not(.hidden)').forEach(function(td){
+        cells.push('"'+td.textContent.trim().replace(/"/g,'""')+'"');
+      });
+      if(cells.length)rows.push(cells.join(','));
+    });
+    rows.push('');
+  });
+  var csv=rows.join('\n');
+  var dateStr=new Date().toISOString().split('T')[0];
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=modName+'_'+dateStr+'_full.csv';a.click();URL.revokeObjectURL(a.href);
+  showToast('Exported '+tables.length+' tables as '+modName+'_'+dateStr+'_full.csv','success');
 }
 function printTable(tid){
   var tbl=document.getElementById(tid);if(!tbl)return;
@@ -4763,6 +4869,19 @@ function cancelInlineEdit(inp){
 }
 
 // ═══ INIT ═══
+// Apply sidebar visibility based on persisted role
+(function(){
+  var r=currentRole;
+  if(r!=='Super Admin'){
+    document.querySelectorAll('#sidebarNav .sidebar-item').forEach(function(el){
+      var g=el.id.replace('s_','');
+      if(!g||g==='')return;
+      var grp=GROUPS[g];if(!grp){el.style.display='flex';return}
+      var visible=grp.mods.some(function(m){return canAccess(m.id);});
+      el.style.display=visible?'flex':'none';
+    });
+  }
+})();
 switchGroup('executive');
 // Enhance tables after init
 setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();updateNotifBadge();},100);
