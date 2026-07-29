@@ -225,6 +225,54 @@
     td[data-field]:hover::after{opacity:1}
     html.dark td[data-field]:hover{background:#1a2332!important}
     html.dark .ie-input{background:#1f2937;color:#e0e0e0;border-color:#4a6fa5}
+    /* ═══ GLOBAL SEARCH DROPDOWN ═══ */
+    #searchWrap{position:relative;display:flex;align-items:center}
+    #searchBar{display:flex;align-items:center;gap:4px;background:#f5f5f7;border:1px solid transparent;border-radius:8px;padding:4px 10px;width:160px;cursor:text;transition:all .15s;font-size:11px;color:#888}
+    #searchBar:focus-within{width:240px;border-color:#2F80ED;background:#fff;box-shadow:0 0 0 2px rgba(47,128,237,.1)}
+    #searchBar input{flex:1;border:none;outline:none;font-size:11px;background:transparent;color:#333;min-width:0}
+    #searchBar input::placeholder{color:#aaa}
+    #searchBar .kbd{font-size:8px;color:#bbb;background:#fff;border:1px solid #e0e0e0;border-radius:3px;padding:1px 4px;font-weight:500;line-height:1.4;margin-left:2px;flex-shrink:0}
+    #searchBar .search-icon{width:14px;height:14px;color:#aaa;flex-shrink:0}
+    html.dark #searchBar{background:#1e293b;border-color:#2a3a52}
+    html.dark #searchBar:focus-within{background:#0f172a;border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.15)}
+    html.dark #searchBar input{color:#e0e0e0}
+    html.dark #searchBar .kbd{background:#1e293b;border-color:#334155;color:#64748b}
+    #searchDropdown{position:absolute;top:calc(100% + 4px);left:0;width:440px;max-height:460px;background:#fff;border:1px solid #e0e0e0;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.12);z-index:9999;display:none;overflow:hidden}
+    #searchDropdown.active{display:flex;flex-direction:column}
+    #searchDropdown .sd-input-wrap{padding:8px 10px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:6px}
+    #searchDropdown .sd-input-wrap input{flex:1;border:none;outline:none;font-size:12px;padding:4px 0;background:transparent;color:#333}
+    #searchDropdown .sd-input-wrap input::placeholder{color:#aaa}
+    #searchDropdown .sd-results{flex:1;overflow-y:auto;padding:4px 6px;max-height:360px}
+    #searchDropdown .sd-empty{padding:30px 20px;text-align:center;color:#999;font-size:12px}
+    .sd-item{padding:6px 8px;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;margin-bottom:2px;transition:background .08s}
+    .sd-item:hover,.sd-item.hl{background:#f0f4ff}
+    html.dark .sd-item:hover,html.dark .sd-item.hl{background:#1e293b}
+    .sd-item .sd-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-weight:600}
+    .sd-item .sd-info{flex:1;min-width:0}
+    .sd-item .sd-title{font-size:12px;font-weight:500;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    html.dark .sd-item .sd-title{color:#e0e0e0}
+    .sd-item .sd-sub{font-size:10px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .sd-item .sd-mod{font-size:9px;color:#2F80ED;background:#eef3ff;padding:1px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;font-weight:500}
+    html.dark .sd-item .sd-mod{background:#1a2a4a;color:#60a5fa}
+    #searchDropdown .sd-footer{padding:5px 10px;border-top:1px solid #e8e8e8;font-size:9px;color:#aaa;display:flex;justify-content:space-between}
+    html.dark #searchDropdown .sd-footer{border-color:#2a3a52;color:#64748b}
+    html.dark #searchDropdown{background:#0f172a;border-color:#2a3a52}
+    html.dark #searchDropdown .sd-input-wrap{border-color:#2a3a52}
+    html.dark #searchDropdown .sd-input-wrap input{color:#e0e0e0}
+    html.dark .sd-empty{color:#64748b}
+    /* ═══ PRINT REPORT ═══ */
+    @media print{body *{visibility:hidden}#printReport,#printReport *{visibility:visible}#printReport{position:fixed;left:0;top:0;width:100%;height:100%;z-index:99999;background:#fff;padding:30px 40px;overflow:auto;font-family:'Inter',sans-serif}}
+    #printReport{display:none;font-family:'Inter',sans-serif;color:#333}
+    #printReport .pr-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #2F80ED}
+    #printReport .pr-info .pr-title{font-size:20px;font-weight:700;color:#111}
+    #printReport .pr-info .pr-sub{font-size:11px;color:#888;margin-top:3px}
+    #printReport .pr-meta{text-align:right;font-size:10px;color:#888;line-height:1.6}
+    #printReport table{width:100%;border-collapse:collapse;font-size:10px}
+    #printReport th{background:#f8f9fa;padding:6px 8px;text-align:left;font-weight:600;border:1px solid #ddd;font-size:9px;text-transform:uppercase;color:#444}
+    #printReport td{padding:5px 8px;border:1px solid #ddd;font-size:10px}
+    #printReport tr:nth-child(even){background:#fafbfc}
+    #printReport .pr-foot{margin-top:20px;padding-top:12px;border-top:1px solid #eee;font-size:9px;color:#aaa;text-align:center}
+    #printReport .pr-foot span{display:inline-block;margin:0 12px}
   </style>
 </head>
 <body>
@@ -267,7 +315,23 @@
     <div class="top-bar">
       <div class="top-nav" id="topNav"></div>
       <div class="top-actions" style="position:relative">
-        <div class="icon-btn" onclick="toggleGlobalSearch()" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <div id="searchWrap">
+          <div id="searchBar" tabindex="-1">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="gsInput" placeholder="Search anything..." onfocus="openSearchDropdown()" oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
+            <span class="kbd">⌘K</span>
+          </div>
+          <div id="searchDropdown">
+            <div class="sd-input-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="sdInput" placeholder="Search across all modules..." oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
+              <span onclick="closeSearchDropdown()" style="cursor:pointer;color:#999;font-size:13px;padding:2px">✕</span>
+            </div>
+            <div class="sd-results" id="sdResults"></div>
+            <div class="sd-footer"><span>All modules</span><span>↑↓ Navigate · Enter Open · Esc Close</span></div>
+          </div>
+        </div>
+        <div class="icon-btn" onclick="printReport()" title="Print Report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></div>
         <div class="icon-btn" onclick="toggleNotifications()" title="Notifications" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
         <div class="user-avatar" onclick="toggleRoleMenu()" title="Switch Role">SA</div>
       </div>
@@ -289,14 +353,6 @@
     </div>
   </div>
 </div>
-
-<div id="globalSearchPanel" class="slide-out"><div class="backdrop" onclick="toggleGlobalSearch()"></div><div class="panel" style="padding:14px">
-  <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-    <input id="globalSearchInput" placeholder="Search leads, plots, projects, contacts..." onkeyup="globalSearch()" style="flex:1;padding:7px 10px;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;outline:none"/>
-    <div class="icon-btn" onclick="toggleGlobalSearch()">✕</div>
-  </div>
-  <div id="globalSearchResults" style="flex:1;overflow-y:auto"></div>
-</div></div>
 
 <div id="notifPanel" class="slide-out"><div class="backdrop" onclick="toggleNotifications()"></div><div class="panel">
   <div style="padding:12px 14px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600">Notifications</span></div>
@@ -3753,8 +3809,148 @@ function renderSettings(el){
 
 // ═══ TOAST, SEARCH, THEME, ROLE, ZOOM ═══
 function showToast(msg,t='success'){const c=document.getElementById('toastContainer');const d=document.createElement('div');d.className='toast '+t;d.textContent=msg;c.appendChild(d);setTimeout(()=>d.remove(),3000)}
-function toggleGlobalSearch(){document.getElementById('globalSearchPanel').classList.toggle('active')}
-function toggleNotifications(){document.getElementById('notifPanel').classList.toggle('active')}
+// ═══ GLOBAL SEARCH DROPDOWN ═══
+var _sdHL=-1;
+function openSearchDropdown(){
+  document.getElementById('searchDropdown').classList.add('active');
+  var inp=document.getElementById('sdInput');
+  var gs=document.getElementById('gsInput');
+  inp.value=gs.value;
+  inp.focus();
+  doGlobalSearch();
+}
+function closeSearchDropdown(){
+  document.getElementById('searchDropdown').classList.remove('active');
+  _sdHL=-1;
+}
+function doGlobalSearch(){
+  var q=(document.getElementById('sdInput').value||'').toLowerCase().trim();
+  document.getElementById('gsInput').value=q;
+  var c=document.getElementById('sdResults');
+  if(!q){c.innerHTML='<div class="sd-empty">Type to search across all modules...</div>';return}
+  var allDatasets=[
+    // Executive
+    {arr:'mockTasks',label:'Tasks',icon:'📋',mod:'tasks',fields:['title','project']},
+    {arr:'mockBiReports',label:'Reports',icon:'📊',mod:'bi_reports',fields:['name','reportType']},
+    // Sales & CRM
+    {arr:'mockLeads',label:'Leads',icon:'🎯',mod:'crm',fields:['name','property','source']},
+    {arr:'mockContacts',label:'Contacts',icon:'👤',mod:'contacts',fields:['name','company']},
+    {arr:'mockCampaigns',label:'Campaigns',icon:'📢',mod:'sales_marketing',fields:['name','status']},
+    {arr:'mockAgents',label:'Agents',icon:'🤝',mod:'sales_marketing',fields:['name','branch']},
+    {arr:'mockDues',label:'Dues',icon:'💰',mod:'dues_recovery',fields:['name','project']},
+    {arr:'mockDuesPromises',label:'Promises',icon:'📅',mod:'dues_recovery',fields:['name']},
+    // Land & Projects
+    {arr:'mockPlots',label:'Plots',icon:'🏞️',mod:'plots',fields:['id','type','status']},
+    {arr:'mockProjects',label:'Projects',icon:'🏗️',mod:'projects',fields:['name','location','status']},
+    {arr:'mockCompliance',label:'Compliance',icon:'✅',mod:'compliance',fields:['name','type','priority']},
+    {arr:'mockLandProposals',label:'Land Proposals',icon:'📄',mod:'land_mgmt',fields:['name','location']},
+    // Bookings & Customer
+    {arr:'mockBookings',label:'Bookings',icon:'📝',mod:'bookings',fields:['client','property','id']},
+    {arr:'mockCustomers',label:'Customers',icon:'👥',mod:'customer_portal',fields:['name','phone','project']},
+    {arr:'mockHandoverUnits',label:'Handover Units',icon:'🔑',mod:'handover',fields:['id','unit']},
+    {arr:'mockSnags',label:'Snags',icon:'🔧',mod:'handover',fields:['unit','reportedBy']},
+    // Construction
+    {arr:'mockContractors',label:'Contractors',icon:'👷',mod:'contractors',fields:['name','type']},
+    {arr:'mockWorkOrders',label:'Work Orders',icon:'📋',mod:'contractors',fields:['id','scope','project']},
+    {arr:'mockBOQItems',label:'BOQ Items',icon:'💰',mod:'boq',fields:['item','category','project']},
+    {arr:'mockRateAnalysis',label:'Rate Analysis',icon:'📐',mod:'boq',fields:['name']},
+    {arr:'mockRabills',label:'R.A. Bills',icon:'📄',mod:'boq',fields:['billNo','project']},
+    {arr:'mockEquipment',label:'Equipment',icon:'🚜',mod:'equipment',fields:['name','model','type']},
+    {arr:'mockMaintenanceLog',label:'Maintenance Log',icon:'🔧',mod:'equipment',fields:['equipment','type']},
+    {arr:'mockLabor',label:'Workers',icon:'👷',mod:'labor',fields:['name','category']},
+    {arr:'mockPayroll',label:'Payroll',icon:'💵',mod:'labor',fields:['name']},
+    {arr:'mockInspections',label:'Inspections',icon:'🔍',mod:'qc',fields:['area','inspector']},
+    {arr:'mockDesigns',label:'Designs',icon:'🎨',mod:'designs',fields:['name','designer']},
+    // Finance & Admin
+    {arr:'mockInventory',label:'Inventory',icon:'📦',mod:'stock',fields:['name','category']},
+    {arr:'mockSuppliers',label:'Suppliers',icon:'🏭',mod:'stock',fields:['name','material']},
+    {arr:'mockPurchaseOrders',label:'Purchase Orders',icon:'📄',mod:'stock',fields:['id','supplier']},
+    {arr:'mockTransactions',label:'Transactions',icon:'💳',mod:'finance',fields:['description','category']},
+    {arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','department']},
+    {arr:'mockDocuments',label:'Documents',icon:'📄',mod:'documents',fields:['name','project']},
+    {arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
+    // Collaboration
+    {arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']},
+    // Design
+    {arr:'mockDesigns',label:'Designs (alt)',icon:'🎨',mod:'designs',fields:['name','type']}
+  ];
+  var res=[];
+  allDatasets.forEach(function(ds){
+    var arr=window[ds.arr];
+    if(!arr)return;
+    arr.forEach(function(item){
+      var found=false;
+      var matchedField='';
+      ds.fields.forEach(function(f){
+        var v=item[f];
+        if(v&&String(v).toLowerCase().includes(q)){found=true;matchedField=f;}
+      });
+      if(found){
+        var title=item[ds.fields[0]]||item.id||'';
+        var sub=ds.fields.slice(1).map(function(f){return item[f]}).filter(Boolean).join(' · ');
+        res.push({title:title,sub:sub,mod:ds.mod,label:ds.label,icon:ds.icon});
+      }
+    });
+  });
+  if(res.length===0){c.innerHTML='<div class="sd-empty">No results found for "<b>'+q+'</b>"</div>';_sdHL=-1;return}
+  _sdHL=-1;
+  c.innerHTML='<div style="font-size:9px;color:#888;padding:2px 4px 6px;font-weight:500">'+res.length+' result'+(res.length>1?'s':'')+'</div>'+
+    res.slice(0,30).map(function(r,i){
+      return '<div class="sd-item" data-idx="'+i+'" onclick="navigateSearch(\''+r.mod+'\',\''+r.title.replace(/'/g,"\\'")+'\')">'+
+        '<div class="sd-icon" style="background:#f0f4ff">'+r.icon+'</div>'+
+        '<div class="sd-info"><div class="sd-title">'+r.title+'</div><div class="sd-sub">'+r.sub+'</div></div>'+
+        '<span class="sd-mod">'+r.label+'</span></div>';
+    }).join('');
+}
+function searchKeyNav(e){
+  var items=document.querySelectorAll('#sdResults .sd-item');
+  if(e.key==='ArrowDown'){e.preventDefault();_sdHL=Math.min(_sdHL+1,items.length-1);highlightSearch(items);}
+  else if(e.key==='ArrowUp'){e.preventDefault();_sdHL=Math.max(_sdHL-1,0);highlightSearch(items);}
+  else if(e.key==='Enter'&&_sdHL>=0&&items[_sdHL]){items[_sdHL].click();}
+  else if(e.key==='Escape'){closeSearchDropdown();document.getElementById('gsInput').blur();}
+}
+function highlightSearch(items){
+  items.forEach(function(el,i){el.classList.toggle('hl',i===_sdHL);});
+  if(_sdHL>=0&&items[_sdHL])items[_sdHL].scrollIntoView({block:'nearest'});
+}
+function navigateSearch(mod,title){
+  closeSearchDropdown();
+  var grp=GROUPS_LOOKUP[mod];
+  if(grp)switchGroup(grp);
+  else switchModule(mod);
+}
+function toggleGlobalSearch(){openSearchDropdown();}
+// ═══ PRINT REPORT ═══
+function printReport(){
+  var title=document.querySelector('.page-title');
+  var subtitle=document.querySelector('.page-subtitle');
+  var tables=document.querySelectorAll('#mainContent table');
+  if(tables.length===0){showToast('No table data to print','error');return}
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var pr=document.getElementById('printReport')||(function(){
+    var d=document.createElement('div');d.id='printReport';document.body.appendChild(d);return d;
+  })();
+  var h='<div class="pr-hdr">'+
+    '<div class="pr-info"><div class="pr-title">'+(title?title.textContent:'Report')+'</div>'+
+    '<div class="pr-sub">'+(subtitle?subtitle.textContent:'REM ERP')+'</div></div>'+
+    '<div class="pr-meta"><div>REM ERP</div><div>'+dateStr+'</div></div></div>';
+  var rows=0;
+  tables.forEach(function(t,i){
+    var caption=t.querySelector('caption');
+    h+='<h3 style="font-size:13px;font-weight:600;margin:12px 0 6px;color:#333">'+
+      (caption?caption.textContent:'Table '+(i+1))+'</h3>';
+    h+=t.outerHTML;
+    rows+=t.querySelectorAll('tbody tr').length;
+  });
+  h+='<div class="pr-foot"><span>Total Records: '+rows+'</span><span>REM ERP v4.1</span><span>Generated: '+dateStr+'</span></div>';
+  pr.innerHTML=h;
+  pr.style.display='block';
+  setTimeout(function(){
+    window.print();
+    setTimeout(function(){pr.style.display='none';},100);
+  },200);
+}
 function toggleRoleMenu(){document.getElementById('roleMenuPanel').classList.toggle('active')}
 function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remove('active')}
 function setRole(role){
@@ -3904,18 +4100,6 @@ function convertLeadToBooking(id){
   if(!l.activities)l.activities=[];
   l.activities.push({type:'Note',user:'System',date:'Just now',text:'Converted to booking.'});
   closeLeadPanel();DB.save('leads');DB.save('bookings');renderModule();showToast('Converted to booking!');
-}
-function globalSearch(){
-  const q=document.getElementById('globalSearchInput').value.toLowerCase();
-  const c=document.getElementById('globalSearchResults');
-  if(!q){c.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:12px">Type to search...</div>';return}
-  const res=[];
-  mockLeads.forEach(l=>{if(l.name.toLowerCase().includes(q))res.push({title:l.name,sub:l.property+' · '+l.status,color:'#e3f2fd',mod:'crm'})});
-  mockPlots.forEach(p=>{if(p.id.toLowerCase().includes(q))res.push({title:p.id,sub:p.type+' · '+p.status,color:'#e8f5e9',mod:'plots'})});
-  mockProjects.forEach(p=>{if(p.name.toLowerCase().includes(q))res.push({title:p.name,sub:p.location+' · '+p.status,color:'#fff3e0',mod:'projects'})});
-  mockContacts.forEach(c=>{if(c.name.toLowerCase().includes(q))res.push({title:c.name,sub:c.type+' · '+c.company,color:'#f3e5f5',mod:'contacts'})});
-  if(res.length===0)c.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:12px">No results</div>';
-  else c.innerHTML=res.slice(0,20).map(function(r){return '<div onclick="switchGroup(\''+GROUPS_LOOKUP[r.mod]+'\');setTimeout(function(){switchModule(\''+r.mod+'\')},50)" style="padding:8px 10px;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;margin-bottom:3px;background:#f8f9fa"><div style="width:28px;height:28px;border-radius:6px;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">'+r.title[0]+'</div><div><div style="font-size:12px;font-weight:500">'+r.title+'</div><div style="font-size:10px;color:#888">'+r.sub+'</div></div></div>';}).join('');
 }
 const GROUPS_LOOKUP = {dashboard:'executive',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'finance_admin',documents:'finance_admin',knowledge_base:'finance_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
 
@@ -4389,6 +4573,27 @@ renderModule=function(){origRender();setTimeout(function(){enhanceAllTables();in
 var origSwitch=switchModule;
 switchModule=function(mod){currentModule=mod;origSwitch(mod);setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();},50);};
 function resetAllAppData(){if(confirm("Reset ALL app data? This cannot be undone.")){localStorage.clear();location.reload()}}
+// ═══ KEYBOARD SHORTCUTS ═══
+document.addEventListener('keydown',function(e){
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){
+    e.preventDefault();
+    var sd=document.getElementById('searchDropdown');
+    if(sd&&sd.classList.contains('active')){closeSearchDropdown();}
+    else{openSearchDropdown();}
+  }
+  if(e.key==='Escape'){
+    var sd=document.getElementById('searchDropdown');
+    if(sd&&sd.classList.contains('active')){closeSearchDropdown();}
+  }
+});
+// Close search dropdown on click outside
+document.addEventListener('click',function(e){
+  var wrap=document.getElementById('searchWrap');
+  if(wrap&&!wrap.contains(e.target)){
+    var sd=document.getElementById('searchDropdown');
+    if(sd&&sd.classList.contains('active'))closeSearchDropdown();
+  }
+});
 
 // ═══ LABOR MANAGEMENT MODULE ═══
 var ltTab='dashboard';
