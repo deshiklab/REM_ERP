@@ -1122,23 +1122,44 @@ function openModal(title,body,onSave){
   const c=document.getElementById('crudFormContent');
   c.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="font-size:14px;font-weight:700">'+title+'</h3><span onclick="closeModal()" style="cursor:pointer;color:#999;font-size:16px">✕</span></div>'+body+'<div style="display:flex;gap:6px;margin-top:14px;justify-content:flex-end"><button onclick="closeModal()" style="padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;font-weight:500;color:#555">Cancel</button><button onclick="saveModal()" id="crudSaveBtn" style="padding:6px 14px;border:none;border-radius:6px;background:#2F80ED;color:#fff;cursor:pointer;font-size:11px;font-weight:600">Save</button></div>';
   window._crudOnSave=onSave; document.getElementById('crudModal').classList.add('active');
+  // Keyboard shortcuts
+  setTimeout(function(){
+    document.addEventListener('keydown',__modalKeyHandler=function(e){
+      if(!document.getElementById('crudModal').classList.contains('active'))return;
+      if(e.key==='Escape'){closeModal();e.preventDefault()}
+      if(e.key==='Enter'&&e.target.tagName!=='SELECT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();saveModal()}
+    });
+  },50);
 }
-function closeModal(){document.getElementById('crudModal').classList.remove('active')}
-function saveModal(){if(window._crudOnSave){window._crudOnSave();closeModal()}}
+function closeModal(){
+  document.getElementById('crudModal').classList.remove('active');
+  document.removeEventListener('keydown',__modalKeyHandler);
+}
+function saveModal(){
+  // Check required fields
+  var errors=[];var m=document.getElementById('crudModal');
+  m.querySelectorAll('[required]').forEach(function(el){
+    if(!el.value.trim()){errors.push(el.id);el.style.borderColor='#e53935';el.style.background='#fff5f5'}
+    else{el.style.borderColor='';el.style.background=''}
+  });
+  if(errors.length>0){showToast('Please fill in required fields: '+errors.join(', '),'error');return}
+  if(window._crudOnSave){window._crudOnSave();closeModal()}
+}
 function g(id){const e=document.getElementById(id);return e?e.value:''}
-function inputField(l,id,v,p){return '<div class="form-group"><label class="form-label">'+l+'</label><input class="form-input" id="'+id+'" value="'+(v||'')+'" placeholder="'+(p||'')+'"/></div>'}
-function selectField(l,id,v,ops){return '<div class="form-group"><label class="form-label">'+l+'</label><select class="form-input" id="'+id+'">'+ops.map(function(o){return '<option value="'+o+'"'+(v===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'}
+function inputField(l,id,v,p,r){return '<div class="form-group"><label class="form-label">'+l+(r?' <span style="color:#e53935">*</span>':'')+'</label><input class="form-input" id="'+id+'" value="'+(v||'')+'" placeholder="'+(p||'')+'"'+(r?' required':'')+'/></div>'}
+function selectField(l,id,v,ops,r){return '<div class="form-group"><label class="form-label">'+l+(r?' <span style="color:#e53935">*</span>':'')+'</label><select class="form-input" id="'+id+'"'+(r?' required':'')+'>'+ops.map(function(o){return '<option value="'+o+'"'+(v===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'}
+function formRow(a,b){return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+a+b+'</div>'}
 function nextId(a){return Math.max(0,...a.map(function(i){return i.id||0}))+1}
 function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');renderModule()}
 function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');renderModule()}}
 function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info');renderModule()}}
-function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',owner:'Unassigned',nextFollowUp:'',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',inputField('Name','f_name',l.name)+inputField('Phone','f_phone',l.phone)+inputField('Email','f_email',l.email)+inputField('Property','f_prop',l.property)+inputField('Value','f_value',l.value)+selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'])+selectField('Type','f_type',l.type,['Local','NRB'])+selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'])+selectField('Priority','f_priority',l.priority,['High','Medium','Low'])+inputField('Owner','f_owner',l.owner)+inputField('Next Follow-up','f_fup',l.nextFollowUp),function(){const d={id:l.id,name:g('f_name'),phone:g('f_phone'),email:g('f_email'),property:g('f_prop'),value:g('f_value'),source:g('f_source'),type:g('f_type'),status:g('f_status'),priority:g('f_priority'),owner:g('f_owner'),nextFollowUp:g('f_fup'),lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d,'leads'):updateItem(mockLeads,l.id,d,'leads')})}
-function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',inputField('Name','f_name',p.name)+inputField('Location','f_loc',p.location)+selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed'])+inputField('Budget','f_budget',p.budget)+inputField('Manager','f_mgr',p.manager)+selectField('Type','f_type',p.type,['land','flat'])+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')})}
-function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',inputField('Client','f_client',b.client)+inputField('Property','f_prop',b.property)+inputField('Unit','f_unit',b.unit)+inputField('Price','f_price',b.price)+inputField('Advance','f_adv',b.advance)+selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
-function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',inputField('Name','f_name',e.name)+inputField('Designation','f_desig',e.designation)+selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT'])+inputField('Phone','f_phone',e.phone),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees'):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}),'employees')})}
-function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',inputField('Name','f_item',i.item)+selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate'])+inputField('Quantity','f_qty',i.quantity)+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder','f_reorder',i.reorder),function(){const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
-function crudTransaction(){openModal('New Transaction','<div class="form-group"><label class="form-label">Description</label><input class="form-input" id="f_desc"/></div>'+selectField('Type','f_type','Inflow',['Inflow','Outflow'])+inputField('Amount','f_amt')+selectField('Status','f_stat','Received',['Received','Pending','Paid']),function(){addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:g('f_type'),amount:g('f_amt'),status:g('f_stat'),project:'—'})})}
-function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',inputField('Vendor','f_vendor',p.vendor)+inputField('Items','f_items',p.items)+inputField('Amount','f_amt',p.amount)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled']),function(){const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*100))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
+function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',owner:'Unassigned',nextFollowUp:'',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',formRow(inputField('Name','f_name',l.name,'',true),inputField('Phone','f_phone',l.phone,'',true))+formRow(inputField('Email','f_email',l.email),inputField('Property','f_prop',l.property,'',true))+formRow(inputField('Value','f_value',l.value,'',true),selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'],true))+formRow(selectField('Type','f_type',l.type,['Local','NRB']),selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'],true))+formRow(selectField('Priority','f_priority',l.priority,['High','Medium','Low']),inputField('Owner','f_owner',l.owner))+inputField('Next Follow-up','f_fup',l.nextFollowUp),function(){const d={id:l.id,name:g('f_name'),phone:g('f_phone'),email:g('f_email'),property:g('f_prop'),value:g('f_value'),source:g('f_source'),type:g('f_type'),status:g('f_status'),priority:g('f_priority'),owner:g('f_owner'),nextFollowUp:g('f_fup'),lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d,'leads'):updateItem(mockLeads,l.id,d,'leads')})}
+function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',formRow(inputField('Name','f_name',p.name,'',true),inputField('Location','f_loc',p.location,'',true))+formRow(selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed']),selectField('Type','f_type',p.type,['land','flat']))+formRow(inputField('Budget','f_budget',p.budget),inputField('Manager','f_mgr',p.manager))+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')})}
+function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',formRow(inputField('Client','f_client',b.client,'',true),inputField('Property','f_prop',b.property,'',true))+formRow(inputField('Unit','f_unit',b.unit),inputField('Price','f_price',b.price,'',true))+formRow(inputField('Advance','f_adv',b.advance),selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed'])),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
+function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',formRow(inputField('Name','f_name',e.name,'',true),inputField('Designation','f_desig',e.designation,'',true))+formRow(selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT']),inputField('Phone','f_phone',e.phone)),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees'):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}),'employees')})}
+function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',formRow(inputField('Name','f_item',i.item,'',true),selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate']))+formRow(inputField('Quantity','f_qty',i.quantity,'',true),selectField('Status','f_stat',i.status,['Adequate','Warning','Critical']))+inputField('Reorder','f_reorder',i.reorder),function(){const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
+function crudTransaction(){openModal('New Transaction',formRow(inputField('Description','f_desc','','',true),selectField('Type','f_type','Inflow',['Inflow','Outflow'],true))+formRow(inputField('Amount','f_amt','','',true),selectField('Status','f_stat','Received',['Received','Pending','Paid'])),function(){addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:g('f_type'),amount:g('f_amt'),status:g('f_stat'),project:'—'})})}
+function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',formRow(inputField('Vendor','f_vendor',p.vendor,'',true),inputField('Items','f_items',p.items,'',true))+formRow(inputField('Amount','f_amt',p.amount,'',true),selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled'])),function(){const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*100))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
 
 // ═══ DETAIL PANELS ═══
 function showDetailPanel(title, bodyHTML, footerHTML) {
@@ -1242,54 +1263,61 @@ function enhanceAllTables(){
     }
     // Build toolbar if not exists
     if(!wrap.parentElement.querySelector('.tbl-toolbar')){
-      var card=wrap.closest('.card')||wrap.parentElement;
-      if(card.classList.contains('card')||card.tagName==='DIV'){
-        // Try card-header first, otherwise insert before the table wrapper
-        var header=card.querySelector('.card-header')||card;
-        var insertPoint=header;
-        if(header===card&&card.querySelector('.card-body')){
-          // Insert before card-body's first child (which is the table-wrap)
-          var body=card.querySelector('.card-body');
-          if(body&&body.firstChild)insertPoint=body;
-          else insertPoint=body;
-        }
-        if(!insertPoint.querySelector('.tbl-toolbar')){
-          var tb=document.createElement('div');tb.className='tbl-toolbar';
-          tb.style.borderBottom='1px solid #e8e8e8';
-          // Row count
-          var rows=tbl.querySelectorAll('tbody tr').length;
-          var rc=document.createElement('span');rc.className='tt-label';rc.textContent=rows+' rows';
-          tb.appendChild(rc);
-          tb.appendChild(document.createElement('span')).className='tt-spacer';
-          // Filter button
-          var fb=document.createElement('button');fb.className='tt-btn';fb.innerHTML='🔍 Filter';
-          fb.onclick=function(){toggleFilterPanel(tid);};
-          tb.appendChild(fb);
-          // Export CSV
-          var eb=document.createElement('button');eb.className='tt-btn';eb.innerHTML='📥 CSV';
-          eb.onclick=function(){exportCSV(tid);};
-          tb.appendChild(eb);
-          // Print
-          var pb=document.createElement('button');pb.className='tt-btn';pb.innerHTML='🖨 Print';
-          pb.onclick=function(){printTable(tid);};
-          tb.appendChild(pb);
-          // Columns
-          var cb=document.createElement('button');cb.className='tt-btn';cb.innerHTML='👁 Columns';
-          cb.onclick=function(){toggleColMenu(tid);};
-          cb.style.position='relative';
-          tb.appendChild(cb);
-          // Insert toolbar after card-header
-          header.after(tb);
-          // Add filter panel
-          var fp=document.createElement('div');fp.className='filter-panel';fp.id='fp_'+tid;
-          fp.innerHTML='<span class="fp-label">Search:</span><input id="fp_search_'+tid+'" placeholder="Type to filter..." oninput="filterTable(\''+tid+'\')" style="flex:1;max-width:180px"/> <span class="fp-label">Sort:</span><select id="fp_sort_'+tid+'" onchange="sortTableBy(\''+tid+'\')"><option value="">Default</option>'+getSortOptions(tid)+'</select> <button class="fp-btn primary" onclick="filterTable(\''+tid+'\')">Apply</button> <button class="fp-btn secondary" onclick="clearFilter(\''+tid+'\')">Clear</button>';
-          tb.after(fp);
-          // Add column menu
-          var cm=document.createElement('div');cm.className='col-menu';cm.id='cm_'+tid;
-          cm.innerHTML=getColMenuHTML(tid);
-          cb.appendChild(cm);
-        }  // end toolbar build
-      }  // end card check
+      var card=wrap.closest('.card')||wrap.parentElement.closest('.card')||null;
+      // Find the container that will hold the toolbar
+      var container=card||wrap.parentElement;
+      // Ensure there's a card-header to attach toolbar to
+      var header=container.querySelector('.card-header');
+      if(!header && container.classList.contains('card')){
+        header=document.createElement('div');header.className='card-header';header.style.padding='4px 10px';
+        container.insertBefore(header,container.firstChild);
+      }
+      // If still no header (bare card-body without card), wrap in a card
+      if(!header){
+        var wrapper=document.createElement('div');wrapper.className='card';
+        wrap.parentNode.insertBefore(wrapper,wrap);
+        wrapper.appendChild(wrap);
+        header=document.createElement('div');header.className='card-header';header.style.padding='4px 10px';
+        wrapper.insertBefore(header,wrapper.firstChild);
+        container=wrapper;
+        card=wrapper;
+      }
+      if(!header.querySelector('.tbl-toolbar')){
+        var tb=document.createElement('div');tb.className='tbl-toolbar';
+        tb.style.borderBottom='1px solid #e8e8e8';
+        // Row count
+        var rows=tbl.querySelectorAll('tbody tr').length;
+        var rc=document.createElement('span');rc.className='tt-label';rc.textContent=rows+' rows';
+        tb.appendChild(rc);
+        tb.appendChild(document.createElement('span')).className='tt-spacer';
+        // Filter button
+        var fb=document.createElement('button');fb.className='tt-btn';fb.innerHTML='🔍 Filter';
+        fb.onclick=function(){toggleFilterPanel(tid);};
+        tb.appendChild(fb);
+        // Export CSV
+        var eb=document.createElement('button');eb.className='tt-btn';eb.innerHTML='📥 CSV';
+        eb.onclick=function(){exportCSV(tid);};
+        tb.appendChild(eb);
+        // Print
+        var pb=document.createElement('button');pb.className='tt-btn';pb.innerHTML='🖨 Print';
+        pb.onclick=function(){printTable(tid);};
+        tb.appendChild(pb);
+        // Columns
+        var cb=document.createElement('button');cb.className='tt-btn';cb.innerHTML='👁 Columns';
+        cb.onclick=function(){toggleColMenu(tid);};
+        cb.style.position='relative';
+        tb.appendChild(cb);
+        // Insert toolbar after card-header
+        header.after(tb);
+        // Add filter panel
+        var fp=document.createElement('div');fp.className='filter-panel';fp.id='fp_'+tid;
+        fp.innerHTML='<span class="fp-label">Search:</span><input id="fp_search_'+tid+'" placeholder="Type to filter..." oninput="filterTable(\''+tid+'\')" style="flex:1;max-width:180px"/> <span class="fp-label">Sort:</span><select id="fp_sort_'+tid+'" onchange="sortTableBy(\''+tid+'\')"><option value="">Default</option>'+getSortOptions(tid)+'</select> <button class="fp-btn primary" onclick="filterTable(\''+tid+'\')">Apply</button> <button class="fp-btn secondary" onclick="clearFilter(\''+tid+'\')">Clear</button>';
+        tb.after(fp);
+        // Add column menu
+        var cm=document.createElement('div');cm.className='col-menu';cm.id='cm_'+tid;
+        cm.innerHTML=getColMenuHTML(tid);
+        cb.appendChild(cm);
+      }  // end toolbar build
     }
   });
 }
