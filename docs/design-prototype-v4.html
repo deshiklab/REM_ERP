@@ -581,16 +581,37 @@ window.mockBIReports = DB.init('bi_reports', [
   {name:'Cash Flow Forecast',type:'Line Chart',period:'Nov 2024',updated:'2024-10-25',status:'Auto'},
   {name:'Installment Collection Efficiency',type:'Gauge',period:'Oct 2024',updated:'2024-10-28',status:'Auto'}
 ]);
+window.kbCategories = [
+  {id:'legal',label:'Legal & Compliance',icon:'⚖️',color:'#1565c0'},
+  {id:'sales',label:'Sales & Marketing',icon:'📊',color:'#e65100'},
+  {id:'finance',label:'Finance & Accounts',icon:'💰',color:'#2e7d32'},
+  {id:'procurement',label:'Procurement & Supply Chain',icon:'📦',color:'#6a1b9a'},
+  {id:'hr',label:'HR & Admin',icon:'👥',color:'#00838f'},
+  {id:'land',label:'Land Acquisition',icon:'🏗️',color:'#4e342e'},
+  {id:'operations',label:'Operations & QC',icon:'🔧',color:'#37474f'}
+];
 window.mockKnowledgeBase = DB.init('knowledge_base', [
-  {title:'Land Acquisition Process',category:'Land Acquisition',updated:'2024-10-15',author:'Legal Team'},
-  {title:'Sales Commission Policy v3',category:'Sales',updated:'2024-09-20',author:'HR'},
-  {title:'VAT Calculation Guide',category:'Finance',updated:'2024-10-01',author:'Accounts'},
-  {title:'QC Checklist — Concrete Works',category:'Procurement',updated:'2024-08-15',author:'Quality Team'},
-  {title:'Employee Onboarding Checklist',category:'HR',updated:'2024-10-10',author:'HR'}
+  {title:'Land Acquisition Process — Step by Step Guide',category:'Legal & Compliance',catId:'legal',content:'This document outlines the complete land acquisition process for REM projects. Step 1: Site identification and feasibility study. Step 2: Title verification at Sub-Registry office. Step 3: Mutation and name transfer with DC office. Step 4: Land survey and demarcation by licensed surveyor. Step 5: Physical possession handover with signed deed. Step 6: Final registration at Sub-Registry and tax payment. Each step requires specific documentation. The legal team must verify all original deeds dating back 20+ years. Environmental clearance certificate required for projects over 5 bigha.',tags:['land','acquisition','legal','deed'],author:'Legal Team',updated:'2024-10-15',views:342,status:'Published'},
+  {title:'Sales Commission Policy v3 — Agent Payout Structure',category:'Sales & Marketing',catId:'sales',content:'Updated commission structure effective January 2025. BASE RATES: Direct Sales Agents — 2.5% of deal value on first booking, 1.5% on subsequent. Senior Agents — 3% on first 3 deals, 2% thereafter. Team Leads — 1% override on team deals. REFERRAL BONUS: Referral from existing customer — additional 0.5%. Corporate referrals — 1%. BULK DISCOUNT: 3+ units purchased same project — negotiate. Commission is paid 50% on downpayment, 50% on handover. Clawback applies if customer defaults within 6 months.',tags:['commission','sales','policy','agent','payout'],author:'HR',updated:'2024-09-20',views:567,status:'Published'},
+  {title:'VAT & Tax Calculation Guide — Real Estate',category:'Finance & Accounts',catId:'finance',content:'Comprehensive guide for VAT and tax calculations in real estate transactions. VAT RATES: Apartment sales — 5% on land value portion, 7.5% on construction portion. Land plots — 5% on total. Commercial properties — 10% on construction portion. TAX DEDUCTION: Source tax (AIT) at 3% for individual buyers, 5% for corporate. TDS on contractor payments — 5% for registered firms, 10% for unregistered. IMPORTANT: File monthly VAT returns by 15th of following month. Annual tax returns by September 15. Keep all challans for minimum 7 years.',tags:['vat','tax','finance','calculation','compliance'],author:'Accounts',updated:'2024-10-01',views:289,status:'Published'},
+  {title:'QC Checklist — Concrete Works & Structural Testing',category:'Operations & QC',catId:'operations',content:'Standard quality control checklist for all REM construction projects. PRE-POUR: Check slump (target 75-100mm). Verify rebar spacing per structural drawing. Check formwork alignment (±3mm tolerance). Verify concrete grade (minimum C30 for slabs, C35 for columns). DURING POUR: Continuous pouring preferred. Maximum delay 30 mins between batches. Consolidate with needle vibrator (25mm dia for dense reinforcement). POST-POUR: Initial curing with wet jute bags for 7 days. Remove formwork at 14 days (slabs) or 7 days (columns). Test cylinders at 7 days (70% target) and 28 days (100%).',tags:['qc','concrete','testing','structural','quality'],author:'Quality Team',updated:'2024-10-10',views:198,status:'Published'},
+  {title:'Employee Onboarding & Offboarding Checklist',category:'HR & Admin',catId:'hr',content:'HR procedures for new joinees and exits. ONBOARDING: Day 1 — Welcome kit, ID card, email setup, desk allocation. Week 1 — Company orientation, policy review, system access, bank account setup. Month 1 — Probation period starts, mentor assignment, 30-day goals. OFFBOARDING: Resignation acceptance — 60 days notice period. Exit interview — HR conducts within 7 days. Clearance — IT, Accounts, Admin clearances required. Final settlement — Within 30 days of last working day. Full & Final includes salary, leave encashment, gratuity (if 5+ years).',tags:['hr','onboarding','offboarding','employee','checklist'],author:'HR',updated:'2024-10-05',views:445,status:'Published'},
+  {title:'Property Handover Procedure — End-to-End Guide',category:'Sales & Marketing',catId:'sales',content:'Step-by-step handover process for completed properties. STAGE 1: Pre-Handover Inspection — Customer visits site 30 days before handover, defects register created. STAGE 2: Snag List Resolution — Construction team resolves all reported issues within 21 days. STAGE 3: Final Inspection — Customer re-verifies resolved items, signs acceptance. STAGE 4: Documentation — Mutation certificate, Completion certificate, Possession letter, Utility connections, Maintenance period starts (1 year). STAGE 5: Handover — Keys handed over at ceremonial event, welcome kit with manuals, warranty cards.',tags:['handover','customer','property','inspection'],author:'Sales Team',updated:'2024-10-20',views:312,status:'Published'},
+  {title:'Procurement Policy & Vendor Management',category:'Procurement & Supply Chain',catId:'procurement',content:'Procurement guidelines for REM projects. VENDOR ONBOARDING: All vendors must submit trade license, TIN certificate, bank details, and 3 client references. Evaluation takes 10 working days. APPROVAL LIMITS: Up to Tk 5L — Department Head approval. Tk 5L-25L — Director approval. Above Tk 25L — Board approval. Minimum 3 quotations required for orders above Tk 1L. PAYMENT TERMS: Local suppliers — 30% advance, 70% on delivery. Foreign suppliers — LC at sight or 60 days. Annual vendor review every December. Blacklisted vendors cannot reapply for 3 years.',tags:['procurement','vendor','policy','purchase'],author:'Procurement',updated:'2024-10-12',views:267,status:'Published'},
+  {title:'BOQ Preparation & Cost Estimation Standards',category:'Procurement & Supply Chain',catId:'procurement',content:'Standard Bill of Quantities methodology for REM projects. COST COMPONENTS: Land cost (30-35% of total), Construction (40-45%), Finishing (10-12%), Utilities (5-7%), Marketing (3-5%), Admin & Legal (2-3%), Contingency (5%). RATE ANALYSIS: Material rates updated quarterly from market survey. Labor rates per sqft — standard RCC building Tk 1,200-1,500/sqft. Overhead allocation — 15% of direct costs. Contingency reserve — 5% for ongoing, 8% for new projects. Profit margin target — 18-22%.',tags:['boq','estimation','cost','budget','construction'],author:'Projects',updated:'2024-10-08',views:178,status:'Draft'},
+  {title:'Customer Complaint Handling & Escalation Matrix',category:'Sales & Marketing',catId:'sales',content:'Standard operating procedure for customer complaints. TIER 1 (Level 1 complaints): Minor issues like paint touch-ups, fitting adjustments. Resolved within 7 days by site team. TIER 2 (Level 2): Water leakage, electrical issues, structural defects. Escalate to Project Manager. Resolved within 21 days. TIER 3 (Level 3): Major structural issues, legal disputes. Escalate to Director. Board review required. SLA: Acknowledge within 24 hours. Weekly update to customer. Document all complaints in CRM with photos. Monthly complaint analysis report to management.',tags:['complaint','customer','service','escalation'],author:'Customer Service',updated:'2024-10-18',views:234,status:'Published'},
+  {title:'Fire Safety & Building Code Compliance',category:'Legal & Compliance',catId:'legal',content:'Fire safety requirements for REM properties as per Bangladesh National Building Code (BNBC). HIGH-RISE (6+ stories): Fire-rated stairwell doors (90 min rating). Fire hydrant on every floor. Sprinkler system in common areas. Smoke detectors in all units. Emergency lighting and exit signs. Fire alarm panel at ground floor entrance. LOW-RISE: Fire extinguishers every 500 sqft. Clear fire exit paths marked with photoluminescent signs. Fire drill twice per year. All buildings require fire clearance from Fire Service & Civil Defense before occupancy certificate.',tags:['fire','safety','building','code','compliance','bnbc'],author:'Legal Team',updated:'2024-10-22',views:156,status:'Published'},
+  {title:'Leave Policy & Attendance Guidelines',category:'HR & Admin',catId:'hr',content:'Company leave and attendance policy effective 2024. LEAVE ENTITLEMENT: Annual Leave — 14 days per calendar year (prorated for new joiners). Sick Leave — 10 days per year (medical certificate required for 3+ consecutive days). Casual Leave — 7 days per year (1 day minimum, max 3 at a time). Festival Leave — 7 days (Eid-ul-Fitr 3, Eid-ul-Adha 3, other 1). Maternity — 4 months fully paid (after 1 year service). Paternity — 5 working days. ATTENDANCE: Core hours 9:00 AM-6:00 PM. 30 min grace period. Late 3 times = 1 day casual leave deducted.',tags:['hr','leave','attendance','policy'],author:'HR',updated:'2024-10-03',views:523,status:'Published'},
+  {title:'Marketing Campaign Strategy & ROI Framework',category:'Sales & Marketing',catId:'sales',content:'Standard marketing campaign framework for REM Projects. CAMPAIGN TYPES: Digital (Facebook/Youtube/Google Ads) — 40% of budget. Traditional (Billboard/Print/TV) — 30%. Events & Exhibitions — 20%. Agent Network — 10%. ROI TARGETS: Digital — minimum 500% ROI (cost per lead < Tk 500). Traditional — 200% ROI minimum. Events — target 50+ quality leads per event. BUDGET ALLOCATION: New project launch — 3% of projected revenue. Ongoing project — 1.5% of remaining inventory value. Monthly performance review with actual vs budget tracking.',tags:['marketing','campaign','roi','strategy','advertising'],author:'Marketing',updated:'2024-10-25',views:345,status:'Published'},
+  {title:'Land Mutation & Title Transfer Process',category:'Land Acquisition',catId:'land',content:'Detailed mutation process for land purchased by REM. Step 1: Application to DC office with original deed and khatian. Step 2: Physical verification by Assistant Commissioner (Land) — site visit within 30 days. Step 3: Hearing and objection period — 14 days public notice. Step 4: Mutation order issued by AC(Land). Step 5: Mutation certificate printed. REQUIRED DOCUMENTS: Original sale deed, Previous mutation certificate, Khatian copies (current & 20-year old), Tax receipt, Non-encumbrance certificate, Possession proof. Timeline: 90-180 days depending on district. Legal fee: 2% of land value.',tags:['land','mutation','title','transfer','legal'],author:'Legal Team',updated:'2024-10-28',views:189,status:'Published'},
+  {title:'Monthly Financial Reporting — Templates & Deadlines',category:'Finance & Accounts',catId:'finance',content:'Standard monthly financial reporting package for REM management. REPORTS DUE: 5th — Bank reconciliation & cash position. 7th — Sales report (bookings, collections, dues). 10th — Project-wise cost report (actual vs budget). 12th — Ageing of payables & receivables. 15th — VAT return filing. 20th — Fund flow forecast for next 45 days. 25th — Monthly management accounts (P&L, Balance Sheet). FORMAT: Excel templates with standard chart of accounts. Submit to CFO with variance analysis. Board pack prepared by 30th for monthly board meeting.',tags:['finance','reporting','monthly','deadline','template'],author:'Finance',updated:'2024-10-20',views:267,status:'Published'},
+  {title:'Contractor Evaluation & Performance Scorecard',category:'Procurement & Supply Chain',catId:'procurement',content:'Quarterly contractor evaluation system. EVALUATION CRITERIA: Quality (30%) — Pass rate on QC inspections. Timeliness (25%) — % of milestones met on schedule. Safety (15%) — Incident rate per 1000 man-hours. Cost Control (15%) — % within budget. Compliance (15%) — Documentation, labor law adherence. RATING SCALE: A (90-100%) — Preferred, fast-track payment. B (75-89%) — Standard terms. C (60-74%) — Enhanced supervision, 50% payment hold until completion. D (below 60%) — Show cause notice, no new contracts for 1 year.',tags:['contractor','evaluation','performance','scorecard','vendor'],author:'Procurement',updated:'2024-10-15',views:145,status:'Published'},
+  {title:'Emergency Response Plan — Construction Sites',category:'Operations & QC',catId:'operations',content:'Emergency procedures for all REM construction sites. MEDICAL EMERGENCY: First aid kit at every site office. Designated first aider on each shift. Nearest hospital mapped with contact numbers. Ambulance on-call for sites with 50+ workers. FIRE: Evacuation drill every 3 months. Fire extinguishers inspected monthly. Designated assembly point 50m from structure. STRUCTURAL: Stop work immediately if unusual movement/cracks detected. Site engineer evaluates. Structural engineer visit within 24 hours. SAFETY INCIDENTS: Report within 1 hour to safety officer. Root cause analysis within 48 hours. Safety stand-down if fatality occurs.',tags:['safety','emergency','construction','response','plan'],author:'Safety Officer',updated:'2024-10-18',views:123,status:'Published'},
+  {title:'Project Budget Tracking — SOP for PMs',category:'Finance & Accounts',catId:'finance',content:'Standard operating procedure for project budget management. BUDGET STRUCTURE: WBS Level 1 — Land, Construction, Marketing, Admin, Finance. WBS Level 2 — Substructure, Superstructure, Finishing, MEP, External Works. Each work package has cost code, budget owner, and monthly review. TRACKING: Monthly actual vs budget report with variance analysis. >10% variance requires written explanation from PM. >20% requires board approval. CHANGE ORDER: Any scope change > Tk 2L requires change order with client sign-off. Contingency release requires PM + Director approval. FORECAST: EAC (Estimate at Completion) updated monthly based on actual progress vs planned.',tags:['budget','project','pm','cost','tracking'],author:'Finance',updated:'2024-10-22',views:201,status:'Published'}
 ]);
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
-let landTab = 'identification', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list';
+let landTab = 'identification', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard';
 
 // ═══ GROUP & TOP BAR NAV ═══
 function switchGroup(group) {
@@ -1255,10 +1276,156 @@ function renderVariations(el){
 }
 
 function renderKB(el){
-  const pK=_pg('kb',mockKnowledgeBase);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Knowledge Base</div><div class="page-subtitle">${mockKnowledgeBase.length} articles</div>
-    <div style="display:flex;gap:6px;margin-bottom:8px"><div class="search-box" style="max-width:100%;flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search knowledge base..." style="font-size:11px"/></div></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Article</th><th>Category</th><th>Updated</th><th>Author</th></tr></thead><tbody>${pK.items.map(k=>`<tr><td style="font-weight:500;cursor:pointer;color:#2F80ED">${k.title}</td><td><span class="badge-status badge-reserved">${k.category}</span></td><td style="font-size:10px">${k.updated}</td><td style="font-size:10px">${k.author}</td></tr>`).join('')}</tbody></table>${_pgHtml('kb',pK.total,pK.page,pK.totalPages,pK.perPage)}</div></div></div></div>`;
+  const total=mockKnowledgeBase.length;
+  const pub=mockKnowledgeBase.filter(a=>a.status==='Published').length;
+  const draft=mockKnowledgeBase.filter(a=>a.status==='Draft').length;
+  const totalViews=mockKnowledgeBase.reduce((s,a)=>s+(a.views||0),0);
+  const cats=kbCategories.length;
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Knowledge Base</div><div class="page-subtitle">${total} articles \u00B7 ${cats} categories \u00B7 ${totalViews.toLocaleString('en-IN')} total views</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <div class="tabs">${['dashboard','articles','categories','favorites'].map(t=>`<div class="tab ${kbTab===t?'active':''}" onclick="kbTab='${t}';Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','articles':'\uD83D\uDCC4 All Articles','categories':'\uD83D\uDCC1 Categories','favorites':'\u2B50 Favorites'}[t]}</div>`).join('')}</div>
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="crudArticle()" style="padding:3px 8px;font-size:10px">+ New Article</button>
+    </div>
+    ${kbTab==='dashboard'?renderKBDashboard():
+      kbTab==='articles'?renderKBArticles():
+      kbTab==='categories'?renderKBCategories():
+      kbTab==='favorites'?renderKBFavorites():''}
+  </div>`;
+}
+
+function renderKBDashboard(){
+  const total=mockKnowledgeBase.length;
+  const pub=mockKnowledgeBase.filter(a=>a.status==='Published').length;
+  const draft=mockKnowledgeBase.filter(a=>a.status==='Draft').length;
+  const totalViews=mockKnowledgeBase.reduce((s,a)=>s+(a.views||0),0);
+  const cats=kbCategories.length;
+  const popular=mockKnowledgeBase.filter(a=>a.status==='Published').sort((a,b)=>b.views-a.views).slice(0,5);
+  const recent=mockKnowledgeBase.slice().sort((a,b)=>new Date(b.updated)-new Date(a.updated)).slice(0,5);
+  const byCat={};kbCategories.forEach(c=>{byCat[c.id]=mockKnowledgeBase.filter(a=>a.catId===c.id).length});
+  const catStats=kbCategories.filter(c=>byCat[c.id]>0).sort((a,b)=>byCat[b.id]-byCat[a.id]);
+  return `<div class="stats-row" style="margin-bottom:6px">${[
+    ['Total Articles',total,'#1565c0'],
+    ['Published',pub,'#2e7d32'],
+    ['Drafts',draft,draft>0?'#e65100':'#999'],
+    ['Categories',cats,'#7b1fa2'],
+    ['Total Views',totalViews.toLocaleString('en-IN'),'#00838f'],
+    ['Most Viewed',Math.max(...mockKnowledgeBase.map(a=>a.views||0)).toLocaleString('en-IN'),'#c62828']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+    <div class="card"><div class="card-header"><h3>Popular Articles</h3></div><div class="card-body" style="padding:6px">${popular.map((a,i)=>`<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="openArticle(${a.id})"><div style="width:20px;height:20px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${i+1}</div><div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div><div style="font-size:8px;color:#888">${a.views.toLocaleString('en-IN')} views \u00B7 ${a.category}</div></div></div>`).join('')}</div></div>
+    <div class="card"><div class="card-header"><h3>Recently Updated</h3></div><div class="card-body" style="padding:6px">${recent.map(a=>`<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="openArticle(${a.id})"><div style="width:20px;height:20px;border-radius:4px;background:#e8f5e9;color:#2e7d32;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">\u270E</div><div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div><div style="font-size:8px;color:#888">${a.updated} \u00B7 ${a.author}</div></div></div>`).join('')}</div></div>
+  </div>
+  <div class="card"><div class="card-header"><h3>Articles by Category</h3></div><div class="card-body" style="padding:8px;font-size:10px"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px">${catStats.map(c=>{
+    const pct=total>0?Math.round(byCat[c.id]/total*100):0;
+    return '<div style="padding:6px;border:1px solid #e0e0e0;border-radius:6px;cursor:pointer" onclick="kbTab=\\x27categories\x27;renderModule()"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><span>'+c.icon+'</span><span style="font-weight:500;font-size:10px;color:'+c.color+'">'+c.label+'</span></div><div style="display:flex;justify-content:space-between;font-size:9px"><span>'+byCat[c.id]+' articles</span><span style="color:#888">'+pct+'%</span></div><div style="height:3px;background:#e0e0e0;border-radius:2px;margin-top:3px"><div style="width:'+pct+'%;height:3px;background:'+c.color+';border-radius:2px"></div></div></div>';
+  }).join('')}</div></div></div>`;
+}
+
+function renderKBArticles(){
+  const q=(document.getElementById('kbSearch')||{}).value||'';
+  const cf=(document.getElementById('kbFCat')||{}).value||'';
+  const sf=(document.getElementById('kbFStatus')||{}).value||'';
+  const fv=document.getElementById('kbFavOnly')&&document.getElementById('kbFavOnly').checked;
+  var filtered=mockKnowledgeBase.filter(function(a){
+    if(cf&&a.catId!==cf)return false;
+    if(sf&&a.status!==sf)return false;
+    if(fv&&(!a._fav))return false;
+    if(q&&!a.title.toLowerCase().includes(q.toLowerCase())&&!a.tags.some(t=>t.includes(q.toLowerCase())))return false;
+    return true;
+  });
+  const pA=_pg('kb',filtered);
+  return `<div class="toolbar" style="margin-bottom:6px">
+    <input id="kbSearch" placeholder="Search articles..." oninput="_PG.kb={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/>
+    <select id="kbFCat" onchange="_PG.kb={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>${kbCategories.map(c=>'<option value="'+c.id+'"'+(cf===c.id?' selected':'')+'>'+c.label+'</option>').join('')}</select>
+    <select id="kbFStatus" onchange="_PG.kb={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option value="Published"${sf==='Published'?' selected':''}>Published</option><option value="Draft"${sf==='Draft'?' selected':''}>Draft</option></select>
+    <label style="font-size:9px;display:flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="kbFavOnly"${fv?' checked':''} onchange="_PG.kb={page:1,perPage:_pgPerPage};renderModule()" style="margin:0"/> Favorites</label>
+    <div class="spacer"></div>
+    <button class="action-btn primary" onclick="crudArticle()" style="padding:3px 8px;font-size:10px">+ New Article</button>
+  </div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th></th><th>Article</th><th>Category</th><th>Tags</th><th>Author</th><th>Updated</th><th class="num">Views</th><th>Status</th><th></th></tr></thead><tbody>${
+    pA.items.map(function(a){
+      const cat=kbCategories.find(c=>c.id===a.catId);
+      return '<tr style="cursor:pointer" onclick="openArticle('+a.id+')"><td style="padding:4px 2px 4px 6px;width:22px"><span style="cursor:pointer;font-size:12px" onclick="event.stopPropagation();a._fav=!a._fav;renderModule()">'+(a._fav?'\u2B50':'\u2606')+'</span></td><td style="font-weight:500;color:#2F80ED;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+a.title+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;background:'+(cat?cat.color+'15':'#f0f0f0')+';color:'+(cat?cat.color:'#888')+'">'+(cat?cat.label:a.category)+'</span></td><td style="font-size:8px;color:#888;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+a.tags.slice(0,3).map(t=>'#'+t).join(' ')+'</td><td style="font-size:9px">'+a.author+'</td><td style="font-size:9px;color:#888">'+a.updated+'</td><td class="num" style="font-weight:600">'+a.views.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(a.status==='Published'?'badge-active':'badge-pending')+'">'+a.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudArticle(mockKnowledgeBase.find(function(x){return x.id==='+a.id+'}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();if(confirm(\x27Delete this article?\x27)){var idx=mockKnowledgeBase.findIndex(function(x){return x.id==='+a.id+'});if(idx>=0)mockKnowledgeBase.splice(idx,1);_PG={};renderModule();showToast(\x27Article deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
+    }).join('')
+  }</tbody></table>${_pgHtml('kb',pA.total,pA.page,pA.totalPages,pA.perPage)}</div></div></div>`;
+}
+
+function renderKBCategories(){
+  const byCat={};kbCategories.forEach(c=>{byCat[c.id]=mockKnowledgeBase.filter(a=>a.catId===c.id)});
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">${kbCategories.filter(c=>byCat[c.id].length>0).map(c=>{
+    const arts=byCat[c.id];
+    const pubArts=arts.filter(a=>a.status==='Published').length;
+    const totalV=arts.reduce((s,a)=>s+(a.views||0),0);
+    return '<div class="card" style="cursor:pointer" onclick="kbTab=\\x27articles\\x27;document.getElementById(\\x27kbFCat\\x27)&&(document.getElementById(\\x27kbFCat\\x27).value=\\x27'+c.id+'\\x27);_PG={};renderModule()"><div class="card-header"><h3 style="color:'+c.color+'">'+c.icon+' '+c.label+'</h3><span style="font-size:10px;color:#888">'+arts.length+' articles</span></div><div class="card-body" style="padding:8px;font-size:9px">'+arts.slice(0,4).map(a=>'<div style="padding:3px 0;display:flex;justify-content:space-between;border-bottom:1px solid #f5f5f5"><span style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openArticle('+a.id+')">'+a.title.substring(0,32)+(a.title.length>32?'...':'')+'</span><span style="color:#888">'+a.views+' views</span></div>').join('')+'</div><div style="padding:5px 8px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#888"><span>'+pubArts+' published</span><span>'+totalV.toLocaleString('en-IN')+' total views</span></div></div>';
+  }).join('')}</div>`;
+}
+
+function renderKBFavorites(){
+  const favs=mockKnowledgeBase.filter(a=>a._fav);
+  if(favs.length===0)return '<div class="card"><div class="card-body" style="padding:20px;text-align:center;color:#888;font-size:12px">\u2B50 No favorites yet. Click the star icon next to any article to bookmark it.</div></div>';
+  const pF=_pg('kbfav',favs);
+  return `<div class="stats-row" style="margin-bottom:6px">${[
+    ['Bookmarked',favs.length,'#f9a825'],
+    ['Categories',new Set(favs.map(a=>a.catId)).size,'#1565c0'],
+    ['Total Views',favs.reduce((s,a)=>s+(a.views||0),0).toLocaleString('en-IN'),'#2e7d32']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Article</th><th>Category</th><th>Author</th><th class="num">Views</th><th>Status</th></tr></thead><tbody>${
+    pF.items.map(a=>{
+      const cat=kbCategories.find(c=>c.id===a.catId);
+      return '<tr style="cursor:pointer" onclick="openArticle('+a.id+')"><td style="font-weight:500;color:#2F80ED">'+a.title+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;background:'+(cat?cat.color+'15':'#f0f0f0')+';color:'+(cat?cat.color:'#888')+'">'+(cat?cat.label:a.category)+'</span></td><td style="font-size:9px">'+a.author+'</td><td class="num">'+a.views.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(a.status==='Published'?'badge-active':'badge-pending')+'">'+a.status+'</span></td></tr>';
+    }).join('')
+  }</tbody></table>${_pgHtml('kbfav',pF.total,pF.page,pF.totalPages,pF.perPage)}</div></div></div>`;
+}
+
+function openArticle(id){
+  var a=mockKnowledgeBase.find(function(x){return x.id===id});if(!a)return;
+  a.views=(a.views||0)+1;
+  var cat=kbCategories.find(function(c){return c.id===a.catId});
+  showDetailPanel('\uD83D\uDCD6 '+a.title,'<div style="font-size:11px;line-height:1.6"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+(cat?cat.color+'15':'#f0f0f0')+';color:'+(cat?cat.color:'#888')+';border-radius:4px;font-size:9px">'+(cat?cat.icon+' ':'')+(cat?cat.label:a.category)+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">\uD83D\uDC64 '+a.author+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">\uD83D\uDCC5 '+a.updated+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">\uD83D\uDC40 '+(a.views||0).toLocaleString('en-IN')+' views</span><span class="badge-status '+(a.status==='Published'?'badge-active':'badge-pending')+'">'+a.status+'</span></div>'+
+    '<div style="padding:8px;background:#f9f9fb;border-radius:6px;margin-bottom:10px;white-space:pre-wrap">'+a.content+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:4px">'+a.tags.map(function(t){return '<span style="padding:1px 6px;background:#eef3ff;color:#2F80ED;border-radius:4px;font-size:9px">#'+t+'</span>';}).join('')+'</div></div>');
+}
+
+function crudArticle(item){
+  var n=!item;
+  var cats=kbCategories.map(function(c){return '<option value="'+c.id+'">'+c.label+'</option>';}).join('');
+  var selCats=kbCategories.map(function(c){return '<option value="'+c.id+'"'+(item&&item.catId===c.id?' selected':'')+'>'+c.label+'</option>';}).join('');
+  showModal(
+    n?'New Article':'Edit Article',
+    '<div class="form-grid" style="grid-template-columns:1fr">'+
+      '<div class="field-row"><label>Title *</label><input id="f_title" value="'+(item?item.title.replace(/'/g,"\\'"):'')+'" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px"/></div>'+
+      '<div class="field-row" style="grid-template-columns:1fr 1fr"><label>Category</label><label>Status</label><select id="f_category" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px">'+(n?cats:selCats)+'</select><select id="f_status" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="Published"'+(item&&item.status==='Published'?' selected':'')+'>Published</option><option value="Draft"'+(item&&item.status==='Draft'?' selected':'')+'>Draft</option></select></div>'+
+      '<div class="field-row"><label>Author</label><input id="f_author" value="'+(item?item.author:'')+'" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px"/></div>'+
+      '<div class="field-row"><label>Tags (comma-separated)</label><input id="f_tags" value="'+(item?item.tags.join(', '):'')+'" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px"/></div>'+
+      '<div class="field-row"><label>Content *</label><textarea id="f_content" rows="6" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-family:inherit;resize:vertical">'+(item?item.content:'')+'</textarea></div>'+
+    '</div>',
+    [
+      {label:'Cancel',action:'close',secondary:true},
+      {label:n?'Create Article':'Save Changes',action:function(){
+        var title=document.getElementById('f_title').value.trim();
+        var catId=document.getElementById('f_category').value;
+        var status=document.getElementById('f_status').value;
+        var author=document.getElementById('f_author').value.trim()||'Current User';
+        var tagsStr=document.getElementById('f_tags').value.trim();
+        var content=document.getElementById('f_content').value.trim();
+        if(!title||!content){showToast('Title and Content are required','error');return;}
+        var tags=tagsStr?tagsStr.split(',').map(function(t){return t.trim().toLowerCase();}).filter(Boolean):[];
+        var cat=kbCategories.find(function(c){return c.id===catId;});
+        if(n){
+          var nc={id:Date.now(),title:title,category:cat?cat.label:'General',catId:catId,content:content,tags:tags,author:author,updated:new Date().toISOString().slice(0,10),views:0,status:status,_fav:false};
+          mockKnowledgeBase.push(nc);
+          showToast('Article created','success');
+        }else{
+          item.title=title;item.category=cat?cat.label:'General';item.catId=catId;
+          item.content=content;item.tags=tags;item.author=author;item.status=status;
+          item.updated=new Date().toISOString().slice(0,10);
+          showToast('Article updated','success');
+        }
+        closeModal();_PG={};renderModule();
+      }}
+    ]
+  );
 }
 
 function renderWorkspace(el){
