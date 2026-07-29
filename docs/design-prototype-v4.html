@@ -809,6 +809,18 @@ window.mockTasks = DB.init('tasks', [
   {id:24,title:'Follow up with Dr. Rubina Ali — installment',status:'To Do',priority:'High',project:'Jolshiri',assignee:'Iftekhar Ahmad',deadline:'2026-06-19',desc:'3rd installment of 5 Lac due Jun 20. NRB client — confirm via WhatsApp',tags:['CRM','Collection']},
   {id:25,title:'QC check — concrete test results',status:'Review',priority:'Medium',project:'Muktodhara',assignee:'Mizanur Rahman',deadline:'2026-06-21',desc:'Review 28-day cylinder test results for Block C slab pour (target: C30)',tags:['QC','Testing']}
 ]);
+window.taskComments = DB.init('task_comments', [
+  {taskId:1,id:'c1',author:'Hasanul Banna',text:'Called Tariqul — interested but wants to negotiate price. Scheduled site visit for Saturday.',time:'2026-06-18 10:30 AM',attachments:[{name:'Call_Notes.pdf',type:'pdf'}]},
+  {taskId:1,id:'c2',author:'Iftekhar Ahmad',text:'I can join the site visit on Saturday. Will prepare the plot layout sheet beforehand.',time:'2026-06-18 11:15 AM',attachments:[]},
+  {taskId:3,id:'c3',author:'Hasanul Banna',text:'Client confirmed for Saturday 10 AM at Jolshiri site. Need 2 helmets and site passes ready.',time:'2026-06-17 2:30 PM',attachments:[]},
+  {taskId:3,id:'c4',author:'Mizanur Rahman',text:'Site passes arranged. Will also prepare the project brochure and payment plan.',time:'2026-06-17 3:45 PM',attachments:[{name:'Jolshiri_Brochure_2026.pdf',type:'pdf'},{name:'Payment_Plan_Sheet.xlsx',type:'xlsx'}]},
+  {taskId:7,id:'c5',author:'Mizanur Rahman',text:'Consolidated Q3 P&L attached. Need board review by June 25 for monthly meeting.',time:'2026-06-19 9:00 AM',attachments:[{name:'Q3_PnL_Draft.xlsx',type:'xlsx'},{name:'Q3_Financial_Summary.pdf',type:'pdf'}]},
+  {taskId:7,id:'c6',author:'Nazma Akhter',text:'VAT reconciliation for Q3 completed. All challans verified and filed.',time:'2026-06-19 10:20 AM',attachments:[]},
+  {taskId:11,id:'c7',author:'Mizanur Rahman',text:'Inspected footing F-12 to F-18. Rebar spacing within tolerance. Pour scheduled for tomorrow.',time:'2026-06-18 4:00 PM',attachments:[{name:'Foundation_Inspection_Report.pdf',type:'pdf'}]},
+  {taskId:14,id:'c8',author:'Mizanur Rahman',text:'Checked pump room — pressure valve needs replacement. Ordered from supplier. ETA 2 days.',time:'2026-06-17 12:00 PM',attachments:[{name:'Pump_Room_Photo.jpg',type:'img'}]},
+  {taskId:14,id:'c9',author:'Customer Service',text:'Customer informed about the repair timeline. Requested daily updates.',time:'2026-06-17 1:15 PM',attachments:[]},
+  {taskId:10,id:'c10',author:'Iftekhar Ahmad',text:'Kazi Nizam interested in the Skyline penthouse. Sent the premium brochure. Follow-up call on Monday.',time:'2026-06-18 3:00 PM',attachments:[{name:'Skyline_Penthouse_Brochure.pdf',type:'pdf'}]}
+]);
 window.mockCampaigns = DB.init('campaigns', [
   {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:150000,spent:135000,leads:45,conversions:8,roi:320,startDate:'Jun 01, 2026',endDate:'Aug 31, 2026',status:'Active',target:'5 Katha Plots',notes:'Facebook + Instagram campaign targeting NRB buyers.'},
   {id:'CAM-002',name:'Jolshiri Launch Event',channel:'On-site Event',budget:300000,spent:285000,leads:78,conversions:12,roi:450,startDate:'Sep 15, 2026',endDate:'Sep 15, 2026',status:'Completed',target:'Apt Bookings',notes:'Grand opening event at Jolshiri site. 120 attendees.'},
@@ -4276,7 +4288,10 @@ function renderTasks(el){
             '</div>'+
             '<div style="display:flex;justify-content:space-between;align-items:center">'+
               '<div style="display:flex;gap:2px">'+(t.tags||[]).slice(0,3).map(function(tag){return '<span style="font-size:7px;padding:0 4px;border-radius:2px;background:#f0f0f0;color:#888">'+tag+'</span>';}).join('')+'</div>'+
-              (t.status!=='Done'?'<span style="font-size:8px;color:#2e7d32;cursor:pointer" onclick="event.stopPropagation();toggleTaskStatus('+t.id+')">▶ '+stageTarget[t.status]+'</span>':'<span style="font-size:8px;color:#2e7d32">✓ Done</span>')+
+              '<div style="display:flex;align-items:center;gap:4px">'+
+                (function(){var cc=taskComments.filter(function(c){return c.taskId===t.id});return cc.length?'<span style="font-size:8px;color:#888">💬 '+cc.length+'</span>':''})()+
+                (t.status!=='Done'?'<span style="font-size:8px;color:#2e7d32;cursor:pointer" onclick="event.stopPropagation();toggleTaskStatus('+t.id+')">▶ '+stageTarget[t.status]+'</span>':'<span style="font-size:8px;color:#2e7d32">✓ Done</span>')+
+              '</div>'+
             '</div></div>';
         }).join('')+
         '</div></div>';
@@ -4305,7 +4320,37 @@ function openTaskDetail(id){
       '<div class="stat-card"><div class="label">Task ID</div><div style="font-size:12px;font-weight:600;margin-top:2px;font-family:monospace;color:#888">#'+t.id+'</div></div>'+
     '</div>'+
     (t.tags&&t.tags.length?'<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:#555;margin-bottom:4px">🏷️ Tags</div><div style="display:flex;gap:3px;flex-wrap:wrap">'+t.tags.map(function(tag){return '<span style="padding:2px 8px;font-size:9px;background:#f0f4ff;color:#1565c0;border-radius:4px">'+tag+'</span>';}).join('')+'</div></div>':'')+
-    '<div style="background:#f9f9f9;border-radius:6px;padding:10px;text-align:center;color:#999;font-size:11px">📝 Comments & attachments coming soon</div>',
+    '<div id="taskCommentsSection">'+
+      '<div style="font-size:10px;font-weight:600;color:#555;margin-bottom:6px">💬 Comments & Attachments</div>'+
+      (function(){
+        var comments=taskComments.filter(function(c){return c.taskId===t.id});
+        if(!comments.length)return '<div style="text-align:center;padding:14px;background:#f9f9f9;border-radius:6px;color:#999;font-size:11px">No comments yet.</div>';
+        return comments.map(function(c){
+          var attachHtml='';
+          if(c.attachments&&c.attachments.length){
+            attachHtml='<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px">'+
+              c.attachments.map(function(a){
+                var ic={pdf:'📄',xlsx:'📊',img:'🖼️',doc:'📄',jpg:'🖼️'}[a.type]||'📎';
+                var safeName=a.name.replace(/'/g,"");
+                return '<span style="padding:2px 6px;background:#f0f4ff;color:#1565c0;border-radius:3px;font-size:8px;cursor:pointer" onclick="biTaskDownload(\''+safeName+'\')">'+ic+' '+a.name+'</span>';
+              }).join('')+'</div>';
+          }
+          return '<div style="padding:7px 9px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:4px">'+
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'+
+              '<span style="font-size:10px;font-weight:600">👤 '+c.author+'</span>'+
+              '<span style="font-size:8px;color:#888">'+c.time+'</span>'+
+            '</div>'+
+            '<div style="font-size:10px;color:#555;line-height:1.4">'+c.text+'</div>'+
+            attachHtml+'</div>';
+        }).join('');
+      })()+
+      '<div id="taskCommentForm" style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">'+
+        '<input id="taskCommentInput" placeholder="Add a comment..." style="flex:1;min-width:140px;padding:5px 8px;border:1px solid #e0e0e0;border-radius:5px;font-size:10px;background:transparent"/>'+
+        '<input id="taskAttachInput" type="file" style="display:none" onchange="taskAttachFile(\''+t.id+'\')"/>'+
+        '<button class="action-btn secondary" onclick="document.getElementById(\'taskAttachInput\').click()" style="padding:3px 7px;font-size:9px">📎</button>'+
+        '<button class="action-btn primary" onclick="taskAddComment(\''+t.id+'\')" style="padding:3px 10px;font-size:9px">Send</button>'+
+      '</div>'+
+    '</div>',
     '<div class="lead-footer">'+
       '<button class="lead-foot-btn primary" onclick="editTask('+t.id+');closeLeadPanel()">✎ Edit</button>'+
       (t.status!=='Done'?'<button class="lead-foot-btn success" onclick="toggleTaskStatus('+t.id+');closeLeadPanel()">▶ '+{toDo:'In Progress','In Progress':'Review',Review:'Done'}[t.status.toLowerCase().replace(/\s/g,'')]+'</button>':'')+
@@ -4336,6 +4381,38 @@ function taskCrudQuick(){
     }
   );
 }
+function taskAddComment(taskId){
+  var inp=document.getElementById('taskCommentInput');
+  if(!inp||!inp.value.trim())return;
+  var authors=['Hasanul Banna','Iftekhar Ahmad','Mizanur Rahman','Nazma Akhter','Shamim Reza'];
+  var now=new Date();
+  var timeStr=now.toISOString().slice(0,10)+' '+now.toTimeString().slice(0,5);
+  taskComments.push({taskId:taskId,id:'c'+Date.now(),author:localStorage.getItem('rem_comment_author')||authors[Math.floor(Math.random()*authors.length)],text:inp.value.trim(),time:timeStr,attachments:[]});
+  DB.save('task_comments');
+  inp.value='';
+  showToast('Comment added','success');
+  closeLeadPanel();
+  // Reopen with updated comments
+  openTaskDetail(taskId);
+}
+function taskAttachFile(taskId){
+  var inp=document.getElementById('taskAttachInput');
+  if(!inp||!inp.files||!inp.files.length)return;
+  var file=inp.files[0];
+  var ext=file.name.split('.').pop().toLowerCase();
+  var typeMap={pdf:'pdf',xlsx:'xlsx',xls:'xlsx',jpg:'img',jpeg:'img',png:'img',gif:'img',doc:'doc',docx:'doc',txt:'doc'};
+  var type=typeMap[ext]||'doc';
+  var authors=['Hasanul Banna','Iftekhar Ahmad','Mizanur Rahman','Nazma Akhter','Shamim Reza'];
+  var now=new Date();
+  var timeStr=now.toISOString().slice(0,10)+' '+now.toTimeString().slice(0,5);
+  taskComments.push({taskId:taskId,id:'c'+Date.now(),author:localStorage.getItem('rem_comment_author')||authors[Math.floor(Math.random()*authors.length)],text:'Uploaded attachment: '+file.name,time:timeStr,attachments:[{name:file.name,type:type}]});
+  DB.save('task_comments');
+  inp.value='';
+  showToast('📎 '+file.name+' attached','success');
+  closeLeadPanel();
+  openTaskDetail(taskId);
+}
+function biTaskDownload(name){showToast('📥 Downloading '+name+'...','info');}
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
 
 window.mockSettingsActivity = DB.init('settings_activity', [
