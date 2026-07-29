@@ -33,8 +33,6 @@
     html.dark .card,html.dark .slide-out .panel,html.dark .lead-panel,html.dark .tbl-toolbar,html.dark .kanban-col,html.dark .stat-card,html.dark .quick-card,html.dark .filter-panel,html.dark .lead-header,html.dark .lead-footer,html.dark .installment-item,html.dark .doc-item,html.dark .activity-item{background:var(--card-bg)!important;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);border:1px solid var(--card-border);box-shadow:0 4px 20px rgba(0,0,0,.2),inset 0 1px 0 var(--glass-edge)}
     html.dark .card:hover,html.dark .quick-card:hover,html.dark .group-card:hover,html.dark .installment-item:hover,html.dark .doc-item:hover,html.dark .activity-item:hover{box-shadow:0 6px 28px var(--glass-glow),inset 0 1px 0 var(--glass-edge)}
     html.dark #sidebar,html.dark .top-bar,html.dark .content-footer,html.dark .sidebar-bottom{backdrop-filter:blur(16px) saturate(200%);-webkit-backdrop-filter:blur(16px) saturate(200%);background:var(--sidebar-bg)!important;border-color:var(--sidebar-border)}
-    html.dark .modal-box{backdrop-filter:blur(16px) saturate(200%);-webkit-backdrop-filter:blur(16px) saturate(200%);background:var(--card-bg)!important;border:1px solid var(--card-border)}
-    html.dark .modal-overlay{background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
     html.dark .notification-panel,html.dark .notif-list{backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);background:var(--card-bg)!important}
     html.dark .card-header{border-bottom-color:var(--glass-edge)!important}
     html.dark .s-grp-sep{background:var(--glass-edge)}
@@ -336,17 +334,40 @@
       .top-actions{gap:3px!important}
     }
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-    .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.35);z-index:9998;align-items:center;justify-content:center;overflow-y:auto;padding:20px}
-    .modal-overlay.active{display:flex}
-    .modal-box{background:#fff;border-radius:12px;padding:20px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.15);animation:fadeIn .2s ease-out}
-    html.dark .modal-overlay{background:rgba(0,0,0,.6)}
-    html.dark .modal-box{background:#1e293b;border:1px solid #2a3a52}
-    .modal-box h3{font-size:14px;font-weight:700;color:#333;margin:0}
-    html.dark .modal-box h3{color:#e0e0e0}
-    @media(max-width:768px){
-      .modal-box{max-width:96vw;padding:16px;border-radius:10px}
-    }
+    @keyframes slideDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+    /* ═══ DRAWER (App Sheet) ═══ */
+    .drawer-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:9998;align-items:flex-end;justify-content:center;overflow:hidden}
+    .drawer-overlay.active{display:flex}
+    .drawer-sheet{background:#fff;border-radius:16px 16px 0 0;padding:0;max-width:520px;width:100%;max-height:87vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -4px 30px rgba(0,0,0,.15);animation:slideUp .3s cubic-bezier(.32,.72,0,1)}
+    .drawer-sheet.closing{animation:slideDown .2s ease-in}
+    .drawer-handle{width:36px;height:4px;border-radius:2px;background:#d1d5db;margin:10px auto 6px;flex-shrink:0}
+    .drawer-header{display:flex;justify-content:space-between;align-items:center;padding:4px 16px 10px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
+    .drawer-header h3{font-size:14px;font-weight:700;color:#333;margin:0}
+    .drawer-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#999;font-size:16px;transition:all .12s}
+    .drawer-close:hover{background:#f0f0f0;color:#333}
+    .drawer-body{flex:1;overflow-y:auto;padding:14px 18px 18px}
+    .drawer-footer{display:flex;gap:6px;padding:10px 16px 14px;border-top:1px solid #f0f0f0;justify-content:flex-end;flex-shrink:0}
+    .drawer-btn{padding:7px 16px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:4px}
+    .drawer-btn.primary{background:#2F80ED;color:#fff;border:none}
+    .drawer-btn.primary:hover{background:#2568c9}
+    .drawer-btn.secondary{background:#fff;color:#555;border:1px solid #e0e0e0}
+    .drawer-btn.secondary:hover{border-color:#2F80ED;color:#2F80ED}
+    html.dark .drawer-overlay{background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    html.dark .drawer-sheet{background:var(--card-bg)!important;border-color:var(--card-border);backdrop-filter:blur(16px) saturate(200%);-webkit-backdrop-filter:blur(16px) saturate(200%)}
+    html.dark .drawer-handle{background:rgba(255,255,255,.2)}
+    html.dark .drawer-header{border-bottom-color:var(--glass-edge,#ffffff10)}
+    html.dark .drawer-header h3{color:var(--fg,#e0e0e0)}
+    html.dark .drawer-close:hover{background:var(--hover-bg,#1a2a4a);color:var(--fg)}
+    html.dark .drawer-footer{border-top-color:var(--glass-edge,#ffffff10)}
+    html.dark .drawer-btn.secondary{background:rgba(255,255,255,.05)!important;border-color:var(--input-border,#334155);color:var(--muted,#94a3b8)}
+    html.dark .drawer-btn.secondary:hover{border-color:var(--primary);color:var(--primary)}
     @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:fixed;inset:0;background:#fff;padding:20px;overflow:auto;z-index:9999}#printArea table{font-size:10px}#printArea th{background:#f5f5f5!important;color:#333!important}}
+    @media(max-width:768px){
+      .drawer-sheet{max-width:100vw!important;border-radius:14px 14px 0 0!important;max-height:92vh!important}
+      .drawer-body{padding:10px 14px 14px!important}
+      .drawer-footer{padding:8px 14px 12px!important}
+      .drawer-header{padding:4px 14px 8px!important}
+    }
   </style>
   <style>
     /* Global tooltip system */
@@ -576,7 +597,7 @@
 
 <div id="leadSlideOut" class="slide-out"><div class="backdrop" onclick="closeLeadPanel()"></div><div class="lead-panel" id="leadPanelContent"></div></div>
 <div id="toastContainer" class="toast-container"></div>
-<div id="crudModal" class="modal-overlay"><div class="modal-box" id="crudFormContent"></div></div>
+<div id="appDrawer" class="drawer-overlay"><div class="drawer-sheet"><div class="drawer-handle"></div><div class="drawer-header"><h3 id="drawerTitle">Form</h3><div class="drawer-close" onclick="closeDrawer()">✕</div></div><div class="drawer-body" id="drawerBody"></div><div class="drawer-footer" id="drawerFooter"></div></div></div>
 
 <script>
 // ═══ GROUP DEFINITIONS ═══
@@ -2043,7 +2064,7 @@ function crudProposal(item){
           item.notes=notes;item.nextAction=nextAction||'Review';
           showToast('Proposal updated','success');
         }
-        closeModal();Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();
+        closeDrawer();Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();
       }}
     ]
   );
@@ -3558,7 +3579,7 @@ function crudArticle(item){
         item.updated=new Date().toISOString().slice(0,10);
         showToast('Article updated','success');
       }
-      DB.save('knowledgeBase');closeModal();_PG={};renderModule();
+      DB.save('knowledgeBase');closeDrawer();_PG={};renderModule();
     }
   );
 }
@@ -4193,7 +4214,7 @@ function crudSystemDoc(item){
       var data={id:d.id,title:title,category:document.getElementById('sdt_cat').value,icon:document.getElementById('sdt_icon').value,content:content,excerpt:excerpt,updated:new Date().toISOString().split('T')[0],readTime:parseInt(document.getElementById('sdt_read').value)||5};
       if(n){mockSystemDocs.push(data);DB.save('systemDocs');showToast('Article created','success');}
       else{var idx=mockSystemDocs.findIndex(function(x){return x.id===d.id});if(idx>=0){mockSystemDocs[idx]=data;DB.save('systemDocs');showToast('Article updated','info');}}
-      closeModal();_PG={};renderModule();
+      closeDrawer();_PG={};renderModule();
     }
   );
 }
@@ -4264,7 +4285,7 @@ function crudBackup(item){
       var data={id:b.id,date:new Date().toISOString().split('T')[0]+' '+new Date().toTimeString().split(' ')[0],type:type,size:formatBackupSize(size*1024*1024),sizeBytes:size*1024*1024,included:inc,status:'Success',notes:document.getElementById('bkp_notes').value||''};
       if(n){mockBackups.unshift(data);DB.save('backups');showToast('Backup created!','success');}
       else{var idx=mockBackups.findIndex(function(x){return x.id===b.id});if(idx>=0){mockBackups[idx]=data;DB.save('backups');showToast('Updated','info');}}
-      closeModal();renderModule();
+      closeDrawer();renderModule();
     }
   );
 }
@@ -4764,9 +4785,9 @@ function settingsToggleUser(u){u.status=u.status==='Active'?'Inactive':'Active';
 function settingsBulkAction(){var idx=prompt('Bulk User Action:\n1. Activate All\n2. Suspend All\n3. Cancel\n\nEnter 1, 2, or 3:');if(idx==='1'){mockUsers.forEach(function(u){u.status='Active'});DB.save('users');showToast('All users activated','success');renderModule()}else if(idx==='2'){mockUsers.forEach(function(u){u.status='Inactive'});DB.save('users');showToast('All users suspended','info');renderModule()}}
 function settingsAddAccount(){openModal('Add Account',inputField('Code','ac_code')+inputField('Name','ac_name')+selectField('Type','ac_type','Asset',['Asset','Liability','Income','Expense'])+inputField('Balance','ac_bal'),function(){mockCOA.push({code:g('ac_code')||'NEW',name:g('ac_name')||'New Account',type:g('ac_type'),balance:g('ac_bal')||'₹0'});DB.save('coa');showToast('Account added!','success');renderModule()})}
 function settingsAddBank(){openModal('Add Bank Account',inputField('Bank Name','bk_name')+inputField('Account No','bk_acct')+selectField('Type','bk_type','Current',['Current','SME','Savings','Petty Cash'])+inputField('Balance','bk_bal'),function(){mockBankAccounts.push({name:g('bk_name')||'New Bank',account:g('bk_acct')||'XXXX',branch:'—',type:g('bk_type'),balance:g('bk_bal')||'₹0'});DB.save('bank_accounts');showToast('Bank added!','success');renderModule()})}
-function settingsConfigure(name){openModal('Configure: '+name,'<p style="font-size:12px;color:#888;margin-bottom:10px">Configure '+name+' integration settings.</p><div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="apikey" placeholder="Enter API key..."/></div><div class="form-group"><label class="form-label">Webhook URL</label><input class="form-input" id="webhook" placeholder="https://..."/></div>',function(){showToast(name+' configuration saved!','success');closeModal()})}
+function settingsConfigure(name){openModal('Configure: '+name,'<p style="font-size:12px;color:#888;margin-bottom:10px">Configure '+name+' integration settings.</p><div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="apikey" placeholder="Enter API key..."/></div><div class="form-group"><label class="form-label">Webhook URL</label><input class="form-input" id="webhook" placeholder="https://..."/></div>',function(){showToast(name+' configuration saved!','success');closeDrawer()})}
 function settingsNewRule(){openModal('New Automation Rule',selectField('Trigger','nr_trigger','Lead Created',['Lead Created','Payment Received','Installment Due','Installment Overdue','Booking Converted','Stock Low'])+selectField('Channel','nr_channel','Email + SMS',['Email','SMS','Email + SMS'])+'<div class="form-group"><label class="form-label">Action</label><input class="form-input" id="nr_action" placeholder="e.g. Notify Sales Manager"/></div>',function(){showToast('Rule created!','success');renderModule()})}
-function settingsEditRule(){openModal('Edit Automation Rule',selectField('Status','er_status','Active',['Active','Paused']),function(){showToast('Rule updated!','success');closeModal()})}
+function settingsEditRule(){openModal('Edit Automation Rule',selectField('Status','er_status','Active',['Active','Paused']),function(){showToast('Rule updated!','success');closeDrawer()})}
 function settingsAddList(k){var v=prompt('Add new item to '+k+':');if(v&&v.trim()){if(!mockMasterLists[k])mockMasterLists[k]=[];mockMasterLists[k].push(v.trim());DB.save('master_lists');renderModule()}}
 function settingsRemoveList(k,i){if(!confirm('Remove "'+i+'" from '+k+'?'))return;if(mockMasterLists[k]){mockMasterLists[k]=mockMasterLists[k].filter(function(x){return x!==i});DB.save('master_lists');renderModule()}}
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
@@ -4982,31 +5003,41 @@ const GROUPS_LOOKUP = {dashboard:'executive',crm:'sales_crm',sales_marketing:'sa
 
 // ═══ CRUD ═══
 function openModal(title,body,onSave){
-  const c=document.getElementById('crudFormContent');
-  c.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="font-size:14px;font-weight:700">'+title+'</h3><span onclick="closeModal()" style="cursor:pointer;color:#999;font-size:16px">✕</span></div>'+body+'<div style="display:flex;gap:6px;margin-top:14px;justify-content:flex-end"><button onclick="closeModal()" style="padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;font-weight:500;color:#555">Cancel</button><button onclick="saveModal()" id="crudSaveBtn" style="padding:6px 14px;border:none;border-radius:6px;background:#2F80ED;color:#fff;cursor:pointer;font-size:11px;font-weight:600">Save</button></div>';
-  window._crudOnSave=onSave; document.getElementById('crudModal').classList.add('active');
+  var d=document.getElementById('appDrawer');
+  document.getElementById('drawerTitle').textContent=title;
+  document.getElementById('drawerBody').innerHTML=body;
+  document.getElementById('drawerFooter').innerHTML=
+    '<button class="drawer-btn secondary" onclick="closeDrawer()">Cancel</button>'+
+    '<button class="drawer-btn primary" onclick="saveDrawer()" id="drawerSaveBtn">Save</button>';
+  window._drawerOnSave=onSave;
+  d.classList.add('active');
   // Keyboard shortcuts
   setTimeout(function(){
-    document.addEventListener('keydown',__modalKeyHandler=function(e){
-      if(!document.getElementById('crudModal').classList.contains('active'))return;
-      if(e.key==='Escape'){closeModal();e.preventDefault()}
-      if(e.key==='Enter'&&e.target.tagName!=='SELECT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();saveModal()}
+    document.addEventListener('keydown',__drawerKeyHandler=function(e){
+      if(!document.getElementById('appDrawer').classList.contains('active'))return;
+      if(e.key==='Escape'){closeDrawer();e.preventDefault()}
+      if(e.key==='Enter'&&e.target.tagName!=='SELECT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();saveDrawer()}
     });
   },50);
 }
-function closeModal(){
-  document.getElementById('crudModal').classList.remove('active');
-  try{document.removeEventListener('keydown',__modalKeyHandler);}catch(e){}
+function closeDrawer(){
+  var s=document.querySelector('.drawer-sheet');
+  s.classList.add('closing');
+  setTimeout(function(){
+    document.getElementById('appDrawer').classList.remove('active');
+    s.classList.remove('closing');
+    try{document.removeEventListener('keydown',__drawerKeyHandler);}catch(e){}
+  },180);
 }
-function saveModal(){
+function saveDrawer(){
   // Check required fields
-  var errors=[];var m=document.getElementById('crudModal');
+  var errors=[];var m=document.getElementById('appDrawer');
   m.querySelectorAll('[required]').forEach(function(el){
     if(!el.value.trim()){errors.push(el.id);el.style.borderColor='#e53935';el.style.background='#fff5f5'}
     else{el.style.borderColor='';el.style.background=''}
   });
   if(errors.length>0){showToast('Please fill in required fields: '+errors.join(', '),'error');return}
-  if(window._crudOnSave){window._crudOnSave();closeModal()}
+  if(window._drawerOnSave){window._drawerOnSave();closeDrawer()}
 }
 function g(id){const e=document.getElementById(id);return e?e.value:''}
 function inputField(l,id,v,p,r){return '<div class="form-group"><label class="form-label">'+l+(r?' <span style="color:#e53935">*</span>':'')+'</label><input class="form-input" id="'+id+'" value="'+(v||'')+'" placeholder="'+(p||'')+'"'+(r?' required':'')+'/></div>'}
