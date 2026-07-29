@@ -778,10 +778,42 @@ window.mockVariations = DB.init('variations', [
   {id:'VO-003',project:'Muktodhara Green Park',title:'Premium Flooring Upgrade',status:'Draft',impact:'+৳3,20,000',originator:'Client',date:'2024-10-25',schedule:'+14 days'}
 ]);
 window.mockCustomers = DB.init('customers', [
-  {id:'CUS-001',name:'Kamrul Hasan',property:'Jolshiri Abason - 9A',status:'Active',dues:'৳8,00,000',nextDue:'2024-12-15',payments:3},
-  {id:'CUS-002',name:'Dr. Rubina Ali',property:'Jolshiri Abason - 4B',status:'Active',dues:'৳20,00,000',nextDue:'2024-11-30',payments:1},
-  {id:'CUS-003',name:'Tariqul Islam',property:'Muktodhara - M-103',status:'Active',dues:'৳34,50,000',nextDue:'2025-01-15',payments:2},
-  {id:'CUS-004',name:'Engr. Salahuddin',property:'Muktodhara - M-22',status:'Overdue',dues:'৳8,00,000',nextDue:'2024-10-15',payments:4}
+  {id:'CUS-001',name:'Kamrul Hasan',phone:'01711-234567',email:'kamrul.hasan@gmail.com',property:'Jolshiri Abason - Apt 9A',type:'Booking',status:'Active',dues:'Tk8,00,000',duesNum:800000,nextDue:'2025-01-15',payments:3,propertyValue:4500000,downPayment:900000,lastPayment:'2024-12-15',project:'Jolshiri'},
+  {id:'CUS-002',name:'Dr. Rubina Ali',phone:'01722-345678',email:'rubina.ali@yahoo.com',property:'Jolshiri Abason - Apt 4B',type:'Installment',status:'Active',dues:'Tk20,00,000',duesNum:2000000,nextDue:'2025-02-28',payments:1,propertyValue:5500000,downPayment:1100000,lastPayment:'2024-11-30',project:'Jolshiri'},
+  {id:'CUS-003',name:'Tariqul Islam',phone:'01733-456789',email:'tariq.islam@gmail.com',property:'Muktodhara - Plot M-103',type:'Installment',status:'Active',dues:'Tk34,50,000',duesNum:3450000,nextDue:'2025-03-15',payments:2,propertyValue:8000000,downPayment:1600000,lastPayment:'2025-01-15',project:'Muktodhara'},
+  {id:'CUS-004',name:'Engr. Salahuddin',phone:'01744-567890',email:'salahuddin@live.com',property:'Muktodhara - Plot 22',type:'Booking',status:'Overdue',dues:'Tk8,00,000',duesNum:800000,nextDue:'2024-10-15',payments:4,propertyValue:3500000,downPayment:700000,lastPayment:'2024-09-15',project:'Muktodhara'},
+  {id:'CUS-005',name:'Fatima Begum',phone:'01755-678901',email:'fatima.begum@gmail.com',property:'Jolshiri Abason - Apt 7C',type:'Installment',status:'Active',dues:'Tk12,00,000',duesNum:1200000,nextDue:'2025-04-30',payments:2,propertyValue:5000000,downPayment:1000000,lastPayment:'2025-01-20',project:'Jolshiri'},
+  {id:'CUS-006',name:'Mrs. Jahanara Begum',phone:'01766-789012',email:'jahanara@hotmail.com',property:'Jolshiri Abason - Apt 3C',type:'Owner',status:'Active',dues:'Tk0',duesNum:0,nextDue:'-',payments:12,propertyValue:4800000,downPayment:4800000,lastPayment:'2024-06-30',project:'Jolshiri'},
+  {id:'CUS-007',name:'Md. Nazrul Islam',phone:'01777-890123',email:'nazrul.islam@gmail.com',property:'Muktodhara - Unit 201',type:'Installment',status:'Delinquent',dues:'Tk15,00,000',duesNum:1500000,nextDue:'2024-09-30',payments:1,propertyValue:6000000,downPayment:1200000,lastPayment:'2024-08-15',project:'Muktodhara'},
+  {id:'CUS-008',name:'Shamima Akhter',phone:'01788-901234',email:'shamima.akhter@yahoo.com',property:'Muktodhara - Unit 305',type:'Installment',status:'Active',dues:'Tk9,50,000',duesNum:950000,nextDue:'2025-05-15',payments:3,propertyValue:4200000,downPayment:840000,lastPayment:'2025-02-01',project:'Muktodhara'},
+  {id:'CUS-009',name:'Abdur Rahim',phone:'01799-012345',email:'abdur.rahim@live.com',property:'Jolshiri Abason - Apt 5A',type:'Booking',status:'Active',dues:'Tk5,00,000',duesNum:500000,nextDue:'2025-03-01',payments:1,propertyValue:3800000,downPayment:760000,lastPayment:'2025-01-30',project:'Jolshiri'},
+  {id:'CUS-010',name:'Nurjahan Begum',phone:'01800-123456',email:'nurjahan@gmail.com',property:'Muktodhara - Plot 15',type:'Owner',status:'Active',dues:'Tk0',duesNum:0,nextDue:'-',payments:6,propertyValue:3200000,downPayment:3200000,lastPayment:'2024-12-01',project:'Muktodhara'},
+  {id:'CUS-011',name:'Shafiqul Alam',phone:'01811-234567',email:'shafiq.alam@gmail.com',property:'Jolshiri Abason - Apt 2B',type:'Installment',status:'Overdue',dues:'Tk18,00,000',duesNum:1800000,nextDue:'2024-11-30',payments:2,propertyValue:5200000,downPayment:1040000,lastPayment:'2024-10-15',project:'Jolshiri'},
+  {id:'CUS-012',name:'Rashida Khatun',phone:'01822-345678',email:'rashida.khatun@yahoo.com',property:'Muktodhara - Studio A',type:'Booking',status:'Active',dues:'Tk2,50,000',duesNum:250000,nextDue:'2025-04-01',payments:1,propertyValue:2800000,downPayment:560000,lastPayment:'2025-02-10',project:'Muktodhara'}
+]);
+window.mockCustomerDocs = DB.init('customerDocs', [
+  {id:'DOC-001',customerId:'CUS-001',customerName:'Kamrul Hasan',docType:'Booking Form',date:'2024-09-01',status:'Verified',project:'Jolshiri'},
+  {id:'DOC-002',customerId:'CUS-001',customerName:'Kamrul Hasan',docType:'Downpayment Receipt',date:'2024-09-01',status:'Verified',project:'Jolshiri'},
+  {id:'DOC-003',customerId:'CUS-002',customerName:'Dr. Rubina Ali',docType:'Installment Schedule',date:'2024-11-01',status:'Verified',project:'Jolshiri'},
+  {id:'DOC-004',customerId:'CUS-002',customerName:'Dr. Rubina Ali',docType:'NID Copy',date:'2024-10-15',status:'Pending',project:'Jolshiri'},
+  {id:'DOC-005',customerId:'CUS-003',customerName:'Tariqul Islam',docType:'Booking Form',date:'2024-12-01',status:'Verified',project:'Muktodhara'},
+  {id:'DOC-006',customerId:'CUS-003',customerName:'Tariqul Islam',docType:'Agreement Deed',date:'2024-12-15',status:'Verified',project:'Muktodhara'},
+  {id:'DOC-007',customerId:'CUS-004',customerName:'Engr. Salahuddin',docType:'NID Copy',date:'2024-06-01',status:'Verified',project:'Muktodhara'},
+  {id:'DOC-008',customerId:'CUS-005',customerName:'Fatima Begum',docType:'Booking Form',date:'2024-11-15',status:'Verified',project:'Jolshiri'},
+  {id:'DOC-009',customerId:'CUS-005',customerName:'Fatima Begum',docType:'Income Proof',date:'2024-11-20',status:'Pending',project:'Jolshiri'},
+  {id:'DOC-010',customerId:'CUS-006',customerName:'Mrs. Jahanara Begum',docType:'Handover Certificate',date:'2024-06-30',status:'Verified',project:'Jolshiri'},
+  {id:'DOC-011',customerId:'CUS-007',customerName:'Md. Nazrul Islam',docType:'Booking Form',date:'2024-08-01',status:'Verified',project:'Muktodhara'},
+  {id:'DOC-012',customerId:'CUS-007',customerName:'Md. Nazrul Islam',docType:'Agreement Deed',date:'2024-08-15',status:'Pending',project:'Muktodhara'}
+]);
+window.mockSupportTickets = DB.init('supportTickets', [
+  {id:'TKT-001',customerId:'CUS-001',customerName:'Kamrul Hasan',subject:'Water connection delay',category:'Utility',priority:'High',status:'Open',date:'2026-01-10',assignedTo:'Rofiqul Islam',description:'Water line not connected yet despite booking confirmation stating Dec 2024'},
+  {id:'TKT-002',customerId:'CUS-002',customerName:'Dr. Rubina Ali',subject:'Site visit request',category:'Site Visit',priority:'Low',status:'Resolved',date:'2026-01-05',assignedTo:'Shamim Reza',description:'Customer wants to visit site this weekend'},
+  {id:'TKT-003',customerId:'CUS-004',customerName:'Engr. Salahuddin',subject:'Payment receipt not uploaded',category:'Billing',priority:'Medium',status:'In Progress',date:'2026-01-12',assignedTo:'Nazma Akhter',description:'Oct payment receipt not showing in portal'},
+  {id:'TKT-004',customerId:'CUS-003',customerName:'Tariqul Islam',subject:'Plot boundary verification',category:'Property',priority:'Medium',status:'Open',date:'2026-01-08',assignedTo:'Tanvir Ahmed',description:'Need site engineer to verify plot M-103 boundaries'},
+  {id:'TKT-005',customerId:'CUS-005',customerName:'Fatima Begum',subject:'Installment schedule change',category:'Billing',priority:'High',status:'Open',date:'2026-01-15',assignedTo:'Nazma Akhter',description:'Wants to switch from quarterly to monthly installments'},
+  {id:'TKT-006',customerId:'CUS-007',customerName:'Md. Nazrul Islam',subject:'Late payment penalty dispute',category:'Billing',priority:'High',status:'In Progress',date:'2025-12-20',assignedTo:'Nazma Akhter',description:'Disputes 2% late fee - claims no reminder received'},
+  {id:'TKT-007',customerId:'CUS-008',customerName:'Shamima Akhter',subject:'Unit finishing preferences',category:'Property',priority:'Low',status:'Resolved',date:'2025-12-28',assignedTo:'Shahidul Islam',description:'Submitted finishing selection form'},
+  {id:'TKT-008',customerId:'CUS-011',customerName:'Shafiqul Alam',subject:'Dues clarification',category:'Billing',priority:'Medium',status:'Open',date:'2026-01-14',assignedTo:'Nazma Akhter',description:'Confused about outstanding amount vs payment schedule'}
 ]);
 window.mockHandover = DB.init('handover', [
   {id:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',status:'Inspection Pending',date:'2025-01-15',snags:3,'pos_date':'2024-12-20'},
@@ -1626,17 +1658,280 @@ function renderBookings(el){
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Status</th></tr></thead><tbody>${pB.items.map(b=>`<tr style="cursor:pointer" onclick="openBooking('${b.id}')"><td style="font-weight:500">${b.id}</td><td>${b.client}</td><td>${b.property}</td><td>${b.unit}</td><td class="num">${b.price}</td><td class="num">${b.advance}</td><td><span class="badge-status ${b.status==='Confirmed'?'badge-active':'badge-pending'}">${b.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('bookings',pB.total,pB.page,pB.totalPages,pB.perPage)}</div></div></div></div>`;
 }
 
+var cpTab='dashboard';
 function renderCustomerPortal(el){
-  const pC=_pg('customers',mockCustomers);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Customer Portal</div><div class="page-subtitle">${mockCustomers.length} active customers</div>
-    <div class="stats-row" style="margin-bottom:8px">${[
-      ['Total Customers',mockCustomers.length,''],['Active',mockCustomers.filter(c=>c.status==='Active').length,'#2e7d32'],
-      ['Overdue',mockCustomers.filter(c=>c.status==='Overdue').length,'#c62828'],['Total Collection','৳1.2 Cr','#1565c0']
-    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
-    <div class="card"><div class="card-header"><h3>Customer Accounts</h3><button class="action-btn primary" onclick="showToast('Send bulk notification coming soon','info')" style="padding:3px 7px;font-size:9px">Notify All</button></div>
-    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Property</th><th>Status</th><th class="num">Dues</th><th>Next Due</th><th>Payments</th></tr></thead><tbody>${pC.items.map(c=>`<tr><td style="font-weight:500">${c.id}</td><td>${c.name}</td><td>${c.property}</td><td><span class="badge-status ${c.status==='Active'?'badge-active':'badge-sold'}">${c.status}</span></td><td class="num" style="color:#c62828;font-weight:600">${c.dues}</td><td style="font-size:10px">${c.nextDue}</td><td style="text-align:center;font-weight:600">${c.payments}</td></tr>`).join('')}</tbody></table>${_pgHtml('customers',pC.total,pC.page,pC.totalPages,pC.perPage)}</div></div></div></div>`;
+  cpTab=cpTab||'dashboard';
+  var total=mockCustomers.length,active=mockCustomers.filter(function(c){return c.status==='Active'||c.status==='Owner'}).length;
+  var overdue=mockCustomers.filter(function(c){return c.status==='Overdue'}).length;
+  var delinquent=mockCustomers.filter(function(c){return c.status==='Delinquent'}).length;
+  var totalDues=mockCustomers.reduce(function(s,c){return s+c.duesNum},0);
+  var totalPV=mockCustomers.reduce(function(s,c){return s+c.propertyValue},0);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Customer Portal</div><div class="page-subtitle">'+total+' customers · Tk'+(totalDues/100000).toFixed(1)+'L total dues · Tk'+(totalPV/100000).toFixed(1)+'L portfolio</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','📊 Dashboard'],
+        ['customers','👥 Customers'],
+        ['documents','📁 Documents'],
+        ['tickets','🎫 Support Tickets']
+      ].map(function(t){
+        return '<div class="tab '+(cpTab===t[0]?'active':'')+'" onclick="cpTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudCustomer()" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='customers'?'':'none')+'">+ Add Customer</button>'+
+      '<button class="action-btn primary" onclick="crudCustomerDoc()" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='documents'?'':'none')+'">+ Upload Doc</button>'+
+      '<button class="action-btn primary" onclick="crudTicket()" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='tickets'?'':'none')+'">+ New Ticket</button>'+
+    '</div>'+
+    (cpTab==='dashboard'?renderCustDashboard():
+     cpTab==='customers'?renderCustList():
+     cpTab==='documents'?renderCustDocs():
+     cpTab==='tickets'?renderCustTickets():'')+
+  '</div>';
 }
-
+function renderCustDashboard(){
+  var total=mockCustomers.length,active=mockCustomers.filter(function(c){return c.status==='Active'||c.status==='Owner'}).length;
+  var overdue=mockCustomers.filter(function(c){return c.status==='Overdue'}).length;
+  var delinquent=mockCustomers.filter(function(c){return c.status==='Delinquent'}).length;
+  var owners=mockCustomers.filter(function(c){return c.type==='Owner'}).length;
+  var installments=mockCustomers.filter(function(c){return c.type==='Installment'}).length;
+  var bookings=mockCustomers.filter(function(c){return c.type==='Booking'}).length;
+  var totalDues=mockCustomers.reduce(function(s,c){return s+c.duesNum},0);
+  var totalPV=mockCustomers.reduce(function(s,c){return s+c.propertyValue},0);
+  var totalPaid=mockCustomers.reduce(function(s,c){return s+c.downPayment},0);
+  var docs=mockCustomerDocs.length,verified=mockCustomerDocs.filter(function(d){return d.status==='Verified'}).length;
+  var tix=mockSupportTickets.length,openTix=mockSupportTickets.filter(function(t){return t.status==='Open'||t.status==='In Progress'}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Customers',total,'#1565c0'],
+    ['Active',active,'#2e7d32'],
+    ['Overdue',overdue,overdue>0?'#c62828':'#999'],
+    ['Delinquent',delinquent,delinquent>0?'#c62828':'#999'],
+    ['Total Dues','Tk'+(totalDues/100000).toFixed(1)+'L',totalDues>0?'#c62828':'#999'],
+    ['Open Tickets',openTix,openTix>0?'#e65100':'#999']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Customer by Type</h3></div><div class="card-body" style="padding:8px">'+
+    [['Owner',owners,'#2e7d32'],['Installment',installments,'#1565c0'],['Booking',bookings,'#e65100']].map(function(t){
+      var pct=Math.round(t[1]/total*100);
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:80px">'+t[0]+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+t[2]+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+t[1]+'</div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Portfolio Summary</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
+      '<div style="display:flex;justify-content:center;gap:16px;margin-bottom:8px">'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#2e7d32">Tk'+(totalPV/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#888">Portfolio</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#c62828">Tk'+(totalDues/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#888">Outstanding</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1565c0">Tk'+(totalPaid/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#888">Collected</div></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;justify-content:center;margin-top:4px">'+
+        '<div style="padding:3px 8px;background:#e8f5e9;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#2e7d32">'+verified+'/'+docs+'</div><div style="font-size:7px;color:#666">Docs Verified</div></div>'+
+        '<div style="padding:3px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#1565c0">'+owners+'</div><div style="font-size:7px;color:#666">Full Owners</div></div>'+
+      '</div>'+
+    '</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>Recent Support Tickets</h3></div><div class="card-body" style="padding:4px 8px">'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px">'+
+  mockSupportTickets.slice(0,4).map(function(t,i){
+    var pc={'High':'#c62828','Medium':'#e65100','Low':'#888'}[t.priority]||'#888';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:#f9fafb;border-radius:6px;cursor:pointer" onclick="cpTab=\x27tickets\x27;renderModule()">'+
+      '<div style="width:24px;height:24px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t.subject+'</div><div style="font-size:8px;color:#888">'+t.customerName+' · '+t.category+'</div></div>'+
+      '<span style="font-size:8px;font-weight:600;color:'+pc+'">'+t.priority+'</span></div>';
+  }).join('')+'</div></div></div>';
+}
+function renderCustList(){
+  var q=(document.getElementById('cstSearch')||{}).value||'';
+  var sf=(document.getElementById('cstStatus')||{}).value||'';
+  var tf=(document.getElementById('cstType')||{}).value||'';
+  var filtered=mockCustomers.filter(function(c){
+    if(sf&&c.status!==sf)return false;
+    if(tf&&c.type!==tf)return false;
+    if(q&&!c.name.toLowerCase().includes(q.toLowerCase())&&!c.property.toLowerCase().includes(q.toLowerCase())&&!c.phone.includes(q))return false;
+    return true;
+  });
+  var pC=_pg('cst',filtered);
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="cstSearch" placeholder="Search..." oninput="_PG.cst={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="cstStatus" onchange="_PG.cst={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Active</option><option>Overdue</option><option>Delinquent</option><option>Owner</option></select>'+
+    '<select id="cstType" onchange="_PG.cst={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option>Booking</option><option>Installment</option><option>Owner</option></select>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">'+
+  pC.items.map(function(c){
+    var sc={'Active':'#2e7d32','Overdue':'#c62828','Delinquent':'#c62828','Owner':'#1565c0'}[c.status]||'#888';
+    var sbg={'Active':'#e8f5e9','Overdue':'#ffebee','Delinquent':'#ffebee','Owner':'#e3f2fd'}[c.status]||'#f5f5f5';
+    return '<div style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openCustomer(\x27'+c.id+'\x27)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-weight:700;color:#2F80ED">'+c.name.charAt(0)+'</div>'+
+          '<div><div style="font-size:11px;font-weight:600;color:#222">'+c.name+'</div><div style="font-size:9px;color:#2F80ED">'+c.type+' · '+c.property.substring(0,20)+'</div></div>'+
+        '</div>'+
+        '<span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+c.status+'</span>'+
+      '</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:4px">'+c.phone+(c.email?' · '+c.email:'')+'</div>'+
+      '<div style="display:flex;gap:4px;margin-top:6px">'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#fff3e0;color:#e65100">Due: '+c.dues+'</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e3f2fd;color:#1565c0">Next: '+c.nextDue+'</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e8f5e9;color:#2e7d32">'+c.payments+' payments</span>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
+        '<span style="font-size:8px;color:#999">Tk'+(c.propertyValue/100000).toFixed(1)+'L property</span>'+
+        '<div style="display:flex;gap:4px">'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCustomer(mockCustomers.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+c.name+'?\x27)){var idx=mockCustomers.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCustomers.splice(idx,1);DB.save(\x27customers\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('')+'</div>'+
+  (filtered.length>_pgPerPage?_pgHtml('cst',pC.total,pC.page,pC.totalPages,pC.perPage):'');
+}
+function renderCustDocs(){
+  var q=(document.getElementById('cdSearch')||{}).value||'';
+  var ps=(document.getElementById('cdProject')||{}).value||'';
+  var ss=(document.getElementById('cdStatus')||{}).value||'';
+  var filtered=mockCustomerDocs.filter(function(d){
+    if(ss&&d.status!==ss)return false;
+    if(ps&&d.project!==ps)return false;
+    if(q&&!d.customerName.toLowerCase().includes(q.toLowerCase())&&!d.docType.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pD=_pg('cd',filtered);
+  var tot=mockCustomerDocs.length,ver=mockCustomerDocs.filter(function(d){return d.status==='Verified'}).length;
+  var pend=mockCustomerDocs.filter(function(d){return d.status==='Pending'}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Documents',tot,'#1565c0'],
+    ['Verified',ver,'#2e7d32'],
+    ['Pending',pend,pend>0?'#ff8f00':'#999'],
+    ['Customers',new Set(mockCustomerDocs.map(function(d){return d.customerId})).size,'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="cdSearch" placeholder="Search..." oninput="_PG.cd={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="cdProject" onchange="_PG.cd={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Projects</option><option>Jolshiri</option><option>Muktodhara</option></select>'+
+    '<select id="cdStatus" onchange="_PG.cd={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Verified</option><option>Pending</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Customer</th><th>Document Type</th><th>Project</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pD.items.map(function(d){
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+d.id+'</td><td style="font-weight:500">'+d.customerName+'</td><td>'+d.docType+'</td><td style="font-size:9px">'+d.project+'</td><td style="font-size:9px;color:#888">'+d.date+'</td><td><span class="badge-status '+(d.status==='Verified'?'badge-active':'badge-pending')+'">'+d.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCustomerDoc(mockCustomerDocs.find(function(x){return x.id===\x27'+d.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCustomerDocs.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockCustomerDocs.splice(idx,1);DB.save(\x27customerDocs\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('cd',pD.total,pD.page,pD.totalPages,pD.perPage)+'</div></div></div>';
+}
+function renderCustTickets(){
+  var q=(document.getElementById('tktSearch')||{}).value||'';
+  var ps=(document.getElementById('tktPriority')||{}).value||'';
+  var ss=(document.getElementById('tktStatus')||{}).value||'';
+  var filtered=mockSupportTickets.filter(function(t){
+    if(ps&&t.priority!==ps)return false;
+    if(ss&&t.status!==ss)return false;
+    if(q&&!t.subject.toLowerCase().includes(q.toLowerCase())&&!t.customerName.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pT=_pg('tkt',filtered);
+  var open=mockSupportTickets.filter(function(t){return t.status==='Open'}).length;
+  var ip=mockSupportTickets.filter(function(t){return t.status==='In Progress'}).length;
+  var res=mockSupportTickets.filter(function(t){return t.status==='Resolved'}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total',mockSupportTickets.length,'#1565c0'],
+    ['Open',open,open>0?'#c62828':'#999'],
+    ['In Progress',ip,ip>0?'#ff8f00':'#999'],
+    ['Resolved',res,'#2e7d32']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="tktSearch" placeholder="Search..." oninput="_PG.tkt={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="tktPriority" onchange="_PG.tkt={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option></select>'+
+    '<select id="tktStatus" onchange="_PG.tkt={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Open</option><option>In Progress</option><option>Resolved</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Subject</th><th>Customer</th><th>Category</th><th>Priority</th><th>Date</th><th>Assigned</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pT.items.map(function(t){
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+t.id+'</td><td style="font-weight:500;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+t.subject+'">'+t.subject+'</td><td>'+t.customerName+'</td><td style="font-size:9px">'+t.category+'</td><td><span class="badge-status" style="background:'+(t.priority==='High'?'#ffebee':t.priority==='Medium'?'#fff3e0':'#f5f5f5')+';color:'+(t.priority==='High'?'#c62828':t.priority==='Medium'?'#e65100':'#888')+'">'+t.priority+'</span></td><td style="font-size:9px;color:#888">'+t.date+'</td><td style="font-size:9px">'+t.assignedTo+'</td><td><span class="badge-status" style="background:'+(t.status==='Open'?'#ffebee':t.status==='In Progress'?'#fff8e1':'#e8f5e9')+';color:'+(t.status==='Open'?'#c62828':t.status==='In Progress'?'#ff8f00':'#2e7d32')+'">'+t.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudTicket(mockSupportTickets.find(function(x){return x.id===\x27'+t.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockSupportTickets.findIndex(function(x){return x.id===\x27'+t.id+'\x27});if(idx>=0)mockSupportTickets.splice(idx,1);DB.save(\x27supportTickets\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('tkt',pT.total,pT.page,pT.totalPages,pT.perPage)+'</div></div></div>';
+}
+function openCustomer(id){
+  var c=mockCustomers.find(function(x){return x.id===id});
+  if(!c)return;
+  var docs=mockCustomerDocs.filter(function(d){return d.customerId===c.id});
+  var tickets=mockSupportTickets.filter(function(t){return t.customerId===c.id});
+  var paidPct=Math.round(c.downPayment/c.propertyValue*100);
+  showDetailPanel('Customer: '+c.name,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:44px;height:44px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#2F80ED">'+c.name.charAt(0)+'</div>'+
+      '<div><span class="badge-status" style="background:'+(c.status==='Active'?'#e8f5e9':c.status==='Overdue'?'#ffebee':'#fff3e0')+';color:'+(c.status==='Active'?'#2e7d32':c.status==='Overdue'?'#c62828':'#e65100')+'">'+c.status+'</span><div style="font-size:9px;color:#888;margin-top:2px">'+c.type+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['Phone',c.phone],
+      ['Email',c.email],
+      ['Property',c.property],
+      ['Project',c.project],
+      ['Property Value','Tk'+(c.propertyValue/100000).toFixed(1)+'L'],
+      ['Down Payment','Tk'+(c.downPayment/100000).toFixed(1)+'L ('+paidPct+'%)'],
+      ['Outstanding',c.dues],
+      ['Next Due',c.nextDue],
+      ['Payments Made',c.payments],
+      ['Last Payment',c.lastPayment]
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px">'+
+      '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:11px;font-weight:600;color:#1565c0">'+docs.length+'</div><div style="font-size:8px;color:#888">Documents</div></div>'+
+      '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:11px;font-weight:600;color:'+(tickets.length>0?'#c62828':'#888')+'">'+tickets.length+'</div><div style="font-size:8px;color:#888">Tickets</div></div>'+
+    '</div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudCustomer(mockCustomers.find(function(x){return x.id===\x27'+c.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+function crudCustomer(item){
+  var n=!item;
+  var types=['Booking','Installment','Owner'];var statuses=['Active','Overdue','Delinquent','Owner'];
+  var c=n?{id:'CUS-'+String(mockCustomers.length+1).padStart(3,'0'),name:'',phone:'',email:'',property:'',type:'Booking',status:'Active',dues:'Tk0',duesNum:0,nextDue:'',payments:0,propertyValue:0,downPayment:0,lastPayment:'',project:'Muktodhara'}:item;
+  openModal(n?'Add Customer':'Edit Customer',
+    formRow(inputField('Name','cf_name',c.name,'',true),inputField('Phone','cf_phone',c.phone,'',true))+
+    formRow(inputField('Email','cf_email',c.email),inputField('Property','cf_prop',c.property,'',true))+
+    formRow(selectField('Type','cf_type',c.type,types,true),selectField('Status','cf_stat',c.status,statuses,true))+
+    formRow(inputField('Property Value','cf_pv',String(c.propertyValue),'',true),selectField('Project','cf_proj',c.project,['Muktodhara','Jolshiri'],true))+
+    formRow(inputField('Down Payment','cf_dp',String(c.downPayment)),inputField('Last Payment','cf_lp',c.lastPayment)),
+    function(){
+      var pv=parseInt(g('cf_pv'))||0;
+      var dp=parseInt(g('cf_dp'))||0;
+      var dues=pv-dp;
+      var d={id:c.id,name:g('cf_name'),phone:g('cf_phone'),email:g('cf_email'),property:g('cf_prop'),type:g('cf_type'),status:g('cf_stat'),dues:'Tk'+dues.toLocaleString('en-IN'),duesNum:dues,nextDue:c.nextDue||'',payments:c.payments,propertyValue:pv,downPayment:dp,lastPayment:g('cf_lp'),project:g('cf_proj')};
+      if(n){mockCustomers.push(d);DB.save('customers');showToast('Customer added','success');}
+      else{var idx=mockCustomers.findIndex(function(x){return x.id===c.id});if(idx>=0){mockCustomers[idx]=d;DB.save('customers');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudCustomerDoc(item){
+  var n=!item;
+  var d=n?{id:'DOC-'+String(mockCustomerDocs.length+1).padStart(3,'0'),customerId:mockCustomers.length>0?mockCustomers[0].id:'',customerName:mockCustomers.length>0?mockCustomers[0].name:'',docType:'Booking Form',date:new Date().toISOString().split('T')[0],status:'Pending',project:mockCustomers.length>0?mockCustomers[0].project:'Muktodhara'}:item;
+  var docTypes=['Booking Form','Agreement Deed','NID Copy','Income Proof','Downpayment Receipt','Installment Schedule','Handover Certificate','Possession Letter'];
+  openModal(n?'Upload Document':'Edit Document',
+    formRow(selectField('Customer','df_cust',d.customerId,mockCustomers.map(function(c){return c.id+'|'+c.name}),true),selectField('Document Type','df_type',d.docType,docTypes,true))+
+    formRow(inputField('Date','df_date',d.date),selectField('Project','df_proj',d.project,['Muktodhara','Jolshiri'],true))+
+    selectField('Status','df_stat',d.status,['Verified','Pending'],true),
+    function(){
+      var sel=g('df_cust');var cid=sel.split('|')[0];
+      var cObj=mockCustomers.find(function(x){return x.id===cid});
+      var d2={id:d.id,customerId:cid,customerName:cObj?cObj.name:'Unknown',docType:g('df_type'),date:g('df_date')||d.date,status:g('df_stat'),project:g('df_proj')};
+      if(n){mockCustomerDocs.push(d2);DB.save('customerDocs');showToast('Document added','success');}
+      else{var idx=mockCustomerDocs.findIndex(function(x){return x.id===d.id});if(idx>=0){mockCustomerDocs[idx]=d2;DB.save('customerDocs');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudTicket(item){
+  var n=!item;
+  var t=n?{id:'TKT-'+String(mockSupportTickets.length+1).padStart(3,'0'),customerId:mockCustomers.length>0?mockCustomers[0].id:'',customerName:mockCustomers.length>0?mockCustomers[0].name:'',subject:'',category:'Billing',priority:'Medium',status:'Open',date:new Date().toISOString().split('T')[0],assignedTo:'Nazma Akhter',description:''}:item;
+  var cats=['Billing','Property','Utility','Site Visit','Documentation','Complaint'];
+  var assignees=['Nazma Akhter','Shamim Reza','Rofiqul Islam','Tanvir Ahmed','Shahidul Islam'];
+  openModal(n?'New Ticket':'Edit Ticket',
+    formRow(inputField('Subject','tf_sub',t.subject,'',true),selectField('Customer','tf_cust',t.customerId,mockCustomers.map(function(c){return c.id+'|'+c.name}),true))+
+    formRow(selectField('Category','tf_cat',t.category,cats,true),selectField('Priority','tf_pri',t.priority,['High','Medium','Low'],true))+
+    formRow(inputField('Date','tf_date',t.date),selectField('Assigned To','tf_asgn',t.assignedTo,assignees,true))+
+    formRow(selectField('Status','tf_stat',t.status,['Open','In Progress','Resolved'],true),inputField('Description','tf_desc',t.description)),
+    function(){
+      var sel=g('tf_cust');var cid=sel.split('|')[0];
+      var cObj=mockCustomers.find(function(x){return x.id===cid});
+      var d={id:t.id,customerId:cid,customerName:cObj?cObj.name:'Unknown',subject:g('tf_sub'),category:g('tf_cat'),priority:g('tf_pri'),status:g('tf_stat'),date:g('tf_date')||t.date,assignedTo:g('tf_asgn'),description:g('tf_desc')};
+      if(n){mockSupportTickets.push(d);DB.save('supportTickets');showToast('Ticket created','success');}
+      else{var idx=mockSupportTickets.findIndex(function(x){return x.id===t.id});if(idx>=0){mockSupportTickets[idx]=d;DB.save('supportTickets');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
 function renderHandover(el){
   const pH=_pg('handover',mockHandover);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Handover & Post-Sales</div><div class="page-subtitle">${mockHandover.length} units</div>
