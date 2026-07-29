@@ -404,29 +404,35 @@
     html.dark #searchBar:focus-within{background:#0f172a;border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.15)}
     html.dark #searchBar input{color:#e0e0e0}
     html.dark #searchBar .kbd{background:#1e293b;border-color:#334155;color:#64748b}
-    #searchDropdown{position:absolute;top:calc(100% + 4px);left:0;width:440px;max-height:460px;background:#fff;border:1px solid #e0e0e0;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.12);z-index:9999;display:none;overflow:hidden}
+    #searchDropdown{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);width:520px;max-height:520px;background:#fff;border:1px solid #e0e0e0;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.15);z-index:9999;display:none;overflow:hidden}
     #searchDropdown.active{display:flex;flex-direction:column}
-    #searchDropdown .sd-input-wrap{padding:8px 10px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:6px}
-    #searchDropdown .sd-input-wrap input{flex:1;border:none;outline:none;font-size:12px;padding:4px 0;background:transparent;color:#333}
+    #searchDropdown .sd-input-wrap{padding:10px 12px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:8px}
+    #searchDropdown .sd-input-wrap input{flex:1;border:none;outline:none;font-size:13px;padding:4px 0;background:transparent;color:#333}
     #searchDropdown .sd-input-wrap input::placeholder{color:#aaa}
-    #searchDropdown .sd-results{flex:1;overflow-y:auto;padding:4px 6px;max-height:360px}
-    #searchDropdown .sd-empty{padding:30px 20px;text-align:center;color:#999;font-size:12px}
-    .sd-item{padding:6px 8px;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;margin-bottom:2px;transition:background .08s}
-    .sd-item:hover,.sd-item.hl{background:#f0f4ff}
-    html.dark .sd-item:hover,html.dark .sd-item.hl{background:#1e293b}
-    .sd-item .sd-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-weight:600}
+    #searchDropdown .sd-results{flex:1;overflow-y:auto;padding:4px 6px;max-height:400px}
+    #searchDropdown .sd-empty{padding:40px 20px;text-align:center;color:#999;font-size:12px}
+    #searchDropdown .sd-empty .sd-empty-icon{font-size:32px;margin-bottom:8px;opacity:.5}
+    .sd-group-header{font-size:10px;font-weight:600;color:#888;padding:5px 10px 3px;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:4px}
+    .sd-group-header span{background:#f5f5f5;padding:0 4px;border-radius:3px;font-size:9px;color:#999;margin-left:auto}
+    .sd-item{padding:7px 10px;display:flex;align-items:center;gap:10px;border-radius:8px;cursor:pointer;margin-bottom:2px;transition:all .1s}
+    .sd-item:hover,.sd-item.hl{background:#f0f4ff;transform:translateX(2px)}
+    html.dark .sd-item:hover,html.dark .sd-item.hl{background:rgba(59,130,246,.08);transform:translateX(2px)}
+    .sd-item .sd-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-weight:600}
     .sd-item .sd-info{flex:1;min-width:0}
-    .sd-item .sd-title{font-size:12px;font-weight:500;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sd-item .sd-title{font-size:13px;font-weight:500;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     html.dark .sd-item .sd-title{color:#e0e0e0}
     .sd-item .sd-sub{font-size:10px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-    .sd-item .sd-mod{font-size:9px;color:#2F80ED;background:#eef3ff;padding:1px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;font-weight:500}
+    .sd-item .sd-mod{font-size:9px;color:#2F80ED;background:#eef3ff;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;font-weight:500}
     html.dark .sd-item .sd-mod{background:#1a2a4a;color:#60a5fa}
     #searchDropdown .sd-footer{padding:5px 10px;border-top:1px solid #e8e8e8;font-size:9px;color:#aaa;display:flex;justify-content:space-between}
     html.dark #searchDropdown .sd-footer{border-color:#2a3a52;color:#64748b}
-    html.dark #searchDropdown{background:#0f172a;border-color:#2a3a52}
-    html.dark #searchDropdown .sd-input-wrap{border-color:#2a3a52}
+    html.dark #searchDropdown{background:rgba(12,18,30,.75)!important;border-color:rgba(255,255,255,.08);backdrop-filter:blur(20px) saturate(200%);-webkit-backdrop-filter:blur(20px) saturate(200%);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+    html.dark #searchDropdown .sd-input-wrap{border-color:rgba(255,255,255,.06)}
     html.dark #searchDropdown .sd-input-wrap input{color:#e0e0e0}
-    html.dark .sd-empty{color:#64748b}
+    html.dark #searchDropdown .sd-empty{color:#64748b}
+    html.dark .sd-group-header{color:#64748b}
+    html.dark .sd-group-header span{background:rgba(255,255,255,.04);color:#64748b}
+    html.dark .sd-item .sd-mod{background:rgba(59,130,246,.15);color:#60a5fa}
     /* ═══ PRINT REPORT ═══ */
     @media print{body *{visibility:hidden}#printReport,#printReport *{visibility:visible}#printReport{position:fixed;left:0;top:0;width:100%;height:100%;z-index:99999;background:#fff;padding:30px 40px;overflow:auto;font-family:'Inter',sans-serif}}
     #printReport{display:none;font-family:'Inter',sans-serif;color:#333}
@@ -546,12 +552,12 @@
           </div>
           <div id="searchDropdown">
             <div class="sd-input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input id="sdInput" placeholder="Search across all modules..." oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
-              <span onclick="closeSearchDropdown()" style="cursor:pointer;color:#999;font-size:13px;padding:2px">✕</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="sdInput" placeholder="Search leads, projects, contacts..." oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
+              <span onclick="closeSearchDropdown()" style="cursor:pointer;color:#999;font-size:14px;padding:2px;width:24px;text-align:center;border-radius:4px">✕</span>
             </div>
             <div class="sd-results" id="sdResults"></div>
-            <div class="sd-footer"><span>All modules</span><span>↑↓ Navigate · Enter Open · Esc Close</span></div>
+            <div class="sd-footer"><span id="sdResultCount">All 28 modules</span><span>↑↓ Navigate · ↩ Open · ⎋ Close</span></div>
           </div>
         </div>
         <div class="icon-btn" onclick="openQuickAdd()" title="Quick Add" style="font-weight:700;font-size:16px;color:#2F80ED">+</div>
@@ -4374,6 +4380,14 @@ function showToast(msg,t='success'){
 }
 // ═══ GLOBAL SEARCH DROPDOWN ═══
 var _sdHL=-1;
+var _sdRecent=JSON.parse(localStorage.getItem('sd_recent')||'[]');
+function _sdSaveRecent(q){
+  if(!q||q.length<2)return;
+  _sdRecent=_sdRecent.filter(function(x){return x!==q});
+  _sdRecent.unshift(q);
+  if(_sdRecent.length>5)_sdRecent=_sdRecent.slice(0,5);
+  localStorage.setItem('sd_recent',JSON.stringify(_sdRecent));
+}
 function openSearchDropdown(){
   document.getElementById('searchDropdown').classList.add('active');
   var inp=document.getElementById('sdInput');
@@ -4386,90 +4400,176 @@ function closeSearchDropdown(){
   document.getElementById('searchDropdown').classList.remove('active');
   _sdHL=-1;
 }
+var _sdDatasetDefs=[
+  // Group: Executive
+  {g:'Executive',arr:'mockTasks',label:'Tasks',icon:'📋',mod:'tasks',fields:['title','project','status']},
+  {g:'Executive',arr:'mockBiReports',label:'Reports',icon:'📊',mod:'bi_reports',fields:['name','reportType','status']},
+  // Group: Sales & CRM
+  {g:'Sales & CRM',arr:'mockLeads',label:'Leads',icon:'🎯',mod:'crm',fields:['name','property','source','phone','email']},
+  {g:'Sales & CRM',arr:'mockContacts',label:'Contacts',icon:'👤',mod:'contacts',fields:['name','company','email','phone']},
+  {g:'Sales & CRM',arr:'mockCampaigns',label:'Campaigns',icon:'📢',mod:'sales_marketing',fields:['name','status']},
+  {g:'Sales & CRM',arr:'mockAgents',label:'Agents',icon:'🤝',mod:'sales_marketing',fields:['name','branch']},
+  {g:'Sales & CRM',arr:'mockDues',label:'Dues',icon:'💰',mod:'dues_recovery',fields:['name','project']},
+  {g:'Sales & CRM',arr:'mockDuesPromises',label:'Promises',icon:'📅',mod:'dues_recovery',fields:['name']},
+  // Group: Land & Projects
+  {g:'Land & Projects',arr:'mockPlots',label:'Plots',icon:'🏞️',mod:'plots',fields:['id','type','status']},
+  {g:'Land & Projects',arr:'mockProjects',label:'Projects',icon:'🏗️',mod:'projects',fields:['name','location','status']},
+  {g:'Land & Projects',arr:'mockCompliance',label:'Compliance',icon:'✅',mod:'compliance',fields:['name','type','priority']},
+  {g:'Land & Projects',arr:'mockLandProposals',label:'Land Proposals',icon:'📄',mod:'land_mgmt',fields:['name','location']},
+  // Group: Bookings & Customer
+  {g:'Bookings & Customer',arr:'mockBookings',label:'Bookings',icon:'📝',mod:'bookings',fields:['client','property','id','status']},
+  {g:'Bookings & Customer',arr:'mockCustomers',label:'Customers',icon:'👥',mod:'customer_portal',fields:['name','phone','project']},
+  {g:'Bookings & Customer',arr:'mockHandoverUnits',label:'Handover Units',icon:'🔑',mod:'handover',fields:['id','unit']},
+  {g:'Bookings & Customer',arr:'mockSnags',label:'Snags',icon:'🔧',mod:'handover',fields:['unit','reportedBy','status']},
+  // Group: Construction
+  {g:'Construction',arr:'mockContractors',label:'Contractors',icon:'👷',mod:'contractors',fields:['name','type']},
+  {g:'Construction',arr:'mockWorkOrders',label:'Work Orders',icon:'📋',mod:'contractors',fields:['id','scope','project','status']},
+  {g:'Construction',arr:'mockBOQItems',label:'BOQ Items',icon:'💰',mod:'boq',fields:['item','category','project']},
+  {g:'Construction',arr:'mockRateAnalysis',label:'Rate Analysis',icon:'📐',mod:'boq',fields:['name']},
+  {g:'Construction',arr:'mockRabills',label:'R.A. Bills',icon:'📄',mod:'boq',fields:['billNo','project','status']},
+  {g:'Construction',arr:'mockEquipment',label:'Equipment',icon:'🚜',mod:'equipment',fields:['name','model','type']},
+  {g:'Construction',arr:'mockMaintenanceLog',label:'Maintenance Log',icon:'🔧',mod:'equipment',fields:['equipment','type']},
+  {g:'Construction',arr:'mockLabor',label:'Workers',icon:'👷',mod:'labor',fields:['name','category']},
+  {g:'Construction',arr:'mockPayroll',label:'Payroll',icon:'💵',mod:'labor',fields:['name']},
+  {g:'Construction',arr:'mockInspections',label:'Inspections',icon:'🔍',mod:'qc',fields:['area','inspector','status']},
+  {g:'Construction',arr:'mockDesigns',label:'Designs',icon:'🎨',mod:'designs',fields:['name','designer','status']},
+  // Group: Finance & Admin
+  {g:'Finance & Admin',arr:'mockInventory',label:'Inventory',icon:'📦',mod:'stock',fields:['name','category','qty']},
+  {g:'Finance & Admin',arr:'mockSuppliers',label:'Suppliers',icon:'🏭',mod:'stock',fields:['name','material']},
+  {g:'Finance & Admin',arr:'mockPurchaseOrders',label:'Purchase Orders',icon:'📄',mod:'stock',fields:['id','supplier','status']},
+  {g:'Finance & Admin',arr:'mockTransactions',label:'Transactions',icon:'💳',mod:'finance',fields:['description','category','amount']},
+  {g:'Finance & Admin',arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','department','designation']},
+  {g:'Finance & Admin',arr:'mockDocuments',label:'Documents',icon:'📄',mod:'documents',fields:['name','project','type']},
+  {g:'Finance & Admin',arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
+  // Group: Collaboration
+  {g:'Collaboration',arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']}
+];
+var _sdGroupOrder=['Executive','Sales & CRM','Land & Projects','Bookings & Customer','Construction','Finance & Admin','Collaboration'];
+function sdOpenResult(el){
+  navigateSearch(el.getAttribute('data-mod'),el.getAttribute('data-title')||'');
+}
+function sdRecall(q){
+  document.getElementById('sdInput').value=q;
+  doGlobalSearch();
+  document.getElementById('sdInput').focus();
+}
+function sdRemoveRecent(i){
+  _sdRecent.splice(i,1);
+  localStorage.setItem('sd_recent',JSON.stringify(_sdRecent));
+  doGlobalSearch();
+}
 function doGlobalSearch(){
   var q=(document.getElementById('sdInput').value||'').toLowerCase().trim();
   document.getElementById('gsInput').value=q;
   var c=document.getElementById('sdResults');
-  if(!q){c.innerHTML='<div class="sd-empty">Type to search across all modules...</div>';return}
-  var allDatasets=[
-    // Executive
-    {arr:'mockTasks',label:'Tasks',icon:'📋',mod:'tasks',fields:['title','project']},
-    {arr:'mockBiReports',label:'Reports',icon:'📊',mod:'bi_reports',fields:['name','reportType']},
-    // Sales & CRM
-    {arr:'mockLeads',label:'Leads',icon:'🎯',mod:'crm',fields:['name','property','source']},
-    {arr:'mockContacts',label:'Contacts',icon:'👤',mod:'contacts',fields:['name','company']},
-    {arr:'mockCampaigns',label:'Campaigns',icon:'📢',mod:'sales_marketing',fields:['name','status']},
-    {arr:'mockAgents',label:'Agents',icon:'🤝',mod:'sales_marketing',fields:['name','branch']},
-    {arr:'mockDues',label:'Dues',icon:'💰',mod:'dues_recovery',fields:['name','project']},
-    {arr:'mockDuesPromises',label:'Promises',icon:'📅',mod:'dues_recovery',fields:['name']},
-    // Land & Projects
-    {arr:'mockPlots',label:'Plots',icon:'🏞️',mod:'plots',fields:['id','type','status']},
-    {arr:'mockProjects',label:'Projects',icon:'🏗️',mod:'projects',fields:['name','location','status']},
-    {arr:'mockCompliance',label:'Compliance',icon:'✅',mod:'compliance',fields:['name','type','priority']},
-    {arr:'mockLandProposals',label:'Land Proposals',icon:'📄',mod:'land_mgmt',fields:['name','location']},
-    // Bookings & Customer
-    {arr:'mockBookings',label:'Bookings',icon:'📝',mod:'bookings',fields:['client','property','id']},
-    {arr:'mockCustomers',label:'Customers',icon:'👥',mod:'customer_portal',fields:['name','phone','project']},
-    {arr:'mockHandoverUnits',label:'Handover Units',icon:'🔑',mod:'handover',fields:['id','unit']},
-    {arr:'mockSnags',label:'Snags',icon:'🔧',mod:'handover',fields:['unit','reportedBy']},
-    // Construction
-    {arr:'mockContractors',label:'Contractors',icon:'👷',mod:'contractors',fields:['name','type']},
-    {arr:'mockWorkOrders',label:'Work Orders',icon:'📋',mod:'contractors',fields:['id','scope','project']},
-    {arr:'mockBOQItems',label:'BOQ Items',icon:'💰',mod:'boq',fields:['item','category','project']},
-    {arr:'mockRateAnalysis',label:'Rate Analysis',icon:'📐',mod:'boq',fields:['name']},
-    {arr:'mockRabills',label:'R.A. Bills',icon:'📄',mod:'boq',fields:['billNo','project']},
-    {arr:'mockEquipment',label:'Equipment',icon:'🚜',mod:'equipment',fields:['name','model','type']},
-    {arr:'mockMaintenanceLog',label:'Maintenance Log',icon:'🔧',mod:'equipment',fields:['equipment','type']},
-    {arr:'mockLabor',label:'Workers',icon:'👷',mod:'labor',fields:['name','category']},
-    {arr:'mockPayroll',label:'Payroll',icon:'💵',mod:'labor',fields:['name']},
-    {arr:'mockInspections',label:'Inspections',icon:'🔍',mod:'qc',fields:['area','inspector']},
-    {arr:'mockDesigns',label:'Designs',icon:'🎨',mod:'designs',fields:['name','designer']},
-    // Finance & Admin
-    {arr:'mockInventory',label:'Inventory',icon:'📦',mod:'stock',fields:['name','category']},
-    {arr:'mockSuppliers',label:'Suppliers',icon:'🏭',mod:'stock',fields:['name','material']},
-    {arr:'mockPurchaseOrders',label:'Purchase Orders',icon:'📄',mod:'stock',fields:['id','supplier']},
-    {arr:'mockTransactions',label:'Transactions',icon:'💳',mod:'finance',fields:['description','category']},
-    {arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','department']},
-    {arr:'mockDocuments',label:'Documents',icon:'📄',mod:'documents',fields:['name','project']},
-    {arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
-    // Collaboration
-    {arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']},
-    // Design
-    {arr:'mockDesigns',label:'Designs (alt)',icon:'🎨',mod:'designs',fields:['name','type']}
-  ];
-  var res=[];
-  allDatasets.forEach(function(ds){
+  var counter=document.getElementById('sdResultCount');
+  if(!q){
+    // Show recent searches
+    if(_sdRecent.length){
+      c.innerHTML='<div class="sd-empty"><div class="sd-empty-icon">🔍</div>Type to search across all 28 modules</div>'+
+        '<div class="sd-group-header">🕐 Recent searches</div>'+
+        _sdRecent.map(function(r,i){
+          var safe=r.replace(/'/g,"&apos;").replace(/"/g,"&quot;");
+          return '<div class="sd-item" onclick="sdRecall(\''+safe+'\')">'+
+            '<div class="sd-icon" style="background:#f5f5f5;font-size:12px">🕐</div>'+
+            '<div class="sd-info"><div class="sd-title">'+safe+'</div></div>'+
+            '<span class="sd-mod" onclick="event.stopPropagation();sdRemoveRecent('+i+')" style="cursor:pointer">✕</span></div>';
+        }).join('');
+    }else{
+      c.innerHTML='<div class="sd-empty"><div class="sd-empty-icon">🔍</div>Type to search across<br><b>28 modules</b> · Leads, Projects, Contacts & more</div>';
+    }
+    counter.textContent='All 28 modules';
+    _sdHL=-1;
+    return;
+  }
+  // Save to recent
+  _sdSaveRecent(q);
+  // Module name search
+  var moduleNames=[];var modMap={};
+  _sdDatasetDefs.forEach(function(ds){
+    if(!modMap[ds.g])modMap[ds.g]=[];
+    if(modMap[ds.g].indexOf(ds.label)<0)modMap[ds.g].push(ds.label);
+  });
+  // Search data
+  var grouped={};
+  var total=0;
+  _sdDatasetDefs.forEach(function(ds){
     var arr=window[ds.arr];
     if(!arr)return;
     arr.forEach(function(item){
       var found=false;
-      var matchedField='';
+      var matchedFields=[];
       ds.fields.forEach(function(f){
         var v=item[f];
-        if(v&&String(v).toLowerCase().includes(q)){found=true;matchedField=f;}
+        if(v&&String(v).toLowerCase().includes(q)){found=true;matchedFields.push(f);}
       });
       if(found){
+        total++;
         var title=item[ds.fields[0]]||item.id||'';
-        var sub=ds.fields.slice(1).map(function(f){return item[f]}).filter(Boolean).join(' · ');
-        res.push({title:title,sub:sub,mod:ds.mod,label:ds.label,icon:ds.icon});
+        var subParts=[];
+        ds.fields.slice(1).forEach(function(f){
+          if(item[f]&&String(item[f]).toLowerCase().includes(q)){
+            var v=item[f];
+            if(matchedFields.indexOf(f)>=0)subParts.push(v);
+            else subParts.push(item[f]);
+          }
+        });
+        var sub=subParts.filter(Boolean).join(' · ');
+        if(!sub){
+          ds.fields.slice(1).forEach(function(f){if(item[f]&&subParts.indexOf(item[f])<0)subParts.push(item[f]);});
+          sub=subParts.filter(Boolean).join(' · ');
+        }
+        if(!grouped[ds.g])grouped[ds.g]=[];
+        grouped[ds.g].push({title:title,sub:sub,mod:ds.mod,label:ds.label,icon:ds.icon});
       }
     });
   });
-  if(res.length===0){c.innerHTML='<div class="sd-empty">No results found for "<b>'+q+'</b>"</div>';_sdHL=-1;return}
-  _sdHL=-1;
-  c.innerHTML='<div style="font-size:9px;color:#888;padding:2px 4px 6px;font-weight:500">'+res.length+' result'+(res.length>1?'s':'')+'</div>'+
-    res.slice(0,30).map(function(r,i){
-      return '<div class="sd-item" data-idx="'+i+'" onclick="navigateSearch(\''+r.mod+'\',\''+r.title.replace(/'/g,"\\'")+'\')">'+
+  if(total===0){
+    c.innerHTML='<div class="sd-empty"><div class="sd-empty-icon">🔎</div>No results found for "<b>'+q+'</b>"<br><span style="font-size:11px;color:#999;margin-top:6px;display:block">Try searching by name, phone, project, or module</span></div>';
+    counter.textContent='0 results';
+    _sdHL=-1;
+    return;
+  }
+  _sdHL=0;
+  var html='';
+  var globalIdx=0;
+  _sdGroupOrder.forEach(function(grp){
+    if(!grouped[grp]||!grouped[grp].length)return;
+    var items=grouped[grp];
+    html+='<div class="sd-group-header">'+items[0].icon+' '+grp+'<span>'+items.length+'</span></div>';
+    items.slice(0,8).forEach(function(r){
+      html+='<div class="sd-item" data-idx="'+globalIdx+'" data-mod="'+r.mod+'" data-title="'+r.title.replace(/'/g,"").replace(/"/g,"&quot;")+'" onclick="sdOpenResult(this)">'+
         '<div class="sd-icon" style="background:#f0f4ff">'+r.icon+'</div>'+
-        '<div class="sd-info"><div class="sd-title">'+r.title+'</div><div class="sd-sub">'+r.sub+'</div></div>'+
+        '<div class="sd-info"><div class="sd-title">'+_sdHighlight(r.title,q)+'</div><div class="sd-sub">'+_sdHighlight(r.sub,q)+'</div></div>'+
         '<span class="sd-mod">'+r.label+'</span></div>';
-    }).join('');
+      globalIdx++;
+    });
+    if(items.length>8){
+      html+='<div style="padding:2px 10px 4px;font-size:9px;color:#999">+ '+(items.length-8)+' more in '+grp.toLowerCase()+'</div>';
+      globalIdx+=items.length-8;
+    }
+  });
+  c.innerHTML=html;
+  counter.textContent=total+' result'+(total>1?'s':'');
+  // Auto-highlight first
+  var firstItem=document.querySelector('#sdResults .sd-item');
+  if(firstItem)firstItem.classList.add('hl');
+}
+function _sdHighlight(text,query){
+  if(!text||!query)return text||'';
+  var idx=text.toLowerCase().indexOf(query);
+  if(idx<0)return text;
+  return text.slice(0,idx)+'<b style="color:#2F80ED;font-weight:600">'+text.slice(idx,idx+query.length)+'</b>'+text.slice(idx+query.length);
 }
 function searchKeyNav(e){
   var items=document.querySelectorAll('#sdResults .sd-item');
   if(e.key==='ArrowDown'){e.preventDefault();_sdHL=Math.min(_sdHL+1,items.length-1);highlightSearch(items);}
-  else if(e.key==='ArrowUp'){e.preventDefault();_sdHL=Math.max(_sdHL-1,0);highlightSearch(items);}
-  else if(e.key==='Enter'&&_sdHL>=0&&items[_sdHL]){items[_sdHL].click();}
+  else if(e.key==='ArrowUp'){e.preventDefault();_sdHL=Math.max(_sdHL-1,items.length-1);highlightSearch(items);}
+  else if(e.key==='Enter'){
+    e.preventDefault();
+    if(_sdHL>=0&&items[_sdHL]){items[_sdHL].click();}
+    else if(items.length>0){items[0].click();}
+  }
   else if(e.key==='Escape'){closeSearchDropdown();document.getElementById('gsInput').blur();}
 }
 function highlightSearch(items){
@@ -4477,6 +4577,7 @@ function highlightSearch(items){
   if(_sdHL>=0&&items[_sdHL])items[_sdHL].scrollIntoView({block:'nearest'});
 }
 function navigateSearch(mod,title){
+  _sdSaveRecent(document.getElementById('sdInput').value);
   closeSearchDropdown();
   var grp=GROUPS_LOOKUP[mod];
   if(grp)switchGroup(grp);
