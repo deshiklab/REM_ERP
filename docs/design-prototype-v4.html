@@ -560,7 +560,7 @@
               <span onclick="closeSearchDropdown()" style="cursor:pointer;color:#999;font-size:14px;padding:2px;width:24px;text-align:center;border-radius:4px">✕</span>
             </div>
             <div class="sd-results" id="sdResults"></div>
-            <div class="sd-footer"><span id="sdResultCount">All 28 modules</span><span>↑↓ Navigate · ↩ Open · ⎋ Close</span></div>
+            <div class="sd-footer"><span id="sdResultCount">All 30 modules</span><span>↑↓ Navigate · ↩ Open · ⎋ Close</span></div>
           </div>
         </div>
         <div class="icon-btn" onclick="openQuickAdd()" title="Quick Add" style="font-weight:700;font-size:16px;color:#2F80ED">+</div>
@@ -939,6 +939,26 @@ window.mockEntities = DB.init('entities', [
   {id:'ENT-043',type:'joint',name:'Delwar Hossain & Shamim Reza (Joint)',phone:'+880 1817 909090',email:'',address:'Joint Property - Muktodhara',roles:{customer:true,buyer:true},linkedIds:{},priority:'Normal',source:'Joint Purchase',notes:'Joint investment in Muktodhara plot. Delwar (60%) & Shamim (40%).',created:'2024-10-15',totalPurchases:1,totalValue:'₹2.5 Cr',members:[{entityId:'ENT-005',share:'60%'},{entityId:'ENT-013',share:'40%'}]},
   {id:'ENT-044',type:'joint',name:'Mizanur Rahman & Shahidul Islam (Joint)',phone:'+880 1919 343434',email:'',address:'Joint Property - Jolshiri',roles:{customer:true,buyer:true},linkedIds:{},priority:'Normal',source:'Joint Purchase',notes:'Joint family investment. Mizanur (50%) & Shahidul (50%).',created:'2024-10-20',totalPurchases:1,totalValue:'₹3.8 Cr',members:[{entityId:'ENT-007',share:'50%'},{entityId:'ENT-008',share:'50%'}]},
   {id:'ENT-045',type:'joint',name:'Selina Begum & Nasrin Akter (Joint)',phone:'+880 1912 334455',email:'',address:'Joint Property - Jolshiri',roles:{customer:true,buyer:true},linkedIds:{},priority:'Normal',source:'Joint Purchase',notes:'Sisters investing together in a 2BR apartment. Selina (60%) & Nasrin (40%).',created:'2024-10-25',totalPurchases:0,totalValue:'৳0',members:[{entityId:'ENT-011',share:'60%'},{entityId:'ENT-009',share:'40%'}]}
+]);
+window.mockReminders = DB.init('reminders', [
+  {id:'REM-001',entityId:'ENT-001',title:'Follow up on Muktodhara plot pricing',date:'2026-07-01',status:'pending',priority:'High',assignedTo:'Hasanul Banna',notes:'Discuss 5 katha plot pricing - client wants negotiation.'},
+  {id:'REM-002',entityId:'ENT-004',title:'NRB installment reminder',date:'2026-06-19',status:'pending',priority:'High',assignedTo:'Iftekhar Ahmad',notes:'3rd installment of 5 Lac due Jun 20. Contact via WhatsApp.'},
+  {id:'REM-003',entityId:'ENT-004',title:'Send Jolshiri progress photos',date:'2026-06-25',status:'pending',priority:'Medium',assignedTo:'Sales Team A',notes:'Dr. Rubina requested monthly construction update photos.'},
+  {id:'REM-004',entityId:'ENT-005',title:'Verify Delwar Hossain payment schedule',date:'2026-07-05',status:'completed',priority:'Medium',assignedTo:'Nazma Akhter',notes:'Confirm next installment date for Apt 4C booking.'},
+  {id:'REM-005',entityId:'ENT-007',title:'Site visit follow-up - Mizanur Rahman',date:'2026-06-22',status:'pending',priority:'High',assignedTo:'Hasanul Banna',notes:'Client visited Jolshiri site. Send payment plan breakdown.'},
+  {id:'REM-006',entityId:'ENT-008',title:'Muktodhara plot registration update',date:'2026-06-30',status:'pending',priority:'Medium',assignedTo:'Legal Dept',notes:'Check mutation deed status for Plot 15 - Shahidul Islam.'},
+  {id:'REM-007',entityId:'ENT-010',title:'Kazi Nizam penthouse proposal',date:'2026-06-21',status:'pending',priority:'High',assignedTo:'Iftekhar Ahmad',notes:'Prepare premium proposal for Skyline penthouse. Follow up call.'},
+  {id:'REM-008',entityId:'ENT-017',title:'Kamrul Hasan - final payment reminder',date:'2026-07-15',status:'completed',priority:'Low',assignedTo:'Sales Team A',notes:'Final payment of 80 Lac due Jul 15 for Apt 9A.'},
+  {id:'REM-009',entityId:'ENT-018',title:'Fatima Begum plot handover checklist',date:'2026-07-10',status:'pending',priority:'Medium',assignedTo:'Shamim Reza',notes:'Prepare handover documents for 3 Katha plot at Jolshiri.'},
+  {id:'REM-010',entityId:'ENT-019',title:'Jahanara Begum - crack inspection',date:'2026-06-28',status:'pending',priority:'Low',assignedTo:'Engr. Faruk',notes:'Schedule inspection for drawing room wall cracks at Apt 3C.'}
+]);
+window.mockVault = DB.init('vault', [
+  {id:'VLT-001',entityId:'ENT-001',name:'NID Copy',value:'ENCRYPTED::NID-1234567890::AES256',category:'ID Document',created:'2024-01-20'},
+  {id:'VLT-002',entityId:'ENT-004',name:'Tax Certificate',value:'ENCRYPTED::TAX-CERT-2024-78901::AES256',category:'Financial',created:'2024-09-15'},
+  {id:'VLT-003',entityId:'ENT-004',name:'Passport Scan',value:'ENCRYPTED::PASS-BD-AB123456::AES256',category:'ID Document',created:'2024-09-10'},
+  {id:'VLT-004',entityId:'ENT-008',name:'Bank Statement',value:'ENCRYPTED::BANK-DBBL-123456789-FY2425::AES256',category:'Financial',created:'2024-08-20'},
+  {id:'VLT-005',entityId:'ENT-010',name:'Agreement Draft',value:'ENCRYPTED::AGMT-SKYLINE-PENTHOUSE-V2::AES256',category:'Agreement',created:'2024-09-10'},
+  {id:'VLT-006',entityId:'ENT-001',name:'Portal Password',value:'ENCRYPTED::PWD::portal.marsconstech.com::admin123!::AES256',category:'Password',created:'2024-02-01'}
 ]);
 window.mockDocuments = DB.init('documents', [
   {id:1,title:'Muktodhara CS Khatiyan',type:'CS Khatiyan',date:'2023-10-12',property:'Muktodhara',status:'Verified'},
@@ -4091,65 +4111,110 @@ function renderEntities(el){
     }).join('')+
     '</tbody></table>'+_pgHtml('entities',pagE.total,pagE.page,pagE.totalPages,pagE.perPage)+'</div></div></div></div>';
 }
-function openEntity(id){
+function openEntity(id, tab){
+  tab=tab||'overview';
   var e=mockEntities.find(function(x){return x.id===id});if(!e)return;
   var typeIcon={individual:'👤',company:'🏢',joint:'👥'}[e.type]||'👤';
   var typeLabel={individual:'Individual',company:'Company',joint:'Joint'}[e.type]||e.type;
   var roles=getEntityRoles(e);
-  var roleHtml=roles.map(function(r){return '<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;background:#f0f4ff;color:#2F80ED;margin:1px">'+r+'</span>';}).join('');
+  var roleHtml=roles.map(function(r){return '<span style=\"display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;background:#f0f4ff;color:#2F80ED;margin:1px\">'+r+'</span>';}).join('');
+  // Tab navigation
+  var tabs=['overview','statement','reminders','vault','tasks'];
+  var tabLabels={overview:'📋 Overview',statement:'💰 Statement',reminders:'🔔 Reminders',vault:'🔒 Vault',tasks:'✅ Tasks'};
+  var tabNav='<div class=\"lead-tabs\" style=\"display:flex;gap:2px;margin-bottom:10px;background:#f5f5f5;border-radius:6px;padding:3px;overflow-x:auto\">'+tabs.map(function(t){return '<div class=\"lead-tab\" style=\"padding:4px 10px;font-size:9px;font-weight:600;border-radius:4px;cursor:pointer;white-space:nowrap;'+(tab===t?'color:#2F80ED;background:#fff;border-bottom:2px solid #2F80ED':'color:#888')+'\" onclick=\"openEntity(\\''+id+'\\',\\''+t+'\\')\">'+tabLabels[t]+'</div>';}).join('')+'</div>';
+  // Build overview content
   var linkedSections='';
   if(e.linkedIds){
-    if(e.linkedIds.employeeId){
-      var emp=mockEmployees.find(function(x){return x.id===e.linkedIds.employeeId;});
-      if(emp)linkedSections+='<div style="margin-top:8px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">🏢 Employee Record</h3><div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:2px"><div class="stat-card"><div class="label">Designation</div><div style="font-size:11px;font-weight:600;margin-top:2px">'+emp.designation+'</div></div><div class="stat-card"><div class="label">Department</div><div style="font-size:11px;font-weight:600;margin-top:2px">'+emp.dept+'</div></div></div></div>';
-    }
-    if(e.linkedIds.brokerId){
-      var brk=mockBrokers.find(function(x){return x.id===e.linkedIds.brokerId;});
-      if(brk)linkedSections+='<div style="margin-top:8px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">🤝 Broker Record</h3><div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:2px"><div class="stat-card"><div class="label">Tier</div><div style="font-size:11px;font-weight:600;margin-top:2px">'+brk.tier+'</div></div><div class="stat-card"><div class="label">Region</div><div style="font-size:11px;font-weight:600;margin-top:2px">'+brk.region+'</div></div></div></div>';
-    }
-    if(e.linkedIds.supplierId){
-      var sup=mockSuppliers.find(function(x){return x.id===e.linkedIds.supplierId;});
-      if(sup)linkedSections+='<div style="margin-top:8px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">🏭 Supplier Record</h3><div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:2px"><div class="stat-card"><div class="label">Type</div><div style="font-size:11px;font-weight:600;margin-top:2px">'+(sup.type||'—')+'</div></div><div class="stat-card"><div class="label">Items</div><div style="font-size:11px;font-weight:600;margin-top:2px">'+(sup.items||'—')+'</div></div></div></div>';
-    }
+    if(e.linkedIds.employeeId){var emp=mockEmployees.find(function(x){return x.id===e.linkedIds.employeeId;});if(emp)linkedSections+='<div style=\"margin-top:8px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">🏢 Employee Record</h3><div class=\"stats-row\" style=\"grid-template-columns:1fr 1fr;margin-top:2px\"><div class=\"stat-card\"><div class=\"label\">Designation</div><div style=\"font-size:11px;font-weight:600;margin-top:2px\">'+emp.designation+'</div></div><div class=\"stat-card\"><div class=\"label\">Department</div><div style=\"font-size:11px;font-weight:600;margin-top:2px\">'+emp.dept+'</div></div></div></div>';}
+    if(e.linkedIds.brokerId){var brk=mockBrokers.find(function(x){return x.id===e.linkedIds.brokerId;});if(brk)linkedSections+='<div style=\"margin-top:8px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">🤝 Broker Record</h3><div class=\"stats-row\" style=\"grid-template-columns:1fr 1fr;margin-top:2px\"><div class=\"stat-card\"><div class=\"label\">Tier</div><div style=\"font-size:11px;font-weight:600;margin-top:2px\">'+brk.tier+'</div></div><div class=\"stat-card\"><div class=\"label\">Region</div><div style=\"font-size:11px;font-weight:600;margin-top:2px\">'+brk.region+'</div></div></div></div>';}
+    if(e.linkedIds.supplierId){var sup=mockSuppliers.find(function(x){return x.id===e.linkedIds.supplierId;});if(sup)linkedSections+='<div style=\"margin-top:8px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">🏭 Supplier Record</h3><div class=\"stats-row\" style=\"grid-template-columns:1fr 1fr;margin-top:2px\"><div class=\"stat-card\"><div class=\"label\">Type</div><div style=\"font-size:11px;font-weight:600;margin-top:2px\">'+(sup.type||'—')+'</div></div><div class=\"stat-card\"><div class=\"label\">Items</div><div style=\"font-size:11px;font-weight:600;margin-top:2px\">'+(sup.items||'—')+'</div></div></div></div>';}
   }
   // Purchase History
   var bookings=mockBookings.filter(function(b){return b.entityId===e.id;});
   var purchaseHtml='';
-  if(bookings.length){
-    purchaseHtml='<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">📋 Purchase History ('+bookings.length+' bookings)</h3><div style="font-size:10px">'+bookings.map(function(b){return '<div style="padding:5px 8px;margin-bottom:3px;background:#fff;border:1px solid #e8e8e8;border-radius:4px;display:flex;justify-content:space-between;align-items:center"><div><b>'+b.property+'</b> · '+b.unit+'</div><div style="text-align:right"><div style="font-weight:600">'+b.price+'</div><span class="badge-status '+(b.status==='Confirmed'?'badge-active':(b.status==='Pending Review'?'badge-pending':'badge-closed'))+'">'+b.status+'</span></div></div>';}).join('')+'</div></div>';
-  }else{
-    purchaseHtml='<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">📋 Purchase History</h3><div style="padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px">No purchase history yet.</div></div>';
-  }
+  if(bookings.length){purchaseHtml='<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">📋 Purchase History ('+bookings.length+' bookings)</h3><div style=\"font-size:10px\">'+bookings.map(function(b){return '<div style=\"padding:5px 8px;margin-bottom:3px;background:#fff;border:1px solid #e8e8e8;border-radius:4px;display:flex;justify-content:space-between;align-items:center\"><div><b>'+b.property+'</b> · '+b.unit+'</div><div style=\"text-align:right\"><div style=\"font-weight:600\">'+b.price+'</div><span class=\"badge-status '+(b.status==='Confirmed'?'badge-active':(b.status==='Pending Review'?'badge-pending':'badge-closed'))+'\">'+b.status+'</span></div></div>';}).join('')+'</div></div>';}else{purchaseHtml='<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">📋 Purchase History</h3><div style=\"padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px\">No purchase history yet.</div></div>';}
   // Joint members
   var membersHtml='';
-  if(e.type==='joint'&&e.members&&e.members.length){
-    membersHtml='<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">👥 Joint Members</h3>'+e.members.map(function(m){
-      var mem=mockEntities.find(function(x){return x.id===m.entityId;});
-      return '<div style="padding:5px 8px;margin-bottom:3px;background:#fff;border:1px solid #e8e8e8;border-radius:4px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="openEntity(\''+m.entityId+'\')"><div><span style="font-weight:500">'+(mem?mem.name:'Unknown')+'</span> <span style="font-size:9px;color:#888">('+m.share+')</span></div><span style="font-size:9px;color:#2F80ED">View →</span></div>';
-    }).join('')+'</div>';
-  }
-  showDetailPanel(typeIcon+' '+e.name,
-    '<div style="text-align:center;padding:18px"><div style="width:50px;height:50px;border-radius:50%;background:'+contactBadgeColor(e.type)+'22;color:'+contactBadgeColor(e.type)+';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px">'+typeIcon+'</div><div style="font-size:14px;font-weight:700">'+e.name+'</div><div style="font-size:10px;margin-top:4px"><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:'+contactBadgeColor(e.type)+'">'+typeIcon+' '+typeLabel+'</span></div><div style="margin-top:4px">'+roleHtml+'</div></div>'+
-    '<div class="stats-row" style="grid-template-columns:1fr 1fr">'+
-      '<div class="stat-card"><div class="label">Phone</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(e.phone||'&mdash;')+'</div></div>'+
-      '<div class="stat-card"><div class="label">Email</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(e.email||'&mdash;')+'</div></div>'+
+  if(e.type==='joint'&&e.members&&e.members.length){membersHtml='<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">👥 Joint Members</h3>'+e.members.map(function(m){var mem=mockEntities.find(function(x){return x.id===m.entityId;});return '<div style=\"padding:5px 8px;margin-bottom:3px;background:#fff;border:1px solid #e8e8e8;border-radius:4px;display:flex;justify-content:space-between;align-items:center;cursor:pointer\" onclick=\"openEntity(\\''+m.entityId+'\\')\"><div><span style=\"font-weight:500\">'+(mem?mem.name:'Unknown')+'</span> <span style=\"font-size:9px;color:#888\">('+m.share+')</span></div><span style=\"font-size:9px;color:#2F80ED\">View →</span></div>';}).join('')+'</div>';}
+  var overviewContent=
+    '<div style=\"text-align:center;padding:18px\"><div style=\"width:50px;height:50px;border-radius:50%;background:'+contactBadgeColor(e.type)+'22;color:'+contactBadgeColor(e.type)+';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px\">'+typeIcon+'</div><div style=\"font-size:14px;font-weight:700\">'+e.name+'</div><div style=\"font-size:10px;margin-top:4px\"><span style=\"display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:'+contactBadgeColor(e.type)+'\">'+typeIcon+' '+typeLabel+'</span></div><div style=\"margin-top:4px\">'+roleHtml+'</div></div>'+
+    '<div class=\"stats-row\" style=\"grid-template-columns:1fr 1fr\">'+
+      '<div class=\"stat-card\"><div class=\"label\">Phone</div><div style=\"font-size:12px;font-weight:600;margin-top:2px\">'+(e.phone||'&mdash;')+'</div></div>'+
+      '<div class=\"stat-card\"><div class=\"label\">Email</div><div style=\"font-size:12px;font-weight:600;margin-top:2px\">'+(e.email||'&mdash;')+'</div></div>'+
     '</div>'+
-    '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:6px">'+
-      (e.nid?'<div class="stat-card"><div class="label">NID</div><div style="font-size:12px;font-weight:600;margin-top:2px;font-family:monospace">'+e.nid+'</div></div>':'')+
-      (e.tradeLicense?'<div class="stat-card"><div class="label">Trade License</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+e.tradeLicense+'</div></div>':'')+
-      '<div class="stat-card"><div class="label">Priority</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:'+contactBadgeColor(e.priority)+'">'+e.priority+'</div></div>'+
-      '<div class="stat-card"><div class="label">Source</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(e.source||'&mdash;')+'</div></div>'+
+    '<div class=\"stats-row\" style=\"grid-template-columns:1fr 1fr;margin-top:6px\">'+
+      (e.nid?'<div class=\"stat-card\"><div class=\"label\">NID</div><div style=\"font-size:12px;font-weight:600;margin-top:2px;font-family:monospace\">'+e.nid+'</div></div>':'')+
+      (e.tradeLicense?'<div class=\"stat-card\"><div class=\"label\">Trade License</div><div style=\"font-size:12px;font-weight:600;margin-top:2px\">'+e.tradeLicense+'</div></div>':'')+
+      '<div class=\"stat-card\"><div class=\"label\">Priority</div><div style=\"font-size:12px;font-weight:600;margin-top:2px;color:'+contactBadgeColor(e.priority)+'\">'+e.priority+'</div></div>'+
+      '<div class=\"stat-card\"><div class=\"label\">Source</div><div style=\"font-size:12px;font-weight:600;margin-top:2px\">'+(e.source||'&mdash;')+'</div></div>'+
     '</div>'+
-    '<div style="margin-top:8px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">📍 Address</h3><div style="font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+(e.address||'&mdash;')+'</div></div>'+
+    '<div style=\"margin-top:8px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">📍 Address</h3><div style=\"font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px\">'+(e.address||'&mdash;')+'</div></div>'+
     linkedSections+
-    '<div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f8f9fa;border-radius:6px"><span style="font-size:11px;font-weight:600">📊 Total Purchases</span><span style="font-weight:700;font-size:13px">'+e.totalPurchases+' ('+(e.totalValue||'0')+')</span></div>'+
+    '<div style=\"margin-top:10px;display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f8f9fa;border-radius:6px\"><span style=\"font-size:11px;font-weight:600\">📊 Total Purchases</span><span style=\"font-weight:700;font-size:13px\">'+e.totalPurchases+' ('+(e.totalValue||'0')+')</span></div>'+
     membersHtml+
     purchaseHtml+
-    (e.notes?'<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">📝 Notes</h3><div style="font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+e.notes+'</div></div>':'')+
-    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">📊 Activity</h3><div style="padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px">Activity log coming soon.</div></div>',
-    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudEntity(mockEntities.find(function(x){return x.id===\''+e.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">✕ Close</button></div>'
+    (e.notes?'<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">📝 Notes</h3><div style=\"font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px\">'+e.notes+'</div></div>':'')+
+    '<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:6px\">📊 Activity</h3><div style=\"padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px\">Activity log coming soon.</div></div>';
+  // Statement tab
+  function renderStatementTab(){
+    var leads=mockLeads.filter(function(l){return l.entityId===e.id;});
+    var transactions=[];
+    leads.forEach(function(l){(l.installments||[]).forEach(function(inst){var amtNum=parseInt(inst.amount.replace(/[₹৳,\s]/g,''))||0;transactions.push({date:inst.date,desc:(l.property||'Property')+' - '+inst.amount,amount:inst.amount,status:inst.status,amtNum:inst.status==='Paid'?amtNum:0});});});
+    bookings.forEach(function(b){var amtNum=parseInt((b.advance||'0').replace(/[₹৳,\s]/g,''))||0;transactions.push({date:b.date,desc:'Booking: '+b.property+' '+b.unit,amount:b.advance||'—',status:b.status==='Confirmed'?'Paid':b.status,amtNum:b.status==='Confirmed'?amtNum:0});});
+    transactions.sort(function(a,b){return a.date.localeCompare(b.date);});
+    var totalPaid=transactions.reduce(function(s,t){return s+(t.status==='Paid'?t.amtNum:0);},0);
+    var totalDue=transactions.reduce(function(s,t){return s+(t.status!=='Paid'?t.amtNum:0);},0);
+    var balance=totalPaid-totalDue;
+    var payStatus=balance>=0?'✅ Good Standing':(balance<0?'🔴 Outstanding':'⚪ Pending');
+    var running=0;
+    return '<div style=\"margin-bottom:10px\">'+
+      '<div class=\"stats-row\" style=\"grid-template-columns:repeat(4,1fr);margin-bottom:10px\">'+
+        '<div class=\"stat-card\"><div class=\"label\">Total Paid</div><div style=\"font-size:13px;font-weight:700;color:#2e7d32;margin-top:2px\">₹'+totalPaid.toLocaleString('en-IN')+'</div></div>'+
+        '<div class=\"stat-card\"><div class=\"label\">Total Due</div><div style=\"font-size:13px;font-weight:700;color:#c62828;margin-top:2px\">₹'+totalDue.toLocaleString('en-IN')+'</div></div>'+
+        '<div class=\"stat-card\"><div class=\"label\">Balance</div><div style=\"font-size:13px;font-weight:700;color:'+(balance>=0?'#2e7d32':'#c62828')+';margin-top:2px\">₹'+Math.abs(balance).toLocaleString('en-IN')+'</div></div>'+
+        '<div class=\"stat-card\"><div class=\"label\">Payment Status</div><div style=\"font-size:11px;font-weight:600;margin-top:2px\">'+payStatus+'</div></div>'+
+      '</div>'+
+      '<div class=\"card\"><div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table style=\"font-size:10px\"><thead><tr><th>Date</th><th>Description</th><th class=\"num\">Amount</th><th>Status</th><th class=\"num\">Balance</th></tr></thead><tbody>'+
+      (transactions.length?transactions.map(function(t){running+=t.status==='Paid'?t.amtNum:0;return '<tr><td style=\"font-size:9px\">'+t.date+'</td><td>'+t.desc+'</td><td class=\"num\" style=\"font-weight:600;color:'+(t.status==='Paid'?'#2e7d32':'#c62828')+'\">'+t.amount+'</td><td><span class=\"badge-status '+(t.status==='Paid'||t.status==='Confirmed'?'badge-active':'badge-pending')+'\">'+t.status+'</span></td><td class=\"num\" style=\"font-weight:600\">₹'+running.toLocaleString('en-IN')+'</td></tr>';}).join(''):'<tr><td colspan=\"5\" style=\"text-align:center;color:#999;padding:12px\">No payment records found.</td></tr>')+
+      '</tbody></table></div></div></div></div>';
+  }
+  // Reminders tab
+  function renderRemindersTab(){
+    var reminders=(window.mockReminders||[]).filter(function(r){return r.entityId===e.id;});
+    var addBtn='<button class=\"action-btn primary\" onclick=\"var t=prompt(\\'Reminder title:\\');if(!t)return;var d=prompt(\\'Date (YYYY-MM-DD):\\',new Date().toISOString().split(\\'T\\')[0]);if(!d)return;var p=prompt(\\'Priority (High/Medium/Low):\\',\\'Medium\\')||\\'Medium\\';var a=prompt(\\'Assigned to:\\')||\\'—\\';var n=prompt(\\'Notes:\\')||\\'\\';mockReminders.push({id:\\'REM-\\'+String(mockReminders.length+1).padStart(3,\\'0\\'),entityId:\\''+e.id+'\\',title:t,date:d,status:\\'pending\\',priority:p,assignedTo:a,notes:n});DB.save(\\'reminders\\');openEntity(\\''+e.id+'\\',\\'reminders\\');showToast(\\'Reminder added\\',\\'success\\');" style=\"padding:3px 8px;font-size:10px;margin-bottom:6px\">+ New Reminder</button>';
+    var priorityColor={High:'#e53935',Medium:'#fb8c00',Low:'#43a047'};
+    return addBtn+'<div class=\"card\"><div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table style=\"font-size:10px\"><thead><tr><th>Title</th><th>Date</th><th>Priority</th><th>Status</th><th>Assigned To</th></tr></thead><tbody>'+(reminders.length?reminders.map(function(r){return '<tr><td style=\"font-weight:500\">'+r.title+'</td><td style=\"font-size:9px\">'+r.date+'</td><td><span style=\"display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+(priorityColor[r.priority]||'#888')+'\">'+r.priority+'</span></td><td><span style=\"display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;cursor:pointer;color:#fff;background:'+(r.status==='completed'?'#2e7d32':'#fb8c00')+'\" onclick=\"var idx=mockReminders.findIndex(function(x){return x.id===\\''+r.id+'\\'});if(idx>=0){mockReminders[idx].status=mockReminders[idx].status===\\'completed\\'?\\'pending\\':\\'completed\\';DB.save(\\'reminders\\');openEntity(\\''+e.id+'\\',\\'reminders\\')}\">'+(r.status==='completed'?'✔ Completed':'⏳ Pending')+'</span></td><td style=\"font-size:9px\">'+(r.assignedTo||'—')+'</td></tr>';}).join(''):'<tr><td colspan=\"5\" style=\"text-align:center;color:#999;padding:12px\">No reminders for this entity.</td></tr>')+'</tbody></table></div></div></div>';
+  }
+  // Vault tab
+  function renderVaultTab(){
+    var entries=(window.mockVault||[]).filter(function(v){return v.entityId===e.id;});
+    var addBtn='<button class=\"action-btn primary\" onclick=\"var n=prompt(\\'Entry name:\\');if(!n)return;var cat=prompt(\\'Category (ID Document/Financial/Agreement/Password):\\',\\'ID Document\\')||\\'ID Document\\';var val=prompt(\\'Value:\\');if(!val)return;mockVault.push({id:\\'VLT-\\'+String(mockVault.length+1).padStart(3,\\'0\\'),entityId:\\''+e.id+'\\',name:n,value:\\'ENCRYPTED::\\'+val+\\'::AES256\\',category:cat,created:new Date().toISOString().split(\\'T\\')[0]});DB.save(\\'vault\\');openEntity(\\''+e.id+'\\',\\'vault\\');showToast(\\'Entry added\\',\\'success\\');" style=\"padding:3px 8px;font-size:10px;margin-bottom:6px\">+ Add Entry</button>';
+    var catColor={'ID Document':'#1565c0','Financial':'#2e7d32','Agreement':'#e65100','Password':'#6a1b9a'};
+    if(!window._vaultReveal)window._vaultReveal={};
+    return addBtn+'<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:8px\">'+(entries.length?entries.map(function(v){var revealed=window._vaultReveal[v.id];return '<div style=\"padding:10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px\"><div style=\"font-size:11px;font-weight:600\">'+v.name+'</div><div style=\"font-size:8px;margin-top:2px\"><span style=\"display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(catColor[v.category]||'#888')+'\">'+v.category+'</span> <span style=\"color:#888;margin-left:4px\">'+v.created+'</span></div><div style=\"margin-top:6px;padding:6px 8px;background:#f5f5f5;border-radius:4px;font-family:monospace;font-size:10px;color:#333\">'+(revealed?v.value:'••••••••')+'</div><div style=\"margin-top:6px;display:flex;gap:4px\"><button class=\"action-btn\" style=\"padding:2px 8px;font-size:9px;cursor:pointer\" onclick=\"window._vaultReveal[\\''+v.id+'\\']=!window._vaultReveal[\\''+v.id+'\\'];openEntity(\\''+e.id+'\\',\\'vault\\')\">'+(revealed?'🔒 Hide':'👁 Show')+'</button><button class=\"action-btn\" style=\"padding:2px 8px;font-size:9px;cursor:pointer\" onclick=\"navigator.clipboard.writeText(\\''+v.value.replace(/'/g,\\\"\\\'\\")+'\\');showToast(\\'Copied\\',\\'success\\')\">📋 Copy</button></div></div>';}).join(''):'<div style=\"grid-column:1/-1;text-align:center;padding:18px;color:#999;font-size:11px\">No vault entries for this entity.</div>')+'</div>';
+  }
+  // Tasks tab
+  function renderTasksTab(){
+    var eName=e.name.toLowerCase();
+    var tasks=(window.mockTasks||[]).filter(function(t){return (t.entityId&&t.entityId===e.id)||(t.desc&&t.desc.toLowerCase().indexOf(eName)>=0)||(t.title&&t.title.toLowerCase().indexOf(eName)>=0);});
+    var addBtn='<button class=\"action-btn primary\" onclick=\"var t=prompt(\\'Task title:\\');if(!t)return;var p=prompt(\\'Priority (High/Medium/Low):\\',\\'Medium\\')||\\'Medium\\';var a=prompt(\\'Assignee:\\')||\\'—\\';var d=prompt(\\'Deadline (YYYY-MM-DD):\\',new Date().toISOString().split(\\'T\\')[0]);mockTasks.push({id:mockTasks.length+1,title:t,status:\\'To Do\\',priority:p,project:\\'—\\',assignee:a,deadline:d,desc:\\'\\',tags:[\\'CRM\\']});DB.save(\\'tasks\\');openEntity(\\''+e.id+'\\',\\'tasks\\');showToast(\\'Task added\\',\\'success\\');" style=\"padding:3px 8px;font-size:10px;margin-bottom:6px\">+ New Task</button>';
+    var priorityColor={High:'#e53935',Medium:'#fb8c00',Low:'#43a047'};
+    var statusColor={'To Do':'#888','In Progress':'#1565c0','Review':'#e65100','Done':'#2e7d32'};
+    return addBtn+'<div class=\"card\"><div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table style=\"font-size:10px\"><thead><tr><th>Title</th><th>Project</th><th>Priority</th><th>Status</th><th>Deadline</th></tr></thead><tbody>'+(tasks.length?tasks.map(function(t){return '<tr><td style=\"font-weight:500\">'+t.title+'</td><td style=\"font-size:9px\">'+(t.project||'—')+'</td><td><span style=\"display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+(priorityColor[t.priority]||'#888')+'\">'+t.priority+'</span></td><td><span style=\"display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+(statusColor[t.status]||'#888')+'\">'+t.status+'</span></td><td style=\"font-size:9px\">'+(t.deadline||'—')+'</td></tr>';}).join(''):'<tr><td colspan=\"5\" style=\"text-align:center;color:#999;padding:12px\">No related tasks found.</td></tr>')+'</tbody></table></div></div></div>';
+  }
+  // Switch on tab
+  var bodyContent=tabNav;
+  if(tab==='overview'){bodyContent+=overviewContent;}
+  else if(tab==='statement'){bodyContent+=renderStatementTab();}
+  else if(tab==='reminders'){bodyContent+=renderRemindersTab();}
+  else if(tab==='vault'){bodyContent+=renderVaultTab();}
+  else if(tab==='tasks'){bodyContent+=renderTasksTab();}
+  showDetailPanel(typeIcon+' '+e.name,
+    bodyContent,
+    '<div class=\"lead-footer\"><button class=\"lead-foot-btn primary\" onclick=\"crudEntity(mockEntities.find(function(x){return x.id===\\''+e.id+'\\'}));closeLeadPanel()\">✎ Edit</button><button class=\"lead-foot-btn\" onclick=\"closeLeadPanel()\">✕ Close</button></div>'
   );
 }
+
 function crudEntity(item){
   var n=!item;var c=n?{id:'ENT-'+(mockEntities.length+1).toString().padStart(3,'0'),type:'individual',name:'',phone:'',email:'',address:'',nid:'',roles:{customer:false,buyer:false,supplier:false,broker:false,employee:false,contractor:false,landowner:false,channelPartner:false},linkedIds:{},priority:'Normal',source:'',notes:'',created:new Date().toISOString().split('T')[0],totalPurchases:0,totalValue:'৳0'}:item;
   var roleChecks=['customer','buyer','supplier','broker','employee','contractor','landowner','channelPartner'].map(function(r){
@@ -5012,6 +5077,8 @@ var _sdDatasetDefs=[
   {g:'Sales & CRM',arr:'mockAgents',label:'Agents',icon:'🤝',mod:'sales_marketing',fields:['name','branch']},
   {g:'Sales & CRM',arr:'mockDues',label:'Dues',icon:'💰',mod:'dues_recovery',fields:['name','project']},
   {g:'Sales & CRM',arr:'mockDuesPromises',label:'Promises',icon:'📅',mod:'dues_recovery',fields:['name']},
+  {g:'Sales & CRM',arr:'mockReminders',label:'Reminders',icon:'🔔',mod:'contacts',fields:['title','priority','status']},
+  {g:'Sales & CRM',arr:'mockVault',label:'Vault',icon:'🔒',mod:'contacts',fields:['name','category']},
   // Group: Land & Projects
   {g:'Land & Projects',arr:'mockPlots',label:'Plots',icon:'🏞️',mod:'plots',fields:['id','type','status']},
   {g:'Land & Projects',arr:'mockProjects',label:'Projects',icon:'🏗️',mod:'projects',fields:['name','location','status']},
@@ -5067,7 +5134,7 @@ function doGlobalSearch(){
   if(!q){
     // Show recent searches
     if(_sdRecent.length){
-      c.innerHTML='<div class="sd-empty"><div class="sd-empty-icon">🔍</div>Type to search across all 28 modules</div>'+
+      c.innerHTML='<div class="sd-empty"><div class="sd-empty-icon">🔍</div>Type to search across all 30 modules</div>'+
         '<div class="sd-group-header">🕐 Recent searches</div>'+
         _sdRecent.map(function(r,i){
           var safe=r.replace(/'/g,"&apos;").replace(/"/g,"&quot;");
@@ -5077,9 +5144,9 @@ function doGlobalSearch(){
             '<span class="sd-mod" onclick="event.stopPropagation();sdRemoveRecent('+i+')" style="cursor:pointer">✕</span></div>';
         }).join('');
     }else{
-      c.innerHTML='<div class="sd-empty"><div class="sd-empty-icon">🔍</div>Type to search across<br><b>28 modules</b> · Leads, Projects, Contacts & more</div>';
+      c.innerHTML='<div class="sd-empty"><div class="sd-empty-icon">🔍</div>Type to search across<br><b>30 modules</b> · Leads, Projects, Contacts & more</div>';
     }
-    counter.textContent='All 28 modules';
+    counter.textContent='All 30 modules';
     _sdHL=-1;
     return;
   }
