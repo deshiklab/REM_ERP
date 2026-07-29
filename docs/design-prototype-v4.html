@@ -521,10 +521,20 @@ window.mockLandProposals = DB.init('land_proposals', [
   {id:'LP-015',name:'Tejgaon Industrial Area',area:'20 Bigha',price:500000000,priceF:'৳50 Cr',location:'Tejgaon',stage:'due_diligence',status:'Feasibility Study',risk:'Medium',roi:'36%',contact:'Tanvir Ahmed',notes:'Large industrial plot. Rented to 3 factories currently. Vacancy timeline 6 months.',date:'2024-10-18',owner:'Tejgaon Development Board',budget:'৳45 Cr',priority:'Medium',progress:30,nextAction:'Structural assessment of existing buildings'}
 ]);
 window.mockDesigns = DB.init('designs', [
-  {id:'DSG-001',name:'Muktodhara Master Layout',type:'Master Plan',version:'v2.3',status:'Approved',date:'2024-09-15'},
-  {id:'DSG-002',name:'Jolshiri Tower A Design',type:'Architecture',version:'v4.1',status:'In Review',date:'2024-10-20'},
-  {id:'DSG-003',name:'Landscape Design',type:'Landscape',version:'v1.0',status:'Draft',date:'2024-10-25'},
-  {id:'DSG-004',name:'Structural Design',type:'Structural',version:'v3.0',status:'Approved',date:'2024-08-10'}
+  {id:'DSG-001',name:'Muktodhara Master Layout',type:'Master Plan',typeIcon:'\uD83D\uDCCB',version:'v2.3',status:'Approved',project:'Muktodhara Green Park',designer:'Ar. Hasan Mahmud',description:'Complete master layout plan for Muktodhara Green Park residential project including plot division, road network, amenities, and utility corridors.',submitted:'2024-06-01',approved:'2024-09-15',versions:[{v:'v1.0',date:'2024-01-10',status:'Draft'},{v:'v2.0',date:'2024-04-15',status:'Approved'},{v:'v2.3',date:'2024-09-15',status:'Approved'}],downloadUrl:'#'},
+  {id:'DSG-002',name:'Jolshiri Tower A Architecture',type:'Architecture',typeIcon:'\uD83C\uDFD7\uFE0F',version:'v4.1',status:'In Review',project:'Jolshiri Abason',designer:'Ar. Farzana Rahman',description:'Architectural design for Tower A \u2014 12-story residential building with 3 BHK and 4 BHK units, rooftop garden, and basement parking.',submitted:'2024-08-20',approved:'',versions:[{v:'v1.0',date:'2024-08-20',status:'Draft'},{v:'v2.0',date:'2024-09-05',status:'In Review'},{v:'v3.0',date:'2024-09-25',status:'Rejected'},{v:'v4.1',date:'2024-10-20',status:'In Review'}],downloadUrl:'#'},
+  {id:'DSG-003',name:'Landscape Design',type:'Landscape',typeIcon:'\uD83C\uDF3F',version:'v1.0',status:'Draft',project:'Muktodhara Green Park',designer:'Ar. Shahin Sultana',description:'Landscape design including central park, children playground, walking paths, water features, and green buffer zones.',submitted:'2024-10-25',approved:'',versions:[{v:'v1.0',date:'2024-10-25',status:'Draft'}],downloadUrl:'#'},
+  {id:'DSG-004',name:'Structural Design Tower B',type:'Structural',typeIcon:'\uD83C\uDFD7\uFE0F',version:'v3.0',status:'Approved',project:'Jolshiri Abason',designer:'Engr. Md. Rofiqul Islam',description:'Structural design for Tower B \u2014 reinforced concrete frame with pile foundation, shear walls for seismic resistance, and flat slab system.',submitted:'2024-05-10',approved:'2024-08-10',versions:[{v:'v1.0',date:'2024-05-10',status:'Draft'},{v:'v2.0',date:'2024-06-20',status:'In Review'},{v:'v3.0',date:'2024-08-10',status:'Approved'}],downloadUrl:'#'},
+  {id:'DSG-005',name:'Electrical Layout Phase 1',type:'Electrical',typeIcon:'\u26A1',version:'v2.0',status:'Approved',project:'Muktodhara Green Park',designer:'Engr. Kamal Hossain',description:'Electrical distribution layout for Phase 1 \u2014 substation, feeder lines, street lighting, and individual plot meter connections.',submitted:'2024-07-15',approved:'2024-09-01',versions:[{v:'v1.0',date:'2024-07-15',status:'Draft'},{v:'v2.0',date:'2024-09-01',status:'Approved'}],downloadUrl:'#'},
+  {id:'DSG-006',name:'Plumbing & Sanitary Design',type:'Plumbing',typeIcon:'\uD83D\uDCA7',version:'v1.2',status:'In Review',project:'Jolshiri Abason',designer:'Engr. Nurul Amin',description:'Water supply, drainage, and sanitary plumbing design for Tower A and B \u2014 overhead tank sizing, sewage treatment plant, and rainwater harvesting.',submitted:'2024-09-10',approved:'',versions:[{v:'v1.0',date:'2024-09-10',status:'Draft'},{v:'v1.2',date:'2024-10-05',status:'In Review'}],downloadUrl:'#'},
+  {id:'DSG-007',name:'Interior Design Show Flat',type:'Interior',typeIcon:'\uD83D\uDDBC\uFE0F',version:'v2.0',status:'Approved',project:'Jolshiri Abason',designer:'Ar. Farzana Rahman',description:'Interior design for Tower A show flat \u2014 modern minimalist theme with premium finishes, modular kitchen, and wardrobes.',submitted:'2024-10-01',approved:'2024-10-28',versions:[{v:'v1.0',date:'2024-10-01',status:'Draft'},{v:'v2.0',date:'2024-10-28',status:'Approved'}],downloadUrl:'#'},
+  {id:'DSG-008',name:'Elevation Design Tower A',type:'Elevation',typeIcon:'\uD83C\uDFD8\uFE0F',version:'v3.1',status:'In Review',project:'Jolshiri Abason',designer:'Ar. Hasan Mahmud',description:'South and east elevation design for Tower A \u2014 modern facade with glass curtain walls, balcony railing patterns, and color scheme.',submitted:'2024-09-20',approved:'',versions:[{v:'v1.0',date:'2024-09-20',status:'Draft'},{v:'v2.0',date:'2024-10-05',status:'Rejected'},{v:'v3.1',date:'2024-10-25',status:'In Review'}],downloadUrl:'#'},
+  {id:'DSG-009',name:'Fire Safety Layout',type:'Safety',typeIcon:'\uD83D\uDD25',version:'v1.0',status:'Draft',project:'Jolshiri Abason',designer:'Engr. Kamal Hossain',description:'Fire detection, sprinkler system layout and evacuation plan for Tower B \u2014 BNBC compliant with fire-rated doors.',submitted:'2024-10-30',approved:'',versions:[{v:'v1.0',date:'2024-10-30',status:'Draft'}],downloadUrl:'#'},
+  {id:'DSG-010',name:'Site Plan Full Development',type:'Site Plan',typeIcon:'\uD83C\uDF0D',version:'v2.1',status:'Approved',project:'Muktodhara Green Park',designer:'Ar. Shahin Sultana',description:'Comprehensive site plan showing all plot boundaries, road network, utility corridors, green spaces, and common facilities.',submitted:'2024-04-01',approved:'2024-06-15',versions:[{v:'v1.0',date:'2024-04-01',status:'Draft'},{v:'v2.0',date:'2024-05-20',status:'In Review'},{v:'v2.1',date:'2024-06-15',status:'Approved'}],downloadUrl:'#'},
+  {id:'DSG-011',name:'MEP Design Tower A',type:'MEP',typeIcon:'\u2699\uFE0F',version:'v2.0',status:'Approved',project:'Jolshiri Abason',designer:'Engr. Nurul Amin',description:'Mechanical, electrical, and plumbing coordination design for Tower A \u2014 HVAC ducting, electrical risers, plumbing shafts.',submitted:'2024-07-01',approved:'2024-09-10',versions:[{v:'v1.0',date:'2024-07-01',status:'Draft'},{v:'v2.0',date:'2024-09-10',status:'Approved'}],downloadUrl:'#'},
+  {id:'DSG-012',name:'Boundary Wall & Gate Design',type:'Civil',typeIcon:'\uD83C\uDFED',version:'v1.0',status:'Rejected',project:'Muktodhara Green Park',designer:'Engr. Rofiqul Islam',description:'Perimeter boundary wall, guard house, and main gate design with decorative brickwork and security lighting.',submitted:'2024-10-10',approved:'',versions:[{v:'v1.0',date:'2024-10-10',status:'Draft'},{v:'v1.0',date:'2024-10-20',status:'Rejected'}],downloadUrl:'#'},
+  {id:'DSG-013',name:'Foundation Design Tower A',type:'Structural',typeIcon:'\uD83C\uDFD7\uFE0F',version:'v2.0',status:'Approved',project:'Jolshiri Abason',designer:'Engr. Md. Rofiqul Islam',description:'Pile foundation design for Tower A \u2014 1.2m diameter bored cast-in-situ piles, 35m depth.',submitted:'2024-06-15',approved:'2024-08-01',versions:[{v:'v1.0',date:'2024-06-15',status:'Draft'},{v:'v2.0',date:'2024-08-01',status:'Approved'}],downloadUrl:'#'},
+  {id:'DSG-014',name:'Road & Utility Corridor Plan',type:'Infrastructure',typeIcon:'\uD83D\uDEE4\uFE0F',version:'v1.0',status:'Draft',project:'Muktodhara Green Park',designer:'Ar. Hasan Mahmud',description:'Internal road network design with 6m/8m/10m wide roads, underground utility corridor for gas, water, electricity.',submitted:'2024-10-28',approved:'',versions:[{v:'v1.0',date:'2024-10-28',status:'Draft'}],downloadUrl:'#'}
 ]);
 window.mockContractors = DB.init('contractors', [
   {name:'M/S Rahman Enterprise',type:'Civil Works',contact:'+880****4555',rating:4,status:'Active'},
@@ -705,7 +715,7 @@ function switchModule(mod) {
     case 'equipment': renderSubTable(el, 'equipment', mockEquipment, ['Name','Model','Site','Status'], ['name','model','site','status'], 'Equipment'); break;
     case 'labor': renderSubTable(el, 'labor', mockLabor, ['Name','Count','Site','Status'], ['name','count','site','status'], 'Labor Management'); break;
     case 'qc': renderSubTable(el, 'qc', mockQC, ['Project','Item','Result','Inspector'], ['project','item','result','inspector'], 'QC & Inspection'); break;
-    case 'designs': renderSubTable(el, 'designs', mockDesigns, ['Name','Type','Version','Status'], ['name','type','version','status'], 'Design Management'); break;
+    case 'designs': renderDesigns(el); break;
     case 'finance': renderFinance(el); break;
     case 'stock': renderStock(el); break;
     case 'hr': renderHR(el); break;
@@ -1446,6 +1456,158 @@ function renderVariations(el){
     <div class="card"><div class="card-header"><h3>Variation Register</h3><button class="action-btn primary" onclick="showToast('New variation form coming soon','info')" style="padding:3px 7px;font-size:9px">+ New VO</button></div>
     <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>VO ID</th><th>Project</th><th>Title</th><th>Status</th><th>Cost Impact</th><th>Schedule</th><th>Originator</th></tr></thead><tbody>${pV.items.map(v=>`<tr><td style="font-weight:500">${v.id}</td><td>${v.project}</td><td>${v.title}</td><td><span class="badge-status ${v.status==='Approved'?'badge-active':v.status==='Pending Review'?'badge-pending':'badge-closed'}">${v.status}</span></td><td style="color:#c62828;font-weight:600">${v.impact}</td><td style="color:#e65100;font-size:10px">${v.schedule}</td><td style="font-size:10px">${v.originator}</td></tr>`).join('')}</tbody></table>${_pgHtml('variations',pV.total,pV.page,pV.totalPages,pV.perPage)}</div></div></div></div>`;
 }
+
+function renderDesigns(el){
+  const total=mockDesigns.length;
+  const apps=mockDesigns.filter(d=>d.status==='Approved').length;
+  const revs=mockDesigns.filter(d=>d.status==='In Review').length;
+  const drafts=mockDesigns.filter(d=>d.status==='Draft').length;
+  const rejs=mockDesigns.filter(d=>d.status==='Rejected').length;
+  const uniqDes=new Set(mockDesigns.map(d=>d.designer)).size;
+  const dsgTypes=mockDesigns.reduce(function(acc,d){if(acc.indexOf(d.type)<0)acc.push(d.type);return acc;},[]);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Design Management</div><div class="page-subtitle">'+total+' designs \\u00B7 '+apps+' approved \\u00B7 '+uniqDes+' designers</div>'+
+    '<div class="stats-row" style="margin-bottom:6px">'+[
+      ['Total Designs',total,'#1565c0'],
+      ['Approved',apps,'#2e7d32'],
+      ['In Review',revs,revs>0?'#e65100':'#999'],
+      ['Drafts',drafts,drafts>0?'#ff8f00':'#999'],
+      ['Rejected',rejs,rejs>0?'#c62828':'#999'],
+      ['Designers',uniqDes,'#7b1fa2']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+['All'].concat(dsgTypes).map(function(t){
+        var active=(t==='All'&&!window.dsType)||window.dsType===t;
+        return '<div class="tab '+(active?'active':'')+'" onclick="dsType='+(t==='All'?"''":'\\x27'+t+'\\x27')+';Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t+'</div>';
+      }).join('')+'</div>'+
+      '<input id="dsSearch" placeholder="Search designs..." oninput="_PG.ds={page:1,perPage:_pgPerPage};renderModule()" style="margin-left:8px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudDesign()" style="padding:3px 8px;font-size:10px">+ New Design</button>'+
+    '</div>'+
+    renderDesignCards()+
+  '</div>';
+}
+
+function renderDesignCards(){
+  var q=(document.getElementById('dsSearch')||{}).value||'';
+  var filtered=mockDesigns.filter(function(d){
+    if(window.dsType&&d.type!==window.dsType)return false;
+    if(q&&!d.name.toLowerCase().includes(q.toLowerCase())&&!d.project.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pD=_pg('ds',filtered);
+  var cards=pD.items.map(function(d){
+    var sc={'Draft':'#ff8f00','In Review':'#e65100','Approved':'#2e7d32','Rejected':'#c62828'}[d.status]||'#888';
+    var sbg={'Draft':'#fff8e1','In Review':'#fff3e0','Approved':'#e8f5e9','Rejected':'#ffebee'}[d.status]||'#f5f5f5';
+    return '<div class="ds-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px;cursor:pointer" onclick="openDesign(\\x27'+d.id+'\\x27)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(d.typeIcon||'\\uD83D\\uDCCB')+'</div>'+
+          '<div><div style="font-size:11px;font-weight:600;color:#222">'+d.name+'</div><div style="font-size:9px;color:#2F80ED">'+d.project+'</div></div>'+
+        '</div>'+
+        '<div style="display:flex;gap:3px">'+
+          '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+sbg+';color:'+sc+';font-weight:600">'+d.status+'</span>'+
+          '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f0f0f0;color:#666">'+d.version+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div style="font-size:9px;color:#888">'+d.designer+' \\u00B7 '+d.type+'</div>'+
+      '<div style="font-size:9px;color:#888;max-height:28px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+d.description.substring(0,80)+(d.description.length>80?'...':'')+'</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">'+
+        '<div style="font-size:8px;color:#999">Submitted: '+d.submitted+'</div>'+
+        '<div style="display:flex;gap:4px">'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudDesign(mockDesigns.find(function(x){return x.id===\\x27'+d.id+'\\x27}))">\\u270E Edit</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+d.name+'?\\x27)){var idx=mockDesigns.findIndex(function(x){return x.id===\\x27'+d.id+'\\x27});if(idx>=0)mockDesigns.splice(idx,1);DB.save(\\x27designs\\x27);showToast(\\x27Design deleted\\x27,\\x27info\\x27);renderModule()}">\\u2715 Delete</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">'+cards+'</div>'+
+    (filtered.length>_pgPerPage?_pgHtml('ds',pD.total,pD.page,pD.totalPages,pD.perPage):'');
+}
+
+function openDesign(id){
+  var d=mockDesigns.find(function(x){return x.id===id});
+  if(!d){showToast('Design not found','error');return;}
+  var sc={'Draft':'#ff8f00','In Review':'#e65100','Approved':'#2e7d32','Rejected':'#c62828'}[d.status]||'#888';
+  var sbg={'Draft':'#fff8e1','In Review':'#fff3e0','Approved':'#e8f5e9','Rejected':'#ffebee'}[d.status]||'#f5f5f5';
+  var versions=d.versions||[];
+  var verHtml=versions.length>0?versions.map(function(v,i){
+    var vsc={'Draft':'#ff8f00','In Review':'#e65100','Approved':'#2e7d32','Rejected':'#c62828'}[v.status]||'#888';
+    return '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #f0f0f0">'+
+      '<div style="width:20px;height:20px;border-radius:50%;background:'+vsc+';display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;flex-shrink:0;margin-top:1px">'+(i+1)+'</div>'+
+      '<div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:10px"><span style="font-weight:600">'+v.v+'</span><span style="color:#888;font-size:9px">'+v.date+'</span></div>'+
+      '<span style="display:inline-block;padding:0 4px;border-radius:2px;font-size:8px;background:'+(v.status==='Approved'?'#e8f5e9':v.status==='Draft'?'#fff8e1':v.status==='In Review'?'#fff3e0':'#ffebee')+';color:'+vsc+';margin-top:2px">'+v.status+'</span></div></div>';
+  }).join(''):'<div style="font-size:10px;color:#888;padding:8px;text-align:center">No version history</div>';
+  showDetailPanel('Design: '+d.name,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:40px;height:40px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">'+(d.typeIcon||'\\uD83D\\uDCCB')+'</div>'+
+      '<div><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+d.status+'</span><span style="margin-left:4px;font-size:9px;color:#888">'+d.version+'</span></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['Design ID',d.id],
+      ['Project',d.project],
+      ['Designer',d.designer],
+      ['Type',d.type],
+      ['Submitted',d.submitted||'---'],
+      ['Approved',d.approved||'---'],
+      ['Download','<span style="color:#2F80ED;cursor:pointer" onclick="showToast(\\x27Download started\\x27,\\x27info\\x27)">Download PDF \\u2193</span>']
+    ].map(function(r){
+      return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';
+    }).join('')+'</div>'+
+    '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;margin-bottom:4px">Description</div>'+
+    '<div style="font-size:10px;color:#555;line-height:1.4;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+d.description+'</div></div>'+
+    '<div><div style="font-size:11px;font-weight:600;margin-bottom:4px">Version History</div>'+
+    '<div style="padding:6px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+verHtml+'</div></div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudDesign(mockDesigns.find(function(x){return x.id===\\x27'+d.id+'\\x27}))">Edit Design</button>'+
+      '<button class="lead-foot-btn" onclick="showToast(\\x27Download started\\x27,\\x27info\\x27)">Download PDF</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+
+function crudDesign(item){
+  var n=!item;
+  var d=n?{id:'DSG-'+(String(mockDesigns.length+1).padStart(3,'0')),name:'',type:'Master Plan',typeIcon:'\\uD83D\\uDCCB',version:'v1.0',status:'Draft',project:'Muktodhara Green Park',designer:'',description:''}:item;
+  var dsgTypes=['Master Plan','Architecture','Structural','Landscape','Electrical','Plumbing','Interior','Elevation','Safety','Site Plan','MEP','Civil','Infrastructure'];
+  var projects=['Muktodhara Green Park','Jolshiri Abason'];
+  var statuses=['Draft','In Review','Approved','Rejected'];
+  openModal(n?'New Design':'Edit Design',
+    formRow(inputField('Design Name','df_name',d.name,'',true),selectField('Type','df_type',d.type,dsgTypes,true))+
+    formRow(inputField('Version','df_ver',d.version),selectField('Status','df_status',d.status,statuses,true))+
+    formRow(selectField('Project','df_project',d.project,projects,true),inputField('Designer','df_designer',d.designer,'',true))+
+    inputField('Description','df_desc',d.description,''),
+    function(){
+      var newd={
+        id:d.id,
+        name:g('df_name'),
+        type:g('df_type'),
+        typeIcon:{'Master Plan':'\\uD83D\\uDCCB','Architecture':'\\uD83C\\uDFD7\\uFE0F','Structural':'\\uD83C\\uDFD7\\uFE0F','Landscape':'\\uD83C\\uDF3F','Electrical':'\\u26A1','Plumbing':'\\uD83D\\uDCA7','Interior':'\\uD83D\\uDDBC\\uFE0F','Elevation':'\\uD83C\\uDFD8\\uFE0F','Safety':'\\uD83D\\uDD25','Site Plan':'\\uD83C\\uDF0D','MEP':'\\u2699\\uFE0F','Civil':'\\uD83C\\uDFED','Infrastructure':'\\uD83D\\uDEE4\\uFE0F'}[g('df_type')]||'\\uD83D\\uDCCB',
+        version:g('df_ver')||'v1.0',
+        status:g('df_status'),
+        project:g('df_project'),
+        designer:g('df_designer'),
+        description:g('df_desc'),
+        submitted:d.submitted||new Date().toISOString().split('T')[0],
+        approved:d.status==='Approved'?new Date().toISOString().split('T')[0]:d.approved||'',
+        versions:d.versions||[{v:d.version||'v1.0',date:new Date().toISOString().split('T')[0],status:d.status||'Draft'}],
+        downloadUrl:'#'
+      };
+      if(n){
+        mockDesigns.push(newd);
+        DB.save('designs');
+        showToast('Design created','success');
+      } else {
+        var idx=mockDesigns.findIndex(function(x){return x.id===d.id});
+        if(idx>=0){mockDesigns[idx]=newd;DB.save('designs');showToast('Design updated','info');}
+      }
+      renderModule();
+    }
+  );
+}
+
+// Ensure design tab variable is declared
+if(typeof dsType==='undefined') window.dsType='';
+
 
 function renderKB(el){
   const total=mockKnowledgeBase.length;
