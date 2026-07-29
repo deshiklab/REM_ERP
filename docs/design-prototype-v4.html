@@ -415,12 +415,18 @@ window.mockUsers = DB.init('users', [
   {name:'Sales Team A',email:'sales@mars.com',role:'Sales Agent',dept:'Sales',status:'Active',initials:'SA'}
 ]);
 window.mockContacts = DB.init('contacts', [
-  {id:1,name:'Tariqul Islam',role:'Client',phone:'+880****0000',email:'tariqul@example.com',company:'N/A'},
-  {id:2,name:'Shah Cement Industries',role:'Supplier',phone:'+880****2333',email:'sales@shahcement.com',company:'Shah Cement',rating:5},
-  {id:3,name:'M/S Rahman Enterprise',role:'Contractor',phone:'+880****4555',email:'contact@rahmanent.com',company:'Rahman Ent.',rating:4},
-  {id:4,name:'MD Hasanul Banna',role:'Staff',phone:'+880****9888',email:'banna@marsconstech.com',company:'Mars Constech'},
-  {id:5,name:'Iftekhar Ahmad',role:'Staff',phone:'+880****7666',email:'iftekhar@marsconstech.com',company:'Mars Constech'},
-  {id:6,name:'Dr. Rubina Ali',role:'Client',phone:'+141****0198',email:'rubina@example.com',company:'N/A'}
+  {id:1,name:'Tariqul Islam',type:'Buyer',designation:'Home Buyer',phone:'+880 1711 000000',email:'tariqul@example.com',company:'N/A',address:'House 12, Road 5, Banani, Dhaka',notes:'Interested in 5 katha plot at Muktodhara. Prefers south-facing.',priority:'Hot'},
+  {id:2,name:'Shah Cement Industries',type:'Supplier',designation:'Sales Manager',phone:'+880 1700 002333',email:'sales@shahcement.com',company:'Shah Cement',address:'Chattogram EPZ',notes:'Primary cement supplier for Muktodhara project. Credit terms: 30 days.',priority:'Normal'},
+  {id:3,name:'M/S Rahman Enterprise',type:'Contractor',designation:'Proprietor',phone:'+880 1711 004555',email:'contact@rahmanent.com',company:'Rahman Enterprise',address:'89 East Rajabazar, Farmgate, Dhaka',notes:'Earthwork and foundation contractor. Good rates for bulk excavation.',priority:'Normal'},
+  {id:4,name:'MD Hasanul Banna',type:'Staff',designation:'Project Director',phone:'+880 1711 009888',email:'banna@marsconstech.com',company:'Mars Constech Ltd.',address:'Head Office, Dhaka',notes:'Project director for all Mars projects.',priority:'Normal'},
+  {id:5,name:'Iftekhar Ahmad',type:'Staff',designation:'Sales Manager',phone:'+880 1711 007666',email:'iftekhar@marsconstech.com',company:'Mars Constech Ltd.',address:'Head Office, Dhaka',notes:'Senior sales lead handling CRM and bookings.',priority:'Normal'},
+  {id:6,name:'Dr. Rubina Ali',type:'Buyer',designation:'Consultant',phone:'+1 415 555 0198',email:'rubina@example.com',company:'Self Employed',address:'San Francisco, CA, USA',notes:'NRB buyer. Booked Jolshiri Apt 4B. Needs regular progress updates.',priority:'Hot'},
+  {id:7,name:'BRB Cables Ltd.',type:'Supplier',designation:'Regional Manager',phone:'+880 1812 003456',email:'orders@brbcables.com',company:'BRB Cables Ltd.',address:'Kawran Bazar, Dhaka',notes:'Electrical cable supplier. Call before order for price negotiation.',priority:'Normal'},
+  {id:8,name:'ABC Construction',type:'Contractor',designation:'Managing Director',phone:'+880 1915 007890',email:'info@abcconstruction.com',company:'ABC Construction',address:'Uttara, Dhaka',notes:'Highrise specialist. Submitted RFP for Jolshiri Tower B.',priority:'High'},
+  {id:9,name:'Housing & Building Research Institute',type:'Consultant',designation:'Chief Engineer',phone:'+880 1723 001234',email:'info@hbri.gov.bd',company:'HBRI',address:'Mirpur, Dhaka',notes:'Soil test and structural design consultant for all projects.',priority:'Normal'},
+  {id:10,name:'Bashundhara Group',type:'Broker',designation:'Senior Broker',phone:'+880 1622 005678',email:'broker@bashundhara.com',company:'Bashundhara Real Estate',address:'Bashundhara R/A, Dhaka',notes:'Land broker for Purbachal sector deals. Has leads on 10 bigha plot.',priority:'High'},
+  {id:11,name:'Dhaka Bank Ltd.',type:'Others',designation:'Relationship Manager',phone:'+880 1550 009012',email:'corporate@dhakabank.com',company:'Dhaka Bank Ltd.',address:'Motijheel, Dhaka',notes:'Construction loan relation manager. Limit: 50 Cr.',priority:'Normal'},
+  {id:12,name:'RAJUK',type:'Government',designation:'Assistant Engineer',phone:'+880 2834 5678',email:'info@rajuk.gov.bd',company:'RAJUK',address:'Sher-e-Bangla Nagar, Dhaka',notes:'Approval authority for Muktodhara layout plan.',priority:'Normal'}
 ]);
 window.mockDocuments = DB.init('documents', [
   {id:1,title:'Muktodhara CS Khatiyan',type:'CS Khatiyan',date:'2023-10-12',property:'Muktodhara',status:'Verified'},
@@ -558,7 +564,7 @@ function switchModule(mod) {
     case 'crm': renderCRM(el); break;
     case 'sales_marketing': renderSalesMarketing(el); break;
     case 'dues_recovery': renderDues(el); break;
-    case 'contacts': renderSubTable(el, 'contacts', mockContacts, ['Name','Role','Phone','Company'], ['name','role','phone','company'], 'Contact Book'); break;
+    case 'contacts': renderContacts(el); break;
     case 'land_mgmt': renderLandMgmt(el); break;
     case 'plots': renderPlots(el); break;
     case 'projects': renderProjects(el); break;
@@ -851,6 +857,66 @@ function renderNotificationsPage(el){
     </div></div></div>`;
 }
 
+function contactBadgeColor(v){return{Buyer:'#1565c0',Supplier:'#e65100',Contractor:'#2e7d32',Staff:'#2F80ED',Consultant:'#7b1fa2',Broker:'#00897b',Government:'#c62828',Others:'#555',Hot:'#c62828',High:'#e65100',Normal:'#888'}[v]||'#888'}
+function renderContacts(el){
+  var q=(document.getElementById('contactsSearch')||{}).value||'';
+  var ft=(document.getElementById('contactsFType')||{}).value||'';
+  var filtered=mockContacts.filter(function(c){
+    if(ft&&c.type!==ft)return false;
+    if(q&&!c.name.toLowerCase().includes(q.toLowerCase())&&!c.company.toLowerCase().includes(q.toLowerCase())&&!c.phone.includes(q))return false;
+    return true;
+  });
+  var pagC=_pg('contacts',filtered);
+  var tc={};mockContacts.forEach(function(c){tc[c.type]=(tc[c.type]||0)+1});
+  el.innerHTML='<div class="fade-in"><div class="page-title">Contact Book</div><div class="page-subtitle">'+mockContacts.length+' total · '+mockContacts.filter(function(c){return c.priority==='Hot'}).length+' hot · '+(tc.Buyer||0)+' buyers</div>'+
+    '<div class="stats-row" style="margin-bottom:8px">'+[
+      ['Total',mockContacts.length,''],
+      ['Buyer',tc.Buyer||0,'#1565c0'],
+      ['Supplier',tc.Supplier||0,'#e65100'],
+      ['Contractor',tc.Contractor||0,'#2e7d32'],
+      ['Staff',tc.Staff||0,'#2F80ED'],
+      ['Hot',mockContacts.filter(function(c){return c.priority==='Hot'}).length,'#c62828']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value"'+(s[2]?' style="color:'+s[2]+'"':'')+'>'+s[1]+'</div></div>'}).join('')+'</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<input id="contactsSearch" placeholder="Search contacts..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:180px"/>'+
+      '<select id="contactsFType" onchange="renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option>Buyer</option><option>Supplier</option><option>Contractor</option><option>Consultant</option><option>Broker</option><option>Staff</option><option>Government</option><option>Others</option></select>'+
+      '<div class="spacer"></div><button class="action-btn primary" onclick="crudContact()">+ Add Contact</button>'+
+    '</div>'+
+    '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name</th><th>Company</th><th>Type</th><th>Phone</th><th>Email</th><th>Priority</th><th></th></tr></thead><tbody>'+
+    pagC.items.map(function(c){return '<tr style="cursor:pointer" onclick="openContact('+c.id+')"><td style="padding:4px 4px 4px 10px;width:28px"><div style="width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+leadGetInitials(c.name)+'</div></td><td style="font-weight:500">'+c.name+'</td><td style="font-size:10px;color:#555">'+c.company+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:'+contactBadgeColor(c.type)+'">'+c.type+'</span></td><td style="font-size:10px">'+c.phone+'</td><td style="font-size:10px;color:#555">'+(c.email||'&mdash;')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:'+contactBadgeColor(c.priority)+'">'+c.priority+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudContact(mockContacts.find(function(x){return x.id==='+c.id+'}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteContact('+c.id+')">✕</span></td></tr>';}).join('')+
+    '</tbody></table>'+_pgHtml('contacts',pagC.total,pagC.page,pagC.totalPages,pagC.perPage)+'</div></div></div></div>';
+}
+function openContact(id){
+  var c=mockContacts.find(function(x){return x.id===id});if(!c)return;
+  var ti={Buyer:'&#128100;',Supplier:'&#127963;',Contractor:'&#128295;',Staff:'&#128100;',Consultant:'&#128203;',Broker:'&#129309;',Government:'&#127987;',Others:'&#128193;'};
+  showDetailPanel((ti[c.type]||'&#128193;')+' '+c.name,
+    '<div style="text-align:center;padding:18px"><div style="width:50px;height:50px;border-radius:50%;background:'+contactBadgeColor(c.type)+'22;color:'+contactBadgeColor(c.type)+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin:0 auto 10px">'+leadGetInitials(c.name)+'</div><div style="font-size:14px;font-weight:700">'+c.name+'</div><div style="font-size:11px;color:'+contactBadgeColor(c.type)+'">'+c.designation+'</div><div style="font-size:10px;color:#888;margin-top:2px">'+c.company+'</div></div>'+
+    '<div class="stats-row" style="grid-template-columns:1fr 1fr">'+
+      '<div class="stat-card"><div class="label">Phone</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(c.phone||'&mdash;')+'</div></div>'+
+      '<div class="stat-card"><div class="label">Email</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+(c.email||'&mdash;')+'</div></div>'+
+    '</div>'+
+    '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-top:6px">'+
+      '<div class="stat-card"><div class="label">Type</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:'+contactBadgeColor(c.type)+'">'+c.type+'</div></div>'+
+      '<div class="stat-card"><div class="label">Priority</div><div style="font-size:12px;font-weight:600;margin-top:2px;color:'+contactBadgeColor(c.priority)+'">'+c.priority+'</div></div>'+
+    '</div>'+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">&#128205; Address</h3><div style="font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+(c.address||'&mdash;')+'</div></div>'+
+    (c.notes?'<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">&#128221; Notes</h3><div style="font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+c.notes+'</div></div>':'')+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">&#128200; Activity</h3><div style="padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px">Activity log coming soon.</div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudContact(mockContacts.find(function(x){return x.id==='+c.id+'}),1);closeLeadPanel()">&#9998; Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+  );
+}
+function crudContact(item){
+  var n=!item;var c=n?{id:nextId(mockContacts),name:'',type:'Buyer',designation:'',phone:'',email:'',company:'',address:'',notes:'',priority:'Normal'}:item;
+  openModal(n?'New Contact':'Edit Contact',
+    formRow(inputField('Name','cf_name',c.name,'',true),selectField('Type','cf_type',c.type,['Buyer','Supplier','Contractor','Consultant','Broker','Staff','Government','Others'],true))+
+    formRow(inputField('Designation','cf_desig',c.designation),inputField('Phone','cf_phone',c.phone,'',true))+
+    formRow(inputField('Email','cf_email',c.email),inputField('Company','cf_comp',c.company))+
+    formRow(inputField('Address','cf_addr',c.address),selectField('Priority','cf_prio',c.priority,['Hot','High','Normal']))+
+    inputField('Notes','cf_notes',c.notes),
+    function(){var d={id:c.id,name:g('cf_name'),type:g('cf_type'),designation:g('cf_desig'),phone:g('cf_phone'),email:g('cf_email'),company:g('cf_comp'),address:g('cf_addr'),notes:g('cf_notes'),priority:g('cf_prio')};n?addItem(mockContacts,d,'contacts'):updateItem(mockContacts,c.id,d,'contacts')}
+  );
+}
+function deleteContact(id){if(!confirm('Delete this contact?'))return;var i=mockContacts.findIndex(function(x){return x.id===id});if(i>-1){mockContacts.splice(i,1);DB.save('contacts');closeLeadPanel();renderModule();showToast('Deleted','info')}}
 function renderSubTable(el, mod, items, headers, fields, title){
   el.innerHTML=`<div class="fade-in"><div class="page-title">${title}</div><div class="page-subtitle">${items.length} records</div>
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${items.map(i=>`<tr>${fields.map(f=>`<td>${i[f]||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div></div>`;
@@ -1111,7 +1177,7 @@ function globalSearch(){
   mockLeads.forEach(l=>{if(l.name.toLowerCase().includes(q))res.push({title:l.name,sub:l.property+' · '+l.status,color:'#e3f2fd',mod:'crm'})});
   mockPlots.forEach(p=>{if(p.id.toLowerCase().includes(q))res.push({title:p.id,sub:p.type+' · '+p.status,color:'#e8f5e9',mod:'plots'})});
   mockProjects.forEach(p=>{if(p.name.toLowerCase().includes(q))res.push({title:p.name,sub:p.location+' · '+p.status,color:'#fff3e0',mod:'projects'})});
-  mockContacts.forEach(c=>{if(c.name.toLowerCase().includes(q))res.push({title:c.name,sub:c.role+' · '+c.company,color:'#f3e5f5',mod:'contacts'})});
+  mockContacts.forEach(c=>{if(c.name.toLowerCase().includes(q))res.push({title:c.name,sub:c.type+' · '+c.company,color:'#f3e5f5',mod:'contacts'})});
   if(res.length===0)c.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:12px">No results</div>';
   else c.innerHTML=res.slice(0,20).map(function(r){return '<div onclick="switchGroup(\''+GROUPS_LOOKUP[r.mod]+'\');setTimeout(function(){switchModule(\''+r.mod+'\')},50)" style="padding:8px 10px;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;margin-bottom:3px;background:#f8f9fa"><div style="width:28px;height:28px;border-radius:6px;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">'+r.title[0]+'</div><div><div style="font-size:12px;font-weight:500">'+r.title+'</div><div style="font-size:10px;color:#888">'+r.sub+'</div></div></div>';}).join('');
 }
