@@ -302,8 +302,26 @@ const GROUPS = {
 };
 const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','collaboration','system'];
 
-// ═══ DATA ═══
-const mockLeads = [
+// ═══ DATA STORE (localStorage persistence) ═══
+const DB = {
+  _v: 1, _data: {},
+  init(key, defaultData) {
+    try {
+      const saved = localStorage.getItem('rem_'+key);
+      if (saved) { this._data[key] = JSON.parse(saved);
+        if (!Array.isArray(this._data[key]) && typeof this._data[key] !== 'object')
+          this._data[key] = JSON.parse(JSON.stringify(defaultData));
+      } else { this._data[key] = JSON.parse(JSON.stringify(defaultData)); }
+    } catch(e) { this._data[key] = JSON.parse(JSON.stringify(defaultData)); }
+    return this._data[key];
+  },
+  save(key) { try { localStorage.setItem('rem_'+key, JSON.stringify(this._data[key])); } catch(e) { console.warn('DB:', e); } },
+  saveAll() { Object.keys(this._data).forEach(k => this.save(k)); },
+  reset(key) { localStorage.removeItem('rem_'+key); delete this._data[key]; },
+  resetAll() { Object.keys(this._data).forEach(k => { localStorage.removeItem('rem_'+k); delete this._data[k]; }); }
+};
+
+window.mockLeads = DB.init('leads', [
   {id:1,name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Facebook',value:'৳1.5 Cr',lastContact:'2h ago',paymentStatus:'Up to Date',
    installments:[{date:'Oct 01, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Nov 01, 2024',amount:'৳5,00,000',status:'Due'}],
    documents:[{name:'NID_Front.jpg',type:'ID Document'},{name:'Application_Form.pdf',type:'Application'}],
@@ -316,42 +334,42 @@ const mockLeads = [
    installments:[{date:'Sep 20, 2024',amount:'৳10,00,000',status:'Paid'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'NID_Copy.pdf',type:'ID Document'}],activities:[{type:'Note',user:'System',date:'Sep 20, 2024',text:'Booking confirmed. Unit 9A allocated.'}]},
   {id:5,name:'Syed Rahman',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'NRB',source:'Facebook',value:'৳1.5 Cr',lastContact:'10m ago',paymentStatus:'Pending',installments:[],documents:[],activities:[]},
   {id:6,name:'Fatima Begum',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'Referral',value:'৳85 Lac',lastContact:'2d ago',paymentStatus:'Up to Date',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]}
-];
-const mockProjects = [
+]);
+window.mockProjects = DB.init('projects', [
   {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
   {id:'P-102',name:'Jolshiri Abason',type:'flat',location:'Rupganj, Narayanganj',status:'In Progress',progress:42,budget:'৳120.0 Cr',manager:'Iftekhar Ahmad',units:48,stats:{sold:36,reserved:2,available:10}},
   {id:'P-103',name:'Green Valley Estate',type:'land',location:'Savar, Dhaka',status:'Planning',progress:10,budget:'৳25.0 Cr',manager:'Tariqul Islam',plots:80,stats:{sold:20,reserved:10,available:50}},
   {id:'P-104',name:'Skyline Towers',type:'flat',location:'Bashundhara, Dhaka',status:'Near Completion',progress:85,budget:'৳80.0 Cr',manager:'Rubina Ali',units:36,stats:{sold:30,reserved:4,available:2}}
-];
-const mockPlots = [
+]);
+window.mockPlots = DB.init('plots', [
   {id:'M-101',type:'3 Katha',status:'sold',block:'A'},{id:'M-102',type:'3 Katha',status:'available',block:'A'},{id:'M-103',type:'5 Katha',status:'reserved',block:'A'},{id:'M-104',type:'5 Katha',status:'not_acquired',block:'A'},
   {id:'M-105',type:'3 Katha',status:'sold',block:'B'},{id:'M-106',type:'10 Katha',status:'available',block:'B'},{id:'M-107',type:'5 Katha',status:'not_acquired',block:'B'},{id:'M-108',type:'3 Katha',status:'available',block:'B'}
-];
-const mockBookings = [
+]);
+window.mockBookings = DB.init('bookings', [
   {id:'BKG-101',client:'Kamrul Hasan',date:'Sep 20, 2024',property:'Jolshiri Abason',unit:'Apt 9A',price:'৳1.8 Cr',advance:'৳10,00,000',status:'Confirmed',type:'Flat'},
   {id:'BKG-102',client:'Dr. Rubina Ali',date:'Oct 15, 2024',property:'Jolshiri Abason',unit:'Apt 4B',price:'৳2.2 Cr',advance:'৳2,00,000',status:'Pending Review',type:'Flat'},
   {id:'BKG-103',client:'Tariqul Islam',date:'Nov 1, 2024',property:'Muktodhara',unit:'Plot M-103',price:'৳46.0L',advance:'৳11,50,000',status:'Confirmed',type:'Plot'},
   {id:'BKG-104',client:'Fatima Begum',date:'Nov 5, 2024',property:'Green Valley',unit:'Plot G-22',price:'৳32.0L',advance:'৳8,00,000',status:'Pending Review',type:'Plot'}
-];
-const mockInventory = [
+]);
+window.mockInventory = DB.init('inventory', [
   {id:1,site:'Muktodhara',item:'BSRM Steel 500W',quantity:'45 Tons',status:'Adequate',reorder:20},
   {id:2,site:'Muktodhara',item:'Shah Cement',quantity:'150 Bags',status:'Critical',reorder:500},
   {id:3,site:'Jolshiri',item:'Bricks (Class A)',quantity:'12000 Pcs',status:'Warning',reorder:15000},
   {id:4,site:'Jolshiri',item:'Sylhet Sand',quantity:'800 CFT',status:'Adequate',reorder:300}
-];
-const mockPOs = [
+]);
+window.mockPOs = DB.init('pos', [
   {id:'PO-24-089',date:'Oct 25, 2024',vendor:'Shah Cement',site:'Muktodhara',items:'Cement (1000 Bags)',amount:'৳5,50,000',status:'Pending Approval'},
   {id:'PO-24-088',date:'Oct 23, 2024',vendor:'BSRM Steels Ltd',site:'Jolshiri',items:'500W Steel (20 Tons)',amount:'৳18,40,000',status:'Approved'},
   {id:'PO-24-085',date:'Oct 15, 2024',vendor:'Local Sand Suppliers',site:'Muktodhara',items:'Sylhet Sand (3000 CFT)',amount:'৳1,80,000',status:'Delivered'}
-];
-const mockTransactions = [
+]);
+window.mockTransactions = DB.init('transactions', [
   {id:'RCP-8839',date:'2024-10-26',desc:'Invoice #INV-24-001',client:'Tariqul Islam',project:'Muktodhara',type:'Inflow',status:'Received',amount:'+ ৳5,00,000'},
   {id:'PO-24-089',date:'2024-10-25',desc:'Invoice #INV-24-002',vendor:'Shah Cement',project:'Jolshiri',type:'Outflow',status:'Pending',amount:'- ৳5,50,000'},
   {id:'RCP-8838',date:'2024-10-24',desc:'Booking Money - Dr. Rubina',client:'Dr. Rubina Ali',project:'Jolshiri',type:'Inflow',status:'Processing',amount:'+ ৳2,00,000'},
   {id:'EXP-9912',date:'2024-10-23',desc:'Site Labor Wages',type:'Outflow',status:'Paid',amount:'- ৳3,45,000'},
   {id:'EXP-9911',date:'2024-10-20',desc:'Facebook Ads',type:'Outflow',status:'Paid',amount:'- ৳50,000'}
-];
-const mockTasks = [
+]);
+window.mockTasks = DB.init('tasks', [
   {id:1,title:'Call Tariqul Islam regarding Muktodhara plot',status:'To Do',priority:'High'},
   {id:2,title:'Review PO-24-089 for Shah Cement',status:'To Do',priority:'Medium'},
   {id:3,title:'Schedule site visit at Jolshiri',status:'In Progress',priority:'Medium'},
@@ -360,42 +378,42 @@ const mockTasks = [
   {id:6,title:'Update CRM lead statuses',status:'In Progress',priority:'Medium'},
   {id:7,title:'Review Q3 Financials',status:'Review',priority:'High'},
   {id:8,title:'Vendor payment (Shah Cement)',status:'Done',priority:'Low'}
-];
-const mockCampaigns = [
+]);
+window.mockCampaigns = DB.init('campaigns', [
   {id:'CAM-001',name:'Summer 2026 Promo',channel:'Social Media',budget:'Tk 1,50,000',leads:45,conversions:8,roi:'320%',status:'Active'},
   {id:'CAM-002',name:'Jolshiri Launch Event',channel:'On-site Event',budget:'Tk 3,00,000',leads:78,conversions:12,roi:'450%',status:'Completed'},
   {id:'CAM-003',name:'Billboard - Dhaka EPZ',channel:'Billboard',budget:'Tk 2,40,000',leads:22,conversions:3,roi:'180%',status:'Active'},
   {id:'CAM-004',name:'Referral Program Q3',channel:'Referral',budget:'Tk 50,000',leads:15,conversions:5,roi:'520%',status:'Active'},
   {id:'CAM-005',name:'Newspaper Ad - Prothom Alo',channel:'Print',budget:'Tk 1,80,000',leads:30,conversions:4,roi:'210%',status:'Completed'}
-];
-const mockDues = [
+]);
+window.mockDues = DB.init('dues', [
   {id:'BKG-008',customer:'Dr. Rubina Ali',project:'Jolshiri Abason',unit:'Apt 4B',totalPrice:'Tk 65,00,000',paid:'Tk 55,00,000',due:'Tk 10,00,000',dueDate:'2026-06-30',daysOverdue:28,status:'Overdue',bucket:'30 Days'},
   {id:'BKG-012',customer:'Md. Taher Uddin',project:'Muktodhara Green Park',unit:'Plot 17',totalPrice:'Tk 28,00,000',paid:'Tk 20,00,000',due:'Tk 8,00,000',dueDate:'2026-07-15',daysOverdue:13,status:'Overdue',bucket:'15 Days'},
   {id:'BKG-015',customer:'Engr. Salahuddin',project:'Muktodhara Green Park',unit:'Plot 22',totalPrice:'Tk 32,00,000',paid:'Tk 24,00,000',due:'Tk 8,00,000',dueDate:'2026-05-15',daysOverdue:74,status:'Critical',bucket:'60+ Days'},
   {id:'BKG-010',customer:'Mrs. Jahanara Begum',project:'Jolshiri Abason',unit:'Apt 3C',totalPrice:'Tk 58,00,000',paid:'Tk 48,00,000',due:'Tk 10,00,000',dueDate:'2026-08-15',daysOverdue:-18,status:'Upcoming',bucket:'Future'}
-];
-const mockEmployees = [
+]);
+window.mockEmployees = DB.init('employees', [
   {id:1,name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',status:'active'},
   {id:2,name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',status:'active'},
   {id:3,name:'Nazma Akhter',designation:'Accountant',dept:'Finance',phone:'01755557777',status:'active'},
   {id:4,name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',status:'active'},
   {id:5,name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',status:'active'},
   {id:6,name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',status:'active'}
-];
-const mockUsers = [
+]);
+window.mockUsers = DB.init('users', [
   {name:'MD Hasanul Banna',email:'banna@mars.com',role:'Super Admin',dept:'Management',status:'Active',initials:'HB'},
   {name:'Iftekhar Ahmad',email:'iftekhar@mars.com',role:'System Admin',dept:'IT',status:'Active',initials:'IA'},
   {name:'Sales Team A',email:'sales@mars.com',role:'Sales Agent',dept:'Sales',status:'Active',initials:'SA'}
-];
-const mockContacts = [
+]);
+window.mockContacts = DB.init('contacts', [
   {id:1,name:'Tariqul Islam',role:'Client',phone:'+880****0000',email:'tariqul@example.com',company:'N/A'},
   {id:2,name:'Shah Cement Industries',role:'Supplier',phone:'+880****2333',email:'sales@shahcement.com',company:'Shah Cement',rating:5},
   {id:3,name:'M/S Rahman Enterprise',role:'Contractor',phone:'+880****4555',email:'contact@rahmanent.com',company:'Rahman Ent.',rating:4},
   {id:4,name:'MD Hasanul Banna',role:'Staff',phone:'+880****9888',email:'banna@marsconstech.com',company:'Mars Constech'},
   {id:5,name:'Iftekhar Ahmad',role:'Staff',phone:'+880****7666',email:'iftekhar@marsconstech.com',company:'Mars Constech'},
   {id:6,name:'Dr. Rubina Ali',role:'Client',phone:'+141****0198',email:'rubina@example.com',company:'N/A'}
-];
-const mockDocuments = [
+]);
+window.mockDocuments = DB.init('documents', [
   {id:1,title:'Muktodhara CS Khatiyan',type:'CS Khatiyan',date:'2023-10-12',property:'Muktodhara',status:'Verified'},
   {id:2,title:'Jolshiri Land RS Parcha',type:'RS Khatiyan',date:'2023-11-05',property:'Jolshiri',status:'Verified'},
   {id:3,title:'Saf-Kabala Dolil',type:'Purchase Deed',date:'2024-10-15',property:'Jolshiri',status:'Pending Review'},
@@ -404,92 +422,92 @@ const mockDocuments = [
   {id:6,title:'Rajuk Approval',type:'Other Legal',date:'2023-09-20',property:'Jolshiri',status:'Verified'},
   {id:7,title:'Soil Test Report',type:'Site Plan',date:'2023-08-11',property:'Muktodhara',status:'Verified'},
   {id:8,title:'Vendor Agreement',type:'Agreement',date:'2023-11-22',property:'Corporate',status:'Pending Review'}
-];
-const mockLandProposals = [
+]);
+window.mockLandProposals = DB.init('land_proposals', [
   {id:'LP-001',name:'Purbachal Sector 4',area:'15 Bigha',price:'৳25 Cr',status:'Screening',stage:'identification',risk:'Low',roi:'35%'},
   {id:'LP-002',name:'Savar, Hemayetpur',area:'50 Bigha',price:'৳15 Cr',status:'Pending Visit',stage:'identification',risk:'Medium',roi:'40%'},
   {id:'LP-003',name:'Gazipur Industrial',area:'15 Bigha',price:'৳10 Cr',status:'Feasible',stage:'feasibility',risk:'Low',roi:'32%'},
   {id:'LP-004',name:'Purbachal Sector 5',area:'10 Bigha',price:'৳12 Cr',status:'In Progress',stage:'legal',risk:'High',roi:'46%'},
   {id:'LP-005',name:'Jolshiri Extension',area:'10 Bigha',price:'৳12 Cr',status:'Mutation Pending',stage:'acquisition',risk:'Low',roi:'55%'},
   {id:'LP-006',name:'Muktodhara Phase 2',area:'30 Bigha',price:'৳40 Cr',status:'Planning',stage:'planning',risk:'Medium',roi:'45%'}
-];
-const mockDesigns = [
+]);
+window.mockDesigns = DB.init('designs', [
   {id:'DSG-001',name:'Muktodhara Master Layout',type:'Master Plan',version:'v2.3',status:'Approved',date:'2024-09-15'},
   {id:'DSG-002',name:'Jolshiri Tower A Design',type:'Architecture',version:'v4.1',status:'In Review',date:'2024-10-20'},
   {id:'DSG-003',name:'Landscape Design',type:'Landscape',version:'v1.0',status:'Draft',date:'2024-10-25'},
   {id:'DSG-004',name:'Structural Design',type:'Structural',version:'v3.0',status:'Approved',date:'2024-08-10'}
-];
-const mockContractors = [
+]);
+window.mockContractors = DB.init('contractors', [
   {name:'M/S Rahman Enterprise',type:'Civil Works',contact:'+880****4555',rating:4,status:'Active'},
   {name:'Alam Construction',type:'Earth Filling',contact:'+880****2333',rating:5,status:'Active'},
   {name:'Hasan Electricals',type:'Electrical',contact:'+880****5666',rating:3,status:'Inactive'}
-];
-const mockEquipment = [
+]);
+window.mockEquipment = DB.init('equipment', [
   {name:'JCB Excavator',model:'JCB 3DX',site:'Muktodhara',status:'Operational',hours:'1240'},
   {name:'Concrete Mixer',model:'CM-500',site:'Jolshiri',status:'Under Repair',hours:'890'},
   {name:'Crane (20 Ton)',model:'Tadano 20T',site:'Jolshiri',status:'Operational',hours:'560'}
-];
-const mockLabor = [
+]);
+window.mockLabor = DB.init('labor', [
   {name:'Skilled Mason',count:12,site:'Muktodhara',rate:'৳800/day',status:'Present'},
   {name:'Rod Binder',count:8,site:'Jolshiri',rate:'৳700/day',status:'Present'},
   {name:'Carpenter',count:5,site:'Muktodhara',rate:'৳750/day',status:'Present'},
   {name:'General Labor',count:20,site:'Jolshiri',rate:'৳500/day',status:'Present'}
-];
-const mockQC = [
+]);
+window.mockQC = DB.init('qc', [
   {id:1,project:'Muktodhara',item:'Concrete Test',date:'2024-10-20',result:'Pass',inspector:'Tanvir Ahmed'},
   {id:2,project:'Jolshiri',item:'Steel Reinforcement',date:'2024-10-18',result:'Pass',inspector:'Rofiqul Islam'},
   {id:3,project:'Muktodhara',item:'Brick Quality Check',date:'2024-10-15',result:'Fail',inspector:'Tanvir Ahmed'}
-];
-const mockCompliance = [
+]);
+window.mockCompliance = DB.init('compliance', [
   {id:1,name:'RAJUK Approval',project:'Muktodhara',type:'Regulatory',due:'2025-01-15',status:'Compliant'},
   {id:2,name:'Environmental Clearance',project:'Jolshiri',type:'Environmental',due:'2025-03-20',status:'Pending'},
   {id:3,name:'Fire Safety Certificate',project:'Jolshiri',type:'Safety',due:'2025-02-01',status:'Compliant'}
-];
+]);
 // NEW MODULE DATA
-const mockBOQ = [
+window.mockBOQ = DB.init('boq', [
   {id:'BOQ-001',project:'Muktodhara Green Park',item:'Earthwork Excavation',qty:'2500',unit:'CFT',rate:'৳8',total:'৳20,000',status:'Approved'},
   {id:'BOQ-002',project:'Muktodhara Green Park',item:'Brickwork 5"',qty:'15000',unit:'Pcs',rate:'৳12',total:'৳1,80,000',status:'Approved'},
   {id:'BOQ-003',project:'Jolshiri Abason',item:'Reinforced Concrete (1:1.5:3)',qty:'400',unit:'CFT',rate:'৳5,500',total:'৳22,00,000',status:'Draft'},
   {id:'BOQ-004',project:'Jolshiri Abason',item:'Plastering (12mm)',qty:'8500',unit:'SFT',rate:'৳35',total:'৳2,97,500',status:'Pending Review'},
   {id:'BOQ-005',project:'Muktodhara Green Park',item:'Sanitary Fittings',qty:'20',unit:'Set',rate:'৳12,000',total:'৳2,40,000',status:'Draft'}
-];
-const mockVariations = [
+]);
+window.mockVariations = DB.init('variations', [
   {id:'VO-001',project:'Muktodhara Green Park',title:'Widening of Drainage',status:'Approved',impact:'+৳1,50,000',originator:'Site Engineer',date:'2024-09-15',schedule:'+7 days'},
   {id:'VO-002',project:'Jolshiri Abason',title:'Additional Parking Level',status:'Pending Review',impact:'+৳8,00,000',originator:'Architect',date:'2024-10-20',schedule:'+21 days'},
   {id:'VO-003',project:'Muktodhara Green Park',title:'Premium Flooring Upgrade',status:'Draft',impact:'+৳3,20,000',originator:'Client',date:'2024-10-25',schedule:'+14 days'}
-];
-const mockCustomers = [
+]);
+window.mockCustomers = DB.init('customers', [
   {id:'CUS-001',name:'Kamrul Hasan',property:'Jolshiri Abason - 9A',status:'Active',dues:'৳8,00,000',nextDue:'2024-12-15',payments:3},
   {id:'CUS-002',name:'Dr. Rubina Ali',property:'Jolshiri Abason - 4B',status:'Active',dues:'৳20,00,000',nextDue:'2024-11-30',payments:1},
   {id:'CUS-003',name:'Tariqul Islam',property:'Muktodhara - M-103',status:'Active',dues:'৳34,50,000',nextDue:'2025-01-15',payments:2},
   {id:'CUS-004',name:'Engr. Salahuddin',property:'Muktodhara - M-22',status:'Overdue',dues:'৳8,00,000',nextDue:'2024-10-15',payments:4}
-];
-const mockHandover = [
+]);
+window.mockHandover = DB.init('handover', [
   {id:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',status:'Inspection Pending',date:'2025-01-15',snags:3,'pos_date':'2024-12-20'},
   {id:'HND-002',unit:'Muktodhara - Plot M-103',customer:'Tariqul Islam',status:'Handover Scheduled',date:'2025-02-01',snags:0,'pos_date':'2025-01-25'},
   {id:'HND-003',unit:'Jolshiri - Apt 4B',customer:'Dr. Rubina Ali',status:'Construction Ongoing',date:'2025-06-30',snags:0,'pos_date':null}
-];
-const mockWorkspaceChat = [
+]);
+window.mockWorkspaceChat = DB.init('workspace_chat', [
   {sender:'MD Hasanul Banna',msg:'Invoice INV-24-001 has been approved.',time:'10:32 AM',role:'Director'},
   {sender:'Iftekhar Ahmad',msg:'Updated the CRM pipeline. 3 new leads added today.',time:'10:28 AM',role:'Admin'},
   {sender:'Rofiqul Islam',msg:'Jolshiri site progress — plastering 60% complete.',time:'9:45 AM',role:'Engineer'},
   {sender:'Shamim Reza',msg:'Client Dr. Rubina Ali confirmed site visit tomorrow at 11 AM.',time:'9:30 AM',role:'Sales'},
   {sender:'Nazma Akhter',msg:'PO-24-089 payment processed. Awaiting confirmation.',time:'9:15 AM',role:'Finance'}
-];
-const mockBIReports = [
+]);
+window.mockBIReports = DB.init('bi_reports', [
   {name:'Monthly Sales Overview',type:'Chart',period:'Oct 2024',updated:'2024-10-28',status:'Auto'},
   {name:'Lead Conversion Funnel',type:'Funnel',period:'Q3 2024',updated:'2024-10-01',status:'Auto'},
   {name:'Project Budget vs Actual',type:'Bar Chart',period:'Ongoing',updated:'2024-10-27',status:'Manual'},
   {name:'Cash Flow Forecast',type:'Line Chart',period:'Nov 2024',updated:'2024-10-25',status:'Auto'},
   {name:'Installment Collection Efficiency',type:'Gauge',period:'Oct 2024',updated:'2024-10-28',status:'Auto'}
-];
-const mockKnowledgeBase = [
+]);
+window.mockKnowledgeBase = DB.init('knowledge_base', [
   {title:'Land Acquisition Process',category:'Land Acquisition',updated:'2024-10-15',author:'Legal Team'},
   {title:'Sales Commission Policy v3',category:'Sales',updated:'2024-09-20',author:'HR'},
   {title:'VAT Calculation Guide',category:'Finance',updated:'2024-10-01',author:'Accounts'},
   {title:'QC Checklist — Concrete Works',category:'Procurement',updated:'2024-08-15',author:'Quality Team'},
   {title:'Employee Onboarding Checklist',category:'HR',updated:'2024-10-10',author:'HR'}
-];
+]);
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
 let landTab = 'identification', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list';
@@ -821,10 +839,10 @@ function renderTasks(el){
     <div class="card" style="margin-top:10px"><div class="card-header"><h3>Quick Add</h3></div><div class="card-body" style="display:flex;gap:6px"><input id="newTaskInput" placeholder="Task title..." style="flex:1;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px"/><select id="newTaskStatus" style="padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px"><option>To Do</option><option>In Progress</option><option>Review</option><option>Done</option></select><button class="action-btn primary" onclick="addTask()">Add</button></div></div>
     <div class="content-footer"><div class="breadcrumb">Tasks <span>›</span> Board</div></div></div>`;
 }
-function addTask(){const i=document.getElementById('newTaskInput'),s=document.getElementById('newTaskStatus');if(!i.value.trim())return;mockTasks.push({id:Date.now(),title:i.value.trim(),status:s.value,priority:'Medium'});i.value='';renderTasks();showToast('Task added!');}
+function addTask(){const i=document.getElementById('newTaskInput'),s=document.getElementById('newTaskStatus');if(!i.value.trim())return;mockTasks.push({id:Date.now(),title:i.value.trim(),status:s.value,priority:'Medium'});DB.save('tasks');i.value='';renderTasks();showToast('Task added!');}
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
 
-const mockSettingsActivity = [
+window.mockSettingsActivity = DB.init('settings_activity', [
   {user:'MD Hasanul Banna',action:'Updated Company Profile',module:'Settings',detail:'Changed company name',ip:'192.168.1.100',date:'2024-10-28 10:32 AM'},
   {user:'Iftekhar Ahmad',action:'Added User',module:'Settings',detail:'Created account for Shamim Reza',ip:'192.168.1.101',date:'2024-10-27 4:15 PM'},
   {user:'Sales Team A',action:'Exported Leads',module:'CRM',detail:'Exported 45 leads to CSV',ip:'192.168.1.102',date:'2024-10-27 2:30 PM'},
@@ -833,20 +851,20 @@ const mockSettingsActivity = [
   {user:'System',action:'Backup Completed',module:'System',detail:'Daily backup — 256MB',ip:'—',date:'2024-10-25 3:00 AM'},
   {user:'Nazma Akhter',action:'Deleted Transaction',module:'Finance',detail:'Deleted EXP-9909 (duplicate entry)',ip:'192.168.1.104',date:'2024-10-24 5:20 PM'},
   {user:'Iftekhar Ahmad',action:'Updated Integration',module:'Settings',detail:'Changed SMS provider to Twilio',ip:'192.168.1.101',date:'2024-10-23 2:00 PM'}
-];
-const mockBankAccounts = [
+]);
+window.mockBankAccounts = DB.init('bank_accounts', [
   {name:'BRAC Bank Ltd.',account:'BRAC-1234-5678',branch:'Gulshan',type:'Current',balance:'₹85,00,000'},
   {name:'Dutch Bangla Bank',account:'DBBL-9876-5432',branch:'Motijheel',type:'SME',balance:'₹1,20,00,000'},
   {name:'Cash in Hand',account:'CASH-001',branch:'—',type:'Petty Cash',balance:'₹2,50,000'}
-];
-const mockCOA = [
+]);
+window.mockCOA = DB.init('coa', [
   {code:'1-1000',name:'Cash & Bank',type:'Asset',balance:'₹2,07,50,000'},{code:'1-2000',name:'Accounts Receivable',type:'Asset',balance:'₹1,15,00,000'},
   {code:'1-3000',name:'Land Inventory',type:'Asset',balance:'₹4,50,00,000'},{code:'2-1000',name:'Customer Deposits',type:'Liability',balance:'₹3,20,00,000'},
   {code:'2-2000',name:'Accounts Payable',type:'Liability',balance:'₹85,00,000'},{code:'3-1000',name:'Revenue - Booking',type:'Income',balance:'₹7,80,00,000'},
   {code:'3-2000',name:'Revenue - Installments',type:'Income',balance:'₹2,30,00,000'},{code:'4-1000',name:'Construction Costs',type:'Expense',balance:'₹4,10,00,000'},
   {code:'4-2000',name:'Admin Expenses',type:'Expense',balance:'₹55,00,000'}
-];
-const mockMasterLists = {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']};
+]);
+window.mockMasterLists = DB.init('master_lists', {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
 const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Layout','Projects','Compliance','Bookings','Customer Portal','Handover','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Finance','Stock & Procurement','HR','Data Vault','Knowledge Base','Tasks','Workspace'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export'];
 const MOCK_PERMISSIONS = {
@@ -876,7 +894,7 @@ function renderSettings(el){
   }else if(settingsTab==='activity'){
     mc='<div class="card"><div class="card-header"><h3>Activity Log</h3><div style="display:flex;gap:4px"><input id="searchActLog" placeholder="Search log..." onkeyup="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/><button class="action-btn secondary" onclick="clearSearch()" style="padding:3px 7px;font-size:9px">Clear</button></div></div><div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:350px;overflow-y:auto"><table style="font-size:10px"><thead><tr style="position:sticky;top:0;background:#fff"><th>User</th><th>Action</th><th>Module</th><th>Detail</th><th>IP</th><th>Date/Time</th></tr></thead><tbody>'+(function(){var sq=document.getElementById("searchActLog");var q=sq?sq.value.toLowerCase():"";var fl=!q?mockSettingsActivity:mockSettingsActivity.filter(function(a){return a.user.toLowerCase().indexOf(q)>=0||a.action.toLowerCase().indexOf(q)>=0||a.module.toLowerCase().indexOf(q)>=0||a.detail.toLowerCase().indexOf(q)>=0;});var out="";for(var fi=0;fi<fl.length;fi++){var a=fl[fi];out+="<tr><td style=\"font-weight:500\">"+a.user+"</td><td>"+a.action+"</td><td><span class=\"badge-status badge-reserved\" style=\"font-size:8px\">"+a.module+"</span></td><td style=\"font-size:9px;color:#888;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+a.detail+"</td><td style=\"font-family:monospace;font-size:8px;color:#999\">"+a.ip+"</td><td style=\"font-size:9px;color:#888\">"+a.date+"</td></tr>";}return out;})()+'</tbody></table></div></div></div>';
   }
-  el.innerHTML='<div class="fade-in" style="display:flex;gap:8px;height:100%;flex:1"><div style="width:180px;min-width:180px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:6px;display:flex;flex-direction:column;overflow-y:auto"><div style="font-size:12px;font-weight:700;color:#222;margin-bottom:6px;padding:0 4px">Settings</div>'+sidebar+'<div style="margin-top:auto;padding-top:6px;border-top:1px solid #f0f0f0"><button onclick="showToast(\'All settings saved!\',\'success\')" style="width:100%;padding:5px 0;background:#2F80ED;color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button></div></div><div style="flex:1;overflow-y:auto">'+mc+'<div class="content-footer" style="margin-top:8px"><div class="breadcrumb">Settings <span>›</span> '+settingsTab+'</div></div></div></div>';
+  el.innerHTML='<div class="fade-in" style="display:flex;gap:8px;height:100%;flex:1"><div style="width:180px;min-width:180px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:6px;display:flex;flex-direction:column;overflow-y:auto"><div style="font-size:12px;font-weight:700;color:#222;margin-bottom:6px;padding:0 4px">Settings</div>'+sidebar+'<div style="margin-top:auto;padding-top:6px;border-top:1px solid #f0f0f0"><button onclick="showToast(\'All settings saved!\',\'success\')" style="width:100%;padding:5px 0;background:#2F80ED;color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button><button onclick="resetAllAppData()" style="width:100%;padding:4px 0;background:transparent;color:#c62828;border:1px solid #f5c6cb;border-radius:6px;font-size:9px;font-weight:500;cursor:pointer;margin-top:3px">↺ Reset All Data</button></div></div><div style="flex:1;overflow-y:auto">'+mc+'<div class="content-footer" style="margin-top:8px"><div class="breadcrumb">Settings <span>›</span> '+settingsTab+'</div></div></div></div>';
 }
 
 // ═══ TOAST, SEARCH, THEME, ROLE, ZOOM ═══
@@ -897,17 +915,17 @@ function toggleDarkMode(){
   var tb=document.getElementById('footerThemeBtn');if(tb)tb.textContent=is?'☀️':'🌙';
 }
 // ═══ SETTINGS HELPERS ═══
-function settingsAddUser(){openModal('Add User',inputField('Name','su_name')+inputField('Email','su_email')+selectField('Role','su_role','Sales Agent',['Super Admin','System Admin','Sales Agent','Site Engineer','Finance'])+selectField('Dept','su_dept','Sales',['Management','IT','Sales','Construction','Finance','HR']),function(){var n=g('su_name');if(!n)return;var inits=n.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();mockUsers.push({name:n,email:g('su_email'),role:g('su_role'),dept:g('su_dept'),status:'Active',initials:inits});showToast('User added!','success');renderModule()})}
-function settingsEditUser(u){openModal('Edit User',inputField('Name','eu_name',u.name)+inputField('Email','eu_email',u.email)+selectField('Role','eu_role',u.role,['Super Admin','System Admin','Sales Agent','Site Engineer','Finance'])+selectField('Dept','eu_dept',u.dept,['Management','IT','Sales','Construction','Finance','HR']),function(){u.name=g('eu_name');u.email=g('eu_email');u.role=g('eu_role');u.dept=g('eu_dept');showToast('User updated!','success');renderModule()})}
-function settingsToggleUser(u){u.status=u.status==='Active'?'Inactive':'Active';showToast(u.name+' '+u.status,'info');renderModule()}
-function settingsBulkAction(){var idx=prompt('Bulk User Action:\n1. Activate All\n2. Suspend All\n3. Cancel\n\nEnter 1, 2, or 3:');if(idx==='1'){mockUsers.forEach(function(u){u.status='Active'});showToast('All users activated','success');renderModule()}else if(idx==='2'){mockUsers.forEach(function(u){u.status='Inactive'});showToast('All users suspended','info');renderModule()}}
-function settingsAddAccount(){openModal('Add Account',inputField('Code','ac_code')+inputField('Name','ac_name')+selectField('Type','ac_type','Asset',['Asset','Liability','Income','Expense'])+inputField('Balance','ac_bal'),function(){mockCOA.push({code:g('ac_code')||'NEW',name:g('ac_name')||'New Account',type:g('ac_type'),balance:g('ac_bal')||'₹0'});showToast('Account added!','success');renderModule()})}
-function settingsAddBank(){openModal('Add Bank Account',inputField('Bank Name','bk_name')+inputField('Account No','bk_acct')+selectField('Type','bk_type','Current',['Current','SME','Savings','Petty Cash'])+inputField('Balance','bk_bal'),function(){mockBankAccounts.push({name:g('bk_name')||'New Bank',account:g('bk_acct')||'XXXX',branch:'—',type:g('bk_type'),balance:g('bk_bal')||'₹0'});showToast('Bank added!','success');renderModule()})}
+function settingsAddUser(){openModal('Add User',inputField('Name','su_name')+inputField('Email','su_email')+selectField('Role','su_role','Sales Agent',['Super Admin','System Admin','Sales Agent','Site Engineer','Finance'])+selectField('Dept','su_dept','Sales',['Management','IT','Sales','Construction','Finance','HR']),function(){var n=g('su_name');if(!n)return;var inits=n.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();mockUsers.push({name:n,email:g('su_email'),role:g('su_role'),dept:g('su_dept'),status:'Active',initials:inits});DB.save('users');showToast('User added!','success');renderModule()})}
+function settingsEditUser(u){openModal('Edit User',inputField('Name','eu_name',u.name)+inputField('Email','eu_email',u.email)+selectField('Role','eu_role',u.role,['Super Admin','System Admin','Sales Agent','Site Engineer','Finance'])+selectField('Dept','eu_dept',u.dept,['Management','IT','Sales','Construction','Finance','HR']),function(){u.name=g('eu_name');u.email=g('eu_email');u.role=g('eu_role');u.dept=g('eu_dept');DB.save('users');showToast('User updated!','success');renderModule()})}
+function settingsToggleUser(u){u.status=u.status==='Active'?'Inactive':'Active';DB.save('users');showToast(u.name+' '+u.status,'info');renderModule()}
+function settingsBulkAction(){var idx=prompt('Bulk User Action:\n1. Activate All\n2. Suspend All\n3. Cancel\n\nEnter 1, 2, or 3:');if(idx==='1'){mockUsers.forEach(function(u){u.status='Active'});DB.save('users');showToast('All users activated','success');renderModule()}else if(idx==='2'){mockUsers.forEach(function(u){u.status='Inactive'});DB.save('users');showToast('All users suspended','info');renderModule()}}
+function settingsAddAccount(){openModal('Add Account',inputField('Code','ac_code')+inputField('Name','ac_name')+selectField('Type','ac_type','Asset',['Asset','Liability','Income','Expense'])+inputField('Balance','ac_bal'),function(){mockCOA.push({code:g('ac_code')||'NEW',name:g('ac_name')||'New Account',type:g('ac_type'),balance:g('ac_bal')||'₹0'});DB.save('coa');showToast('Account added!','success');renderModule()})}
+function settingsAddBank(){openModal('Add Bank Account',inputField('Bank Name','bk_name')+inputField('Account No','bk_acct')+selectField('Type','bk_type','Current',['Current','SME','Savings','Petty Cash'])+inputField('Balance','bk_bal'),function(){mockBankAccounts.push({name:g('bk_name')||'New Bank',account:g('bk_acct')||'XXXX',branch:'—',type:g('bk_type'),balance:g('bk_bal')||'₹0'});DB.save('bank_accounts');showToast('Bank added!','success');renderModule()})}
 function settingsConfigure(name){openModal('Configure: '+name,'<p style="font-size:12px;color:#888;margin-bottom:10px">Configure '+name+' integration settings.</p><div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="apikey" placeholder="Enter API key..."/></div><div class="form-group"><label class="form-label">Webhook URL</label><input class="form-input" id="webhook" placeholder="https://..."/></div>',function(){showToast(name+' configuration saved!','success');closeModal()})}
 function settingsNewRule(){openModal('New Automation Rule',selectField('Trigger','nr_trigger','Lead Created',['Lead Created','Payment Received','Installment Due','Installment Overdue','Booking Converted','Stock Low'])+selectField('Channel','nr_channel','Email + SMS',['Email','SMS','Email + SMS'])+'<div class="form-group"><label class="form-label">Action</label><input class="form-input" id="nr_action" placeholder="e.g. Notify Sales Manager"/></div>',function(){showToast('Rule created!','success');renderModule()})}
 function settingsEditRule(){openModal('Edit Automation Rule',selectField('Status','er_status','Active',['Active','Paused']),function(){showToast('Rule updated!','success');closeModal()})}
-function settingsAddList(k){var v=prompt('Add new item to '+k+':');if(v&&v.trim()){if(!mockMasterLists[k])mockMasterLists[k]=[];mockMasterLists[k].push(v.trim());renderModule()}}
-function settingsRemoveList(k,i){if(!confirm('Remove "'+i+'" from '+k+'?'))return;if(mockMasterLists[k]){mockMasterLists[k]=mockMasterLists[k].filter(function(x){return x!==i});renderModule()}}
+function settingsAddList(k){var v=prompt('Add new item to '+k+':');if(v&&v.trim()){if(!mockMasterLists[k])mockMasterLists[k]=[];mockMasterLists[k].push(v.trim());DB.save('master_lists');renderModule()}}
+function settingsRemoveList(k,i){if(!confirm('Remove "'+i+'" from '+k+'?'))return;if(mockMasterLists[k]){mockMasterLists[k]=mockMasterLists[k].filter(function(x){return x!==i});DB.save('master_lists');renderModule()}}
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
 if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');
 let currentZoom=100;
@@ -1001,7 +1019,7 @@ function addLeadActivity(id){
   if(!l.activities)l.activities=[];
   const d=new Date();
   const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+', '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  l.activities.unshift({type,user:'You',date:dateStr,text:text.trim()});
+  l.activities.unshift({type,user:'You',date:dateStr,text:text.trim()});DB.save('leads');
   document.getElementById('leadActText').value='';
   openLeadPanel(id,'activities');
   showToast('Activity logged!');
@@ -1013,11 +1031,11 @@ function openAddLeadInstallment(id){
   const d=new Date();
   const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   if(!l.installments)l.installments=[];
-  l.installments.push({date:dateStr,amount:amt,status:'Due'});
+  l.installments.push({date:dateStr,amount:amt,status:'Due'});DB.save('leads');
   openLeadPanel(id,'installments');
   showToast('Installment added!');
 }
-function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.findIndex(x=>x.id===id);if(i>-1){mockLeads.splice(i,1);closeLeadPanel();renderModule();showToast('Deleted','info')}}
+function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.findIndex(x=>x.id===id);if(i>-1){mockLeads.splice(i,1);DB.save('leads');closeLeadPanel();renderModule();showToast('Deleted','info')}}
 function convertLeadToBooking(id){
   const l=mockLeads.find(x=>x.id===id);if(!l)return;
   if(!confirm('Convert '+l.name+' to booking?'))return;
@@ -1025,7 +1043,7 @@ function convertLeadToBooking(id){
   l.status='Booked';l.priority='Low';
   if(!l.activities)l.activities=[];
   l.activities.push({type:'Note',user:'System',date:'Just now',text:'Converted to booking.'});
-  closeLeadPanel();renderModule();showToast('Converted to booking!');
+  closeLeadPanel();DB.save('leads');DB.save('bookings');renderModule();showToast('Converted to booking!');
 }
 function globalSearch(){
   const q=document.getElementById('globalSearchInput').value.toLowerCase();
@@ -1053,16 +1071,16 @@ function g(id){const e=document.getElementById(id);return e?e.value:''}
 function inputField(l,id,v,p){return '<div class="form-group"><label class="form-label">'+l+'</label><input class="form-input" id="'+id+'" value="'+(v||'')+'" placeholder="'+(p||'')+'"/></div>'}
 function selectField(l,id,v,ops){return '<div class="form-group"><label class="form-label">'+l+'</label><select class="form-input" id="'+id+'">'+ops.map(function(o){return '<option value="'+o+'"'+(v===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'}
 function nextId(a){return Math.max(0,...a.map(function(i){return i.id||0}))+1}
-function addItem(a,i){a.push(i);showToast('Created');renderModule()}
-function updateItem(a,id,u){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);showToast('Updated','info');renderModule()}}
-function deleteItem(a,id,l){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);showToast('Deleted','info');renderModule()}}
-function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',inputField('Name','f_name',l.name)+inputField('Phone','f_phone',l.phone)+inputField('Email','f_email',l.email)+inputField('Property','f_prop',l.property)+selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'])+selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'])+selectField('Priority','f_priority',l.priority,['High','Medium','Low'])+inputField('Value','f_value',l.value),function(){const d={id:l.id,name:g('f_name'),phone:g('f_phone'),email:g('f_email'),property:g('f_prop'),source:g('f_source'),status:g('f_status'),priority:g('f_priority'),value:g('f_value'),type:l.type,lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d):updateItem(mockLeads,l.id,d)})}
-function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',inputField('Name','f_name',p.name)+inputField('Location','f_loc',p.location)+selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed'])+inputField('Budget','f_budget',p.budget)+inputField('Manager','f_mgr',p.manager)+selectField('Type','f_type',p.type,['land','flat'])+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d):updateItem(mockProjects,p.id,d)})}
-function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',inputField('Client','f_client',b.client)+inputField('Property','f_prop',b.property)+inputField('Unit','f_unit',b.unit)+inputField('Price','f_price',b.price)+inputField('Advance','f_adv',b.advance)+selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d)):updateItem(mockBookings,b.id,d)})}
-function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',inputField('Name','f_name',e.name)+inputField('Designation','f_desig',e.designation)+selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT'])+inputField('Phone','f_phone',e.phone),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d)):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}))})}
-function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',inputField('Name','f_item',i.item)+selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate'])+inputField('Quantity','f_qty',i.quantity)+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder','f_reorder',i.reorder),function(){const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d)):updateItem(mockInventory,i.id,d)})}
+function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');renderModule()}
+function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');renderModule()}}
+function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info');renderModule()}}
+function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',property:'',source:'Website',status:'New Inquiry',priority:'Medium',type:'Local',value:'',lastContact:'Just now',paymentStatus:'Pending'}:item;openModal(n?'New Lead':'Edit Lead',inputField('Name','f_name',l.name)+inputField('Phone','f_phone',l.phone)+inputField('Email','f_email',l.email)+inputField('Property','f_prop',l.property)+selectField('Source','f_source',l.source,['Website','Facebook','Referral','Walk-in','Agent'])+selectField('Status','f_status',l.status,['New Inquiry','Site Visit','Negotiation','Booked'])+selectField('Priority','f_priority',l.priority,['High','Medium','Low'])+inputField('Value','f_value',l.value),function(){const d={id:l.id,name:g('f_name'),phone:g('f_phone'),email:g('f_email'),property:g('f_prop'),source:g('f_source'),status:g('f_status'),priority:g('f_priority'),value:g('f_value'),type:l.type,lastContact:'Just now',paymentStatus:'Pending'};n?addItem(mockLeads,d,'leads'):updateItem(mockLeads,l.id,d,'leads')})}
+function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',inputField('Name','f_name',p.name)+inputField('Location','f_loc',p.location)+selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed'])+inputField('Budget','f_budget',p.budget)+inputField('Manager','f_mgr',p.manager)+selectField('Type','f_type',p.type,['land','flat'])+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')})}
+function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',inputField('Client','f_client',b.client)+inputField('Property','f_prop',b.property)+inputField('Unit','f_unit',b.unit)+inputField('Price','f_price',b.price)+inputField('Advance','f_adv',b.advance)+selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
+function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',inputField('Name','f_name',e.name)+inputField('Designation','f_desig',e.designation)+selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT'])+inputField('Phone','f_phone',e.phone),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees'):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}),'employees')})}
+function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',inputField('Name','f_item',i.item)+selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate'])+inputField('Quantity','f_qty',i.quantity)+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder','f_reorder',i.reorder),function(){const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
 function crudTransaction(){openModal('New Transaction','<div class="form-group"><label class="form-label">Description</label><input class="form-input" id="f_desc"/></div>'+selectField('Type','f_type','Inflow',['Inflow','Outflow'])+inputField('Amount','f_amt')+selectField('Status','f_stat','Received',['Received','Pending','Paid']),function(){addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:g('f_type'),amount:g('f_amt'),status:g('f_stat'),project:'—'})})}
-function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',inputField('Vendor','f_vendor',p.vendor)+inputField('Items','f_items',p.items)+inputField('Amount','f_amt',p.amount)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled']),function(){const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*100))},d)):updateItem(mockPOs,p.id,d)})}
+function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',inputField('Vendor','f_vendor',p.vendor)+inputField('Items','f_items',p.items)+inputField('Amount','f_amt',p.amount)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled']),function(){const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*100))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
 
 // ═══ DETAIL PANELS ═══
 function showDetailPanel(title, bodyHTML, footerHTML) {
@@ -1388,6 +1406,8 @@ var origRender=renderModule;
 renderModule=function(){origRender();setTimeout(function(){enhanceAllTables();},50);};
 var origSwitch=switchModule;
 switchModule=function(mod){currentModule=mod;origSwitch(mod);setTimeout(function(){enhanceAllTables();},50);};
+function resetAllAppData(){if(confirm("Reset ALL app data? This cannot be undone.")){localStorage.clear();location.reload()}}
 </script>
 </body>
 </html>
+
