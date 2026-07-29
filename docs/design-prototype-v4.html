@@ -370,15 +370,31 @@ window.mockBookings = DB.init('bookings', [
   {id:'BKG-104',client:'Fatima Begum',date:'Nov 5, 2024',property:'Green Valley',unit:'Plot G-22',price:'৳32.0L',advance:'৳8,00,000',status:'Pending Review',type:'Plot'}
 ]);
 window.mockInventory = DB.init('inventory', [
-  {id:1,site:'Muktodhara',item:'BSRM Steel 500W',quantity:'45 Tons',status:'Adequate',reorder:20},
-  {id:2,site:'Muktodhara',item:'Shah Cement',quantity:'150 Bags',status:'Critical',reorder:500},
-  {id:3,site:'Jolshiri',item:'Bricks (Class A)',quantity:'12000 Pcs',status:'Warning',reorder:15000},
-  {id:4,site:'Jolshiri',item:'Sylhet Sand',quantity:'800 CFT',status:'Adequate',reorder:300}
+  {id:1,site:'Muktodhara',item:'BSRM Steel 500W',category:'Construction Material',qty:45,unit:'Tons',price:410000,value:18450000,status:'Adequate',reorder:20,lastReceived:'Oct 23, 2024',supplier:'BSRM Steels Ltd.'},
+  {id:2,site:'Muktodhara',item:'Shah Cement',category:'Construction Material',qty:150,unit:'Bags',price:550,value:82500,status:'Critical',reorder:500,lastReceived:'Oct 25, 2024',supplier:'Shah Cement Ltd.'},
+  {id:3,site:'Jolshiri',item:'Bricks (Class A)',category:'Construction Material',qty:12000,unit:'Pcs',price:12,value:144000,status:'Warning',reorder:15000,lastReceived:'Oct 18, 2024',supplier:'Local Sand Suppliers'},
+  {id:4,site:'Jolshiri',item:'Sylhet Sand',category:'Construction Material',qty:800,unit:'CFT',price:60,value:48000,status:'Adequate',reorder:300,lastReceived:'Oct 15, 2024',supplier:'Local Sand Suppliers'},
+  {id:5,site:'Corporate',item:'Office Furniture',category:'Admin',qty:25,unit:'Sets',price:15000,value:375000,status:'Adequate',reorder:5,lastReceived:'Sep 10, 2024',supplier:'RFL Building Products'},
+  {id:6,site:'Muktodhara',item:'PVC Pipes 4 inch',category:'Plumbing',qty:200,unit:'Pcs',price:850,value:170000,status:'Adequate',reorder:50,lastReceived:'Oct 05, 2024',supplier:'RFL Building Products'},
+  {id:7,site:'Jolshiri',item:'Electrical Cable (6mm)',category:'Electrical',qty:500,unit:'Meters',price:120,value:60000,status:'Warning',reorder:400,lastReceived:'Sep 28, 2024',supplier:'Delta Electricals'},
+  {id:8,site:'Muktodhara',item:'Ceramic Tiles (2x2)',category:'Finishes',qty:350,unit:'Boxes',price:950,value:332500,status:'Adequate',reorder:100,lastReceived:'Oct 10, 2024',supplier:'RFL Building Products'},
+  {id:9,site:'Jolshiri',item:'Safety Helmets',category:'Safety',qty:45,unit:'Pcs',price:250,value:11250,status:'Critical',reorder:60,lastReceived:'Sep 20, 2024',supplier:'Delta Electricals'},
+  {id:10,site:'Muktodhara',item:'Paint (Asian 10L)',category:'Finishes',qty:60,unit:'Buckets',price:3200,value:192000,status:'Adequate',reorder:20,lastReceived:'Oct 08, 2024',supplier:'RFL Building Products'}
 ]);
 window.mockPOs = DB.init('pos', [
-  {id:'PO-24-089',date:'Oct 25, 2024',vendor:'Shah Cement',site:'Muktodhara',items:'Cement (1000 Bags)',amount:'৳5,50,000',status:'Pending Approval'},
-  {id:'PO-24-088',date:'Oct 23, 2024',vendor:'BSRM Steels Ltd',site:'Jolshiri',items:'500W Steel (20 Tons)',amount:'৳18,40,000',status:'Approved'},
-  {id:'PO-24-085',date:'Oct 15, 2024',vendor:'Local Sand Suppliers',site:'Muktodhara',items:'Sylhet Sand (3000 CFT)',amount:'৳1,80,000',status:'Delivered'}
+  {id:'PO-24-089',date:'Oct 25, 2024',vendor:'Shah Cement Ltd.',site:'Muktodhara',items:'Cement (1000 Bags)',amount:550000,fmt:'৳5,50,000',dueDate:'Nov 10, 2024',status:'Pending Approval',category:'Material',approvedBy:'—'},
+  {id:'PO-24-088',date:'Oct 23, 2024',vendor:'BSRM Steels Ltd.',site:'Jolshiri',items:'500W Steel (20 Tons)',amount:1840000,fmt:'৳18,40,000',dueDate:'Nov 05, 2024',status:'Approved',category:'Material',approvedBy:'MD Hasanul Banna'},
+  {id:'PO-24-087',date:'Oct 20, 2024',vendor:'RFL Building Products',site:'Muktodhara',items:'Ceramic Tiles (100 Boxes)',amount:95000,fmt:'৳95,000',dueDate:'Nov 15, 2024',status:'Approved',category:'Finishes',approvedBy:'Iftekhar Ahmad'},
+  {id:'PO-24-086',date:'Oct 18, 2024',vendor:'Delta Electricals',site:'Jolshiri',items:'Cable (1000m) + Switches',amount:165000,fmt:'৳1,65,000',dueDate:'Oct 30, 2024',status:'Delivered',category:'Electrical',approvedBy:'MD Hasanul Banna'},
+  {id:'PO-24-085',date:'Oct 15, 2024',vendor:'Local Sand Suppliers',site:'Muktodhara',items:'Sylhet Sand (3000 CFT)',amount:180000,fmt:'৳1,80,000',dueDate:'Oct 25, 2024',status:'Delivered',category:'Material',approvedBy:'Iftekhar Ahmad'}
+]);
+window.mockSuppliers = DB.init('suppliers', [
+  {id:'SUP-001',name:'Shah Cement Ltd.',contact:'Mr. Kabir Hossain',phone:'+880 1700 111111',email:'kabir@shahcement.com',address:'555 Tejgaon I/A, Dhaka',type:'Material',items:'Cement, Sand, Bricks',rating:4.5,status:'Active',lastOrder:'Oct 25, 2024',totalOrders:28},
+  {id:'SUP-002',name:'BSRM Steels Ltd.',contact:'Engr. Faruk Ahmed',phone:'+880 1700 222222',email:'faruk@bsrm.com',address:'42 Kakrail, Dhaka',type:'Material',items:'Steel, Rod, Rebar',rating:4.8,status:'Active',lastOrder:'Oct 23, 2024',totalOrders:45},
+  {id:'SUP-003',name:'Local Sand Suppliers',contact:'Md. Alam',phone:'+880 1700 333333',email:'alam@sand.com',address:'Rupganj, Narayanganj',type:'Material',items:'Sylhet Sand, Local Sand',rating:3.8,status:'Active',lastOrder:'Oct 15, 2024',totalOrders:62},
+  {id:'SUP-004',name:'RFL Building Products',contact:'Ms. Shirin Akter',phone:'+880 1700 444444',email:'shirin@rfl.com',address:'780 Tejgaon, Dhaka',type:'Finishes',items:'Sanitary, PVC, Tiles',rating:4.2,status:'Active',lastOrder:'Oct 10, 2024',totalOrders:15},
+  {id:'SUP-005',name:'Delta Electricals',contact:'Mr. Rajib Ghosh',phone:'+880 1700 555555',email:'rajib@delta.com',address:'12 Motijheel, Dhaka',type:'Electrical',items:'Cables, Switches, Panels',rating:4.0,status:'Active',lastOrder:'Sep 28, 2024',totalOrders:22},
+  {id:'SUP-006',name:'Anwar Cement',contact:'Mr. Anwar Hossain',phone:'+880 1700 666666',email:'anwar@cement.com',address:'Sonargaon, Narayanganj',type:'Material',items:'Cement',rating:3.5,status:'Inactive',lastOrder:'Aug 15, 2024',totalOrders:8}
 ]);
 window.mockTransactions = DB.init('transactions', [
   {id:'RCP-8839',date:'2024-10-26',desc:'Invoice #INV-24-001',client:'Tariqul Islam',project:'Muktodhara',type:'Inflow',category:'Booking',status:'Received',amount:500000,fmt:'+ \u09F35,00,000'},
@@ -1242,13 +1258,106 @@ function crudTaxEntry(){
 }
 
 function renderStock(el){
+  const invTotal=mockInventory.reduce((s,i)=>s+(i.value||0),0);
+  const critical=mockInventory.filter(i=>i.status==='Critical').length;
+  const warning=mockInventory.filter(i=>i.status==='Warning').length;
+  const activeSupp=mockSuppliers.filter(s=>s.status==='Active').length;
+
   const pI=_pg('inv',mockInventory);
   const pPO=_pg('po',mockPOs);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Stock & Procurement</div><div class="page-subtitle">Inventory and purchase orders</div>
-    <div class="toolbar" style="margin-bottom:6px"><button class="filter-btn ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';_PG['inv']={page:1,perPage:_pgPerPage};_PG['po']={page:1,perPage:_pgPerPage};renderModule()">Inventory</button><button class="filter-btn ${stockTab==='po'?'active':''}" onclick="stockTab='po';_PG['inv']={page:1,perPage:_pgPerPage};_PG['po']={page:1,perPage:_pgPerPage};renderModule()">Purchase Orders</button><div class="spacer"></div><button class="action-btn primary" onclick="stockTab==='inventory'?crudStockItem():crudPO()">+ New</button></div>
-    ${stockTab==='inventory'?`
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th>Quantity</th><th>Status</th><th>Reorder</th></tr></thead><tbody>${pI.items.map(i=>`<tr style="cursor:pointer" onclick="openStockItem(${i.id})"><td style="font-weight:500">${i.item}</td><td>${i.site}</td><td>${i.quantity}</td><td><span class="badge-status ${i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold'}">${i.status}</span></td><td>${i.reorder}</td></tr>`).join('')}</tbody></table>${_pgHtml('inv',pI.total,pI.page,pI.totalPages,pI.perPage)}</div></div></div>
-    `:`<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Vendor</th><th>Items</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${pPO.items.map(p=>`<tr style="cursor:pointer" onclick="openPO('${p.id}')"><td style="font-weight:500">${p.id}</td><td>${p.vendor}</td><td>${p.items}</td><td class="num">${p.amount}</td><td><span class="badge-status ${p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending'}">${p.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('po',pPO.total,pPO.page,pPO.totalPages,pPO.perPage)}</div></div></div>`}</div>`;
+  const pS=_pg('sup',mockSuppliers);
+
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Stock & Procurement</div><div class="page-subtitle">${mockInventory.length} items · \u09F3 ${invTotal.toLocaleString('en-IN')} total value · ${activeSupp} active suppliers</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <div class="tabs"><div class="tab ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';_PG={};renderModule()">Inventory</div><div class="tab ${stockTab==='po'?'active':''}" onclick="stockTab='po';_PG={};renderModule()">Purchase Orders</div><div class="tab ${stockTab==='suppliers'?'active':''}" onclick="stockTab='suppliers';_PG={};renderModule()">Suppliers</div></div>
+      ${stockTab==='inventory'?`<select id="invCatFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>${['Construction Material','Plumbing','Electrical','Finishes','Safety','Admin'].map(c=>'<option value="'+c+'"'+(g('invCatFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>
+        <select id="invSiteFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Sites</option>${['Muktodhara','Jolshiri','Corporate'].map(c=>'<option value="'+c+'"'+(g('invSiteFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>`:''}
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="crudStockItem()" style="padding:3px 8px;font-size:10px">+ New</button>
+    </div>
+    ${stockTab==='inventory'?renderStockInv(pI):
+      stockTab==='po'?renderStockPO(pPO):
+      stockTab==='suppliers'?renderStockSuppliers(pS):''}
+  </div>`;
+}
+
+function renderStockInv(pI){
+  const catFilter=(document.getElementById('invCatFilter')||{}).value||'';
+  const siteFilter=(document.getElementById('invSiteFilter')||{}).value||'';
+  var filtered=mockInventory.filter(function(i){
+    if(catFilter&&i.category!==catFilter)return false;
+    if(siteFilter&&i.site!==siteFilter)return false;
+    return true;
+  });
+  const pp=_pg('inv',filtered);
+  return `<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">${[
+    ['Total Items',filtered.length,'#1565c0'],
+    ['Total Value','\u09F3 '+filtered.reduce((s,i)=>s+(i.value||0),0).toLocaleString('en-IN'),'#2e7d32'],
+    ['Critical',filtered.filter(i=>i.status==='Critical').length,'#c62828'],
+    ['Warning',filtered.filter(i=>i.status==='Warning').length,'#e65100'],
+    ['Adequate',filtered.filter(i=>i.status==='Adequate').length,'#2e7d32']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Item</th><th>Category</th><th>Site</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Value</th><th>Status</th><th>Supplier</th><th>Last Received</th></tr></thead><tbody>${pp.items.map(i=>'<tr style="cursor:pointer" onclick="openStockItem('+i.id+')"><td style="font-weight:500">'+i.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+i.category+'</span></td><td>'+i.site+'</td><td class="num">'+i.qty+' '+i.unit+'</td><td class="num">\u09F3 '+i.price.toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600">\u09F3 '+i.value.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold')+'" style="font-size:8px">'+i.status+'</span></td><td style="font-size:9px;color:#555">'+i.supplier+'</td><td style="font-size:9px;color:#888">'+i.lastReceived+'</td></tr>').join('')}</tbody></table>${_pgHtml('inv_filtered',pp.total,pp.page,pp.totalPages,pp.perPage)}</div></div></div>`;
+}
+
+function renderStockPO(pPO){
+  return `<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">${[
+    ['Total POs',mockPOs.length,'#1565c0'],
+    ['Total Value','\u09F3 '+mockPOs.reduce((s,p)=>s+(p.amount||0),0).toLocaleString('en-IN'),'#2e7d32'],
+    ['Pending',mockPOs.filter(p=>p.status==='Pending Approval').length,'#e65100'],
+    ['Approved',mockPOs.filter(p=>p.status==='Approved').length,'#1565c0'],
+    ['Delivered',mockPOs.filter(p=>p.status==='Delivered').length,'#2e7d32']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>PO ID</th><th>Date</th><th>Vendor</th><th>Items</th><th>Category</th><th class="num">Amount</th><th>Due Date</th><th>Status</th><th>Approved By</th></tr></thead><tbody>${pPO.items.map(p=>'<tr style="cursor:pointer" onclick="openPO(\''+p.id+'\')"><td style="font-weight:500;font-family:monospace;font-size:9px">'+p.id+'</td><td style="font-size:9px;color:#888">'+p.date+'</td><td style="font-weight:500;font-size:10px">'+p.vendor+'</td><td>'+p.items+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+p.category+'</span></td><td class="num" style="font-weight:600">'+(p.fmt||'\u09F3 '+p.amount.toLocaleString('en-IN'))+'</td><td style="font-size:9px;color:'+(p.dueDate?'#555':'#ccc')+'">'+(p.dueDate||'\u2014')+'</td><td><span class="badge-status '+(p.status==='Approved'||p.status==='Delivered'?'badge-active':'badge-pending')+'">'+p.status+'</span></td><td style="font-size:9px;color:#555">'+(p.approvedBy||'\u2014')+'</td></tr>').join('')}</tbody></table>${_pgHtml('po',pPO.total,pPO.page,pPO.totalPages,pPO.perPage)}</div></div></div>`;
+}
+
+function renderStockSuppliers(pS){
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-bottom:8px">${mockSuppliers.sort((a,b)=>b.rating-a.rating).map(s=>{
+    return '<div class="card" style="cursor:pointer" onclick="openSupplier(\''+s.id+'\')"><div class="card-header"><h3>'+s.name+'</h3><span class="badge-status '+(s.status==='Active'?'badge-active':'badge-sold')+'" style="font-size:8px">'+s.status+'</span></div><div class="card-body" style="padding:8px 10px">'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px"><div><span style="color:#888">Contact:</span> '+s.contact+'</div><div><span style="color:#888">Phone:</span> '+s.phone+'</div><div><span style="color:#888">Type:</span> '+s.type+'</div><div><span style="color:#888">Items:</span> '+s.items+'</div><div><span style="color:#888">Orders:</span> '+s.totalOrders+'</div><div><span style="color:#888">Rating:</span> <span style="font-weight:600;color:'+(s.rating>=4.5?'#2e7d32':s.rating>=4?'#1565c0':'#e65100')+'">'+s.rating+' / 5.0</span></div></div>'+
+    '</div></div>';
+  }).join('')}</div>`;
+}
+
+function crudSupplier(item){
+  const n=!item;
+  const s=n?{id:null,name:'',contact:'',phone:'',email:'',address:'',type:'Material',items:'',rating:4,status:'Active',totalOrders:0}:item;
+  openModal(n?'New Supplier':'Edit Supplier',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Company Name','sup_name',s.name,'',true)+inputField('Contact Person','sup_contact',s.contact)+inputField('Phone','sup_phone',s.phone)+inputField('Email','sup_email',s.email)+inputField('Address','sup_addr',s.address)+selectField('Type','sup_type',s.type,['Material','Finishes','Electrical','Plumbing','Safety','Admin'])+inputField('Items Supplied','sup_items',s.items)+inputField('Rating (1-5)','sup_rating',s.rating,'number')+'</div>',
+    function(){
+      const d={
+        name:document.getElementById('sup_name').value,
+        contact:document.getElementById('sup_contact').value,
+        phone:document.getElementById('sup_phone').value,
+        email:document.getElementById('sup_email').value,
+        address:document.getElementById('sup_addr').value||'N/A',
+        type:document.getElementById('sup_type').value,
+        items:document.getElementById('sup_items').value,
+        rating:parseFloat(document.getElementById('sup_rating').value)||4,
+        status:'Active',
+        totalOrders:s.totalOrders||0,
+        lastOrder:'Just now'
+      };
+      n?addItem(mockSuppliers,Object.assign({id:'SUP-'+(100+Math.floor(Math.random()*900))},d),'suppliers'):
+        updateItem(mockSuppliers,s.id,Object.assign({},d),'suppliers');
+      showToast('Supplier '+(n?'added':'updated')+'!','success');renderModule();
+    }
+  );
+}
+
+function openSupplier(id){
+  const s=mockSuppliers.find(function(x){return x.id===id});if(!s)return;
+  showDetailPanel('Supplier: '+s.name,
+    '<div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">'+
+      [['Company',s.name],['Contact',s.contact],['Phone',s.phone],['Email',s.email],['Address',s.address],['Type',s.type],['Items',s.items],['Orders',s.totalOrders],['Rating',s.rating+' / 5.0'],['Status',s.status]].map(x=>'<div class="stat-card"><div class="label">'+x[0]+'</div><div style="font-size:12px;font-weight:600;margin-top:2px">'+x[1]+'</div></div>').join('')+
+    '</div>'+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Recent POs</h3>'+
+    (mockPOs.filter(p=>p.vendor===s.name).length>0?
+      mockPOs.filter(p=>p.vendor===s.name).slice(0,3).map(p=>'<div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid #f0f0f0"><span>'+p.id+' - '+p.items+'</span><span style="font-weight:600">'+(p.fmt||'\u09F3 '+p.amount.toLocaleString('en-IN'))+'</span></div>').join('')
+    :'<div style="font-size:10px;color:#888;text-align:center;padding:8px">No POs yet</div>')+
+    '</div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudSupplier(mockSuppliers.find(function(x){return x.id===\''+s.id+'\'}));closeLeadPanel()">\u270E Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+  );
 }
 
 function renderHR(el){
@@ -1582,9 +1691,9 @@ function crudLead(item){const n=!item;const l=n?{id:nextId(mockLeads),name:'',ph
 function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',formRow(inputField('Name','f_name',p.name,'',true),inputField('Location','f_loc',p.location,'',true))+formRow(selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed']),selectField('Type','f_type',p.type,['land','flat']))+formRow(inputField('Budget','f_budget',p.budget),inputField('Manager','f_mgr',p.manager))+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')})}
 function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',formRow(inputField('Client','f_client',b.client,'',true),inputField('Property','f_prop',b.property,'',true))+formRow(inputField('Unit','f_unit',b.unit),inputField('Price','f_price',b.price,'',true))+formRow(inputField('Advance','f_adv',b.advance),selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed'])),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
 function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',formRow(inputField('Name','f_name',e.name,'',true),inputField('Designation','f_desig',e.designation,'',true))+formRow(selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT']),inputField('Phone','f_phone',e.phone)),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees'):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}),'employees')})}
-function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',formRow(inputField('Name','f_item',i.item,'',true),selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate']))+formRow(inputField('Quantity','f_qty',i.quantity,'',true),selectField('Status','f_stat',i.status,['Adequate','Warning','Critical']))+inputField('Reorder','f_reorder',i.reorder),function(){const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
+function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',category:'Construction Material',qty:0,unit:'Pcs',price:0,value:0,status:'Adequate',reorder:0,supplier:'',lastReceived:'—'}:item;const cats=['Construction Material','Plumbing','Electrical','Finishes','Safety','Admin'];const sites=['Muktodhara','Jolshiri','Corporate'];const units=['Pcs','Bags','Tons','CFT','Boxes','Meters','Buckets','Sets'];openModal(n?'New Stock Item':'Edit Item','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Item Name','f_item',i.item,'',true)+selectField('Category','f_cat',i.category,cats)+selectField('Site','f_site',i.site,sites)+inputField('Quantity','f_qty',i.qty,'number',true)+selectField('Unit','f_unit',i.unit,units)+inputField('Unit Price','f_price',i.price,'number')+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder Level','f_reorder',i.reorder,'number')+inputField('Supplier','f_supplier',i.supplier)+inputField('Last Received','f_last',i.lastReceived)+'</div>',function(){const qty=parseInt(g('f_qty'))||0;const price=parseInt(g('f_price'))||0;const d={item:g('f_item'),category:g('f_cat'),site:g('f_site'),qty:qty,unit:g('f_unit'),price:price,value:qty*price,status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0,supplier:g('f_supplier'),lastReceived:g('f_last')||'—'};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
 function crudTransaction(){openModal('New Transaction','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Description','f_desc','','',true)+selectField('Type','f_type','Inflow',['Inflow','Outflow'],true)+inputField('Amount','f_amt','','',true)+selectField('Category','f_cat','Booking',['Booking','Installment','Materials','Labor','Marketing','Admin','Legal','Professional Fees','Utilities','Tax'])+selectField('Status','f_stat','Received',['Received','Pending','Paid'])+inputField('Project','f_proj','')+'</div>',function(){const amt=parseInt(g('f_amt'))||0;const type=g('f_type');addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:type,category:g('f_cat'),amount:amt,status:g('f_stat'),project:g('f_proj')||'—',fmt:(type==='Inflow'?'+ \u09F3':'— \u09F3')+amt.toLocaleString('en-IN')},'transactions')})}
-function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',formRow(inputField('Vendor','f_vendor',p.vendor,'',true),inputField('Items','f_items',p.items,'',true))+formRow(inputField('Amount','f_amt',p.amount,'',true),selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled'])),function(){const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*100))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
+function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:0,status:'Pending Approval',category:'Material',dueDate:'',approvedBy:'—'}:item;const cats=['Material','Finishes','Electrical','Plumbing','Safety'];openModal(n?'New PO':'Edit PO','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Vendor','f_vendor',p.vendor,'',true)+inputField('Items','f_items',p.items,'',true)+inputField('Amount (৳)','f_amt',p.amount,'number',true)+selectField('Category','f_cat',p.category,cats)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled'])+inputField('Due Date','f_due',p.dueDate)+'</div>',function(){const amt=parseInt(g('f_amt'))||0;const d={vendor:g('f_vendor'),items:g('f_items'),amount:amt,fmt:'৳'+amt.toLocaleString('en-IN'),category:g('f_cat'),status:g('f_stat'),dueDate:g('f_due')||'—',approvedBy:n?'—':p.approvedBy,site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*900))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
 
 // ═══ DETAIL PANELS ═══
 function showDetailPanel(title, bodyHTML, footerHTML) {
@@ -1623,18 +1732,17 @@ function openTransaction(id){
 }
 function openStockItem(id){
   const i=mockInventory.find(function(x){return x.id===id});if(!i)return;
-  const statusColor=i.status==='Adequate'?'#2e7d32':i.status==='Warning'?'#e65100':'#c62828';
-  showDetailPanel('Stock: '+i.item,
-    detailStatRow([['Item',i.item],['Site',i.site],['Quantity',i.quantity],['Status',i.status],['Reorder Level',i.reorder||'None']])+
-    '<div style="margin-top:12px"><div style="padding:10px;border-radius:6px;background:'+statusColor+'15;border:1px solid '+statusColor+'"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:600;color:'+statusColor+'">'+i.status+'</span><span style="font-size:10px;color:#666">'+(i.reorder>0?'Reorder at '+i.reorder:'No reorder point')+'</span></div><div style="margin-top:6px;height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+(i.status==='Adequate'?'75':i.status==='Warning'?'40':'15')+'%;background:'+statusColor+';border-radius:3px;transition:width .3s"></div></div></div></div>',
-    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudStockItem(mockInventory.find(function(x){return x.id==='+i.id+'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+  showDetailPanel(i.item,
+    detailStatRow([['Item',i.item],['Category',i.category],['Site',i.site],['Quantity',i.qty+' '+i.unit],['Unit Price','\u09F3 '+i.price.toLocaleString('en-IN')],['Total Value','\u09F3 '+i.value.toLocaleString('en-IN')],['Status',i.status],['Supplier',i.supplier||'—'],['Last Received',i.lastReceived]])+
+    '<div style="margin-top:12px"><div style="padding:10px;border-radius:6px;background:'+(i.status==='Adequate'?'#e8f5e9':i.status==='Warning'?'#fff3e0':'#ffebee')+';border:1px solid '+(i.status==='Adequate'?'#c8e6c9':i.status==='Warning'?'#ffe0b2':'#ffcdd2')+'"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:600;color:'+(i.status==='Adequate'?'#2e7d32':i.status==='Warning'?'#e65100':'#c62828')+'">'+i.status+'</span><span style="font-size:10px;color:#666">Reorder at '+i.reorder+'</span></div><div style="margin-top:6px;height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.min(100,i.qty/i.reorder*100)+'%;background:'+(i.status==='Adequate'?'#2e7d32':i.status==='Warning'?'#e65100':'#c62828')+';border-radius:3px;transition:width .3s"></div></div></div></div>',
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudStockItem(mockInventory.find(function(x){return x.id==='+i.id+'}));closeLeadPanel()">\u270E Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
 function openPO(id){
   const p=mockPOs.find(function(x){return x.id===id});if(!p)return;
   showDetailPanel('Purchase Order: '+p.id,
-    detailStatRow([['PO ID',p.id],['Date',p.date],['Vendor',p.vendor],['Items',p.items],['Amount',p.amount],['Site',p.site],['Status',p.status]]),
-    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudPO(mockPOs.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+    detailStatRow([['PO ID',p.id],['Date',p.date],['Vendor',p.vendor],['Items',p.items],['Amount',p.fmt||'\u09F3 '+p.amount.toLocaleString('en-IN')],['Category',p.category||'—'],['Due Date',p.dueDate||'—'],['Status',p.status],['Approved By',p.approvedBy||'—']]),
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudPO(mockPOs.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">\u270E Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
 function openEmployee(id){
