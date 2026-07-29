@@ -11,7 +11,20 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#333;overflow:hidden;height:100vh}
+    body{font-family:'Inter',sans-serif;background:var(--bg,#f8f9fa);color:var(--fg,#333);overflow:hidden;height:100vh}
+    :root{--bg:#f8f9fa;--fg:#333;--card-bg:#fff;--card-border:#e8e8e8;--sidebar-bg:#fff;--sidebar-border:#e8e8e8;--topbar-bg:#fff;--topbar-border:#e8e8e8;--hover-bg:#f0f4ff;--active-bg:#eef3ff;--primary:#2F80ED;--primary-hover:#2568c9;--success:#2e7d32;--danger:#c62828;--warning:#e65100;--muted:#888;--muted-bg:#f5f5f5;--table-header-bg:#fff;--table-border:#f0f0f0;--input-bg:#fff;--input-border:#e0e0e0;--tab-bg:#f5f5f5;--kanban-bg:#f8f9fa;--kanban-border:#e8e8e8;--footer-bg:#fff;--footer-border:#e8e8e8}
+    html.dark{--bg:#0b0c11;--fg:#e0e0e0;--card-bg:#1a2332;--card-border:#2a3a52;--sidebar-bg:#111827;--sidebar-border:#1e293b;--topbar-bg:#111827;--topbar-border:#1e293b;--hover-bg:#1a2a4a;--active-bg:#1a2a4a;--primary:#3b82f6;--primary-hover:#2563eb;--success:#4ade80;--danger:#f87171;--warning:#fb923c;--muted:#94a3b8;--muted-bg:#1e293b;--table-header-bg:#1a2332;--table-border:#2a3a52;--input-bg:#1e293b;--input-border:#334155;--tab-bg:#1e293b;--kanban-bg:#0f172a;--kanban-border:#1e293b;--footer-bg:#111827;--footer-border:#1e293b}
+    /* Theme: Midnight Blue */
+    html.theme-midnight{--bg:#0f172a;--fg:#e2e8f0;--card-bg:#1e293b;--card-border:#334155;--sidebar-bg:#0f172a;--sidebar-border:#1e293b;--topbar-bg:#0f172a;--topbar-border:#1e293b;--primary:#60a5fa;--primary-hover:#3b82f6;--success:#34d399;--danger:#f87171;--warning:#fb923c;--muted:#94a3b8;--muted-bg:#1e293b;--table-header-bg:#1e293b;--table-border:#334155;--input-bg:#1e293b;--input-border:#334155;--tab-bg:#1e293b;--kanban-bg:#0f172a;--kanban-border:#1e293b;--footer-bg:#0f172a;--footer-border:#1e293b;--hover-bg:#1e3a5f;--active-bg:#1e3a5f}
+    /* Theme: Forest Green */
+    html.theme-forest{--bg:#f0faf0;--fg:#1a3a1a;--card-bg:#fff;--card-border:#c8e6c9;--sidebar-bg:#e8f5e9;--sidebar-border:#c8e6c9;--topbar-bg:#fff;--topbar-border:#c8e6c9;--primary:#2e7d32;--primary-hover:#1b5e20;--success:#1b5e20;--danger:#c62828;--warning:#e65100;--muted:#558b2f;--muted-bg:#f1f8e9;--table-header-bg:#f1f8e9;--table-border:#c8e6c9;--input-bg:#fff;--input-border:#a5d6a7;--tab-bg:#e8f5e9;--kanban-bg:#f1f8e9;--kanban-border:#c8e6c9;--footer-bg:#fff;--footer-border:#c8e6c9;--hover-bg:#e8f5e9;--active-bg:#c8e6c9}
+    html.dark.theme-forest{--bg:#0d1f0d;--fg:#a5d6a7;--card-bg:#1a3a1a;--card-border:#2e5a2e;--sidebar-bg:#0d1f0d;--sidebar-border:#1a3a1a;--topbar-bg:#0d1f0d;--topbar-border:#1a3a1a;--primary:#66bb6a;--primary-hover:#4caf50;--success:#81c784;--danger:#ef5350;--warning:#ffa726;--muted:#689f63;--muted-bg:#1a3a1a;--table-header-bg:#1a3a1a;--table-border:#2e5a2e;--input-bg:#1a3a1a;--input-border:#2e5a2e;--tab-bg:#1a3a1a;--kanban-bg:#0d1f0d;--kanban-border:#1a3a1a;--footer-bg:#0d1f0d;--footer-border:#1a3a1a;--hover-bg:#1a3a1a;--active-bg:#2e5a2e}
+    /* Theme: Sunset */
+    html.theme-sunset{--bg:#fff5f0;--fg:#4a1a0a;--card-bg:#fff;--card-border:#ffccbc;--sidebar-bg:#fff3e0;--sidebar-border:#ffccbc;--topbar-bg:#fff;--topbar-border:#ffccbc;--primary:#e65100;--primary-hover:#bf360c;--success:#2e7d32;--danger:#c62828;--warning:#ff8f00;--muted:#bf6a4a;--muted-bg:#fff3e0;--table-header-bg:#fff3e0;--table-border:#ffccbc;--input-bg:#fff;--input-border:#ffab91;--tab-bg:#fff3e0;--kanban-bg:#fff5f0;--kanban-border:#ffccbc;--footer-bg:#fff;--footer-border:#ffccbc;--hover-bg:#fff3e0;--active-bg:#ffe0b2}
+    html.dark.theme-sunset{--bg:#1a0800;--fg:#ffab91;--card-bg:#2a1000;--card-border:#4a2000;--sidebar-bg:#1a0800;--sidebar-border:#2a1000;--topbar-bg:#1a0800;--topbar-border:#2a1000;--primary:#ff8a65;--primary-hover:#ff7043;--success:#81c784;--danger:#ef5350;--warning:#ffb74d;--muted:#a06a50;--muted-bg:#2a1000;--table-header-bg:#2a1000;--table-border:#4a2000;--input-bg:#2a1000;--input-border:#4a2000;--tab-bg:#2a1000;--kanban-bg:#1a0800;--kanban-border:#2a1000;--footer-bg:#1a0800;--footer-border:#2a1000;--hover-bg:#2a1000;--active-bg:#4a2000}
+    /* Theme: Ocean Blue */
+    html.theme-ocean{--bg:#e3f2fd;--fg:#0d47a1;--card-bg:#fff;--card-border:#bbdefb;--sidebar-bg:#e3f2fd;--sidebar-border:#bbdefb;--topbar-bg:#fff;--topbar-border:#bbdefb;--primary:#1565c0;--primary-hover:#0d47a1;--success:#00695c;--danger:#c62828;--warning:#e65100;--muted:#5c6bc0;--muted-bg:#e8eaf6;--table-header-bg:#e3f2fd;--table-border:#bbdefb;--input-bg:#fff;--input-border:#90caf9;--tab-bg:#e3f2fd;--kanban-bg:#e3f2fd;--kanban-border:#bbdefb;--footer-bg:#fff;--footer-border:#bbdefb;--hover-bg:#e3f2fd;--active-bg:#bbdefb}
+    html.dark.theme-ocean{--bg:#0a1628;--fg:#90caf9;--card-bg:#0d2137;--card-border:#1a3a5c;--sidebar-bg:#0a1628;--sidebar-border:#0d2137;--topbar-bg:#0a1628;--topbar-border:#0d2137;--primary:#42a5f5;--primary-hover:#1e88e5;--success:#4db6ac;--danger:#ef5350;--warning:#ffa726;--muted:#7c8fc0;--muted-bg:#0d2137;--table-header-bg:#0d2137;--table-border:#1a3a5c;--input-bg:#0d2137;--input-border:#1a3a5c;--tab-bg:#0d2137;--kanban-bg:#0a1628;--kanban-border:#0d2137;--footer-bg:#0a1628;--footer-border:#0d2137;--hover-bg:#0d2137;--active-bg:#1a3a5c}
     ::-webkit-scrollbar{width:5px;height:5px}
     ::-webkit-scrollbar-track{background:transparent}
     ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
@@ -130,7 +143,7 @@
     .toast.success{background:#2e7d32}
     .toast.error{background:#c62828}
     .toast.info{background:#1565c0}
-    html.dark{filter:invert(1) hue-rotate(180deg);background:#0b0c11}
+    /* Dark mode via CSS variables */
     html.dark img,html.dark canvas,html.dark svg,html.dark .sidebar-item[data-tip]:hover::after{filter:invert(1) hue-rotate(180deg)}
     .lead-panel{width:460px;max-width:95vw;background:#fff;height:100%;box-shadow:-4px 0 20px rgba(0,0,0,.1);display:flex;flex-direction:column;animation:slideIn .25s ease-out}
     .lead-header{background:#fff;border-bottom:1px solid #e8e8e8}
@@ -4213,7 +4226,7 @@ function crudBackup(item){
   );
 }
 function renderSettings(el){
-  const si=[{id:'users',label:'Users',icon:'👤',desc:'Manage users, roles & access'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'roles',label:'Roles & Permissions',icon:'🔐',desc:'Fine-grained permission matrix'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
+  const si=[{id:'users',label:'Users',icon:'👤',desc:'Manage users, roles & access'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'roles',label:'Roles & Permissions',icon:'🔐',desc:'Fine-grained permission matrix'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'theme',label:'Themes & Templates',icon:'🎨',desc:'Appearance, themes, dark/light'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
   const sidebar=si.map(s=>'<div onclick="settingsTab=\''+s.id+'\';renderModule()" style="padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;transition:all .15s;background:'+(settingsTab===s.id?'#eef3ff':'transparent')+';'+(settingsTab===s.id?'font-weight:600;color:#2F80ED':'color:#555')+'"><span style="font-size:14px">'+s.icon+'</span><div><div style="font-size:11px;font-weight:'+(settingsTab===s.id?'600':'500')+'">'+s.label+'</div><div style="font-size:9px;color:#888">'+s.desc+'</div></div></div>').join('');
   var mc='';
   if(settingsTab==='users'){
@@ -4232,6 +4245,53 @@ function renderSettings(el){
   }else if(settingsTab==='automation'){
     var autoData=[['Lead Created','Priority = High','Notify Sales Manager','Email + SMS','Active'],['Payment Received','Amount > ৳50,000','Send Receipt + Thank You','Email','Active'],['Installment Due','Due in 7 days','Send Reminder','SMS','Active'],['Installment Overdue','Overdue > 30 days','Escalate to Manager','Email + SMS','Active'],['Booking Converted','—','Send Welcome Packet','Email','Paused'],['Stock Low','Qty < Reorder','Notify Procurement','SMS','Active']];var pAuto=_pg('settings_auto',autoData);
     mc='<div class="card"><div class="card-header"><h3>Automation Rules</h3><button class="action-btn primary" onclick="settingsNewRule()" style="padding:3px 7px;font-size:9px">+ New Rule</button></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Trigger Event</th><th>Condition</th><th>Action</th><th>Channel</th><th>Status</th><th></th></tr></thead><tbody>'+pAuto.items.map(function(r){var e=r[0],c=r[1],a=r[2],ch=r[3],st=r[4];return '<tr><td style=\"font-weight:500\">'+e+'</td><td style=\"font-size:9px;color:#888\">'+c+'</td><td>'+a+'</td><td><span class=\"badge-status badge-reserved\" style=\"font-size:8px\">'+ch+'</span></td><td><span class=\"badge-status '+(st==='Active'?'badge-active':'badge-pending')+'\">'+st+'</span></td><td><span style=\"color:#2F80ED;cursor:pointer;font-size:10px\" onclick=\"settingsEditRule()\">✎</span></td></tr>';}).join('')+'</tbody></table>'+_pgHtml('settings_auto',pAuto.total,pAuto.page,pAuto.totalPages,pAuto.perPage)+'</div></div>'+'</tbody></table></div></div>';
+  }else if(settingsTab==='theme'){
+    const themes=[
+      {id:'default',name:'Default Light',dark:false,desc:'Clean white & blue',c:{bg:'#f8f9fa',card:'#fff',pri:'#2F80ED',sb:'#fff',fg:'#333'}},
+      {id:'default-dark',name:'Default Dark',dark:true,desc:'Dark mode standard',c:{bg:'#0b0c11',card:'#1a2332',pri:'#3b82f6',sb:'#111827',fg:'#e0e0e0'}},
+      {id:'midnight',name:'Midnight Blue',dark:true,desc:'Professional deep blue',c:{bg:'#0f172a',card:'#1e293b',pri:'#60a5fa',sb:'#0f172a',fg:'#e2e8f0'}},
+      {id:'forest',name:'Forest Green',dark:false,desc:'Natural eco green',c:{bg:'#f0faf0',card:'#fff',pri:'#2e7d32',sb:'#e8f5e9',fg:'#1a3a1a'}},
+      {id:'forest-dark',name:'Forest Dark',dark:true,desc:'Deep nocturnal green',c:{bg:'#0d1f0d',card:'#1a3a1a',pri:'#66bb6a',sb:'#0d1f0d',fg:'#a5d6a7'}},
+      {id:'sunset',name:'Sunset Orange',dark:false,desc:'Warm vibrant orange',c:{bg:'#fff5f0',card:'#fff',pri:'#e65100',sb:'#fff3e0',fg:'#4a1a0a'}},
+      {id:'sunset-dark',name:'Sunset Dark',dark:true,desc:'Warm amber darkness',c:{bg:'#1a0800',card:'#2a1000',pri:'#ff8a65',sb:'#1a0800',fg:'#ffab91'}},
+      {id:'ocean',name:'Ocean Blue',dark:false,desc:'Fresh aqua blue',c:{bg:'#e3f2fd',card:'#fff',pri:'#1565c0',sb:'#e3f2fd',fg:'#0d47a1'}},
+      {id:'ocean-dark',name:'Ocean Dark',dark:true,desc:'Deep sea immersive',c:{bg:'#0a1628',card:'#0d2137',pri:'#42a5f5',sb:'#0a1628',fg:'#90caf9'}},
+    ];
+    var curTheme=localStorage.getItem('rem_theme')||'default';
+    var curMode=localStorage.getItem('theme')||'light';
+    var activeTheme=themes.find(function(t){return t.id===curTheme})||themes[0];
+    mc='<div style="margin-bottom:8px"><div class="page-title">Theme Manager</div><div class="page-subtitle">'+themes.length+' themes · Current: '+activeTheme.name+'</div></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">'+
+      themes.map(function(t){
+        var isActive=(t.id===curTheme)&&((t.dark&&curMode==='dark')||(!t.dark&&curMode==='light'));
+        return '<div class="card" style="cursor:pointer;overflow:hidden;'+(isActive?'box-shadow:0 0 0 2px var(--primary,#2F80ED);border-color:var(--primary,#2F80ED)':'')+'" onclick="selectTheme(\''+t.id+'\','+t.dark+')">'+
+          '<div style="height:50px;display:flex;gap:0;overflow:hidden">'+
+            '<div style="width:40px;background:'+t.c.sb+';flex-shrink:0"></div>'+
+            '<div style="flex:1;background:'+t.c.bg+';padding:5px 7px">'+
+              '<div style="width:50%;height:4px;background:'+t.c.pri+';border-radius:2px;margin-bottom:3px"></div>'+
+              '<div style="width:80%;height:3px;background:'+t.c.fg+'30;border-radius:2px;margin-bottom:2px"></div>'+
+              '<div style="width:60%;height:3px;background:'+t.c.fg+'20;border-radius:2px"></div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="card-body" style="padding:5px 7px">'+
+            '<div style="display:flex;align-items:center;gap:5px;justify-content:space-between"><span style="font-size:11px;font-weight:600">'+t.name+'</span>'+
+            (t.dark?'<span style="font-size:7px;background:#1e293b;color:#94a3b8;padding:0 4px;border-radius:3px">DARK</span>':'<span style="font-size:7px;background:#eef3ff;color:#1565c0;padding:0 4px;border-radius:3px">LIGHT</span>')+
+            '</div>'+
+            '<div style="font-size:9px;color:var(--muted,#888);margin-top:1px">'+t.desc+'</div>'+
+            (isActive?'<div style="margin-top:3px;font-size:8px;color:var(--primary,#2F80ED);font-weight:600">● Active</div>':'<div style="margin-top:3px"><button class="action-btn primary" onclick="event.stopPropagation();selectTheme(\''+t.id+'\','+t.dark+')" style="padding:2px 8px;font-size:8px">Apply</button></div>')+
+          '</div></div>';
+      }).join('')+'</div>'+
+      '<div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+        '<div class="card"><div class="card-header"><h3>🌓 Dark/Light Toggle</h3></div><div class="card-body" style="padding:8px;display:flex;align-items:center;gap:10px">'+
+          '<span style="font-size:11px">Dark Mode:</span>'+
+          '<div class="toggle '+(curMode==='dark'?'on':'')+'" onclick="toggleDarkMode()"></div>'+
+          '<span style="font-size:10px;color:var(--muted,#888)">'+(curMode==='dark'?'Dark active':'Light active')+'</span>'+
+        '</div></div>'+
+        '<div class="card"><div class="card-header"><h3>⚙️ Default Theme</h3></div><div class="card-body" style="padding:8px;display:flex;flex-direction:column;gap:5px">'+
+          '<div style="display:flex;align-items:center;justify-content:space-between;font-size:10px"><span>Set as default</span><button class="action-btn primary" onclick="setDefaultTheme()" style="padding:2px 8px;font-size:9px">Save Default</button></div>'+
+          '<div style="display:flex;align-items:center;justify-content:space-between;font-size:10px"><span>Reset to original</span><button class="action-btn secondary" onclick="resetTheme()" style="padding:2px 8px;font-size:9px">Reset</button></div>'+
+        '</div></div>'+
+      '</div>';
   }else if(settingsTab==='activity'){
     mc='<div class="card"><div class="card-header"><h3>Activity Log</h3><div style="display:flex;gap:4px"><input id="searchActLog" placeholder="Search log..." onkeyup="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/><button class="action-btn secondary" onclick="clearSearch()" style="padding:3px 7px;font-size:9px">Clear</button></div></div><div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:350px;overflow-y:auto"><table style="font-size:10px"><thead><tr style="position:sticky;top:0;background:#fff"><th>User</th><th>Action</th><th>Module</th><th>Detail</th><th>IP</th><th>Date/Time</th></tr></thead><tbody>'+(function(){var sq=document.getElementById("searchActLog");var q=sq?sq.value.toLowerCase():"";var fl=!q?mockSettingsActivity:mockSettingsActivity.filter(function(a){return a.user.toLowerCase().indexOf(q)>=0||a.action.toLowerCase().indexOf(q)>=0||a.module.toLowerCase().indexOf(q)>=0||a.detail.toLowerCase().indexOf(q)>=0;});var pAct=_pg('settings_activity',fl);var out="";for(var fi=0;fi<pAct.items.length;fi++){var a=pAct.items[fi];out+="<tr><td style=\"font-weight:500\">"+a.user+"</td><td>"+a.action+"</td><td><span class=\"badge-status badge-reserved\" style=\"font-size:8px\">"+a.module+"</span></td><td style=\"font-size:9px;color:#888;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+a.detail+"</td><td style=\"font-family:monospace;font-size:8px;color:#999\">"+a.ip+"</td><td style=\"font-size:9px;color:#888\">"+a.date+"</td></tr>";}out+=_pgHtml('settings_activity',pAct.total,pAct.page,pAct.totalPages,pAct.perPage);return out;})()+'</tbody></table></div></div></div>';
   }
@@ -4626,9 +4686,33 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'&&document.getElementById('quickAddDropdown').classList.contains('active'))closeQuickAdd();
 });
 function toggleDarkMode(){
-  const is=document.documentElement.classList.toggle('dark');
+  var is=document.documentElement.classList.toggle('dark');
   localStorage.setItem('theme',is?'dark':'light');
   var tb=document.getElementById('footerThemeBtn');if(tb)tb.textContent=is?'☀️':'🌙';
+  if(settingsTab==='theme')renderModule();
+}
+function selectTheme(tid,isDark){
+  var mode=isDark!==undefined?(isDark?'dark':'light'):localStorage.getItem('theme')||'light';
+  document.documentElement.className='';
+  var baseTheme=tid.replace('-dark','').replace('-light','');
+  if(baseTheme!=='default')document.documentElement.classList.add('theme-'+baseTheme);
+  if(mode==='dark')document.documentElement.classList.add('dark');
+  localStorage.setItem('rem_theme',tid);
+  localStorage.setItem('theme',mode);
+  var tb=document.getElementById('footerThemeBtn');if(tb)tb.textContent=mode==='dark'?'☀️':'🌙';
+  if(settingsTab==='theme')renderModule();
+  else showToast('Theme: '+(tid||'default'),'success');
+}
+function resetTheme(){localStorage.removeItem('rem_theme');localStorage.removeItem('theme');selectTheme('default',false);}
+function setDefaultTheme(){var t=localStorage.getItem('rem_theme')||'default';var m=localStorage.getItem('theme')||'light';selectTheme(t,m==='dark');showToast('Theme saved as default','success');}
+function initTheme(){
+  var theme=localStorage.getItem('rem_theme')||'default';
+  var mode=localStorage.getItem('theme')||'light';
+  var tb=document.getElementById('footerThemeBtn');if(tb)tb.textContent=mode==='dark'?'☀️':'🌙';
+  var baseTheme=theme.replace('-dark','').replace('-light','');
+  document.documentElement.className='';
+  if(baseTheme!=='default')document.documentElement.classList.add('theme-'+baseTheme);
+  if(mode==='dark')document.documentElement.classList.add('dark');
 }
 // ═══ SETTINGS HELPERS ═══
 function settingsAddUser(){openModal('Add User',inputField('Name','su_name')+inputField('Email','su_email')+selectField('Role','su_role','Sales Agent',['Super Admin','System Admin','Sales Agent','Site Engineer','Finance'])+selectField('Dept','su_dept','Sales',['Management','IT','Sales','Construction','Finance','HR']),function(){var n=g('su_name');if(!n)return;var inits=n.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();mockUsers.push({name:n,email:g('su_email'),role:g('su_role'),dept:g('su_dept'),status:'Active',initials:inits});DB.save('users');showToast('User added!','success');renderModule()})}
@@ -4643,7 +4727,7 @@ function settingsEditRule(){openModal('Edit Automation Rule',selectField('Status
 function settingsAddList(k){var v=prompt('Add new item to '+k+':');if(v&&v.trim()){if(!mockMasterLists[k])mockMasterLists[k]=[];mockMasterLists[k].push(v.trim());DB.save('master_lists');renderModule()}}
 function settingsRemoveList(k,i){if(!confirm('Remove "'+i+'" from '+k+'?'))return;if(mockMasterLists[k]){mockMasterLists[k]=mockMasterLists[k].filter(function(x){return x!==i});DB.save('master_lists');renderModule()}}
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
-if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');
+initTheme();
 var savedRole=localStorage.getItem('rem_role');
 if(savedRole&&['Super Admin','Sales Agent','Site Engineer','Finance'].indexOf(savedRole)>=0){
   currentRole=savedRole;
