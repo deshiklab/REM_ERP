@@ -816,9 +816,37 @@ window.mockSupportTickets = DB.init('supportTickets', [
   {id:'TKT-008',customerId:'CUS-011',customerName:'Shafiqul Alam',subject:'Dues clarification',category:'Billing',priority:'Medium',status:'Open',date:'2026-01-14',assignedTo:'Nazma Akhter',description:'Confused about outstanding amount vs payment schedule'}
 ]);
 window.mockHandover = DB.init('handover', [
-  {id:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',status:'Inspection Pending',date:'2025-01-15',snags:3,'pos_date':'2024-12-20'},
-  {id:'HND-002',unit:'Muktodhara - Plot M-103',customer:'Tariqul Islam',status:'Handover Scheduled',date:'2025-02-01',snags:0,'pos_date':'2025-01-25'},
-  {id:'HND-003',unit:'Jolshiri - Apt 4B',customer:'Dr. Rubina Ali',status:'Construction Ongoing',date:'2025-06-30',snags:0,'pos_date':null}
+  {id:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',project:'Jolshiri',type:'Apartment',status:'Inspection Pending',date:'2025-01-15',snags:3,posDate:'2024-12-20',totalValue:4500000,paidAmount:4100000,remarks:'Pending final inspection',assignedTo:'Tanvir Ahmed'},
+  {id:'HND-002',unit:'Muktodhara - Plot M-103',customer:'Tariqul Islam',project:'Muktodhara',type:'Plot',status:'Handover Scheduled',date:'2025-02-01',snags:0,posDate:'2025-01-25',totalValue:8000000,paidAmount:7200000,remarks:'All paperwork ready',assignedTo:'Shahidul Islam'},
+  {id:'HND-003',unit:'Jolshiri - Apt 4B',customer:'Dr. Rubina Ali',project:'Jolshiri',type:'Apartment',status:'Construction Ongoing',date:'2025-06-30',snags:0,posDate:'',totalValue:5500000,paidAmount:2400000,remarks:'Expected completion June 2025',assignedTo:'Rofiqul Islam'},
+  {id:'HND-004',unit:'Jolshiri - Apt 7C',customer:'Fatima Begum',project:'Jolshiri',type:'Apartment',status:'Handover Scheduled',date:'2025-03-01',snags:0,posDate:'',totalValue:5000000,paidAmount:4200000,remarks:'Payment schedule on track',assignedTo:'Shahidul Islam'},
+  {id:'HND-005',unit:'Muktodhara - Unit 201',customer:'Md. Nazrul Islam',project:'Muktodhara',type:'Apartment',status:'Completed',date:'2024-12-15',snags:2,posDate:'2024-12-15',totalValue:6000000,paidAmount:4500000,remarks:'Handed over - 2 snags pending',assignedTo:'Tanvir Ahmed'},
+  {id:'HND-006',unit:'Muktodhara - Unit 305',customer:'Shamima Akhter',project:'Muktodhara',type:'Apartment',status:'Handover Scheduled',date:'2025-04-01',snags:0,posDate:'',totalValue:4200000,paidAmount:3600000,remarks:'Awaiting final payment',assignedTo:'Shahidul Islam'},
+  {id:'HND-007',unit:'Jolshiri - Apt 3C',customer:'Mrs. Jahanara Begum',project:'Jolshiri',type:'Apartment',status:'Completed',date:'2024-06-30',snags:0,posDate:'2024-06-30',totalValue:4800000,paidAmount:4800000,remarks:'Fully paid and handed over',assignedTo:'Tanvir Ahmed'},
+  {id:'HND-008',unit:'Muktodhara - Plot 15',customer:'Nurjahan Begum',project:'Muktodhara',type:'Plot',status:'Completed',date:'2024-12-01',snags:0,posDate:'2024-12-01',totalValue:3200000,paidAmount:3200000,remarks:'All clear',assignedTo:'Rofiqul Islam'},
+  {id:'HND-009',unit:'Muktodhara - Studio A',customer:'Rashida Khatun',project:'Muktodhara',type:'Studio',status:'Construction Ongoing',date:'2025-08-01',snags:0,posDate:'',totalValue:2800000,paidAmount:1200000,remarks:'Foundation work in progress',assignedTo:'Rofiqul Islam'},
+  {id:'HND-010',unit:'Jolshiri - Apt 2B',customer:'Shafiqul Alam',project:'Jolshiri',type:'Apartment',status:'Inspection Pending',date:'2025-03-15',snags:5,posDate:'',totalValue:5200000,paidAmount:3400000,remarks:'Overdue customer - inspection scheduled',assignedTo:'Tanvir Ahmed'}
+]);
+window.mockSnags = DB.init('snags', [
+  {id:'SNAG-001',handoverId:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',item:'Bathroom tile grouting incomplete',category:'Finishing',priority:'High',status:'Open',date:'2025-01-10',assignedTo:'Shahidul Islam',resolvedDate:'',remarks:'3 tiles need replacement'},
+  {id:'SNAG-002',handoverId:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',item:'Main door lock not working',category:'Hardware',priority:'High',status:'In Progress',date:'2025-01-10',assignedTo:'Shahidul Islam',resolvedDate:'',remarks:'New lock ordered'},
+  {id:'SNAG-003',handoverId:'HND-001',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',item:'Window sealant missing - bedroom',category:'Finishing',priority:'Medium',status:'Open',date:'2025-01-10',assignedTo:'Shahidul Islam',resolvedDate:'',remarks:'Needs resealing'},
+  {id:'SNAG-004',handoverId:'HND-005',unit:'Muktodhara - Unit 201',customer:'Md. Nazrul Islam',item:'Electrical switch plate loose',category:'Electrical',priority:'Low',status:'Resolved',date:'2024-12-10',assignedTo:'Tanvir Ahmed',resolvedDate:'2024-12-20',remarks:'Fixed - screw tightened'},
+  {id:'SNAG-005',handoverId:'HND-005',unit:'Muktodhara - Unit 201',customer:'Md. Nazrul Islam',item:'Kitchen counter crack',category:'Finishing',priority:'Medium',status:'In Progress',date:'2024-12-10',assignedTo:'Rofiqul Islam',resolvedDate:'',remarks:'Repair scheduled for next week'},
+  {id:'SNAG-006',handoverId:'HND-010',unit:'Jolshiri - Apt 2B',customer:'Shafiqul Alam',item:'Paint peeling in living room',category:'Painting',priority:'Medium',status:'Open',date:'2025-03-10',assignedTo:'Shahidul Islam',resolvedDate:'',remarks:'Full repaint needed for wall'},
+  {id:'SNAG-007',handoverId:'HND-010',unit:'Jolshiri - Apt 2B',customer:'Shafiqul Alam',item:'Plumbing leak under sink',category:'Plumbing',priority:'High',status:'Open',date:'2025-03-10',assignedTo:'Rofiqul Islam',resolvedDate:'',remarks:'Pipe joint loose - urgent'},
+  {id:'SNAG-008',handoverId:'HND-010',unit:'Jolshiri - Apt 2B',customer:'Shafiqul Alam',item:'AC mounting bracket not installed',category:'HVAC',priority:'Low',status:'Open',date:'2025-03-10',assignedTo:'Rofiqul Islam',resolvedDate:'',remarks:'Customer requested pre-installation'},
+  {id:'SNAG-009',handoverId:'HND-004',unit:'Jolshiri - Apt 7C',customer:'Fatima Begum',item:'Gas line connection check',category:'Utility',priority:'High',status:'Resolved',date:'2025-02-20',assignedTo:'Rofiqul Islam',resolvedDate:'2025-02-25',remarks:'Connection tested - all OK'},
+  {id:'SNAG-010',handoverId:'HND-006',unit:'Muktodhara - Unit 305',customer:'Shamima Akhter',item:'Balcony railing adjustment',category:'Structural',priority:'Low',status:'Resolved',date:'2025-03-20',assignedTo:'Tanvir Ahmed',resolvedDate:'2025-03-28',remarks:'Railing height increased by 2"'}
+]);
+window.mockAfterSales = DB.init('afterSales', [
+  {id:'AFT-001',unit:'Jolshiri - Apt 3C',customer:'Mrs. Jahanara Begum',serviceType:'Water Heater Installation',date:'2024-08-15',status:'Completed',assignedTo:'Rofiqul Islam',cost:25000,remarks:'Installed 40L geyser'},
+  {id:'AFT-002',unit:'Muktodhara - Plot 15',customer:'Nurjahan Begum',serviceType:'Boundary Wall Repair',date:'2025-01-10',status:'Completed',assignedTo:'Shahidul Islam',cost:15000,remarks:'North wall crack repaired'},
+  {id:'AFT-003',unit:'Muktodhara - Unit 201',customer:'Md. Nazrul Islam',serviceType:'Wiring Inspection',date:'2025-02-05',status:'Scheduled',assignedTo:'Tanvir Ahmed',cost:0,remarks:'Scheduled for Feb 15'},
+  {id:'AFT-004',unit:'Jolshiri - Apt 9A',customer:'Kamrul Hasan',serviceType:'Snag Resolution Visit',date:'2025-01-20',status:'In Progress',assignedTo:'Shahidul Islam',cost:0,remarks:'Will fix all 3 snags'},
+  {id:'AFT-005',unit:'Muktodhara - Plot M-103',customer:'Tariqul Islam',serviceType:'Land Survey Recheck',date:'2025-02-10',status:'Scheduled',assignedTo:'Rofiqul Islam',cost:8000,remarks:'Boundary verification requested'},
+  {id:'AFT-006',unit:'Jolshiri - Apt 7C',customer:'Fatima Begum',serviceType:'Pre-Handover Cleaning',date:'2025-02-28',status:'Completed',assignedTo:'Janitorial Team',cost:12000,remarks:'Deep cleaning done'},
+  {id:'AFT-007',unit:'Jolshiri - Apt 2B',customer:'Shafiqul Alam',serviceType:'Plumbing Emergency',date:'2025-03-12',status:'Cancelled',assignedTo:'Rofiqul Islam',cost:0,remarks:'Customer rescheduled'}
 ]);
 window.wsChannels = [{id:'general',label:'# general',icon:'#'},{id:'announcements',label:'\uD83D\uDCE2 announcements',icon:'\uD83D\uDCE2'},{id:'sales',label:'\uD83D\uDCC8 sales',icon:'\uD83D\uDCC8'},{id:'engineering',label:'\uD83D\uDD27 engineering',icon:'\uD83D\uDD27'},{id:'finance',label:'\uD83D\uDCB0 finance',icon:'\uD83D\uDCB0'}];
 window.wsTeam = [
@@ -1932,14 +1960,246 @@ function crudTicket(item){
     }
   );
 }
+var hndTab='dashboard';
 function renderHandover(el){
-  const pH=_pg('handover',mockHandover);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Handover & Post-Sales</div><div class="page-subtitle">${mockHandover.length} units</div>
-    <div class="card"><div class="card-header"><h3>Handover Pipeline</h3></div>
-    <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Unit</th><th>Customer</th><th>Status</th><th>Est. Date</th><th>Snags</th><th>POS Date</th></tr></thead><tbody>${pH.items.map(h=>`<tr><td style="font-weight:500">${h.unit}</td><td>${h.customer}</td><td><span class="badge-status ${h.status==='Handover Scheduled'?'badge-active':h.status==='Inspection Pending'?'badge-pending':'badge-reserved'}">${h.status}</span></td><td>${h.date}</td><td style="text-align:center;font-weight:600;color:${h.snags>0?'#c62828':'#2e7d32'}">${h.snags}</td><td>${h.pos_date||'—'}</td></tr>`).join('')}</tbody></table>${_pgHtml('handover',pH.total,pH.page,pH.totalPages,pH.perPage)}</div></div></div></div>`;
+  hndTab=hndTab||'dashboard';
+  var total=mockHandover.length,completed=mockHandover.filter(function(h){return h.status==='Completed'}).length;
+  var scheduled=mockHandover.filter(function(h){return h.status==='Handover Scheduled'}).length;
+  var inspPend=mockHandover.filter(function(h){return h.status==='Inspection Pending'}).length;
+  var ongoing=mockHandover.filter(function(h){return h.status==='Construction Ongoing'}).length;
+  var totalSnags=mockHandover.reduce(function(s,h){return s+h.snags},0);
+  var totalValue=mockHandover.reduce(function(s,h){return s+h.totalValue},0);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Handover & Post-Sales</div><div class="page-subtitle">'+total+' units · '+completed+' completed · '+totalSnags+' total snags · Tk'+(totalValue/100000).toFixed(1)+'L portfolio</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','📊 Dashboard'],
+        ['pipeline','🏭 Handover Pipeline'],
+        ['snags','🔧 Snags & Warranty'],
+        ['after_sales','📦 After-Sales']
+      ].map(function(t){
+        return '<div class="tab '+(hndTab===t[0]?'active':'')+'" onclick="hndTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudHandover()" style="padding:3px 8px;font-size:10px;display:'+(hndTab==='pipeline'?'':'none')+'">+ New Handover</button>'+
+      '<button class="action-btn primary" onclick="crudSnag()" style="padding:3px 8px;font-size:10px;display:'+(hndTab==='snags'?'':'none')+'">+ Report Snag</button>'+
+      '<button class="action-btn primary" onclick="crudAfterSale()" style="padding:3px 8px;font-size:10px;display:'+(hndTab==='after_sales'?'':'none')+'">+ New Service</button>'+
+    '</div>'+
+    (hndTab==='dashboard'?renderHndDashboard():
+     hndTab==='pipeline'?renderHndPipeline():
+     hndTab==='snags'?renderHndSnags():
+     hndTab==='after_sales'?renderHndAfterSales():'')+
+  '</div>';
 }
-
-/** BOQ & Cost Control Module **/
+function renderHndDashboard(){
+  var total=mockHandover.length,completed=mockHandover.filter(function(h){return h.status==='Completed'}).length;
+  var scheduled=mockHandover.filter(function(h){return h.status==='Handover Scheduled'}).length;
+  var inspPend=mockHandover.filter(function(h){return h.status==='Inspection Pending'}).length;
+  var ongoing=mockHandover.filter(function(h){return h.status==='Construction Ongoing'}).length;
+  var totalSnags=mockHandover.reduce(function(s,h){return s+h.snags},0);
+  var openSnags=mockSnags.filter(function(s){return s.status==='Open'||s.status==='In Progress'}).length;
+  var resolvedSnags=mockSnags.filter(function(s){return s.status==='Resolved'}).length;
+  var totalValue=mockHandover.reduce(function(s,h){return s+h.totalValue},0);
+  var totalPaid=mockHandover.reduce(function(s,h){return s+h.paidAmount},0);
+  var afs=mockAfterSales.length,afsCompleted=mockAfterSales.filter(function(a){return a.status==='Completed'}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Units',total,'#1565c0'],
+    ['Completed',completed,'#2e7d32'],
+    ['Scheduled',scheduled,scheduled>0?'#ff8f00':'#999'],
+    ['Inspection',inspPend,inspPend>0?'#c62828':'#999'],
+    ['Open Snags',openSnags,openSnags>0?'#c62828':'#999'],
+    ['After-Sales',afs,'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Pipeline Status Breakdown</h3></div><div class="card-body" style="padding:8px">'+
+    [['Completed',completed,'#2e7d32'],['Handover Scheduled',scheduled,'#ff8f00'],['Inspection Pending',inspPend,'#c62828'],['Construction Ongoing',ongoing,'#1565c0']].map(function(s){
+      var pct=Math.round(s[1]/total*100);
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+s[0]+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+s[2]+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+s[1]+'</div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Financial Summary</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
+      '<div style="display:flex;justify-content:center;gap:16px;margin-bottom:8px">'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#2e7d32">Tk'+(totalValue/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#888">Total Value</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1565c0">Tk'+(totalPaid/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#888">Collected</div></div>'+
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:'+(totalSnags>0?'#c62828':'#2e7d32')+'">'+totalSnags+'</div><div style="font-size:8px;color:#888">Total Snags</div></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;justify-content:center;margin-top:4px">'+
+        '<div style="padding:3px 8px;background:#e8f5e9;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#2e7d32">'+resolvedSnags+'</div><div style="font-size:7px;color:#666">Snags Resolved</div></div>'+
+        '<div style="padding:3px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:11px;font-weight:600;color:#1565c0">'+afsCompleted+'/'+afs+'</div><div style="font-size:7px;color:#666">Services Done</div></div>'+
+      '</div>'+
+    '</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>Upcoming Handovers</h3></div><div class="card-body" style="padding:4px 8px">'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px">'+
+  mockHandover.filter(function(h){return h.status!=='Completed'}).sort(function(a,b){return a.date>b.date?1:-1}).slice(0,5).map(function(h,i){
+    var sc={'Handover Scheduled':'#ff8f00','Inspection Pending':'#c62828','Construction Ongoing':'#1565c0'}[h.status]||'#888';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:#f9fafb;border-radius:6px;cursor:pointer" onclick="hndTab=\x27pipeline\x27;renderModule()">'+
+      '<div style="width:24px;height:24px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+h.unit+'</div><div style="font-size:8px;color:#888">'+h.customer+' · Est: '+h.date+'</div></div>'+
+      '<span style="font-size:8px;font-weight:600;color:'+sc+'">'+h.status+'</span></div>';
+  }).join('')+'</div></div></div>';
+}
+function renderHndPipeline(){
+  var q=(document.getElementById('hndSearch')||{}).value||'';
+  var sf=(document.getElementById('hndStatus')||{}).value||'';
+  var filtered=mockHandover.filter(function(h){
+    if(sf&&h.status!==sf)return false;
+    if(q&&!h.unit.toLowerCase().includes(q.toLowerCase())&&!h.customer.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pH=_pg('hnd',filtered);
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="hndSearch" placeholder="Search unit/customer..." oninput="_PG.hnd={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="hndStatus" onchange="_PG.hnd={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Completed</option><option>Handover Scheduled</option><option>Inspection Pending</option><option>Construction Ongoing</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Unit</th><th>Customer</th><th>Project</th><th>Type</th><th>Est. Date</th><th class="num">Snags</th><th>Status</th><th>POS Date</th><th></th></tr></thead><tbody>'+
+  pH.items.map(function(h){
+    var sc={'Completed':'#2e7d32','Handover Scheduled':'#ff8f00','Inspection Pending':'#c62828','Construction Ongoing':'#1565c0'}[h.status]||'#888';
+    var sbg={'Completed':'#e8f5e9','Handover Scheduled':'#fff8e1','Inspection Pending':'#ffebee','Construction Ongoing':'#e3f2fd'}[h.status]||'#f5f5f5';
+    return '<tr style="cursor:pointer" onclick="openHandover(\x27'+h.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+h.id+'</td><td style="font-weight:500">'+h.unit+'</td><td>'+h.customer+'</td><td style="font-size:9px">'+h.project+'</td><td style="font-size:9px;color:#888">'+h.type+'</td><td style="font-size:9px;color:#888">'+h.date+'</td><td class="num" style="font-weight:600;color:'+(h.snags>0?'#c62828':'#2e7d32')+'">'+h.snags+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+h.status+'</span></td><td style="font-size:9px;color:#888">'+(h.posDate||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudHandover(mockHandover.find(function(x){return x.id===\x27'+h.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockHandover.findIndex(function(x){return x.id===\x27'+h.id+'\x27});if(idx>=0)mockHandover.splice(idx,1);DB.save(\x27handover\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('hnd',pH.total,pH.page,pH.totalPages,pH.perPage)+'</div></div></div>';
+}
+function renderHndSnags(){
+  var q=(document.getElementById('snagSearch')||{}).value||'';
+  var ps=(document.getElementById('snagPriority')||{}).value||'';
+  var ss=(document.getElementById('snagStatus')||{}).value||'';
+  var filtered=mockSnags.filter(function(s){
+    if(ps&&s.priority!==ps)return false;
+    if(ss&&s.status!==ss)return false;
+    if(q&&!s.unit.toLowerCase().includes(q.toLowerCase())&&!s.item.toLowerCase().includes(q.toLowerCase())&&!s.customer.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pS=_pg('snag',filtered);
+  var open=mockSnags.filter(function(s){return s.status==='Open'}).length;
+  var ip=mockSnags.filter(function(s){return s.status==='In Progress'}).length;
+  var res=mockSnags.filter(function(s){return s.status==='Resolved'}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Snags',mockSnags.length,'#1565c0'],
+    ['Open',open,open>0?'#c62828':'#999'],
+    ['In Progress',ip,ip>0?'#ff8f00':'#999'],
+    ['Resolved',res,'#2e7d32']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="snagSearch" placeholder="Search..." oninput="_PG.snag={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="snagPriority" onchange="_PG.snag={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option></select>'+
+    '<select id="snagStatus" onchange="_PG.snag={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Open</option><option>In Progress</option><option>Resolved</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Unit</th><th>Customer</th><th>Item</th><th>Category</th><th>Priority</th><th>Date</th><th>Assigned</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pS.items.map(function(s){
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+s.id+'</td><td style="font-weight:500">'+s.unit+'</td><td>'+s.customer+'</td><td style="font-size:9px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.item+'">'+s.item+'</td><td style="font-size:9px;color:#888">'+s.category+'</td><td><span class="badge-status" style="background:'+(s.priority==='High'?'#ffebee':s.priority==='Medium'?'#fff8e1':'#f5f5f5')+';color:'+(s.priority==='High'?'#c62828':s.priority==='Medium'?'#ff8f00':'#888')+'">'+s.priority+'</span></td><td style="font-size:9px;color:#888">'+s.date+'</td><td style="font-size:9px">'+s.assignedTo+'</td><td><span class="badge-status" style="background:'+(s.status==='Open'?'#ffebee':s.status==='In Progress'?'#fff8e1':'#e8f5e9')+';color:'+(s.status==='Open'?'#c62828':s.status==='In Progress'?'#ff8f00':'#2e7d32')+'">'+s.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudSnag(mockSnags.find(function(x){return x.id===\x27'+s.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockSnags.findIndex(function(x){return x.id===\x27'+s.id+'\x27});if(idx>=0)mockSnags.splice(idx,1);DB.save(\x27snags\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('snag',pS.total,pS.page,pS.totalPages,pS.perPage)+'</div></div></div>';
+}
+function renderHndAfterSales(){
+  var q=(document.getElementById('afsSearch')||{}).value||'';
+  var ss=(document.getElementById('afsStatus')||{}).value||'';
+  var filtered=mockAfterSales.filter(function(a){
+    if(ss&&a.status!==ss)return false;
+    if(q&&!a.unit.toLowerCase().includes(q.toLowerCase())&&!a.customer.toLowerCase().includes(q.toLowerCase())&&!a.serviceType.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  var pA=_pg('afs',filtered);
+  var totalCost=mockAfterSales.reduce(function(s,a){return s+a.cost},0);
+  var completed=mockAfterSales.filter(function(a){return a.status==='Completed'}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Services',mockAfterSales.length,'#1565c0'],
+    ['Completed',completed,'#2e7d32'],
+    ['Scheduled',mockAfterSales.filter(function(a){return a.status==='Scheduled'}).length,'#ff8f00'],
+    ['Total Cost','Tk'+(totalCost/1000).toFixed(1)+'K','#e65100']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="afsSearch" placeholder="Search..." oninput="_PG.afs={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="afsStatus" onchange="_PG.afs={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Completed</option><option>In Progress</option><option>Scheduled</option><option>Cancelled</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Service</th><th>Unit</th><th>Customer</th><th>Date</th><th>Assigned</th><th class="num">Cost</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pA.items.map(function(a){
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.serviceType+'</td><td>'+a.unit+'</td><td style="font-size:9px">'+a.customer+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.assignedTo+'</td><td class="num" style="font-weight:600;color:#e65100">Tk'+(a.cost/1000).toFixed(1)+'K</td><td><span class="badge-status" style="background:'+(a.status==='Completed'?'#e8f5e9':a.status==='In Progress'?'#fff8e1':a.status==='Scheduled'?'#e3f2fd':'#ffebee')+';color:'+(a.status==='Completed'?'#2e7d32':a.status==='In Progress'?'#ff8f00':a.status==='Scheduled'?'#1565c0':'#c62828')+'">'+a.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAfterSale(mockAfterSales.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockAfterSales.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAfterSales.splice(idx,1);DB.save(\x27afterSales\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('afs',pA.total,pA.page,pA.totalPages,pA.perPage)+'</div></div></div>';
+}
+function openHandover(id){
+  var h=mockHandover.find(function(x){return x.id===id});
+  if(!h)return;
+  var snags=mockSnags.filter(function(s){return s.handoverId===h.id});
+  var sc={'Completed':'#2e7d32','Handover Scheduled':'#ff8f00','Inspection Pending':'#c62828','Construction Ongoing':'#1565c0'}[h.status];
+  showDetailPanel('Handover: '+h.unit,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:44px;height:44px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#2F80ED">'+h.unit.charAt(0)+'</div>'+
+      '<div><span class="badge-status" style="background:'+(h.status==='Completed'?'#e8f5e9':h.status==='Handover Scheduled'?'#fff8e1':h.status==='Inspection Pending'?'#ffebee':'#e3f2fd')+';color:'+sc+'">'+h.status+'</span><div style="font-size:9px;color:#888;margin-top:2px">'+h.type+' · '+h.project+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['Unit',h.unit],
+      ['Customer',h.customer],
+      ['Project',h.project],
+      ['Type',h.type],
+      ['Est. Date',h.date],
+      ['POS Date',h.posDate||'N/A'],
+      ['Total Value','Tk'+(h.totalValue/100000).toFixed(1)+'L'],
+      ['Paid Amount','Tk'+(h.paidAmount/100000).toFixed(1)+'L'],
+      ['Snags',h.snags+' ('+snags.length+' reported)'],
+      ['Assigned To',h.assignedTo]
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px"><div style="font-size:9px;color:#888;margin-bottom:4px">Remarks</div><div style="font-size:10px">'+(h.remarks||'No remarks')+'</div></div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudHandover(mockHandover.find(function(x){return x.id===\x27'+h.id+'\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+function crudHandover(item){
+  var n=!item;
+  var statuses=['Construction Ongoing','Inspection Pending','Handover Scheduled','Completed'];
+  var h=n?{id:'HND-'+String(mockHandover.length+1).padStart(3,'0'),unit:'',customer:'',project:'Muktodhara',type:'Apartment',status:'Construction Ongoing',date:new Date().toISOString().split('T')[0],snags:0,posDate:'',totalValue:0,paidAmount:0,remarks:'',assignedTo:'Tanvir Ahmed'}:item;
+  openModal(n?'New Handover':'Edit Handover',
+    formRow(inputField('Unit','hf_unit',h.unit,'',true),inputField('Customer','hf_cust',h.customer,'',true))+
+    formRow(selectField('Project','hf_proj',h.project,['Muktodhara','Jolshiri'],true),selectField('Type','hf_type',h.type,['Apartment','Plot','Studio','Commercial'],true))+
+    formRow(selectField('Status','hf_stat',h.status,statuses,true),inputField('Est. Date','hf_date',h.date))+
+    formRow(inputField('Total Value','hf_val',String(h.totalValue),'',true),inputField('Paid Amount','hf_paid',String(h.paidAmount),'',true))+
+    formRow(inputField('POS Date','hf_pos',h.posDate),selectField('Assigned To','hf_asgn',h.assignedTo,['Tanvir Ahmed','Shahidul Islam','Rofiqul Islam'],true))+
+    inputField('Remarks','hf_rem',h.remarks),
+    function(){
+      var d={id:h.id,unit:g('hf_unit'),customer:g('hf_cust'),project:g('hf_proj'),type:g('hf_type'),status:g('hf_stat'),date:g('hf_date')||h.date,snags:h.snags||0,posDate:g('hf_pos'),totalValue:parseInt(g('hf_val'))||0,paidAmount:parseInt(g('hf_paid'))||0,remarks:g('hf_rem'),assignedTo:g('hf_asgn')};
+      if(n){mockHandover.push(d);DB.save('handover');showToast('Handover created','success');}
+      else{var idx=mockHandover.findIndex(function(x){return x.id===h.id});if(idx>=0){mockHandover[idx]=d;DB.save('handover');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudSnag(item){
+  var n=!item;
+  var cats=['Finishing','Hardware','Electrical','Plumbing','Painting','Structural','HVAC','Utility'];
+  var s=n?{id:'SNAG-'+String(mockSnags.length+1).padStart(3,'0'),handoverId:'',unit:'',customer:'',item:'',category:'Finishing',priority:'Medium',status:'Open',date:new Date().toISOString().split('T')[0],assignedTo:'Shahidul Islam',resolvedDate:'',remarks:''}:item;
+  openModal(n?'Report Snag':'Edit Snag',
+    formRow(inputField('Item','sf_item',s.item,'',true),selectField('Category','sf_cat',s.category,cats,true))+
+    formRow(selectField('Unit','sf_unit',s.unit,mockHandover.map(function(h){return h.unit+'|'+h.unit+' ('+h.customer+')'}),true),inputField('Customer','sf_cust',s.customer))+
+    formRow(selectField('Priority','sf_pri',s.priority,['High','Medium','Low'],true),selectField('Status','sf_stat',s.status,['Open','In Progress','Resolved'],true))+
+    formRow(selectField('Assigned To','sf_asgn',s.assignedTo,['Shahidul Islam','Rofiqul Islam','Tanvir Ahmed'],true),inputField('Date','sf_date',s.date))+
+    formRow(inputField('Resolved Date','sf_res',s.resolvedDate),inputField('Remarks','sf_rem',s.remarks)),
+    function(){
+      var sel=g('sf_unit');var u=sel.split('|')[0];
+      var d={id:s.id,handoverId:s.handoverId||'',unit:u,customer:g('sf_cust'),item:g('sf_item'),category:g('sf_cat'),priority:g('sf_pri'),status:g('sf_stat'),date:g('sf_date')||s.date,assignedTo:g('sf_asgn'),resolvedDate:g('sf_res'),remarks:g('sf_rem')};
+      if(n){mockSnags.push(d);DB.save('snags');showToast('Snag reported','success');}
+      else{var idx=mockSnags.findIndex(function(x){return x.id===s.id});if(idx>=0){mockSnags[idx]=d;DB.save('snags');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudAfterSale(item){
+  var n=!item;
+  var types=['Water Heater Installation','Snag Resolution Visit','Boundary Wall Repair','Wiring Inspection','Land Survey Recheck','Pre-Handover Cleaning','Plumbing Emergency','AC Installation','Gas Connection','Other'];
+  var a=n?{id:'AFT-'+String(mockAfterSales.length+1).padStart(3,'0'),unit:'',customer:'',serviceType:'Other',date:new Date().toISOString().split('T')[0],status:'Scheduled',assignedTo:'Tanvir Ahmed',cost:0,remarks:''}:item;
+  openModal(n?'New Service':'Edit Service',
+    formRow(inputField('Unit','af_unit',a.unit,'',true),inputField('Customer','af_cust',a.customer,'',true))+
+    formRow(selectField('Service Type','af_type',a.serviceType,types,true),inputField('Date','af_date',a.date))+
+    formRow(selectField('Status','af_stat',a.status,['Scheduled','In Progress','Completed','Cancelled'],true),selectField('Assigned To','af_asgn',a.assignedTo,['Tanvir Ahmed','Shahidul Islam','Rofiqul Islam','Janitorial Team'],true))+
+    formRow(inputField('Cost (Tk)','af_cost',String(a.cost)),inputField('Remarks','af_rem',a.remarks)),
+    function(){
+      var d={id:a.id,unit:g('af_unit'),customer:g('af_cust'),serviceType:g('af_type'),date:g('af_date')||a.date,status:g('af_stat'),assignedTo:g('af_asgn'),cost:parseInt(g('af_cost'))||0,remarks:g('af_rem')};
+      if(n){mockAfterSales.push(d);DB.save('afterSales');showToast('Service created','success');}
+      else{var idx=mockAfterSales.findIndex(function(x){return x.id===a.id});if(idx>=0){mockAfterSales[idx]=d;DB.save('afterSales');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}/** BOQ & Cost Control Module **/
 
 function renderBOQ(el){
   if(typeof boqTab==='undefined') boqTab='dashboard';
