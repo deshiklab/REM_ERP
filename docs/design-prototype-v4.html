@@ -575,9 +575,34 @@ window.mockContractorPayments = DB.init('contractorPayments', [
 ]);
 
 window.mockEquipment = DB.init('equipment', [
-  {name:'JCB Excavator',model:'JCB 3DX',site:'Muktodhara',status:'Operational',hours:'1240'},
-  {name:'Concrete Mixer',model:'CM-500',site:'Jolshiri',status:'Under Repair',hours:'890'},
-  {name:'Crane (20 Ton)',model:'Tadano 20T',site:'Jolshiri',status:'Operational',hours:'560'}
+  {id:'EQ-001',name:'JCB Excavator',model:'JCB 3DX',type:'Heavy',site:'Muktodhara',status:'Operational',hours:'1240',fuelCost:185000,operator:'Md. Ali',lastService:'2024-10-15',icon:'\uD83D\uDE9C'},
+  {id:'EQ-002',name:'Concrete Mixer',model:'CM-500',type:'Heavy',site:'Jolshiri',status:'Under Repair',hours:'890',fuelCost:95000,operator:'Shahin',lastService:'2024-09-20',icon:'\uD83D\uDED2'},
+  {id:'EQ-003',name:'Crane 20 Ton',model:'Tadano 20T',type:'Heavy',site:'Jolshiri',status:'Operational',hours:'560',fuelCost:142000,operator:'Kalam',lastService:'2024-10-10',icon:'\uD83C\uDFD7\uFE0F'},
+  {id:'EQ-004',name:'Dump Truck',model:'Tata LPK 2516',type:'Vehicle',site:'Muktodhara',status:'Operational',hours:'2100',fuelCost:320000,operator:'Faruk',lastService:'2024-10-05',icon:'\uD83D\uDE9A'},
+  {id:'EQ-005',name:'Vibrator Machine',model:'Wacker NEU 3000',type:'Light',site:'Jolshiri',status:'Operational',hours:'420',fuelCost:28000,operator:'Rashid',lastService:'2024-10-20',icon:'\uD83D\uDD28'},
+  {id:'EQ-006',name:'Generator 100KVA',model:'Cummins 100G',type:'Heavy',site:'Muktodhara',status:'Maintenance',hours:'3200',fuelCost:480000,operator:'Jabbar',lastService:'2024-10-01',icon:'\u26A1'},
+  {id:'EQ-007',name:'Plate Compactor',model:'Bomag BPR 60',type:'Light',site:'Jolshiri',status:'Operational',hours:'310',fuelCost:15000,operator:'',lastService:'2024-09-25',icon:'\uD83D\uDD27'},
+  {id:'EQ-008',name:'Welding Machine',model:'ESAB 400i',type:'Tool',site:'Muktodhara',status:'Idle',hours:'180',fuelCost:0,operator:'',lastService:'2024-08-15',icon:'\uD83D\uDD0A'},
+  {id:'EQ-009',name:'Tower Crane',model:'Potain MC 85',type:'Heavy',site:'Jolshiri',status:'Operational',hours:'980',fuelCost:215000,operator:'Hasan',lastService:'2024-10-12',icon:'\uD83C\uDFD7\uFE0F'},
+  {id:'EQ-010',name:'Concrete Pump',model:'Schwing S 36X',type:'Heavy',site:'Jolshiri',status:'Operational',hours:'450',fuelCost:110000,operator:'Siraj',lastService:'2024-10-08',icon:'\uD83D\uDED2'},
+  {id:'EQ-011',name:'Pickup Truck',model:'Toyota Hilux',type:'Vehicle',site:'Head Office',status:'Operational',hours:'15600',fuelCost:560000,operator:'Shamim',lastService:'2024-09-30',icon:'\uD83D\uDE99'},
+  {id:'EQ-012',name:'Water Pump 5HP',model:'Kirloskar 5HP',type:'Light',site:'Muktodhara',status:'Idle',hours:'220',fuelCost:12000,operator:'',lastService:'2024-07-20',icon:'\uD83D\uDCA7'}
+]);
+window.mockMaintenanceLog = DB.init('maintenanceLog', [
+  {id:1,equipment:'JCB Excavator',type:'Service',date:'2024-10-15',cost:8500,status:'Completed',notes:'Oil change, filter replacement, hydraulic check'},
+  {id:2,equipment:'JCB Excavator',type:'Fuel',date:'2024-10-14',cost:15000,status:'Completed',notes:'Diesel refill - 200L'},
+  {id:3,equipment:'Concrete Mixer',type:'Repair',date:'2024-09-20',cost:32000,status:'Completed',notes:'Drum bearing replacement, motor coupling'},
+  {id:4,equipment:'Crane 20 Ton',type:'Service',date:'2024-10-10',cost:12000,status:'Completed',notes:'Annual inspection, wire rope check, grease'},
+  {id:5,equipment:'Crane 20 Ton',type:'Inspection',date:'2024-10-05',cost:5000,status:'Completed',notes:'Safety load test - passed'},
+  {id:6,equipment:'Dump Truck',type:'Service',date:'2024-10-05',cost:9500,status:'Completed',notes:'Brake pad replacement, tire rotation'},
+  {id:7,equipment:'Dump Truck',type:'Fuel',date:'2024-10-12',cost:22000,status:'Completed',notes:'Diesel refill'},
+  {id:8,equipment:'Generator 100KVA',type:'Service',date:'2024-10-01',cost:18000,status:'Scheduled',notes:'Major servicing - coolant flush, belt replacement'},
+  {id:9,equipment:'Generator 100KVA',type:'Fuel',date:'2024-10-10',cost:35000,status:'Completed',notes:'Diesel refill - 500L'},
+  {id:10,equipment:'Tower Crane',type:'Inspection',date:'2024-10-12',cost:7500,status:'Completed',notes:'Monthly safety inspection - all OK'},
+  {id:11,equipment:'Concrete Pump',type:'Service',date:'2024-10-08',cost:11000,status:'Completed',notes:'Hydraulic oil top-up, pipe cleaning'},
+  {id:12,equipment:'Pickup Truck',type:'Fuel',date:'2024-10-13',cost:8000,status:'Completed',notes:'Petrol refill'},
+  {id:13,equipment:'Pickup Truck',type:'Parts',date:'2024-09-30',cost:6500,status:'Completed',notes:'AC compressor replacement'},
+  {id:14,equipment:'Welding Machine',type:'Repair',date:'2024-08-15',cost:4000,status:'Completed',notes:'Cable replacement, tip change'}
 ]);
 window.mockLabor = DB.init('labor', [
   {name:'Skilled Mason',count:12,site:'Muktodhara',rate:'৳800/day',status:'Present'},
@@ -702,7 +727,7 @@ window.mockKnowledgeBase = DB.init('knowledge_base', [
 ]);
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
-let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard', boqTab = 'dashboard';
+let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard', boqTab = 'dashboard', eqTab = 'dashboard';
 
 // ═══ GROUP & TOP BAR NAV ═══
 function switchGroup(group) {
@@ -752,7 +777,7 @@ function switchModule(mod) {
     case 'contractors': renderContractors(el); break;
     case 'boq': renderBOQ(el); break;
     case 'variation_orders': renderVariations(el); break;
-    case 'equipment': renderSubTable(el, 'equipment', mockEquipment, ['Name','Model','Site','Status'], ['name','model','site','status'], 'Equipment'); break;
+    case 'equipment': renderEquipment(el); break;
     case 'labor': renderSubTable(el, 'labor', mockLabor, ['Name','Count','Site','Status'], ['name','count','site','status'], 'Labor Management'); break;
     case 'qc': renderSubTable(el, 'qc', mockQC, ['Project','Item','Result','Inspector'], ['project','item','result','inspector'], 'QC & Inspection'); break;
     case 'designs': renderDesigns(el); break;
@@ -1660,6 +1685,211 @@ function crudBOQ(item){
     }
   );
 }
+/** Equipment & Machinery Tracking Module **/
+
+function renderEquipment(el){
+  if(typeof eqTab==='undefined') eqTab='dashboard';
+  var et=eqTab;
+  var total=mockEquipment.length;
+  var op=mockEquipment.filter(function(e){return e.status==='Operational'}).length;
+  var repair=mockEquipment.filter(function(e){return e.status==='Under Repair'||e.status==='Maintenance'}).length;
+  var idle=mockEquipment.filter(function(e){return e.status==='Idle'}).length;
+  el.innerHTML='<div class="fade-in"><div class="page-title">Equipment & Machinery</div><div class="page-subtitle">'+total+' assets \\u00B7 '+op+' operational \\u00B7 '+repair+' in maintenance</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','\\uD83D\\uDCCA Dashboard'],
+        ['equipment','\\u2699\\uFE0F Equipment'],
+        ['maintenance','\\uD83D\\uDD27 Maintenance']
+      ].map(function(t){
+        return '<div class="tab '+(et===t[0]?'active':'')+'" onclick="eqTab=\\x27'+t[0]+'\\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudEquipment()" style="padding:3px 8px;font-size:10px;display:'+(et==='equipment'?'':'none')+'">+ Add Equipment</button>'+
+      '<button class="action-btn primary" onclick="crudMaintenance()" style="padding:3px 8px;font-size:10px;display:'+(et==='maintenance'?'':'none')+'">+ Log Service</button>'+
+    '</div>'+
+    (et==='dashboard'?renderEqDashboard():
+     et==='equipment'?renderEqList():
+     et==='maintenance'?renderEqMaintenance():'')+
+  '</div>';
+}
+
+function renderEqDashboard(){
+  var total=mockEquipment.length;
+  var op=mockEquipment.filter(function(e){return e.status==='Operational'}).length;
+  var repair=mockEquipment.filter(function(e){return e.status==='Under Repair'||e.status==='Maintenance'}).length;
+  var idle=mockEquipment.filter(function(e){return e.status==='Idle'}).length;
+  var totalH=mockEquipment.reduce(function(s,e){return s+parseInt(e.hours||0)},0);
+  var svc=mockMaintenanceLog.length;
+  var fuelC=mockMaintenanceLog.filter(function(m){return m.type==='Fuel'}).reduce(function(s,m){return s+m.cost},0);
+  var maintC=mockMaintenanceLog.filter(function(m){return m.type!=='Fuel'}).reduce(function(s,m){return s+m.cost},0);
+  var bySite={};mockEquipment.forEach(function(e){bySite[e.site]=(bySite[e.site]||0)+1});
+  var sites=Object.keys(bySite).sort(function(a,b){return bySite[b]-bySite[a]});
+  var topHours=mockEquipment.slice().sort(function(a,b){return parseInt(b.hours||0)-parseInt(a.hours||0)}).slice(0,5);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Assets',total,'#1565c0'],
+    ['Operational',op,'#2e7d32'],
+    ['In Maintenance',repair,repair>0?'#e65100':'#999'],
+    ['Idle',idle,idle>0?'#c62828':'#999'],
+    ['Total Hours',totalH.toLocaleString('en-IN'),'#7b1fa2'],
+    ['Service Logs',svc,'#00838f']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Equipment by Site</h3></div><div class="card-body" style="padding:8px;font-size:10px">'+
+    sites.map(function(s){
+      var pct=Math.round(bySite[s]/total*100);
+      var colors={'Muktodhara':'#1565c0','Jolshiri':'#2e7d32','Head Office':'#7b1fa2','Warehouse':'#e65100'};
+      return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f0f0f0"><div style="width:90px;font-weight:500;color:'+(colors[s]||'#555')+'">'+s+'</div><div style="flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(colors[s]||'#2F80ED')+';border-radius:3px"></div></div><div style="width:30px;text-align:right;font-weight:600;font-size:9px">'+bySite[s]+'</div><div style="width:36px;text-align:right;color:#888">'+pct+'%</div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Highest Running Hours</h3></div><div class="card-body" style="padding:6px">'+
+    topHours.map(function(e,i){
+      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0"><div style="width:18px;height:18px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:9px;font-weight:500">'+e.name+'</div><div style="font-size:8px;color:#888">'+e.model+' \\u00B7 '+e.site+' \\u00B7 '+e.hours+' hrs</div></div></div>';
+    }).join('')+'</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>Cost Summary</h3></div><div class="card-body" style="padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">'+
+    '<div style="padding:8px;background:#e3f2fd;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#1565c0">\\u09F3 '+(fuelC/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Fuel Cost</div></div>'+
+    '<div style="padding:8px;background:#fff3e0;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#e65100">\\u09F3 '+(maintC/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Maintenance Cost</div></div>'+
+    '<div style="padding:8px;background:#e8f5e9;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#2e7d32">\\u09F3 '+((fuelC+maintC)/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Total Cost</div></div>'+
+  '</div></div>';
+}
+
+function renderEqList(){
+  var q=(document.getElementById('eqSearch')||{}).value||'';
+  var sf=(document.getElementById('eqStatus')||{}).value||'';
+  var sif=(document.getElementById('eqSite')||{}).value||'';
+  var filtered=mockEquipment.filter(function(e){
+    if(sf&&e.status!==sf)return false;
+    if(sif&&e.site!==sif)return false;
+    if(q&&!e.name.toLowerCase().includes(q.toLowerCase())&&!e.model.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pE=_pg('eq',filtered);
+  var sites=mockEquipment.reduce(function(a,e){if(a.indexOf(e.site)<0)a.push(e.site);return a;},[]);
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="eqSearch" placeholder="Search equipment..." oninput="_PG.eq={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="eqStatus" onchange="_PG.eq={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Operational</option><option>Idle</option><option>Under Repair</option><option>Maintenance</option></select>'+
+    '<select id="eqSite" onchange="_PG.eq={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Sites</option>'+sites.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('')+'</select>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">'+
+  pE.items.map(function(e){
+    var sc={'Operational':'#2e7d32','Idle':'#ff8f00','Under Repair':'#c62828','Maintenance':'#e65100'}[e.status]||'#888';
+    var sbg={'Operational':'#e8f5e9','Idle':'#fff8e1','Under Repair':'#ffebee','Maintenance':'#fff3e0'}[e.status]||'#f5f5f5';
+    return '<div style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openEquipment(\\x27'+e.id+'\\x27)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(e.icon||'\\uD83D\\uDD27')+'</div>'+
+          '<div><div style="font-size:11px;font-weight:600;color:#222">'+e.name+'</div><div style="font-size:9px;color:#888">'+e.model+'</div></div>'+
+        '</div>'+
+        '<span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+e.status+'</span>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;margin-top:6px">'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e3f2fd;color:#1565c0">'+e.site+'</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f3e5f5;color:#7b1fa2">'+e.hours+' hrs</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e8f5e9;color:#2e7d32">\\u09F3 '+(e.fuelCost||0).toLocaleString('en-IN')+' fuel</span>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
+        '<span style="font-size:8px;color:#999">'+(e.operator?'Operator: '+e.operator:'No operator')+'</span>'+
+        '<div style="display:flex;gap:4px">'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEquipment(mockEquipment.find(function(x){return x.id===\\x27'+e.id+'\\x27}))">\\u270E</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+e.name+'?\\x27)){var idx=mockEquipment.findIndex(function(x){return x.id===\\x27'+e.id+'\\x27});if(idx>=0)mockEquipment.splice(idx,1);DB.save(\\x27equipment\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('')+'</div>'+
+  (filtered.length>_pgPerPage?_pgHtml('eq',pE.total,pE.page,pE.totalPages,pE.perPage):'');
+}
+
+function renderEqMaintenance(){
+  var q=(document.getElementById('maintSearch')||{}).value||'';
+  var tf=(document.getElementById('maintType')||{}).value||'';
+  var sf=(document.getElementById('maintStatus')||{}).value||'';
+  var filtered=mockMaintenanceLog.filter(function(m){
+    if(tf&&m.type!==tf)return false;
+    if(sf&&m.status!==sf)return false;
+    if(q&&!m.equipment.toLowerCase().includes(q.toLowerCase())&&!m.notes.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pM=_pg('maint',filtered);
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="maintSearch" placeholder="Search service logs..." oninput="_PG.maint={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="maintType" onchange="_PG.maint={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option>Service</option><option>Repair</option><option>Fuel</option><option>Inspection</option><option>Parts</option></select>'+
+    '<select id="maintStatus" onchange="_PG.maint={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Completed</option><option>Scheduled</option><option>In Progress</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Date</th><th>Equipment</th><th>Type</th><th class="num">Cost (\\u09F3)</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>'+
+  pM.items.map(function(m){
+    return '<tr><td style="font-size:9px;color:#888">'+m.date+'</td><td style="font-weight:500">'+m.equipment+'</td><td><span class="badge-status" style="background:'+(m.type==='Fuel'?'#fff8e1':m.type==='Repair'?'#ffebee':m.type==='Service'?'#e3f2fd':m.type==='Inspection'?'#e8f5e9':'#f3e5f5')+';color:'+(m.type==='Fuel'?'#ff8f00':m.type==='Repair'?'#c62828':m.type==='Service'?'#1565c0':m.type==='Inspection'?'#2e7d32':'#7b1fa2')+'">'+m.type+'</span></td><td class="num" style="font-weight:600">\\u09F3 '+m.cost.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(m.status==='Completed'?'badge-active':'badge-pending')+'">'+m.status+'</span></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;color:#888">'+m.notes+'</td><td><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="if(confirm(\\x27Delete log?\\x27)){var idx=mockMaintenanceLog.findIndex(function(x){return x.id===\\x27'+m.id+'\\x27});if(idx>=0)mockMaintenanceLog.splice(idx,1);DB.save(\\x27maintenanceLog\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('maint',pM.total,pM.page,pM.totalPages,pM.perPage)+'</div></div></div>';
+}
+
+function openEquipment(id){
+  var e=mockEquipment.find(function(x){return x.id===id});
+  if(!e)return;
+  var sc={'Operational':'#2e7d32','Idle':'#ff8f00','Under Repair':'#c62828','Maintenance':'#e65100'}[e.status]||'#888';
+  var logs=mockMaintenanceLog.filter(function(m){return m.equipment===e.name});
+  var logHtml=logs.length>0?logs.map(function(m){
+    return '<div style="display:flex;justify-content:space-between;font-size:9px;padding:4px 0;border-bottom:1px solid #f0f0f0"><span>'+m.date+' <span style="color:#888">'+m.type+'</span></span><span>\\u09F3 '+m.cost.toLocaleString('en-IN')+'</span></div>';
+  }).join(''):'<div style="font-size:9px;color:#888;text-align:center;padding:6px">No maintenance logs</div>';
+  showDetailPanel('Equipment: '+e.name,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:44px;height:44px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">'+(e.icon||'\\uD83D\\uDD27')+'</div>'+
+      '<div><div style="font-size:14px;font-weight:600">'+e.name+'</div><div style="font-size:10px;color:#888">'+e.model+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['Status',e.status],
+      ['Site',e.site],
+      ['Hours Run',e.hours+' hrs'],
+      ['Fuel Cost','\\u09F3 '+(e.fuelCost||0).toLocaleString('en-IN')],
+      ['Operator',e.operator||'Unassigned'],
+      ['Last Service',e.lastService||'---']
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div><div style="font-size:11px;font-weight:600;margin-bottom:4px">Maintenance History ('+logs.length+')</div>'+
+    '<div style="padding:6px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+logHtml+'</div></div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudEquipment(mockEquipment.find(function(x){return x.id===\\x27'+e.id+'\\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="eqTab=\\x27maintenance\\x27;closeLeadPanel();renderModule()">Service Log</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+
+function crudEquipment(item){
+  var n=!item;
+  var e=n?{id:'EQ-'+String(mockEquipment.length+1).padStart(3,'0'),name:'',model:'',type:'Heavy',site:'Muktodhara',status:'Operational',hours:'0',fuelCost:0,operator:'',lastService:'',icon:'\\uD83D\\uDD27'}:item;
+  var sites=['Muktodhara','Jolshiri','Head Office','Warehouse'];
+  var types=['Heavy','Light','Tool','Vehicle'];
+  openModal(n?'New Equipment':'Edit Equipment',
+    formRow(inputField('Name','eq_name',e.name,'',true),inputField('Model','eq_model',e.model,'',true))+
+    formRow(selectField('Type','eq_type',e.type,types,true),selectField('Site','eq_site',e.site,sites,true))+
+    formRow(selectField('Status','eq_status',e.status,['Operational','Idle','Under Repair','Maintenance'],true),inputField('Hours Run','eq_hours',e.hours))+
+    formRow(inputField('Fuel Cost (Tk)','eq_fuel',String(e.fuelCost)),inputField('Operator','eq_oper',e.operator))+
+    inputField('Last Service Date','eq_lastSvc',e.lastService),
+    function(){
+      var d={id:e.id,name:g('eq_name'),model:g('eq_model'),type:g('eq_type'),site:g('eq_site'),status:g('eq_status'),hours:g('eq_hours')||'0',fuelCost:parseInt(g('eq_fuel'))||0,operator:g('eq_oper'),lastService:g('eq_lastSvc'),icon:e.icon||'\\uD83D\\uDD27'};
+      if(n){mockEquipment.push(d);DB.save('equipment');showToast('Equipment added','success');}
+      else{var idx=mockEquipment.findIndex(function(x){return x.id===e.id});if(idx>=0){mockEquipment[idx]=d;DB.save('equipment');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
+function crudMaintenance(){
+  var eqNames=mockEquipment.map(function(e){return e.name});
+  if(eqNames.length===0){showToast('Add equipment first','info');return;}
+  openModal('Log Service / Fuel',
+    formRow(selectField('Equipment','mt_equip',eqNames[0],eqNames,true),selectField('Type','mt_type','Service',['Service','Repair','Fuel','Inspection','Parts'],true))+
+    formRow(inputField('Date','mt_date',new Date().toISOString().split('T')[0]),inputField('Cost (Tk)','mt_cost','','',true))+
+    selectField('Status','mt_status','Completed',['Completed','In Progress','Scheduled'],true)+
+    inputField('Notes','mt_notes',''),
+    function(){
+      var d={id:mockMaintenanceLog.length+1,equipment:g('mt_equip'),type:g('mt_type'),date:g('mt_date'),cost:parseInt(g('mt_cost'))||0,status:g('mt_status'),notes:g('mt_notes')};
+      mockMaintenanceLog.push(d);
+      DB.save('maintenanceLog');
+      showToast('Service logged','success');
+      renderModule();
+    }
+  );
+}
+
+
 
 
 function renderVariations(el){
