@@ -612,7 +612,7 @@
 // ═══ GROUP DEFINITIONS ═══
 const GROUPS = {
   executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'}] },
-  sales_crm:     { label:'Sales & CRM',   icon:'👥', mods:[{id:'crm',          label:'CRM & Leads'},{id:'sales_marketing',label:'Sales & Marketing'},{id:'dues_recovery',label:'Dues & Recovery'},{id:'contacts',label:'Contact Book'}] },
+  sales_crm:     { label:'Sales & CRM',   icon:'👥', mods:[{id:'crm',          label:'CRM & Leads'},{id:'sales_marketing',label:'Sales & Marketing'},{id:'dues_recovery',label:'Dues & Recovery'},{id:'contacts',label:'Contact Book'},{id:'proposals',label:'Proposals',badge:true}] },
   land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
   construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
@@ -723,6 +723,16 @@ window.mockBookings = DB.init('bookings', [
   {id:'BKG-108',client:'Laily Akhter',date:'Jun 03, 2026',property:'Muktodhara Green Park',unit:'3 Katha',price:'₹95 Lac',advance:'₹4,75,000',status:'Confirmed',type:'Plot',entityId:'ENT-027'},
   {id:'BKG-109',client:'Nadia Akhter',date:'May 28, 2026',property:'Jolshiri Abason',unit:'5 Katha',price:'₹3.2 Cr',advance:'₹10,00,000',status:'Pending Review',type:'Plot',entityId:'ENT-028'},
   {id:'BKG-110',client:'Kazi Nizam',date:'May 25, 2026',property:'Skyline Towers',unit:'Penthouse',price:'₹7.5 Cr',advance:'₹25,00,000',status:'Pending Review',type:'Flat',entityId:'ENT-010'}
+]);
+window.mockProposals = DB.init('proposals', [
+  {id:'PRO-001',entityId:'ENT-001',entityName:'Tariqul Islam',project:'Muktodhara Green Park',unit:'Plot M-103',totalValue:'₹1.2 Cr',paymentPlan:'Construction Link',validityDate:'2026-08-15',status:'Draft',created:'2026-07-01',items:[{description:'5 Katha Residential Plot',qty:1,rate:12000000,amount:12000000},{description:'Registration Fee',qty:1,rate:500000,amount:500000}],notes:'Initial draft proposal for Tariqul'},
+  {id:'PRO-002',entityId:'ENT-004',entityName:'Dr. Rubina Ali',project:'Jolshiri Abason',unit:'Apt 4B',totalValue:'₹2.5 Cr',paymentPlan:'Construction Link',validityDate:'2026-08-20',status:'Sent',created:'2026-07-05',items:[{description:'3BHK Apartment',qty:1,rate:22000000,amount:22000000},{description:'Car Parking',qty:1,rate:1500000,amount:1500000},{description:'Utility Connection',qty:1,rate:500000,amount:500000},{description:'Modification Charges',qty:1,rate:1000000,amount:1000000}],notes:'Sent to NRB client via email.'},
+  {id:'PRO-003',entityId:'ENT-017',entityName:'Kamrul Hasan',project:'Jolshiri Abason',unit:'Apt 9A',totalValue:'₹1.8 Cr',paymentPlan:'Installment (24 Months)',validityDate:'2026-07-30',status:'Accepted',created:'2026-06-20',items:[{description:'3BHK Apartment 9A',qty:1,rate:17000000,amount:17000000},{description:'Modification - Extra Window',qty:2,rate:50000,amount:100000}],notes:'Accepted verbally. Pending signing.'},
+  {id:'PRO-004',entityId:'ENT-005',entityName:'Delwar Hossain',project:'Muktodhara Green Park',unit:'Apt 4C',totalValue:'₹1.6 Cr',paymentPlan:'Construction Link',validityDate:'2026-08-01',status:'Rejected',created:'2026-06-25',items:[{description:'2BHK Apartment 4C',qty:1,rate:15500000,amount:15500000},{description:'Car Parking',qty:1,rate:500000,amount:500000}],notes:'Client chose another developer. Budget constraint.'},
+  {id:'PRO-005',entityId:'ENT-007',entityName:'Mizanur Rahman',project:'Jolshiri Abason',unit:'3 Katha Plot',totalValue:'₹95 Lac',paymentPlan:'Full Payment',validityDate:'2026-09-01',status:'Sent',created:'2026-07-10',items:[{description:'3 Katha Residential Plot',qty:1,rate:8500000,amount:8500000},{description:'Land Development Charge',qty:1,rate:1000000,amount:1000000}],notes:'Offered discount for full payment.'},
+  {id:'PRO-006',entityId:'ENT-008',entityName:'Shahidul Islam',project:'Muktodhara Green Park',unit:'Plot 15',totalValue:'₹1.8 Cr',paymentPlan:'Construction Link',validityDate:'2026-08-25',status:'Converted',created:'2026-06-15',items:[{description:'5 Katha Plot',qty:1,rate:16000000,amount:16000000},{description:'Registration & Legal',qty:1,rate:1500000,amount:1500000},{description:'Boundary Wall',qty:1,rate:500000,amount:500000}],notes:'Converted to booking BKG-105. Client very satisfied.'},
+  {id:'PRO-007',entityId:'ENT-010',entityName:'Kazi Nizam',project:'Skyline Towers',unit:'Penthouse',totalValue:'₹8.0 Cr',paymentPlan:'Installment (36 Months)',validityDate:'2026-10-01',status:'Draft',created:'2026-07-12',items:[{description:'Premium Penthouse',qty:1,rate:70000000,amount:70000000},{description:'3 Car Parkings',qty:3,rate:2000000,amount:6000000},{description:'Interior Design Package',qty:1,rate:4000000,amount:4000000}],notes:'High-value draft. Awaiting board approval for discount.'},
+  {id:'PRO-008',entityId:'ENT-028',entityName:'Nadia Akhter',project:'Jolshiri Abason',unit:'5 Katha Plot',totalValue:'₹2.5 Cr',paymentPlan:'Construction Link',validityDate:'2026-08-10',status:'Accepted',created:'2026-06-28',items:[{description:'5 Katha Premium Plot',qty:1,rate:22000000,amount:22000000},{description:'Landscaping Package',qty:1,rate:1500000,amount:1500000},{description:'Fencing & Gate',qty:1,rate:1500000,amount:1500000}],notes:'Accepted with landscaping package. Following up for booking.'}
 ]);
 window.mockInventory = DB.init('inventory', [
   {id:1,site:'Muktodhara',item:'BSRM Steel 500W',category:'Construction Material',qty:45,unit:'Tons',price:410000,value:18450000,status:'Adequate',reorder:20,lastReceived:'Oct 23, 2024',supplier:'BSRM Steels Ltd.'},
@@ -1470,6 +1480,7 @@ function switchModule(mod) {
     case 'sales_marketing': renderSalesMarketing(el); break;
     case 'dues_recovery': renderDues(el); break;
     case 'contacts': renderEntities(el); break;
+    case 'proposals': renderProposals(el); break;
     case 'land_mgmt': renderLandMgmt(el); break;
     case 'plots': renderPlots(el); break;
     case 'projects': renderProjects(el); break;
@@ -4071,6 +4082,186 @@ function getEntityRoles(e){
   if(r.landowner)m.push('🌳 Landowner');if(r.channelPartner)m.push('🔗 Channel Partner');
   return m.length?m:['—'];
 }
+
+// ═══ ACTIVITY LOG DATA ═══
+window.mockActivities = DB.init('activities', [
+  {id:'ACT-001',entityId:'ENT-001',type:'Call',timestamp:'2026-07-08T10:30:00',description:'Discussed plot location options with Tariqul. Prefers south-facing plot near lake.',user:'Iftekhar'},
+  {id:'ACT-002',entityId:'ENT-001',type:'Note',timestamp:'2026-07-05T14:00:00',description:'Proposal PRO-001 created for Muktodhara Plot M-103.',user:'System'},
+  {id:'ACT-003',entityId:'ENT-004',type:'Call',timestamp:'2026-07-07T11:00:00',description:'Called Dr. Rubina regarding NRB remittance process. She will visit next week.',user:'Hasanul'},
+  {id:'ACT-004',entityId:'ENT-004',type:'📋 Proposal',timestamp:'2026-07-05T09:00:00',description:'Proposal PRO-002 sent to Dr. Rubina Ali for Jolshiri Apt 4B.',user:'System'},
+  {id:'ACT-005',entityId:'ENT-017',type:'💰 Payment',timestamp:'2026-07-03T15:30:00',description:'Booking payment received for Apt 9A. Amount: ₹10,00,000.',user:'Iftekhar'},
+  {id:'ACT-006',entityId:'ENT-017',type:'Meeting',timestamp:'2026-07-01T10:00:00',description:'Site visit with Kamrul Hasan. Showed Jolshiri Apt 9A and common areas.',user:'Hasanul'},
+  {id:'ACT-007',entityId:'ENT-005',type:'📋 Proposal',timestamp:'2026-06-25T16:00:00',description:'Proposal PRO-004 created for Delwar Hossain but later rejected.',user:'System'},
+  {id:'ACT-008',entityId:'ENT-007',type:'Call',timestamp:'2026-07-09T13:00:00',description:'Follow-up call with Mizanur about full payment discount offer.',user:'Iftekhar'},
+  {id:'ACT-009',entityId:'ENT-007',type:'📋 Proposal',timestamp:'2026-07-10T08:00:00',description:'Proposal PRO-005 sent to Mizanur Rahman with full payment discount.',user:'System'},
+  {id:'ACT-010',entityId:'ENT-008',type:'🔄 Status',timestamp:'2026-06-18T09:30:00',description:'Lead converted to Booking BKG-105. Shahidul now a confirmed buyer.',user:'System'},
+  {id:'ACT-011',entityId:'ENT-008',type:'📋 Proposal',timestamp:'2026-06-15T10:00:00',description:'Proposal PRO-006 converted to booking. Great deal closed!',user:'System'},
+  {id:'ACT-012',entityId:'ENT-008',type:'💰 Payment',timestamp:'2026-06-18T11:00:00',description:'Advance payment of ₹5,00,000 received from Shahidul Islam.',user:'Iftekhar'},
+  {id:'ACT-013',entityId:'ENT-010',type:'Meeting',timestamp:'2026-07-06T14:00:00',description:'Met Kazi Nizam at Skyline Towers show flat. Interested in penthouse.',user:'Hasanul'},
+  {id:'ACT-014',entityId:'ENT-010',type:'📋 Proposal',timestamp:'2026-07-12T09:00:00',description:'Proposal PRO-007 drafted for Kazi Nizam - Premium Penthouse ₹8.0 Cr.',user:'System'},
+  {id:'ACT-015',entityId:'ENT-028',type:'Note',timestamp:'2026-07-11T15:00:00',description:'Nadia requested landscaping package addition to proposal.',user:'Iftekhar'},
+  {id:'ACT-016',entityId:'ENT-028',type:'📋 Proposal',timestamp:'2026-06-28T10:00:00',description:'Proposal PRO-008 accepted by Nadia Akhter with landscaping package.',user:'System'},
+  {id:'ACT-017',entityId:'ENT-004',type:'💰 Payment',timestamp:'2026-06-30T12:00:00',description:'Initial advance of ₹2,00,000 received from Dr. Rubina for Apt 4B.',user:'Iftekhar'},
+  {id:'ACT-018',entityId:'ENT-007',type:'Meeting',timestamp:'2026-07-02T11:00:00',description:'Showed Jolshiri 3 Katha plots to Mizanur. He preferred Plot 22.',user:'Hasanul'},
+  {id:'ACT-019',entityId:'ENT-001',type:'Meeting',timestamp:'2026-07-10T16:00:00',description:'Client meeting at office. Discussed payment plan options for Plot M-103.',user:'Hasanul'},
+  {id:'ACT-020',entityId:'ENT-017',type:'🔄 Status',timestamp:'2026-06-30T08:00:00',description:'Booking BKG-101 status updated to Confirmed.',user:'System'}
+]);
+
+// ═══ PROPOSALS MODULE ═══
+function renderProposals(el) {
+  var q=(document.getElementById('propSearch')||{}).value||'';
+  var ft=(document.getElementById('propFStatus')||{}).value||'';
+  var data=mockProposals.filter(function(p){
+    if(ft && p.status!==ft)return false;
+    if(q && p.entityName.toLowerCase().indexOf(q.toLowerCase())<0 && p.project.toLowerCase().indexOf(q.toLowerCase())<0 && p.id.toLowerCase().indexOf(q.toLowerCase())<0)return false;
+    return true;
+  });
+  var stats={
+    total:mockProposals.length,
+    draft:mockProposals.filter(function(p){return p.status==='Draft';}).length,
+    sent:mockProposals.filter(function(p){return p.status==='Sent';}).length,
+    accepted:mockProposals.filter(function(p){return p.status==='Accepted';}).length,
+    converted:mockProposals.filter(function(p){return p.status==='Converted';}).length,
+    value:mockProposals.reduce(function(s,p){return s+(parseInt(String(p.totalValue).replace(/[₹৳,\s]/g,''))||0);},0)
+  };
+  var pag=_pg('proposals',data);
+  el.innerHTML='<div class=\"fade-in\">'+
+    '<div class=\"stats-row\" style=\"grid-template-columns:repeat(6,1fr);margin-bottom:8px\">'+
+      '<div class=\"stat-card\"><div class=\"label\">Total Proposals</div><div style=\"font-size:16px;font-weight:700;margin-top:2px\">'+stats.total+'</div></div>'+
+      '<div class=\"stat-card\"><div class=\"label\">Draft</div><div style=\"font-size:16px;font-weight:700;margin-top:2px;color:#888\">'+stats.draft+'</div></div>'+
+      '<div class=\"stat-card\"><div class=\"label\">Sent</div><div style=\"font-size:16px;font-weight:700;margin-top:2px;color:#1565c0\">'+stats.sent+'</div></div>'+
+      '<div class=\"stat-card\"><div class=\"label\">Accepted</div><div style=\"font-size:16px;font-weight:700;margin-top:2px;color:#2e7d32\">'+stats.accepted+'</div></div>'+
+      '<div class=\"stat-card\"><div class=\"label\">Converted</div><div style=\"font-size:16px;font-weight:700;margin-top:2px;color:#6a1b9a\">'+stats.converted+'</div></div>'+
+      '<div class=\"stat-card\"><div class=\"label\">Total Value</div><div style=\"font-size:13px;font-weight:700;margin-top:2px;color:#e65100\">₹'+(stats.value/100000).toFixed(1)+'L</div></div>'+
+    '</div>'+
+    '<div class=\"tbl-toolbar\" style=\"display:flex;gap:8px;align-items:center;margin-bottom:8px\">'+
+      '<input id=\"propSearch\" placeholder=\"Search proposals...\" style=\"flex:1;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\" value=\"'+(q||'')+'\" oninput=\"renderProposals()\"/>'+
+      '<select id=\"propFStatus\" onchange=\"renderProposals()\" style=\"padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\">'+
+        '<option value=\"\">All Statuses</option>'+
+        '<option value=\"Draft\"'+(ft==='Draft'?' selected':'')+'>Draft</option>'+
+        '<option value=\"Sent\"'+(ft==='Sent'?' selected':'')+'>Sent</option>'+
+        '<option value=\"Accepted\"'+(ft==='Accepted'?' selected':'')+'>Accepted</option>'+
+        '<option value=\"Rejected\"'+(ft==='Rejected'?' selected':'')+'>Rejected</option>'+
+        '<option value=\"Converted\"'+(ft==='Converted'?' selected':'')+'>Converted</option>'+
+      '</select>'+
+      '<button class=\"action-btn primary\" onclick=\"crudCrmProposal()\" style=\"padding:5px 10px;font-size:10px;background:#2F80ED;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;white-space:nowrap\">+ New Proposal</button>'+
+    '</div>'+
+    '<div style=\"display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px\">'+
+    (pag.items.length?pag.items.map(function(p){
+      var statusColor={Draft:'#888',Sent:'#1565c0',Accepted:'#2e7d32',Rejected:'#c62828',Converted:'#6a1b9a'};
+      var isAccepted=p.status==='Accepted';
+      return '<div style=\"padding:12px;background:#fff;border:1px solid #e8e8e8;border-radius:8px;position:relative\">'+
+        '<div style=\"display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px\">'+
+          '<div><div style=\"font-size:12px;font-weight:700\">'+p.entityName+'</div><div style=\"font-size:9px;color:#2F80ED;margin-top:1px\">'+p.id+' · '+p.project+'</div></div>'+
+          '<span style=\"display:inline-block;padding:2px 8px;border-radius:12px;font-size:8px;font-weight:600;color:#fff;background:'+(statusColor[p.status]||'#888')+'\">'+p.status+'</span>'+
+        '</div>'+
+        '<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:9px;color:#555\">'+
+          '<div><span style=\"color:#888\">Unit:</span> '+p.unit+'</div>'+
+          '<div style=\"text-align:right\"><span style=\"color:#888\">Value:</span> <span style=\"font-weight:600;color:#e65100\">'+p.totalValue+'</span></div>'+
+          '<div><span style=\"color:#888\">Plan:</span> '+p.paymentPlan+'</div>'+
+          '<div style=\"text-align:right\"><span style=\"color:#888\">Valid till:</span> '+p.validityDate+'</div>'+
+        '</div>'+
+        (p.notes?'<div style=\"font-size:9px;color:#888;padding:4px 6px;background:#f8f9fa;border-radius:4px;margin-bottom:8px;font-style:italic\">'+p.notes+'</div>':'')+
+        '<div style=\"display:flex;gap:4px;border-top:1px solid #f0f0f0;padding-top:6px\">'+
+          '<button class=\"action-btn\" style=\"padding:2px 8px;font-size:9px;cursor:pointer;border:1px solid #e0e0e0;border-radius:4px;background:#fff\" onclick=\"crudCrmProposal(mockProposals.find(function(x){return x.id===\\''+p.id+'\\'}))\">✎ Edit</button>'+
+          '<button class=\"action-btn\" style=\"padding:2px 8px;font-size:9px;cursor:pointer;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#c62828\" onclick=\"if(confirm(\\'Delete '+p.id+'?\\')){var i=mockProposals.findIndex(function(x){return x.id===\\''+p.id+'\\'});if(i>-1){mockProposals.splice(i,1);DB.save(\\'proposals\\');renderProposals();showToast(\\'Deleted\\',\\'info\\')}}\">✕ Delete</button>'+
+          (isAccepted?'<button class=\"action-btn success\" style=\"padding:2px 8px;font-size:9px;cursor:pointer;border:none;border-radius:4px;background:#2e7d32;color:#fff\" onclick=\"convertProposalToBooking(\\''+p.id+'\\')\">📌 Convert to Booking</button>':'')+
+        '</div></div>';
+    }).join(''):'<div style=\"grid-column:1/-1;text-align:center;padding:30px;color:#999;font-size:11px\">No proposals found.</div>')+
+    '</div>'+
+    _pgHtml('proposals',pag.total,pag.page,pag.totalPages,pag.perPage)+
+  '</div>';
+}
+
+function crudCrmProposal(item) {
+  var n=!item;
+  var p=n?{id:'PRO-'+(mockProposals.length+1).toString().padStart(3,'0'),entityId:'',entityName:'',project:'',unit:'',totalValue:'',paymentPlan:'Construction Link',validityDate:'',status:'Draft',created:new Date().toISOString().split('T')[0],items:[{description:'',qty:1,rate:0,amount:0}],notes:''}:item;
+  var entityOpts=mockEntities.map(function(e){return '<option value=\"'+e.id+'\"'+(p.entityId===e.id?' selected':'')+'>'+e.name+'</option>';}).join('');
+  var itemsHtml=p.items.map(function(it,i){
+    return '<div class=\"prop-item-row\" style=\"display:flex;gap:4px;margin-bottom:4px\">'+
+      '<input id=\"propItemDesc_'+i+'\" placeholder=\"Description\" style=\"flex:2;padding:4px 6px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none\" value=\"'+(it.description||'')+'\"/>'+
+      '<input id=\"propItemQty_'+i+'\" type=\"number\" min=\"1\" style=\"width:40px;padding:4px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none;text-align:center\" value=\"'+(it.qty||1)+'\"/>'+
+      '<input id=\"propItemRate_'+i+'\" type=\"number\" style=\"width:70px;padding:4px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none;text-align:right\" value=\"'+(it.rate||0)+'\" placeholder=\"Rate\"/>'+
+      '<button style=\"padding:2px 6px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;cursor:pointer;font-size:8px;color:#c62828\" onclick=\"this.parentElement.remove()\">✕</button></div>';
+  }).join('');
+  var body=
+    '<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px\">'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Entity</label><select id=\"propEntity\" required style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\" onchange=\"var sel=this.options[this.selectedIndex];var el=document.getElementById(\\'propEntityName\\');if(el&&sel)el.value=sel.text;\">'+
+        '<option value=\"\">Select entity...</option>'+entityOpts+
+      '</select></div>'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Entity Name</label><input id=\"propEntityName\" style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\" value=\"'+(p.entityName||'')+'\"/></div>'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Project</label><input id=\"propProject\" required style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\" value=\"'+(p.project||'')+'\"/></div>'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Unit</label><input id=\"propUnit\" style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\" value=\"'+(p.unit||'')+'\"/></div>'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Total Value</label><input id=\"propTotalValue\" required style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\" value=\"'+(p.totalValue||'')+'\"/></div>'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Payment Plan</label><select id=\"propPaymentPlan\" style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\">'+
+        '<option value=\"Construction Link\"'+(p.paymentPlan==='Construction Link'?' selected':'')+'>Construction Link</option>'+
+        '<option value=\"Installment (24 Months)\"'+(p.paymentPlan==='Installment (24 Months)'?' selected':'')+'>Installment (24 Months)</option>'+
+        '<option value=\"Installment (36 Months)\"'+(p.paymentPlan==='Installment (36 Months)'?' selected':'')+'>Installment (36 Months)</option>'+
+        '<option value=\"Full Payment\"'+(p.paymentPlan==='Full Payment'?' selected':'')+'>Full Payment</option>'+
+      '</select></div>'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Validity Date</label><input id=\"propValidityDate\" type=\"date\" required style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\" value=\"'+(p.validityDate||'')+'\"/></div>'+
+      '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Status</label><select id=\"propStatus\" style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none\">'+
+        '<option value=\"Draft\"'+(p.status==='Draft'?' selected':'')+'>Draft</option>'+
+        '<option value=\"Sent\"'+(p.status==='Sent'?' selected':'')+'>Sent</option>'+
+        '<option value=\"Accepted\"'+(p.status==='Accepted'?' selected':'')+'>Accepted</option>'+
+        '<option value=\"Rejected\"'+(p.status==='Rejected'?' selected':'')+'>Rejected</option>'+
+        '<option value=\"Converted\"'+(p.status==='Converted'?' selected':'')+'>Converted</option>'+
+      '</select></div>'+
+    '</div>'+
+    '<div style=\"margin-bottom:6px\"><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Line Items</label>'+
+    '<div id=\"propItemsContainer\">'+itemsHtml+'</div>'+
+    '<button style=\"padding:3px 10px;font-size:9px;background:#f5f5f5;border:1px dashed #bbb;border-radius:4px;cursor:pointer;margin-top:4px\" onclick=\"var c=document.getElementById(\\'propItemsContainer\\');var idx=c.children.length;var d=document.createElement(\\'div\\');d.className=\\\\'prop-item-row\\\\';d.style=\\\\'display:flex;gap:4px;margin-bottom:4px\\\\';d.innerHTML=\\\\'<input id=\\\\'propItemDesc_\\\\'+idx+'\\\\' placeholder=\\\\'Description\\\\' style=\\\\'flex:2;padding:4px 6px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none\\\\'/><input id=\\\\'propItemQty_\\\\'+idx+'\\\\' type=\\\\'number\\\\' min=\\\\'1\\\\' style=\\\\'width:40px;padding:4px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none;text-align:center\\\\' value=\\\\'1\\\\'/><input id=\\\\'propItemRate_\\\\'+idx+'\\\\' type=\\\\'number\\\\' style=\\\\'width:70px;padding:4px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none;text-align:right\\\\' placeholder=\\\\'Rate\\\\'/><button style=\\\\'padding:2px 6px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;cursor:pointer;font-size:8px;color:#c62828\\\\' onclick=\\\\'this.parentElement.remove()\\\\'>✕</button></div>\\\\';c.appendChild(d);\">+ Add Item</button></div>'+
+    '<div><label style=\"font-size:9px;color:#888;display:block;margin-bottom:2px\">Notes</label><textarea id=\"propNotes\" style=\"width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;resize:vertical;min-height:40px\">'+(p.notes||'')+'</textarea></div>';
+  openModal(n?'New Proposal':'Edit Proposal', body, function(){
+    var g=function(id){var el=document.getElementById(id);return el?el.value:'';};
+    var entityId=g('propEntity');
+    var entityName=g('propEntityName');
+    var items=[];
+    var container=document.getElementById('propItemsContainer');
+    if(container){
+      for(var ci=0;ci<container.children.length;ci++){
+        var descInput=document.getElementById('propItemDesc_'+ci);
+        var qtyInput=document.getElementById('propItemQty_'+ci);
+        var rateInput=document.getElementById('propItemRate_'+ci);
+        if(descInput&&qtyInput&&rateInput){
+          var desc=descInput.value.trim();
+          var qty=parseInt(qtyInput.value)||1;
+          var rate=parseInt(rateInput.value)||0;
+          if(desc)items.push({description:desc,qty:qty,rate:rate,amount:qty*rate});
+        }
+      }
+    }
+    if(items.length===0)items=[{description:g('propItemDesc_0'),qty:parseInt(g('propItemQty_0'))||1,rate:parseInt(g('propItemRate_0'))||0,amount:(parseInt(g('propItemQty_0'))||1)*(parseInt(g('propItemRate_0'))||0)}];
+    var d={entityId:entityId||(p.entityId||''),entityName:entityName||p.entityName,project:g('propProject'),unit:g('propUnit'),totalValue:g('propTotalValue'),paymentPlan:g('propPaymentPlan'),validityDate:g('propValidityDate'),status:g('propStatus'),created:p.created||new Date().toISOString().split('T')[0],items:items,notes:g('propNotes')};
+    if(n){
+      d.id='PRO-'+(mockProposals.length+1).toString().padStart(3,'0');
+      mockProposals.push(d);
+      // Log activity
+      mockActivities.push({id:'ACT-'+(mockActivities.length+1).toString().padStart(3,'0'),entityId:d.entityId,type:'📋 Proposal',timestamp:new Date().toISOString(),description:'Proposal '+d.id+' created for '+d.project+' '+d.unit,user:'System'});
+      DB.save('activities');
+    }else{
+      Object.assign(p,d);
+    }
+    DB.save('proposals');
+    showToast('Proposal '+(n?'created':'updated')+'!','success');
+    renderProposals();
+  });
+}
+
+function convertProposalToBooking(id) {
+  var p=mockProposals.find(function(x){return x.id===id});if(!p)return;
+  var existingBookingsCount=mockBookings.length+1;
+  mockBookings.push({id:'BKG-'+(100+existingBookingsCount),client:p.entityName,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:p.project,unit:p.unit,price:p.totalValue,advance:'৳0',status:'Pending Review',type:'Plot',entityId:p.entityId});
+  p.status='Converted';
+  // Log activity
+  mockActivities.push({id:'ACT-'+(mockActivities.length+1).toString().padStart(3,'0'),entityId:p.entityId,type:'🔄 Status',timestamp:new Date().toISOString(),description:'Proposal '+p.id+' converted to Booking BKG-'+(100+existingBookingsCount-1)+'.',user:'System'});
+  DB.save('activities');
+  DB.save('bookings');
+  DB.save('proposals');
+  renderProposals();
+  showToast('Proposal converted to booking!','success');
+}
+
 function renderEntities(el){
   var q=(document.getElementById('entitiesSearch')||{}).value||'';
   var ft=(document.getElementById('entitiesFType')||{}).value||'';
@@ -4153,8 +4344,16 @@ function openEntity(id, tab){
     '<div style=\"margin-top:10px;display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f8f9fa;border-radius:6px\"><span style=\"font-size:11px;font-weight:600\">📊 Total Purchases</span><span style=\"font-weight:700;font-size:13px\">'+e.totalPurchases+' ('+(e.totalValue||'0')+')</span></div>'+
     membersHtml+
     purchaseHtml+
-    (e.notes?'<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">📝 Notes</h3><div style=\"font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px\">'+e.notes+'</div></div>':'')+
-    '<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:6px\">📊 Activity</h3><div style=\"padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px\">Activity log coming soon.</div></div>';
+    (e.notes?'<div style=\\"margin-top:10px\\"><h3 style=\\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\\">📝 Notes</h3><div style=\\"font-size:11px;color:#555;padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px\\">'+e.notes+'</div></div>':'')+
+    '<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:6px\">📊 Activity</h3>'+
+    '<div style=\"padding:8px 10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:8px\">'+
+    '<div style=\"display:flex;gap:5px;margin-bottom:5px\"><select id=\"entityActTypeFilter\" onchange=\"openEntity(\''+e.id+'\',\'overview\')\" style=\"padding:4px 6px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none\">'+
+    '<option value=\"\">All Types</option><option value=\"Call\">📞 Call</option><option value=\"Meeting\">👥 Meeting</option><option value=\"Note\">📝 Note</option><option value=\"💰 Payment\">💰 Payment</option><option value=\"📋 Proposal\">📋 Proposal</option><option value=\"🔄 Status\">🔄 Status</option></select></div>'+
+    '<div style=\"display:flex;gap:5px;margin-bottom:2px\"><select id=\"entityActTypeAdd\" style=\"padding:4px 6px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none\">'+
+    '<option value=\"Call\">📞 Call</option><option value=\"Meeting\">👥 Meeting</option><option value=\"Note\">📝 Note</option><option value=\"💰 Payment\">💰 Payment</option></select>'+
+    '<input id=\"entityActTextAdd\" placeholder=\"Log activity...\" style=\"flex:1;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:9px;outline:none\"/>'+
+    '<button onclick=\"addEntityActivity(\''+e.id+'\')\" style=\"padding:5px 10px;background:#2F80ED;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:9px;font-weight:600\">Log</button></div></div>'+
+    '<div id=\"entityActivityList\">'+function(){var activities=window.mockActivities||[];var eActivities=activities.filter(function(a){return a.entityId===e.id;});var typeF=(document.getElementById('entityActTypeFilter')||{}).value||'';if(typeF)eActivities=eActivities.filter(function(a){return a.type===typeF;});eActivities.sort(function(a,b){return b.timestamp.localeCompare(a.timestamp);});if(eActivities.length){return eActivities.map(function(a){var iconMap={Call:'📞',Meeting:'👥',Note:'📝','💰 Payment':'💰','📋 Proposal':'📋','🔄 Status':'🔄'};return '<div class=\"activity-item\"><div style=\"display:flex;justify-content:space-between;margin-bottom:3px\"><span style=\"font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px\"><span>'+(iconMap[a.type]||'📝')+' '+(a.type===\"Call\"||a.type===\"Meeting\"||a.type===\"Note\"?a.type:'')+'</span><span style=\"font-weight:400;color:#888\">by '+a.user+'</span></span><span style=\"font-size:9px;color:#999\">'+new Date(a.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</span></div><div style=\"font-size:11px;color:#555\">'+a.description+'</div></div>';}).join('');}else{return '<div style=\"padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:10px\">No activity logged yet.</div>';}}()+'</div></div>';
   // Statement tab
   function renderStatementTab(){
     var leads=mockLeads.filter(function(l){return l.entityId===e.id;});
@@ -4176,7 +4375,9 @@ function openEntity(id, tab){
       '</div>'+
       '<div class=\"card\"><div class=\"card-body\" style=\"padding:0\"><div class=\"table-wrap\"><table style=\"font-size:10px\"><thead><tr><th>Date</th><th>Description</th><th class=\"num\">Amount</th><th>Status</th><th class=\"num\">Balance</th></tr></thead><tbody>'+
       (transactions.length?transactions.map(function(t){running+=t.status==='Paid'?t.amtNum:0;return '<tr><td style=\"font-size:9px\">'+t.date+'</td><td>'+t.desc+'</td><td class=\"num\" style=\"font-weight:600;color:'+(t.status==='Paid'?'#2e7d32':'#c62828')+'\">'+t.amount+'</td><td><span class=\"badge-status '+(t.status==='Paid'||t.status==='Confirmed'?'badge-active':'badge-pending')+'\">'+t.status+'</span></td><td class=\"num\" style=\"font-weight:600\">₹'+running.toLocaleString('en-IN')+'</td></tr>';}).join(''):'<tr><td colspan=\"5\" style=\"text-align:center;color:#999;padding:12px\">No payment records found.</td></tr>')+
-      '</tbody></table></div></div></div></div>';
+      '</tbody></table></div></div></div>'+
+    (function(){var proposals=window.mockProposals||[];var ePro=proposals.filter(function(p){return p.entityId===e.id;});if(ePro.length===0)return '';return '<div style=\"margin-top:10px\"><h3 style=\"font-size:11px;font-weight:600;color:#555;margin-bottom:4px\">📋 Proposals ('+ePro.length+')</h3><div style=\"font-size:10px\">'+ePro.map(function(p){var statusColor={Draft:'#888',Sent:'#1565c0',Accepted:'#2e7d32',Rejected:'#c62828',Converted:'#6a1b9a'};return '<div style=\"padding:5px 8px;margin-bottom:3px;background:#fff;border:1px solid #e8e8e8;border-radius:4px;display:flex;justify-content:space-between;align-items:center\"><div><b>'+p.id+'</b> · '+p.project+' '+p.unit+'</div><div style=\"text-align:right\"><div style=\"font-weight:600\">'+p.totalValue+'</div><span style=\"display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+(statusColor[p.status]||'#888')+'\">'+p.status+'</span></div></div>';}).join('')+'</div></div>';})()+
+    '</div>';
   }
   // Reminders tab
   function renderRemindersTab(){
@@ -4213,6 +4414,20 @@ function openEntity(id, tab){
     bodyContent,
     '<div class=\"lead-footer\"><button class=\"lead-foot-btn primary\" onclick=\"crudEntity(mockEntities.find(function(x){return x.id===\\''+e.id+'\\'}));closeLeadPanel()\">✎ Edit</button><button class=\"lead-foot-btn\" onclick=\"closeLeadPanel()\">✕ Close</button></div>'
   );
+}
+
+// ═══ ENTITY ACTIVITY LOG ═══
+function addEntityActivity(id) {
+  var e=mockEntities.find(function(x){return x.id===id});if(!e)return;
+  var type=document.getElementById('entityActTypeAdd').value;
+  var text=document.getElementById('entityActTextAdd').value;
+  if(!text.trim()){showToast('Please enter activity text','error');return;}
+  if(!window.mockActivities)window.mockActivities=[];
+  mockActivities.push({id:'ACT-'+(mockActivities.length+1).toString().padStart(3,'0'),entityId:id,type:type,timestamp:new Date().toISOString(),description:text,user:'System'});
+  DB.save('activities');
+  document.getElementById('entityActTextAdd').value='';
+  openEntity(id,'overview');
+  showToast('Activity logged!','success');
 }
 
 function crudEntity(item){
@@ -5079,6 +5294,7 @@ var _sdDatasetDefs=[
   {g:'Sales & CRM',arr:'mockDuesPromises',label:'Promises',icon:'📅',mod:'dues_recovery',fields:['name']},
   {g:'Sales & CRM',arr:'mockReminders',label:'Reminders',icon:'🔔',mod:'contacts',fields:['title','priority','status']},
   {g:'Sales & CRM',arr:'mockVault',label:'Vault',icon:'🔒',mod:'contacts',fields:['name','category']},
+  {g:'Sales & CRM',arr:'mockProposals',label:'Proposals',icon:'📋',mod:'proposals',fields:['id','entityName','project','totalValue','status']},
   // Group: Land & Projects
   {g:'Land & Projects',arr:'mockPlots',label:'Plots',icon:'🏞️',mod:'plots',fields:['id','type','status']},
   {g:'Land & Projects',arr:'mockProjects',label:'Projects',icon:'🏗️',mod:'projects',fields:['name','location','status']},
@@ -5669,7 +5885,7 @@ function openLeadPanel(leadId,tab){
   content.innerHTML='<div class="lead-header" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;gap:10px;align-items:center"><div class="lead-avatar">'+leadGetInitials(l.name)+'</div><div><div class="lead-info-row" style="margin-bottom:3px"><span class="lead-badge" style="background:'+leadBadgeColor(l.type)+'15;color:'+leadBadgeColor(l.type)+';border:1px solid '+leadBadgeColor(l.type)+'">'+l.type+'</span><span class="lead-badge" style="background:'+leadBadgeColor(l.status)+'15;color:'+leadBadgeColor(l.status)+';border:1px solid '+leadBadgeColor(l.status)+'">'+l.status+'</span><span class="lead-badge" style="background:'+leadBadgeColor(l.source)+'15;color:'+leadBadgeColor(l.source)+';border:1px solid '+leadBadgeColor(l.source)+'">'+l.source+'</span></div><div style="font-size:14px;font-weight:700;color:#222">'+l.name+'</div><div style="font-size:11px;color:#2F80ED;margin-top:1px">'+l.property+'</div></div></div><span onclick="closeLeadPanel()" style="cursor:pointer;color:#999;font-size:16px;padding:3px">✕</span></div></div>';
   content.innerHTML+='<div class="lead-tabs">'+tabs.map(function(t,i){return '<div class="lead-tab '+(t===tab?'active':'')+'" onclick="openLeadPanel('+l.id+',\''+t+'\')">'+tabLabels[i]+'</div>';}).join('')+'</div>';
   content.innerHTML+='<div class="lead-body">'+tabContent+'</div>';
-  content.innerHTML+='<div class="lead-footer"><button class="lead-foot-btn" onclick="showToast(\'PDF export coming soon\',\'info\')">⬇ PDF</button><button class="lead-foot-btn" onclick="showToast(\'Email feature coming soon\',\'info\')">✉ Email</button><button class="lead-foot-btn primary" onclick="showToast(\'Dialing '+l.phone+'...\',\'info\')">📞 Call</button>'+(isClient?'<button class="lead-foot-btn success" onclick="openAddLeadInstallment('+l.id+')">💰 Collect</button>':'<button class="lead-foot-btn success" onclick="convertLeadToBooking('+l.id+')">📌 Book</button>')+'</div>';
+  content.innerHTML+='<div class="lead-footer"><button class="lead-foot-btn" onclick="showToast(\'PDF export coming soon\',\'info\')">⬇ PDF</button><button class="lead-foot-btn" onclick="showToast(\'Email feature coming soon\',\'info\')">✉ Email</button><button class="lead-foot-btn primary" onclick="showToast(\'Dialing '+l.phone+'...\',\'info\')">📞 Call</button>'+(isClient?'<button class="lead-foot-btn success" onclick="openAddLeadInstallment('+l.id+')">💰 Collect</button>':'<button class="lead-foot-btn success" onclick="convertLeadToBooking('+l.id+')">📌 Book</button>')+(isClient?'':'<button class="lead-foot-btn" style="background:#6a1b9a;color:#fff" onclick="convertLeadToCustomer('+l.id+')">🔄 Convert to Customer</button>')+'</div>';
   container.classList.add('active');
   setTimeout(function(){var e=document.querySelector('#leadActText');if(e)e.focus()},400);
 }
@@ -5706,7 +5922,69 @@ function convertLeadToBooking(id){
   l.status='Booking';l.priority='Low';
   if(!l.activities)l.activities=[];
   l.activities.push({type:'Note',user:'System',date:'Just now',text:'Converted to booking.'});
+  // Log entity activity
+  if(l.entityId&&window.mockActivities){
+    mockActivities.push({id:'ACT-'+(mockActivities.length+1).toString().padStart(3,'0'),entityId:l.entityId,type:'💰 Payment',timestamp:new Date().toISOString(),description:'Lead '+l.name+' converted to booking - '+l.property,user:'System'});
+    DB.save('activities');
+  }
   closeLeadPanel();DB.save('leads');DB.save('bookings');renderModule();showToast('Converted to booking!');
+}
+
+function convertLeadToCustomer(id){
+  const l=mockLeads.find(x=>x.id===id);if(!l)return;
+  // Check if entity already exists by name
+  var existingEntity=mockEntities.find(function(e){return e.name.toLowerCase()===l.name.toLowerCase();});
+  var entityId=existingEntity?existingEntity.id:null;
+  var entityName=l.name;
+  var body='<div style="padding:8px"><h4 style="font-size:12px;font-weight:600;margin-bottom:10px">🔄 Convert Lead to Customer</h4>'+
+    '<div style="margin-bottom:10px;padding:8px;background:#f0f4ff;border-radius:6px;font-size:10px">'+
+    'Converting <b>'+l.name+'</b> ('+l.property+')</div>'+
+    '<div style="margin-bottom:8px"><label style="font-size:9px;color:#888;display:block;margin-bottom:2px">Entity</label>'+
+    '<select id="convEntitySelect" style="width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none" onchange="document.getElementById(\'convEntityName\').value=this.options[this.selectedIndex].text;document.getElementById(\'convCreateNew\').style.display=this.value===\'__new__\'?\'block\':\'none\'">'+
+    '<option value="">Select existing...</option>'+
+    mockEntities.map(function(e){return '<option value="'+e.id+'"'+(existingEntity&&existingEntity.id===e.id?' selected':'')+'>'+e.name+'</option>';}).join('')+
+    '<option value="__new__">✦ Create new entity...</option></select></div>'+
+    '<div id="convCreateNew" style="display:'+(existingEntity?'none':'block')+'">'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'+
+    '<div><label style="font-size:9px;color:#888;display:block;margin-bottom:2px">Name</label><input id="convEntityName" style="width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none" value="'+(entityName||'')+'"/></div>'+
+    '<div><label style="font-size:9px;color:#888;display:block;margin-bottom:2px">Phone</label><input id="convPhone" style="width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none" value="'+(l.phone||'')+'"/></div>'+
+    '<div><label style="font-size:9px;color:#888;display:block;margin-bottom:2px">Email</label><input id="convEmail" style="width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none" value="'+(l.email||'')+'"/></div>'+
+    '<div><label style="font-size:9px;color:#888;display:block;margin-bottom:2px">Source</label><input id="convSource" style="width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none" value="'+(l.source||'Lead Conversion')+'"/></div></div>'+
+    '</div>'+
+    '<div style="margin-bottom:8px"><label style="font-size:9px;color:#888;display:block;margin-bottom:2px">Notes</label><textarea id="convNotes" style="width:100%;padding:5px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;resize:vertical;min-height:40px">Converted from lead: '+l.name+' ('+l.property+')</textarea></div>'+
+    '</div>';
+  openModal('Convert to Customer', body, function(){
+    var g=function(i){var el=document.getElementById(i);return el?el.value:'';};
+    var selId=g('convEntitySelect');
+    if(selId==='__new__'||!selId){
+      // Create new entity
+      var newName=g('convEntityName')||l.name;
+      existingEntity={id:'ENT-'+(mockEntities.length+1).toString().padStart(3,'0'),type:'individual',name:newName,phone:g('convPhone')||l.phone||'',email:g('convEmail')||l.email||'',address:l.address||'',nid:'',roles:{customer:true,buyer:true},linkedIds:{},priority:'Normal',source:g('convSource')||'Lead Conversion',notes:g('convNotes'),created:new Date().toISOString().split('T')[0],totalPurchases:0,totalValue:l.value||'৳0'};
+      mockEntities.push(existingEntity);
+      DB.save('entities');
+      entityId=existingEntity.id;
+      entityName=newName;
+    } else {
+      entityId=selId;
+      entityName=document.getElementById('convEntityName')?document.getElementById('convEntityName').value:l.name;
+    }
+    // Update lead with entityId
+    l.entityId=entityId;
+    // Create booking
+    mockBookings.push({id:'BKG-'+(100+mockBookings.length+1),client:entityName,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:l.property.split('-')[0].trim(),unit:l.property.split('-')[1]||'—',price:l.value,advance:'৳0',status:'Pending Review',type:'Plot',entityId:entityId});
+    // Change lead status
+    l.status='Booking';l.priority='Low';
+    // Log activities
+    if(!l.activities)l.activities=[];
+    l.activities.push({type:'Note',user:'System',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),text:'Converted to customer and booking.'});
+    if(window.mockActivities){
+      mockActivities.push({id:'ACT-'+(mockActivities.length+1).toString().padStart(3,'0'),entityId:entityId,type:'🔄 Status',timestamp:new Date().toISOString(),description:'Lead '+l.name+' converted to customer. Booking created for '+l.property,user:'System'});
+      DB.save('activities');
+    }
+    DB.save('leads');DB.save('bookings');
+    closeLeadPanel();renderModule();
+    showToast(entityName+' converted to customer!','success');
+  });
 }
 // ═══ LEAD SCORING ═══
 function calcLeadScore(l){
@@ -5833,7 +6111,7 @@ function filterLeads(){
     return true;
   });
 }
-const GROUPS_LOOKUP = {dashboard:'executive',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'finance_admin',documents:'finance_admin',knowledge_base:'finance_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
+const GROUPS_LOOKUP = {dashboard:'executive',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',proposals:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'finance_admin',documents:'finance_admin',knowledge_base:'finance_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
 
 // ═══ CRUD ═══
 function openModal(title,body,onSave){
