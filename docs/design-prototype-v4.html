@@ -199,7 +199,88 @@
     .pagination .pg-btn.pg-active{background:#2F80ED;color:#fff;border-color:#2F80ED;font-weight:600}
     .pagination .pg-info{font-size:9px;color:#999;margin-left:auto;white-space:nowrap}
     .pagination .pg-perpage{font-size:9px;padding:2px 4px;border:1px solid #e0e0e0;border-radius:3px;color:#555;background:#fff;outline:none;cursor:pointer;margin-left:4px}
-    @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:fixed;inset:0;background:#fff;padding:20px;overflow:auto;z-index:9999}#printArea table{font-size:10px}#printArea th{background:#f5f5f5!important;color:#333!important}}
+    
+    @media(max-width:768px){
+      body{overflow:auto!important;height:auto!important}
+      .app-shell{flex-direction:column!important;height:auto!important;min-height:100vh!important;padding-bottom:60px}
+      #sidebar{width:100%!important;min-width:100%!important;flex-direction:row!important;height:auto!important;position:fixed!important;bottom:0!important;top:auto!important;left:0!important;z-index:999!important;border-right:none!important;border-top:1px solid #e8e8e8!important;background:#fff!important;overflow-x:auto!important;padding:0 4px!important}
+      .sidebar-logo{display:none!important}
+      .sidebar-scroll{flex-direction:row!important;padding:4px!important;gap:2px!important;overflow-x:auto!important;overflow-y:hidden!important;align-items:center!important;width:100%!important}
+      .sidebar-item{width:38px!important;height:36px!important;margin:0!important;flex-shrink:0!important}
+      .sidebar-item.active::before{left:auto!important;top:auto!important;bottom:0!important;left:4px!important;right:4px!important;width:auto!important;height:2px!important}
+      .sidebar-item svg{width:16px!important;height:16px!important}
+      .sidebar-item[data-tip]:hover::after{display:none!important}
+      .sidebar-item.has-children::after{display:none!important}
+      .s-grp-sep{width:1px!important;height:20px!important;margin:0 3px!important;flex-shrink:0!important}
+      .sidebar-bottom{display:none!important}
+      .main-area{flex:none!important;height:auto!important}
+      .top-bar{height:40px!important;min-height:40px!important;padding:0 8px!important;gap:8px!important;position:sticky!important;top:0!important;z-index:50!important}
+      .top-nav{overflow-x:auto!important;gap:2px!important;-webkit-overflow-scrolling:touch!important}
+      .top-nav-item{padding:4px 8px!important;font-size:10px!important;white-space:nowrap!important;flex-shrink:0!important}
+      .top-nav-item.badge-new::after{font-size:7px!important;padding:0 3px!important}
+      .top-actions .icon-btn{width:26px!important;height:26px!important;flex-shrink:0!important}
+      .top-actions .icon-btn svg{width:14px!important;height:14px!important}
+      .top-actions .user-avatar{width:22px!important;height:22px!important;font-size:8px!important}
+      .content{padding:4px 6px!important;overflow-y:visible!important;height:auto!important}
+      #searchBar{width:100px!important}
+      #searchBar:focus-within{width:160px!important}
+      #searchDropdown{width:calc(100vw - 16px)!important;left:8px!important;top:calc(100% + 2px)!important;max-height:360px!important}
+      .stats-row{grid-template-columns:repeat(2,1fr)!important;gap:2px!important}
+      .stat-card{padding:3px 6px!important}
+      .stat-card .value{font-size:13px!important}
+      .card{border-radius:6px!important}
+      .card-header{padding:3px 6px!important}
+      .card-header h3{font-size:10px!important}
+      .card-body{padding:4px!important}
+      table{font-size:10px!important}
+      thead th{padding:3px 6px!important;font-size:8px!important}
+      tbody td{padding:2px 6px!important;white-space:nowrap!important}
+      .toolbar{gap:3px!important;flex-wrap:wrap!important}
+      .toolbar select{font-size:9px!important;padding:3px 20px 3px 6px!important}
+      .toolbar .search-box{max-width:140px!important;flex:0 1 auto!important}
+      .toolbar .action-btn{padding:3px 8px!important;font-size:9px!important}
+      .toolbar .filter-btn{padding:3px 6px!important;font-size:9px!important}
+      .page-title{font-size:11px!important}
+      .page-subtitle{font-size:9px!important;display:block!important;margin-left:0!important}
+      .tabs{gap:1px!important}
+      .tab{padding:3px 6px!important;font-size:9px!important}
+      .pagination{gap:2px!important;padding:4px 6px!important}
+      .pagination .pg-btn{padding:2px 6px!important;font-size:9px!important;min-width:22px!important}
+      .pagination .pg-info{font-size:8px!important}
+      .kanban-col{min-width:140px!important}
+      .kanban-card{padding:4px 6px!important}
+      .kanban-card .badge-status{font-size:7px!important}
+      .group-grid{grid-template-columns:repeat(2,1fr)!important;gap:6px!important}
+      .dashboard-quick{grid-template-columns:repeat(2,1fr)!important;gap:3px!important}
+      .plot-grid{grid-template-columns:repeat(5,1fr)!important}
+      .slide-out .panel{width:100vw!important;max-width:100vw!important;border-radius:0!important;animation:slideUp .25s ease-out!important}
+      .lead-panel{width:100vw!important;max-width:100vw!important}
+      .tbl-toolbar{padding:4px 6px!important}
+      .tbl-toolbar .tt-btn{padding:3px 6px!important;font-size:9px!important}
+      .filter-panel{padding:4px 6px!important}
+      .filter-panel select,.filter-panel input{font-size:9px!important;padding:3px 6px!important}
+      .content-footer .breadcrumb{font-size:9px!important}
+      .top-nav-item{user-select:none!important;-webkit-tap-highlight-color:transparent!important}
+      .sidebar-item{-webkit-tap-highlight-color:transparent!important}
+      .toast-container{bottom:70px!important;right:10px!important;left:10px!important}
+      .toast{font-size:10px!important;padding:6px 10px!important;text-align:center!important}
+      .lead-tab{padding:6px 10px!important;font-size:10px!important}
+      #quickAddDropdown .panel{max-width:100vw!important;width:100vw!important;height:100%!important;border-radius:0!important;animation:slideUp .25s ease-out!important}
+      #quickAddDropdown .backdrop{background:rgba(0,0,0,.5)!important;flex:0!important;height:0!important}
+      #qaGrid{max-height:calc(100vh - 160px)!important}
+    }
+    @media(max-width:480px){
+      .stats-row{grid-template-columns:repeat(2,1fr)!important}
+      .group-grid{grid-template-columns:1fr!important}
+      .dashboard-quick{grid-template-columns:1fr!important}
+      .sidebar-item{width:32px!important;height:32px!important}
+      .sidebar-item svg{width:14px!important;height:14px!important}
+      #searchBar{width:70px!important}
+      #searchBar:focus-within{width:120px!important}
+      .top-actions{gap:3px!important}
+    }
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:fixed;inset:0;background:#fff;padding:20px;overflow:auto;z-index:9999}#printArea table{font-size:10px}#printArea th{background:#f5f5f5!important;color:#333!important}}
   </style>
   <style>
     /* Global tooltip system */
@@ -323,9 +404,11 @@
 </head>
 <body>
 <div id="quickAddDropdown" class="slide-out top-dropdown"><div class="backdrop" onclick="closeQuickAdd()"></div><div class="panel" style="padding:12px;max-width:420px">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:13px;font-weight:600">Quick Add</span><span onclick="closeQuickAdd()" style="cursor:pointer;color:#999;font-size:15px;padding:2px">✕</span></div>
-  <div id="qaSearch" style="margin-bottom:8px"><input placeholder="Search module..." oninput="filterQuickAdd(this.value)" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px;outline:none;background:transparent"/></div>
-  <div id="qaGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;overflow-y:auto;max-height:380px"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:13px;font-weight:600"><span id="qaRecentBadge" style="display:none;font-size:9px;color:#888;font-weight:400;margin-left:8px"></span></span><span onclick="closeQuickAdd()" style="cursor:pointer;color:#999;font-size:15px;padding:2px;width:28px;text-align:center">✕</span></div>
+  <div id="qaSearch" style="margin-bottom:8px;position:relative"><input id="qaSearchInput" placeholder="Search module... (type or Alt+N to open)" oninput="filterQuickAdd(this.value)" style="width:100%;padding:6px 28px 6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px;outline:none;background:transparent"/><span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:8px;color:#bbb;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:3px;padding:0 4px;line-height:1.6">N</span></div>
+  <div class="toolbar" style="margin-bottom:6px;display:flex;gap:3px;flex-wrap:wrap"><span class="qa-tab active" data-qa-tab="all" onclick="qaSetTab('all')" style="padding:2px 8px;font-size:9px;font-weight:500;border-radius:4px;cursor:pointer;background:#2F80ED;color:#fff">All</span><span class="qa-tab" data-qa-tab="recent" onclick="qaSetTab('recent')" style="padding:2px 8px;font-size:9px;font-weight:500;border-radius:4px;cursor:pointer;background:#f0f0f0;color:#666">Recent</span><span class="qa-tab" data-qa-tab="Sales" onclick="qaSetTab('Sales')" style="padding:2px 8px;font-size:9px;font-weight:500;border-radius:4px;cursor:pointer;background:#f0f0f0;color:#666">Sales</span><span class="qa-tab" data-qa-tab="Land" onclick="qaSetTab('Land')" style="padding:2px 8px;font-size:9px;font-weight:500;border-radius:4px;cursor:pointer;background:#f0f0f0;color:#666">Land</span><span class="qa-tab" data-qa-tab="Finance" onclick="qaSetTab('Finance')" style="padding:2px 8px;font-size:9px;font-weight:500;border-radius:4px;cursor:pointer;background:#f0f0f0;color:#666">Finance</span><span class="qa-tab" data-qa-tab="Construction" onclick="qaSetTab('Construction')" style="padding:2px 8px;font-size:9px;font-weight:500;border-radius:4px;cursor:pointer;background:#f0f0f0;color:#666">Construction</span><span class="qa-tab" data-qa-tab="Customer" onclick="qaSetTab('Customer')" style="padding:2px 8px;font-size:9px;font-weight:500;border-radius:4px;cursor:pointer;background:#f0f0f0;color:#666">Customer</span></div>
+  <div id="qaGrid" style="display:flex;flex-direction:column;overflow-y:auto;max-height:340px;gap:2px"></div>
+  <div style="margin-top:8px;padding-top:6px;border-top:1px solid #f0f0f0;font-size:8px;color:#ccc;display:flex;justify-content:space-between"><span><kbd style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:2px;padding:0 3px;font-size:8px">Alt+N</kbd> Open · <kbd style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:2px;padding:0 3px;font-size:8px">Esc</kbd> Close</span><span>'+_qaItems.length+' items</span></div>
 </div></div>
 
 <div class="app-shell">
@@ -367,6 +450,7 @@
     <div class="top-bar">
       <div class="top-nav" id="topNav"></div>
       <div class="top-actions" style="position:relative">
+        <div id="mobileSideBtn" onclick="toggleMobileSidebar()" style="display:none;width:26px;height:26px;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#666;font-size:16px" class="mobile-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
         <div id="searchWrap">
           <div id="searchBar" tabindex="-1">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -4314,31 +4398,68 @@ var _qaItems = [
   {g:'Docs',icon:'📚',label:'KB Article',fn:'crudArticle',sub:'Knowledge base'},
 ];
 var _qaCache='';
+var _qaTab='all';
+var _qaRecent=JSON.parse(localStorage.getItem('qa_recent')||'[]');
+function qaTrackUse(label){
+  _qaRecent=_qaRecent.filter(function(x){return x!==label});
+  _qaRecent.unshift(label);
+  if(_qaRecent.length>8)_qaRecent=_qaRecent.slice(0,8);
+  localStorage.setItem('qa_recent',JSON.stringify(_qaRecent));
+}
 function openQuickAdd(){
   document.getElementById('quickAddDropdown').classList.add('active');
+  _qaTab='all';
   renderQuickAdd('');
-  document.querySelector('#qaSearch input').value='';
-  document.querySelector('#qaSearch input').focus();
+  document.getElementById('qaSearchInput').value='';
+  document.getElementById('qaSearchInput').focus();
+  var recBadge=document.getElementById('qaRecentBadge');
+  if(_qaRecent.length){recBadge.style.display='inline';recBadge.textContent=_qaRecent.length+' recent';}else recBadge.style.display='none';
+  document.querySelectorAll('.qa-tab').forEach(function(t){t.style.background=t.dataset.qaTab==='all'?'#2F80ED':'#f0f0f0';t.style.color=t.dataset.qaTab==='all'?'#fff':'#666'});
 }
 function closeQuickAdd(){
   document.getElementById('quickAddDropdown').classList.remove('active');
+}
+function qaSetTab(tab){
+  _qaTab=tab;
+  document.querySelectorAll('.qa-tab').forEach(function(t){
+    var is=t.dataset.qaTab===tab;
+    t.style.background=is?'#2F80ED':'#f0f0f0';
+    t.style.color=is?'#fff':'#666';
+  });
+  renderQuickAdd(document.getElementById('qaSearchInput').value);
 }
 function renderQuickAdd(q){
   var grid=document.getElementById('qaGrid');
   if(!grid)return;
   var items=_qaItems;
   if(q){var lq=q.toLowerCase();items=items.filter(function(i){return i.label.toLowerCase().includes(lq)||i.sub.toLowerCase().includes(lq)||i.g.toLowerCase().includes(lq)});}
-  if(!items.length){grid.innerHTML='<div style="text-align:center;padding:30px;color:#999;font-size:12px">No modules match "'+q+'"</div>';return}
-  var html='';var lastG='';
+  if(_qaTab==='recent'){items=items.filter(function(i){return _qaRecent.indexOf(i.label)>=0});items.sort(function(a,b){return _qaRecent.indexOf(a.label)-_qaRecent.indexOf(b.label)});}
+  else if(_qaTab!=='all'){items=items.filter(function(i){return i.g===_qaTab});}
+  if(!items.length){grid.innerHTML='<div style="text-align:center;padding:30px;color:#999;font-size:12px">No modules match "'+(q||_qaTab)+'"</div>';return}
+  var html='<div class="qa-grid-inner" style="display:grid;grid-template-columns:1fr 1fr;gap:3px">';var lastG='';
   items.forEach(function(item){
-    if(item.g!==lastG){html+='<div class="qa-h-group">'+item.g+'</div>';lastG=item.g;}
-    html+='<div class="qa-item" onclick="closeQuickAdd();setTimeout(function(){'+item.fn+'()},100)">'+
+    if(item.g!==lastG&&_qaTab==='all'&&!q){html+='<div class="qa-h-group" style="grid-column:1/-1;padding:4px 2px 2px;font-size:9px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-top:4px">'+item.g+'</div>';lastG=item.g;}
+    var isRecent=_qaRecent.indexOf(item.label)>=0;
+    html+='<div class="qa-item'+(isRecent?' qa-recent':'')+'" onclick="closeQuickAdd();qaTrackUse(\' '+item.label+'\');setTimeout(function(){'+item.fn+'()},100)">'+
       '<div class="qa-icon" style="background:#f0f4ff">'+item.icon+'</div>'+
-      '<div class="qa-info"><div class="qa-title">'+item.label+'</div><div class="qa-sub">'+item.sub+'</div></div></div>';
+      '<div class="qa-info"><div class="qa-title">'+item.label+(isRecent?' <span style="font-size:7px;color:#2F80ED;font-weight:400">recent</span>':'')+'</div><div class="qa-sub">'+item.sub+'</div></div></div>';
   });
+  html+='</div>';
   grid.innerHTML=html;
 }
-function filterQuickAdd(v){renderQuickAdd(v);}
+function filterQuickAdd(v){
+  document.querySelectorAll('.qa-tab').forEach(function(t){t.style.background=t.dataset.qaTab==='all'?'#2F80ED':'#f0f0f0';t.style.color=t.dataset.qaTab==='all'?'#fff':'#666'});
+  _qaTab='all';
+  renderQuickAdd(v);
+}
+document.addEventListener('keydown',function(e){
+  if((e.altKey&&e.key==='n')||(e.ctrlKey&&e.shiftKey&&e.key==='A')){
+    e.preventDefault();
+    if(document.getElementById('quickAddDropdown').classList.contains('active'))closeQuickAdd();
+    else openQuickAdd();
+  }
+  if(e.key==='Escape'&&document.getElementById('quickAddDropdown').classList.contains('active'))closeQuickAdd();
+});
 function toggleDarkMode(){
   const is=document.documentElement.classList.toggle('dark');
   localStorage.setItem('theme',is?'dark':'light');
@@ -4582,7 +4703,7 @@ function openModal(title,body,onSave){
 }
 function closeModal(){
   document.getElementById('crudModal').classList.remove('active');
-  document.removeEventListener('keydown',__modalKeyHandler);
+  try{document.removeEventListener('keydown',__modalKeyHandler);}catch(e){}
 }
 function saveModal(){
   // Check required fields
@@ -5990,6 +6111,31 @@ function crudBIReport(item){
   );
 }
 
+
+function toggleMobileSidebar(){
+  var sb=document.querySelector('#sidebar');
+  if(!sb)return;
+  if(sb.style.display==='none'||sb.style.display===''){
+    sb.style.display='flex';sb.style.position='fixed';sb.style.top='0';sb.style.left='0';sb.style.width='100%';sb.style.height='100%';sb.style.zIndex='9999';sb.style.background='#fff';sb.style.flexDirection='column';sb.style.padding='20px';sb.style.overflow='auto';
+    document.getElementById('mobileSideBtn').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    // Show logo on mobile fullscreen
+    var logo=sb.querySelector('.sidebar-logo');if(logo)logo.style.display='flex';
+    var btm=sb.querySelector('.sidebar-bottom');if(btm)btm.style.display='flex';
+  }else{
+    sb.style.display='';sb.style.position='';sb.style.top='';sb.style.left='';sb.style.width='';sb.style.height='';sb.style.zIndex='';sb.style.background='';sb.style.flexDirection='';sb.style.padding='';sb.style.overflow='';
+    document.getElementById('mobileSideBtn').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+    var logo=sb.querySelector('.sidebar-logo');if(logo)logo.style.display='';
+    var btm=sb.querySelector('.sidebar-bottom');if(btm)btm.style.display='';
+  }
+}
+// Show mobile sidebar button only on small screens
+function checkMobile(){
+  var btn=document.getElementById('mobileSideBtn');
+  if(!btn)return;
+  btn.style.display=window.innerWidth<=768?'flex':'none';
+}
+checkMobile();
+window.addEventListener('resize',checkMobile);
 </script>
 </body>
 </html>
