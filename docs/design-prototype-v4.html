@@ -44,7 +44,6 @@
     .top-actions .icon-btn:hover{background:#f0f0f0;color:#333}
     .top-actions .icon-btn svg{width:16px;height:16px}
     .top-actions .user-avatar{width:26px;height:26px;border-radius:6px;background:#2F80ED;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:600;cursor:pointer}
-    .notif-dot{position:absolute;top:3px;right:3px;width:6px;height:6px;background:#e53935;border-radius:50%;border:1.5px solid #fff}
     .content{flex:1;overflow-y:auto;padding:6px 10px;display:flex;flex-direction:column;gap:4px}
     .toolbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
     .toolbar .filter-btn{padding:5px 10px;font-size:11px;font-weight:500;border:1px solid #e0e0e0;border-radius:6px;background:#fff;color:#333;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:3px;white-space:nowrap}
@@ -303,9 +302,32 @@
     .notif-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #e8e8e8}
     .notif-header .nh-title{font-size:13px;font-weight:600}
     .notif-header .nh-count{font-size:10px;color:#888;font-weight:400}
+    /* ═══ QUICK ADD ═══ */
+    .slide-out.top-dropdown .panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:420px;max-height:500px;border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,.18)!important;border:none!important;padding:16px!important}
+    .slide-out.top-dropdown .backdrop{background:rgba(0,0,0,.4)!important}
+    .qa-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .08s;border:1px solid #f0f0f0;margin-bottom:2px}
+    .qa-item:hover{background:#f0f4ff;border-color:#d0d8e8}
+    html.dark .qa-item{background:#1a2332;border-color:#2a3a52}
+    html.dark .qa-item:hover{background:#1e2a45;border-color:#3b5380}
+    .qa-item .qa-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .qa-item .qa-info{flex:1;min-width:0}
+    .qa-item .qa-title{font-size:11px;font-weight:600;color:#333}
+    html.dark .qa-item .qa-title{color:#e0e0e0}
+    .qa-item .qa-sub{font-size:9px;color:#888;margin-top:1px}
+    .qa-h-group{padding:4px 2px 2px;font-size:9px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+    html.dark .qa-h-group{color:#64748b}
+    #qaGrid{display:flex;flex-direction:column;overflow-y:auto;max-height:380px}
+    #qaGrid .qa-grid-inner{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+    html.dark #qaSearch input{border-color:#2a3a52;color:#e0e0e0}
   </style>
 </head>
 <body>
+<div id="quickAddDropdown" class="slide-out top-dropdown"><div class="backdrop" onclick="closeQuickAdd()"></div><div class="panel" style="padding:12px;max-width:420px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:13px;font-weight:600">Quick Add</span><span onclick="closeQuickAdd()" style="cursor:pointer;color:#999;font-size:15px;padding:2px">✕</span></div>
+  <div id="qaSearch" style="margin-bottom:8px"><input placeholder="Search module..." oninput="filterQuickAdd(this.value)" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:11px;outline:none;background:transparent"/></div>
+  <div id="qaGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;overflow-y:auto;max-height:380px"></div>
+</div></div>
+
 <div class="app-shell">
   <!-- SIDEBAR: 8 Groups with separators -->
   <div id="sidebar">
@@ -361,6 +383,7 @@
             <div class="sd-footer"><span>All modules</span><span>↑↓ Navigate · Enter Open · Esc Close</span></div>
           </div>
         </div>
+        <div class="icon-btn" onclick="openQuickAdd()" title="Quick Add" style="font-weight:700;font-size:16px;color:#2F80ED">+</div>
         <div class="icon-btn" onclick="printReport()" title="Print Report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></div>
         <div class="icon-btn" onclick="toggleNotifications()" title="Notifications" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div id="notifBadge">0</div></div>
         <div class="user-avatar" onclick="toggleRoleMenu()" title="Switch Role">SA</div>
@@ -4069,6 +4092,72 @@ function toggleNotifications(){
   document.getElementById('notifPanel').classList.toggle('active');
   renderNotifications();
 }
+// ═══ QUICK ADD ═══
+var _qaItems = [
+  {g:'Sales',icon:'🎯',label:'Lead',fn:'crudLead',sub:'New prospect'},
+  {g:'Sales',icon:'📝',label:'Booking',fn:'crudBooking',sub:'New reservation'},
+  {g:'Sales',icon:'👤',label:'Contact',fn:'crudContact',sub:'Add person'},
+  {g:'Sales',icon:'📢',label:'Campaign',fn:'crudCampaign',sub:'Marketing push'},
+  {g:'Sales',icon:'💸',label:'Dues Payment',fn:'crudReceivePayment',sub:'Receive payment'},
+  {g:'Sales',icon:'📄',label:'Proposal',fn:'crudProposal',sub:'Land proposal'},
+  {g:'Land',icon:'🏗️',label:'Project',fn:'crudProject',sub:'New development'},
+  {g:'Land',icon:'✅',label:'Compliance',fn:'crudCompliance',sub:'Regulatory item'},
+  {g:'Land',icon:'🔍',label:'Audit',fn:'crudAudit',sub:'Schedule audit'},
+  {g:'Land',icon:'📜',label:'Certificate',fn:'crudCertificate',sub:'Add certificate'},
+  {g:'Finance',icon:'💳',label:'Transaction',fn:'crudTransaction',sub:'Money in/out'},
+  {g:'Finance',icon:'📦',label:'Stock Item',fn:'crudStockItem',sub:'Inventory'},
+  {g:'Finance',icon:'🏭',label:'Supplier',fn:'crudSupplier',sub:'Vendor'},
+  {g:'Finance',icon:'📄',label:'Purchase Order',fn:'crudPO',sub:'Procurement'},
+  {g:'Finance',icon:'👤',label:'Employee',fn:'crudEmployee',sub:'HR record'},
+  {g:'Finance',icon:'💰',label:'Expense',fn:'crudExpense',sub:'Log expense'},
+  {g:'Finance',icon:'🧾',label:'Tax Entry',fn:'crudTaxEntry',sub:'Tax record'},
+  {g:'Construction',icon:'👷',label:'Contractor',fn:'crudContractor',sub:'Vendor'},
+  {g:'Construction',icon:'📋',label:'Work Order',fn:'crudWorkOrder',sub:'Scope of work'},
+  {g:'Construction',icon:'💰',label:'BOQ Item',fn:'crudBOQ',sub:'Cost estimate'},
+  {g:'Construction',icon:'🚜',label:'Equipment',fn:'crudEquipment',sub:'Machinery'},
+  {g:'Construction',icon:'🔧',label:'Maintenance',fn:'crudMaintenance',sub:'Service log'},
+  {g:'Construction',icon:'👷',label:'Worker',fn:'crudWorker',sub:'Labor record'},
+  {g:'Construction',icon:'📋',label:'Attendance',fn:'crudAttendanceRecord',sub:'Daily log'},
+  {g:'Construction',icon:'💵',label:'Payroll',fn:'crudPayrollRecord',sub:'Pay entry'},
+  {g:'Construction',icon:'🔍',label:'QC Inspection',fn:'crudQCItem',sub:'Quality check'},
+  {g:'Construction',icon:'✅',label:'QC Checklist',fn:'crudQCChecklist',sub:'Checklist'},
+  {g:'Construction',icon:'📊',label:'QC Report',fn:'crudQCReport',sub:'Report'},
+  {g:'Construction',icon:'🎨',label:'Design',fn:'crudDesign',sub:'Drawing/plan'},
+  {g:'Construction',icon:'💸',label:'Payment',fn:'crudPayment',sub:'Contractor pay'},
+  {g:'Customer',icon:'👥',label:'Customer',fn:'crudCustomer',sub:'Portal user'},
+  {g:'Customer',icon:'🔑',label:'Handover',fn:'crudHandover',sub:'Unit handover'},
+  {g:'Customer',icon:'🔧',label:'Snag',fn:'crudSnag',sub:'Issue report'},
+  {g:'Customer',icon:'🎫',label:'Ticket',fn:'crudTicket',sub:'Support'},
+  {g:'Customer',icon:'📄',label:'Customer Doc',fn:'crudCustomerDoc',sub:'Document'},
+  {g:'Customer',icon:'📋',label:'After-Sale',fn:'crudAfterSale',sub:'Post-service'},
+  {g:'Docs',icon:'📚',label:'KB Article',fn:'crudArticle',sub:'Knowledge base'},
+];
+var _qaCache='';
+function openQuickAdd(){
+  document.getElementById('quickAddDropdown').classList.add('active');
+  renderQuickAdd('');
+  document.querySelector('#qaSearch input').value='';
+  document.querySelector('#qaSearch input').focus();
+}
+function closeQuickAdd(){
+  document.getElementById('quickAddDropdown').classList.remove('active');
+}
+function renderQuickAdd(q){
+  var grid=document.getElementById('qaGrid');
+  if(!grid)return;
+  var items=_qaItems;
+  if(q){var lq=q.toLowerCase();items=items.filter(function(i){return i.label.toLowerCase().includes(lq)||i.sub.toLowerCase().includes(lq)||i.g.toLowerCase().includes(lq)});}
+  if(!items.length){grid.innerHTML='<div style="text-align:center;padding:30px;color:#999;font-size:12px">No modules match "'+q+'"</div>';return}
+  var html='';var lastG='';
+  items.forEach(function(item){
+    if(item.g!==lastG){html+='<div class="qa-h-group">'+item.g+'</div>';lastG=item.g;}
+    html+='<div class="qa-item" onclick="closeQuickAdd();setTimeout(function(){'+item.fn+'()},100)">'+
+      '<div class="qa-icon" style="background:#f0f4ff">'+item.icon+'</div>'+
+      '<div class="qa-info"><div class="qa-title">'+item.label+'</div><div class="qa-sub">'+item.sub+'</div></div></div>';
+  });
+  grid.innerHTML=html;
+}
+function filterQuickAdd(v){renderQuickAdd(v);}
 function toggleDarkMode(){
   const is=document.documentElement.classList.toggle('dark');
   localStorage.setItem('theme',is?'dark':'light');
