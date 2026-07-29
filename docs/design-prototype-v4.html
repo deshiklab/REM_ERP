@@ -1558,6 +1558,7 @@ function renderCRM(el){
       <select id="crmFPlan" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Plan</option><option value="Construction Link"${f.ppf==='Construction Link'?' selected':''}>Construction Link</option><option value="Bank Loan"${f.ppf==='Bank Loan'?' selected':''}>Bank Loan</option><option value="Full Payment"${f.ppf==='Full Payment'?' selected':''}>Full Payment</option><option value="3-Year Installment"${f.ppf==='3-Year Installment'?' selected':''}>3-Yr Install</option><option value="5-Year Installment"${f.ppf==='5-Year Installment'?' selected':''}>5-Yr Install</option></select>
       <div class="spacer"></div>
       ${bc>0?'<span style="font-size:9px;color:#2F80ED;font-weight:600;padding:0 4px">'+bc+' selected</span><button class="action-btn secondary" onclick="bulkActionStatus(\'Negotiation\')" style="padding:2px 6px;font-size:8px">Advance</button><button class="action-btn secondary" onclick="bulkActionAssign()" style="padding:2px 6px;font-size:8px">Assign</button><button class="action-btn secondary" onclick="bulkActionPriority(\'High\')" style="padding:2px 6px;font-size:8px">🔥 Priority</button><button class="action-btn secondary" onclick="bulkActionDelete()" style="padding:2px 6px;font-size:8px;color:#e53935">Delete</button><button class="action-btn" onclick="_bulkSel={};renderModule()" style="padding:2px 6px;font-size:8px">Clear</button>':''}
+      <button class="action-btn secondary" onclick="importData(mockLeads,'Leads','leads',IMPORT_FIELDS.leads)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button>
       <button class="action-btn primary" onclick="crudLead()" style="padding:3px 8px;font-size:10px">+ Add Lead</button>
       `:crmSubView==='complaints'?`
       <input id="cmpSearch" placeholder="Search client/project..." oninput="_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
@@ -2213,7 +2214,7 @@ function crudProposal(item){
 
 function renderProjects(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active projects</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn primary" onclick="crudProject()">+ New Project</button></div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockProjects,'Projects','projects',IMPORT_FIELDS.projects)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudProject()">+ New Project</button></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
       <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><div style="font-size:12px;font-weight:600">${p.name}</div><div style="font-size:10px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
       <div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:10px"><span>Progress</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div></div>
@@ -4236,7 +4237,7 @@ function renderStock(el){
       ${stockTab==='inventory'?`<select id="invCatFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>${['Construction Material','Plumbing','Electrical','Finishes','Safety','Admin'].map(c=>'<option value="'+c+'"'+(g('invCatFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>
         <select id="invSiteFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Sites</option>${['Muktodhara','Jolshiri','Corporate'].map(c=>'<option value="'+c+'"'+(g('invSiteFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>`:''}
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudStockItem()" style="padding:3px 8px;font-size:10px">+ New</button>
+      <button class="action-btn secondary" onclick="importData(mockInventory,'Items','inventory',IMPORT_FIELDS.inventory)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudStockItem()" style="padding:3px 8px;font-size:10px">+ New</button>
     </div>
     ${stockTab==='inventory'?renderStockInv(pI):
       stockTab==='po'?renderStockPO(pPO):
@@ -4326,7 +4327,7 @@ function openSupplier(id){
 function renderHR(el){
   const pE=_pg('hr',mockEmployees);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Human Resources</div><div class="page-subtitle">${mockEmployees.length} employees</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockEmployees,'Employees','employees',IMPORT_FIELDS.employees)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div>
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${pE.items.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('hr',pE.total,pE.page,pE.totalPages,pE.perPage)}</div></div></div></div>`;
 }
 
@@ -5634,6 +5635,80 @@ function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),na
 function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',category:'Construction Material',qty:0,unit:'Pcs',price:0,value:0,status:'Adequate',reorder:0,supplier:'',lastReceived:'—'}:item;const cats=['Construction Material','Plumbing','Electrical','Finishes','Safety','Admin'];const sites=['Muktodhara','Jolshiri','Corporate'];const units=['Pcs','Bags','Tons','CFT','Boxes','Meters','Buckets','Sets'];openModal(n?'New Stock Item':'Edit Item','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Item Name','f_item',i.item,'',true)+selectField('Category','f_cat',i.category,cats)+selectField('Site','f_site',i.site,sites)+inputField('Quantity','f_qty',i.qty,'number',true)+selectField('Unit','f_unit',i.unit,units)+inputField('Unit Price','f_price',i.price,'number')+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder Level','f_reorder',i.reorder,'number')+inputField('Supplier','f_supplier',i.supplier)+inputField('Last Received','f_last',i.lastReceived)+'</div>',function(){const qty=parseInt(g('f_qty'))||0;const price=parseInt(g('f_price'))||0;const d={item:g('f_item'),category:g('f_cat'),site:g('f_site'),qty:qty,unit:g('f_unit'),price:price,value:qty*price,status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0,supplier:g('f_supplier'),lastReceived:g('f_last')||'—'};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
 function crudTransaction(){openModal('New Transaction','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Description','f_desc','','',true)+selectField('Type','f_type','Inflow',['Inflow','Outflow'],true)+inputField('Amount','f_amt','','',true)+selectField('Category','f_cat','Booking',['Booking','Installment','Materials','Labor','Marketing','Admin','Legal','Professional Fees','Utilities','Tax'])+selectField('Status','f_stat','Received',['Received','Pending','Paid'])+inputField('Project','f_proj','')+'</div>',function(){const amt=parseInt(g('f_amt'))||0;const type=g('f_type');addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:type,category:g('f_cat'),amount:amt,status:g('f_stat'),project:g('f_proj')||'—',fmt:(type==='Inflow'?'+ \u09F3':'— \u09F3')+amt.toLocaleString('en-IN')},'transactions')})}
 function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:0,status:'Pending Approval',category:'Material',dueDate:'',approvedBy:'—'}:item;const cats=['Material','Finishes','Electrical','Plumbing','Safety'];openModal(n?'New PO':'Edit PO','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Vendor','f_vendor',p.vendor,'',true)+inputField('Items','f_items',p.items,'',true)+inputField('Amount (৳)','f_amt',p.amount,'number',true)+selectField('Category','f_cat',p.category,cats)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled'])+inputField('Due Date','f_due',p.dueDate)+'</div>',function(){const amt=parseInt(g('f_amt'))||0;const d={vendor:g('f_vendor'),items:g('f_items'),amount:amt,fmt:'৳'+amt.toLocaleString('en-IN'),category:g('f_cat'),status:g('f_stat'),dueDate:g('f_due')||'—',approvedBy:n?'—':p.approvedBy,site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*900))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
+// ═══ CSV/EXCEL DATA IMPORT ═══
+var IMPORT_FIELDS={
+  leads:[{name:'name',label:'Name *',required:true},{name:'phone',label:'Phone *',required:true},{name:'email',label:'Email'},{name:'property',label:'Property'},{name:'value',label:'Value'},{name:'source',label:'Source',default:'Website'},{name:'status',label:'Stage',default:'New Inquiry'},{name:'priority',label:'Priority',default:'Medium'},{name:'type',label:'Type',default:'Local'},{name:'owner',label:'Owner',default:'Unassigned'},{name:'facingDir',label:'Facing Dir'},{name:'floorPref',label:'Floor Pref'},{name:'flatType',label:'Flat Type'},{name:'sizeSqFt',label:'Size (sqft)'},{name:'paymentPlan',label:'Payment Plan'}],
+  inventory:[{name:'item',label:'Item Name *',required:true},{name:'category',label:'Category',default:'Construction Material'},{name:'site',label:'Site',default:'Muktodhara'},{name:'qty',label:'Quantity',type:'number',default:0},{name:'unit',label:'Unit',default:'Pcs'},{name:'price',label:'Unit Price',type:'number',default:0},{name:'status',label:'Status',default:'Adequate'},{name:'reorder',label:'Reorder Level',type:'number',default:0},{name:'supplier',label:'Supplier'}],
+  employees:[{name:'name',label:'Name *',required:true},{name:'designation',label:'Designation'},{name:'dept',label:'Department',default:'Construction'},{name:'phone',label:'Phone'}],
+  projects:[{name:'name',label:'Name *',required:true},{name:'location',label:'Location'},{name:'status',label:'Status',default:'Planning'},{name:'progress',label:'Progress %',type:'number',default:0},{name:'budget',label:'Budget'},{name:'manager',label:'Manager'},{name:'type',label:'Type',default:'land'},{name:'plots',label:'Plots',type:'number',default:0}]
+};
+function importData(arr,name,key,fields){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.csv,.tsv';
+  inp.onchange=function(e){
+    var f=e.target.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(ev){
+      var txt=ev.target.result;
+      var lines=txt.split(/\r?\n/).filter(function(l){return l.trim()});
+      if(lines.length<2){showToast('File must have header + data rows','error');return}
+      var hdrs=parseCSVLine(lines[0]);
+      var rows=[];
+      for(var i=1;i<lines.length;i++){
+        var vals=parseCSVLine(lines[i]);
+        if(vals.length===hdrs.length&&vals.some(function(v){return v.trim()}))rows.push(vals);
+      }
+      if(rows.length===0){showToast('No data rows found','error');return}
+      showImportMap(hdrs,rows,arr,name,key,fields);
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+function parseCSVLine(line){
+  var r=[],cur='',q=false;
+  for(var i=0;i<line.length;i++){
+    var c=line[i];
+    if(c==='"'){if(q&&i+1<line.length&&line[i+1]==='"'){cur+='"';i++}else q=!q}
+    else if(c===','&&!q){r.push(cur.trim());cur=''}
+    else cur+=c;
+  }
+  r.push(cur.trim());return r;
+}
+function showImportMap(hdrs,rows,arr,name,key,fields){
+  var h='<div style="margin-bottom:6px;font-size:10px;color:#888">'+rows.length+' rows · Map columns to fields:</div><table style="width:100%;font-size:10px"><thead><tr><th>Column</th><th>→ Field</th><th>Preview</th></tr></thead><tbody>';
+  for(var i=0;i<hdrs.length;i++){
+    var pv=rows[0][i]||'';if(pv.length>20)pv=pv.slice(0,20)+'…';
+    var defSelected=null;
+    for(var fi=0;fi<fields.length;fi++){
+      if(hdrs[i].toLowerCase().indexOf(fields[fi].name.toLowerCase())>=0){defSelected=fields[fi].name;break}
+    }
+    h+='<tr><td style="font-weight:500">'+hdrs[i]+'</td><td><select id="im_'+i+'" style="padding:2px 4px;font-size:9px;border:1px solid #e0e0e0;border-radius:3px;max-width:140px"><option value="">— Skip —</option>';
+    for(var j=0;j<fields.length;j++){
+      h+='<option value="'+fields[j].name+'"'+(fields[j].name===defSelected?' selected':'')+'>'+fields[j].label+'</option>';
+    }
+    h+='</select></td><td style="color:#888;font-size:9px">'+pv+'</td></tr>';
+  }
+  h+='</tbody></table><div style="margin-top:6px;padding:4px 8px;background:#fff3e0;border-radius:4px;font-size:9px;color:#e65100">⚠ Required fields: '+fields.filter(function(f){return f.required}).map(function(f){return f.label}).join(', ')+'</div>';
+  openModal('Import '+name,h,function(){
+    var map={},errs=[];
+    for(var i=0;i<hdrs.length;i++){var v=document.getElementById('im_'+i).value;if(v)map[v]=i}
+    for(var r=0;r<fields.length;r++){if(fields[r].required&&map[fields[r].name]===undefined)errs.push(fields[r].label)}
+    if(errs.length>0){showToast('Missing: '+errs.join(', '),'error');return}
+    var imp=0,skp=0;
+    for(var i=0;i<rows.length;i++){
+      var row=rows[i],obj={},ok=true;
+      for(var f=0;f<fields.length;f++){
+        var fd=fields[f],ci=map[fd.name];
+        if(ci!==undefined&&ci<row.length){var val=row[ci].trim();obj[fd.name]=fd.type==='number'?(parseInt(val.replace(/[^0-9]/g,''))||0):val}
+        else if(fd.default!==undefined)obj[fd.name]=fd.default;
+        else if(fd.required)ok=false;
+      }
+      if(ok){obj.id=nextId(arr);arr.push(obj);imp++}else skp++;
+    }
+    if(key)DB.save(key);closeDrawer();renderModule();
+    showToast('Imported '+imp+' '+name+(skp>0?' ('+skp+' skipped)':''),'success');
+  });
+}
 
 // ═══ DETAIL PANELS ═══
 function showDetailPanel(title, bodyHTML, footerHTML, onOpen) {
