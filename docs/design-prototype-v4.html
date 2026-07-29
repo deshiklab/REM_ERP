@@ -597,11 +597,18 @@ window.mockCompliance = DB.init('compliance', [
 ]);
 // NEW MODULE DATA
 window.mockBOQ = DB.init('boq', [
-  {id:'BOQ-001',project:'Muktodhara Green Park',item:'Earthwork Excavation',qty:'2500',unit:'CFT',rate:'৳8',total:'৳20,000',status:'Approved'},
-  {id:'BOQ-002',project:'Muktodhara Green Park',item:'Brickwork 5"',qty:'15000',unit:'Pcs',rate:'৳12',total:'৳1,80,000',status:'Approved'},
-  {id:'BOQ-003',project:'Jolshiri Abason',item:'Reinforced Concrete (1:1.5:3)',qty:'400',unit:'CFT',rate:'৳5,500',total:'৳22,00,000',status:'Draft'},
-  {id:'BOQ-004',project:'Jolshiri Abason',item:'Plastering (12mm)',qty:'8500',unit:'SFT',rate:'৳35',total:'৳2,97,500',status:'Pending Review'},
-  {id:'BOQ-005',project:'Muktodhara Green Park',item:'Sanitary Fittings',qty:'20',unit:'Set',rate:'৳12,000',total:'৳2,40,000',status:'Draft'}
+  {id:'BOQ-001',item:'Earthwork Excavation',category:'Excavation',catColor:'#1565c0',project:'Muktodhara Green Park',qty:'2,500',qtyNum:2500,unit:'CFT',rate:'৳ 8',rateNum:8,status:'Approved',updated:'2024-09-01'},
+  {id:'BOQ-002',item:'Brickwork 5" Wall',category:'Brickwork',catColor:'#e65100',project:'Muktodhara Green Park',qty:'15,000',qtyNum:15000,unit:'Pcs',rate:'৳ 12',rateNum:12,status:'Approved',updated:'2024-09-05'},
+  {id:'BOQ-003',item:'Reinforced Concrete (1:1.5:3)',category:'Concrete',catColor:'#2e7d32',project:'Jolshiri Abason',qty:'400',qtyNum:400,unit:'CFT',rate:'৳ 5,500',rateNum:5500,status:'Draft',updated:'2024-10-01'},
+  {id:'BOQ-004',item:'Plastering 12mm',category:'Finishing',catColor:'#7b1fa2',project:'Jolshiri Abason',qty:'8,500',qtyNum:8500,unit:'SFT',rate:'৳ 35',rateNum:35,status:'Pending Review',updated:'2024-10-15'},
+  {id:'BOQ-005',item:'Sanitary Fittings',category:'Plumbing',catColor:'#00897b',project:'Muktodhara Green Park',qty:'20',qtyNum:20,unit:'Set',rate:'৳ 12,000',rateNum:12000,status:'Draft',updated:'2024-10-20'},
+  {id:'BOQ-006',item:'Pile Foundation Bored Cast-in-situ',category:'Structural',catColor:'#c62828',project:'Jolshiri Abason',qty:'45',qtyNum:45,unit:'Pcs',rate:'৳ 85,000',rateNum:85000,status:'Approved',updated:'2024-08-15'},
+  {id:'BOQ-007',item:'Electrical Wiring & Cables',category:'MEP',catColor:'#00838f',project:'Jolshiri Abason',qty:'2,500',qtyNum:2500,unit:'RFT',rate:'৳ 120',rateNum:120,status:'Approved',updated:'2024-09-20'},
+  {id:'BOQ-008',item:'Plumbing Pipes & Fittings',category:'Plumbing',catColor:'#00897b',project:'Jolshiri Abason',qty:'1,800',qtyNum:1800,unit:'RFT',rate:'৳ 85',rateNum:85,status:'Pending Review',updated:'2024-10-10'},
+  {id:'BOQ-009',item:'Ceramic Floor Tiles',category:'Finishing',catColor:'#7b1fa2',project:'Muktodhara Green Park',qty:'5,000',qtyNum:5000,unit:'SFT',rate:'৳ 95',rateNum:95,status:'Approved',updated:'2024-09-25'},
+  {id:'BOQ-010',item:'Steel Reinforcement Rod',category:'Structural',catColor:'#c62828',project:'Muktodhara Green Park',qty:'120',qtyNum:120,unit:'Ton',rate:'৳ 72,000',rateNum:72000,status:'Approved',updated:'2024-08-30'},
+  {id:'BOQ-011',item:'Paint & Putty Work',category:'Painting',catColor:'#ff8f00',project:'Jolshiri Abason',qty:'12,000',qtyNum:12000,unit:'SFT',rate:'৳ 18',rateNum:18,status:'Draft',updated:'2024-10-25'},
+  {id:'BOQ-012',item:'Roof Waterproofing',category:'Roofing',catColor:'#e65100',project:'Muktodhara Green Park',qty:'800',qtyNum:800,unit:'SFT',rate:'৳ 65',rateNum:65,status:'Pending Review',updated:'2024-10-22'}
 ]);
 window.mockVariations = DB.init('variations', [
   {id:'VO-001',project:'Muktodhara Green Park',title:'Widening of Drainage',status:'Approved',impact:'+৳1,50,000',originator:'Site Engineer',date:'2024-09-15',schedule:'+7 days'},
@@ -695,7 +702,7 @@ window.mockKnowledgeBase = DB.init('knowledge_base', [
 ]);
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
-let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard';
+let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard', boqTab = 'dashboard';
 
 // ═══ GROUP & TOP BAR NAV ═══
 function switchGroup(group) {
@@ -1475,13 +1482,185 @@ function renderHandover(el){
     <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Unit</th><th>Customer</th><th>Status</th><th>Est. Date</th><th>Snags</th><th>POS Date</th></tr></thead><tbody>${pH.items.map(h=>`<tr><td style="font-weight:500">${h.unit}</td><td>${h.customer}</td><td><span class="badge-status ${h.status==='Handover Scheduled'?'badge-active':h.status==='Inspection Pending'?'badge-pending':'badge-reserved'}">${h.status}</span></td><td>${h.date}</td><td style="text-align:center;font-weight:600;color:${h.snags>0?'#c62828':'#2e7d32'}">${h.snags}</td><td>${h.pos_date||'—'}</td></tr>`).join('')}</tbody></table>${_pgHtml('handover',pH.total,pH.page,pH.totalPages,pH.perPage)}</div></div></div></div>`;
 }
 
+/** BOQ & Cost Control Module **/
+
 function renderBOQ(el){
-  const apps=mockBOQ.filter(b=>b.status==='Approved').length;
-  const pB=_pg('boq',mockBOQ);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">BOQ & Cost Control</div><div class="page-subtitle">${mockBOQ.length} items · ${apps} approved</div>
-    <div class="toolbar" style="margin-bottom:6px"><button class="action-btn primary" onclick="showToast('New BOQ item coming soon','info')">+ Add Item</button><div class="spacer"></div><span style="font-size:10px;color:#888">Total: ${mockBOQ.reduce((s,i)=>s+parseInt(i.total.replace(/[^0-9]/g,'')),0).toLocaleString()} ৳</span></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>BOQ ID</th><th>Project</th><th>Item</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th></tr></thead><tbody>${pB.items.map(b=>`<tr><td style="font-weight:500">${b.id}</td><td>${b.project}</td><td>${b.item}</td><td class="num">${b.qty}</td><td>${b.unit}</td><td class="num">${b.rate}</td><td class="num" style="font-weight:600;color:#2e7d32">${b.total}</td><td><span class="badge-status ${b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed'}">${b.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('boq',pB.total,pB.page,pB.totalPages,pB.perPage)}</div></div></div></div>`;
+  if(typeof boqTab==='undefined') boqTab='dashboard';
+  var bt=boqTab;
+  var total=mockBOQ.length;
+  var apps=mockBOQ.filter(function(b){return b.status==='Approved'}).length;
+  var drafts=mockBOQ.filter(function(b){return b.status==='Draft'}).length;
+  var pending=mockBOQ.filter(function(b){return b.status==='Pending Review'}).length;
+  var totalVal=mockBOQ.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0);
+  el.innerHTML='<div class="fade-in"><div class="page-title">BOQ & Cost Control</div><div class="page-subtitle">'+total+' items \\u00B7 \\u09F3 '+(totalVal/100000).toFixed(1)+'L total \\u00B7 '+apps+' approved</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[
+        ['dashboard','\\uD83D\\uDCCA Dashboard'],
+        ['items','\\uD83D\\uDCCB BOQ Items'],
+        ['rate_analysis','\\uD83D\\uDCC8 Rate Analysis']
+      ].map(function(t){
+        return '<div class="tab '+(bt===t[0]?'active':'')+'" onclick="boqTab=\\x27'+t[0]+'\\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
+      }).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudBOQ()" style="padding:3px 8px;font-size:10px;display:'+(bt==='items'?'':'none')+'">+ Add Item</button>'+
+    '</div>'+
+    (bt==='dashboard'?renderBOQDashboard():
+     bt==='items'?renderBOQItems():
+     bt==='rate_analysis'?renderRateAnalysis():'')+
+  '</div>';
 }
+
+function renderBOQDashboard(){
+  var total=mockBOQ.length;
+  var apps=mockBOQ.filter(function(b){return b.status==='Approved'}).length;
+  var drafts=mockBOQ.filter(function(b){return b.status==='Draft'}).length;
+  var pending=mockBOQ.filter(function(b){return b.status==='Pending Review'}).length;
+  var totalVal=mockBOQ.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0);
+  var byCat={};mockBOQ.forEach(function(b){byCat[b.category]=(byCat[b.category]||0)+b.qtyNum*b.rateNum});
+  var catNames=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a]});
+  var byProject={};mockBOQ.forEach(function(b){byProject[b.project]=(byProject[b.project]||0)+1});
+  var projNames=Object.keys(byProject).sort(function(a,b){return byProject[b]-byProject[a]});
+  var topItems=mockBOQ.slice().sort(function(a,b){return (b.qtyNum*b.rateNum)-(a.qtyNum*a.rateNum)}).slice(0,5);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Items',total,'#1565c0'],
+    ['Approved',apps,'#2e7d32'],
+    ['Pending Review',pending,pending>0?'#e65100':'#999'],
+    ['Drafts',drafts,drafts>0?'#ff8f00':'#999'],
+    ['Total Value','\\u09F3 '+(totalVal/100000).toFixed(1)+'L','#7b1fa2'],
+    ['Categories',catNames.length,'#00838f']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>Cost by Category</h3></div><div class="card-body" style="padding:8px;font-size:10px">'+
+    catNames.map(function(cn){
+      var pct=Math.round(byCat[cn]/totalVal*100);
+      var colors={'Excavation':'#1565c0','Concrete':'#2e7d32','Brickwork':'#e65100','Finishing':'#7b1fa2','MEP':'#00838f','Plumbing':'#00897b','Sanitary':'#00695c','Structural':'#c62828'};
+      return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f0f0f0"><div style="width:70px;font-weight:500;color:'+(colors[cn]||'#555')+'">'+cn+'</div><div style="flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(colors[cn]||'#2F80ED')+';border-radius:3px"></div></div><div style="width:60px;text-align:right;font-weight:600;font-size:9px">\\u09F3 '+(byCat[cn]/100000).toFixed(1)+'L</div><div style="width:36px;text-align:right;color:#888">'+pct+'%</div></div>';
+    }).join('')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>Highest Value Items</h3></div><div class="card-body" style="padding:6px">'+
+    topItems.map(function(b,i){
+      var colors={'Excavation':'#1565c0','Concrete':'#2e7d32','Brickwork':'#e65100','Finishing':'#7b1fa2','MEP':'#00838f','Plumbing':'#00897b','Sanitary':'#00695c','Structural':'#c62828'};
+      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0"><div style="width:18px;height:18px;border-radius:4px;background:'+(colors[b.category]||'#eef3ff')+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:9px;font-weight:500">'+b.item.substring(0,35)+(b.item.length>35?'...':'')+'</div><div style="font-size:8px;color:#888">'+b.project+' \\u00B7 \\u09F3 '+((b.qtyNum*b.rateNum)/100000).toFixed(1)+'L</div></div></div>';
+    }).join('')+'</div></div>'+
+  '</div>';
+}
+
+function renderBOQItems(){
+  var q=(document.getElementById('boqSearch')||{}).value||'';
+  var cf=(document.getElementById('boqCat')||{}).value||'';
+  var sf=(document.getElementById('boqStatus')||{}).value||'';
+  var pf=(document.getElementById('boqProject')||{}).value||'';
+  var filtered=mockBOQ.filter(function(b){
+    if(cf&&b.category!==cf)return false;
+    if(sf&&b.status!==sf)return false;
+    if(pf&&b.project!==pf)return false;
+    if(q&&!b.item.toLowerCase().includes(q.toLowerCase())&&!b.id.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pB=_pg('boq',filtered);
+  var cats=mockBOQ.reduce(function(a,b){if(a.indexOf(b.category)<0)a.push(b.category);return a;},[]);
+  var projs=mockBOQ.reduce(function(a,b){if(a.indexOf(b.project)<0)a.push(b.project);return a;},[]);
+  return '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="boqSearch" placeholder="Search BOQ..." oninput="_PG.boq={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="boqCat" onchange="_PG.boq={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>'+cats.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('')+'</select>'+
+    '<select id="boqStatus" onchange="_PG.boq={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Approved</option><option>Pending Review</option><option>Draft</option></select>'+
+    '<select id="boqProject" onchange="_PG.boq={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Projects</option>'+projs.map(function(p){return '<option value="'+p+'">'+p+'</option>';}).join('')+'</select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>BOQ ID</th><th>Item</th><th>Category</th><th>Project</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pB.items.map(function(b){
+    var itemTotal=b.qtyNum*b.rateNum;
+    return '<tr style="cursor:pointer" onclick="openBOQItem(\\x27'+b.id+'\\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+b.id+'</td><td style="font-weight:500;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(b.catColor||'#eef3ff')+'15;color:'+(b.catColor||'#2F80ED')+'">'+b.category+'</span></td><td style="font-size:9px;color:#888">'+b.project+'</td><td class="num">'+b.qty+'</td><td>'+b.unit+'</td><td class="num">\\u09F3 '+(b.rateNum).toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+itemTotal.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudBOQ(mockBOQ.find(function(x){return x.id===\\x27'+b.id+'\\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\\x27Delete '+b.item+'?\\x27)){var idx=mockBOQ.findIndex(function(x){return x.id===\\x27'+b.id+'\\x27});if(idx>=0)mockBOQ.splice(idx,1);DB.save(\\x27boq\\x27);renderModule();showToast(\\x27Deleted\\x27,\\x27info\\x27)}">\\u2715</span></td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('boq',pB.total,pB.page,pB.totalPages,pB.perPage)+'</div></div></div>'+
+  '<div style="margin-top:4px;text-align:right;font-size:9px;color:#888;padding:0 4px">Total BOQ Value: \\u09F3 '+filtered.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0).toLocaleString('en-IN')+'</div>';
+}
+
+function renderRateAnalysis(){
+  var rates=mockBOQ.slice().sort(function(a,b){return b.rateNum-a.rateNum});
+  var pR=_pg('rate',rates);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Avg Rate','\\u09F3 '+Math.round(rates.reduce(function(s,r){return s+r.rateNum},0)/rates.length).toLocaleString('en-IN'),'#1565c0'],
+    ['Highest Rate','\\u09F3 '+rates[0].rateNum.toLocaleString('en-IN'),'#c62828'],
+    ['Lowest Rate','\\u09F3 '+rates[rates.length-1].rateNum.toLocaleString('en-IN'),'#2e7d32'],
+    ['Total Quantity',rates.reduce(function(s,r){return s+r.qtyNum},0).toLocaleString('en-IN'),'#7b1fa2'],
+    ['Units Used',new Set(rates.map(function(r){return r.unit})).size,'#00838f'],
+    ['Categories',new Set(rates.map(function(r){return r.category})).size,'#e65100']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+';font-size:13px">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Item</th><th>Category</th><th>Unit</th><th class="num">Rate (\\u09F3)</th><th class="num">Total Qty</th><th class="num">Extended Value</th><th>Unit Rate / Qty</th></tr></thead><tbody>'+
+  pR.items.map(function(r){
+    var ext=r.qtyNum*r.rateNum;
+    return '<tr><td style="font-weight:500">'+r.item.substring(0,35)+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(r.catColor||'#eef3ff')+'15;color:'+(r.catColor||'#2F80ED')+'">'+r.category+'</span></td><td>'+r.unit+'</td><td class="num" style="font-weight:600">'+r.rateNum.toLocaleString('en-IN')+'</td><td class="num">'+r.qty+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+ext.toLocaleString('en-IN')+'</td><td style="font-size:9px;color:#888">\\u09F3 '+r.rateNum.toLocaleString('en-IN')+' / '+r.unit+'</td></tr>';
+  }).join('')+'</tbody></table>'+_pgHtml('rate',pR.total,pR.page,pR.totalPages,pR.perPage)+'</div></div></div>';
+}
+
+function openBOQItem(id){
+  var b=mockBOQ.find(function(x){return x.id===id});
+  if(!b)return;
+  var total=b.qtyNum*b.rateNum;
+  var catColors={'Excavation':'#1565c0','Concrete':'#2e7d32','Brickwork':'#e65100','Finishing':'#7b1fa2','MEP':'#00838f','Plumbing':'#00897b','Sanitary':'#00695c','Structural':'#c62828'};
+  var catBg=(catColors[b.category]||'#2F80ED')+'15';
+  var catTxt=catColors[b.category]||'#2F80ED';
+  showDetailPanel('BOQ Item: '+b.id,
+    '<div style="margin-bottom:10px"><span class="badge-status" style="background:'+catBg+';color:'+catTxt+'">'+b.category+'</span> <span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></div>'+
+    '<div style="font-size:13px;font-weight:600;margin-bottom:8px">'+b.item+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
+      ['BOQ ID',b.id],
+      ['Project',b.project],
+      ['Category',b.category],
+      ['Quantity',b.qty+' '+b.unit],
+      ['Unit Rate','\\u09F3 '+b.rateNum.toLocaleString('en-IN')],
+      ['Total Value','\\u09F3 '+total.toLocaleString('en-IN')],
+      ['Status',b.status],
+      ['Last Updated',b.updated||b.date||'---']
+    ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="padding:10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center">'+
+      '<div style="font-size:9px;color:#888;margin-bottom:4px">Total Cost for this Item</div>'+
+      '<div style="font-size:24px;font-weight:700;color:#2e7d32">\\u09F3 '+total.toLocaleString('en-IN')+'</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:4px">'+b.qty+' '+b.unit+' \\u00D7 \\u09F3 '+b.rateNum.toLocaleString('en-IN')+'</div>'+
+    '</div>',
+    '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
+      '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudBOQ(mockBOQ.find(function(x){return x.id===\\x27'+b.id+'\\x27}))">Edit</button>'+
+      '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>'+
+    '</div>'
+  );
+}
+
+function crudBOQ(item){
+  var n=!item;
+  var b=n?{id:'BOQ-'+String(mockBOQ.length+1).padStart(3,'0'),item:'',category:'Excavation',catColor:'#1565c0',project:'Muktodhara Green Park',qty:'0',qtyNum:0,unit:'CFT',rate:'\\u09F3 0',rateNum:0,status:'Draft',updated:new Date().toISOString().split('T')[0]}:item;
+  var cats=['Excavation','Concrete','Brickwork','Finishing','MEP','Plumbing','Sanitary','Structural','Roofing','Painting','Earthwork'];
+  var projs=['Muktodhara Green Park','Jolshiri Abason'];
+  var units=['CFT','SFT','Pcs','Set','Lump Sum','RFT','Bag','Kg','Meter'];
+  openModal(n?'New BOQ Item':'Edit BOQ Item',
+    formRow(inputField('Item Name','bq_item',b.item,'',true),selectField('Category','bq_cat',b.category,cats,true))+
+    formRow(inputField('Quantity','bq_qty',String(b.qtyNum||b.qty),'',true),selectField('Unit','bq_unit',b.unit,units,true))+
+    formRow(inputField('Rate (Tk)','bq_rate',String(b.rateNum),'',true),selectField('Project','bq_proj',b.project,projs,true))+
+    selectField('Status','bq_status',b.status,['Draft','Pending Review','Approved'],true),
+    function(){
+      var qty=parseFloat(g('bq_qty'))||0;
+      var rate=parseFloat(g('bq_rate'))||0;
+      var cat=g('bq_cat');
+      var catColors={'Excavation':'#1565c0','Concrete':'#2e7d32','Brickwork':'#e65100','Finishing':'#7b1fa2','MEP':'#00838f','Plumbing':'#00897b','Sanitary':'#00695c','Structural':'#c62828','Roofing':'#e65100','Painting':'#ff8f00','Earthwork':'#795548'};
+      var d={
+        id:b.id,
+        item:g('bq_item'),
+        category:cat,
+        catColor:catColors[cat]||'#2F80ED',
+        project:g('bq_proj'),
+        qty:qty.toLocaleString('en-IN'),
+        qtyNum:qty,
+        unit:g('bq_unit'),
+        rate:'\\u09F3 '+rate.toLocaleString('en-IN'),
+        rateNum:rate,
+        status:g('bq_status'),
+        updated:new Date().toISOString().split('T')[0],
+        date:b.date||''
+      };
+      if(n){mockBOQ.push(d);DB.save('boq');showToast('BOQ item created','success');}
+      else{var idx=mockBOQ.findIndex(function(x){return x.id===b.id});if(idx>=0){mockBOQ[idx]=d;DB.save('boq');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
 
 function renderVariations(el){
   const pV=_pg('variations',mockVariations);
