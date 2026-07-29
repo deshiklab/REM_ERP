@@ -373,11 +373,37 @@ window.mockPOs = DB.init('pos', [
   {id:'PO-24-085',date:'Oct 15, 2024',vendor:'Local Sand Suppliers',site:'Muktodhara',items:'Sylhet Sand (3000 CFT)',amount:'৳1,80,000',status:'Delivered'}
 ]);
 window.mockTransactions = DB.init('transactions', [
-  {id:'RCP-8839',date:'2024-10-26',desc:'Invoice #INV-24-001',client:'Tariqul Islam',project:'Muktodhara',type:'Inflow',status:'Received',amount:'+ ৳5,00,000'},
-  {id:'PO-24-089',date:'2024-10-25',desc:'Invoice #INV-24-002',vendor:'Shah Cement',project:'Jolshiri',type:'Outflow',status:'Pending',amount:'- ৳5,50,000'},
-  {id:'RCP-8838',date:'2024-10-24',desc:'Booking Money - Dr. Rubina',client:'Dr. Rubina Ali',project:'Jolshiri',type:'Inflow',status:'Processing',amount:'+ ৳2,00,000'},
-  {id:'EXP-9912',date:'2024-10-23',desc:'Site Labor Wages',type:'Outflow',status:'Paid',amount:'- ৳3,45,000'},
-  {id:'EXP-9911',date:'2024-10-20',desc:'Facebook Ads',type:'Outflow',status:'Paid',amount:'- ৳50,000'}
+  {id:'RCP-8839',date:'2024-10-26',desc:'Invoice #INV-24-001',client:'Tariqul Islam',project:'Muktodhara',type:'Inflow',category:'Booking',status:'Received',amount:500000,fmt:'+ \u09F35,00,000'},
+  {id:'PO-24-089',date:'2024-10-25',desc:'Invoice #INV-24-002',vendor:'Shah Cement',project:'Jolshiri',type:'Outflow',category:'Materials',status:'Pending',amount:550000,fmt:'- \u09F35,50,000'},
+  {id:'RCP-8838',date:'2024-10-24',desc:'Booking Money - Dr. Rubina',client:'Dr. Rubina Ali',project:'Jolshiri',type:'Inflow',category:'Booking',status:'Processing',amount:200000,fmt:'+ \u09F32,00,000'},
+  {id:'EXP-9912',date:'2024-10-23',desc:'Site Labor Wages',project:'Muktodhara',type:'Outflow',category:'Labor',status:'Paid',amount:345000,fmt:'- \u09F33,45,000'},
+  {id:'EXP-9911',date:'2024-10-20',desc:'Facebook Ads Campaign',project:'Jolshiri',type:'Outflow',category:'Marketing',status:'Paid',amount:50000,fmt:'- \u09F350,000'},
+  {id:'RCP-8837',date:'2024-10-18',desc:'Installment - Shamim Reza',client:'Shamim Reza',project:'Muktodhara',type:'Inflow',category:'Installment',status:'Received',amount:150000,fmt:'+ \u09F31,50,000'},
+  {id:'EXP-9910',date:'2024-10-16',desc:'Office Rent & Utilities',type:'Outflow',category:'Admin',status:'Paid',amount:85000,fmt:'- \u09F385,000'},
+  {id:'RCP-8836',date:'2024-10-14',desc:'Booking - Mrs. Jahanara',client:'Mrs. Jahanara Begum',project:'Jolshiri',type:'Inflow',category:'Booking',status:'Received',amount:350000,fmt:'+ \u09F33,50,000'},
+  {id:'EXP-9909',date:'2024-10-12',desc:'Steel Reinforcement - BSRM',project:'Muktodhara',type:'Outflow',category:'Materials',status:'Paid',amount:420000,fmt:'- \u09F34,20,000'},
+  {id:'RCP-8835',date:'2024-10-10',desc:'Installment - Salahuddin',client:'Engr. Salahuddin',project:'Muktodhara',type:'Inflow',category:'Installment',status:'Received',amount:200000,fmt:'+ \u09F32,00,000'},
+  {id:'EXP-9908',date:'2024-10-08',desc:'Architect Consultation Fee',project:'Muktodhara',type:'Outflow',category:'Professional Fees',status:'Paid',amount:65000,fmt:'- \u09F365,000'},
+  {id:'RCP-8834',date:'2024-10-06',desc:'Plot Payment - Taher Uddin',client:'Md. Taher Uddin',project:'Muktodhara',type:'Inflow',category:'Booking',status:'Received',amount:500000,fmt:'+ \u09F35,00,000'},
+  {id:'EXP-9907',date:'2024-10-04',desc:'Billboard Rental - Signboard',project:'Jolshiri',type:'Outflow',category:'Marketing',status:'Paid',amount:120000,fmt:'- \u09F31,20,000'},
+  {id:'RCP-8833',date:'2024-10-02',desc:'Booking - New Client',client:'Mr. Abdul Karim',project:'Jolshiri',type:'Inflow',category:'Booking',status:'Processing',amount:1000000,fmt:'+ \u09F310,00,000'},
+  {id:'EXP-9906',date:'2024-09-30',desc:'Site Security Wages - Sep',project:'Muktodhara',type:'Outflow',category:'Labor',status:'Paid',amount:78000,fmt:'- \u09F378,000'},
+  {id:'RCP-8832',date:'2024-09-28',desc:'Installment - Tariqul Islam',client:'Tariqul Islam',project:'Muktodhara',type:'Inflow',category:'Installment',status:'Received',amount:100000,fmt:'+ \u09F31,00,000'},
+  {id:'EXP-9905',date:'2024-09-25',desc:'Legal Fee - Land Mutation',project:'Muktodhara',type:'Outflow',category:'Legal',status:'Paid',amount:45000,fmt:'- \u09F345,000'},
+  {id:'RCP-8831',date:'2024-09-22',desc:'Downpayment - Dr. Rubina',client:'Dr. Rubina Ali',project:'Jolshiri',type:'Inflow',category:'Booking',status:'Received',amount:800000,fmt:'+ \u09F38,00,000'},
+  {id:'EXP-9904',date:'2024-09-20',desc:'Generator Fuel - Jolshiri Site',project:'Jolshiri',type:'Outflow',category:'Utilities',status:'Paid',amount:32000,fmt:'- \u09F332,000'},
+  {id:'EXP-9903',date:'2024-09-18',desc:'VAT Payment - NBR',type:'Outflow',category:'Tax',status:'Paid',amount:185000,fmt:'- \u09F31,85,000'}
+]);
+window.mockProjectBudgets = DB.init('project_budgets', [
+  {id:'BGT-001',name:'Muktodhara Green Park',type:'Land Plotting',budget:50000000,allocated:{materials:15000000,labor:8000000,legal:3000000,marketing:2000000,admin:4000000,contingency:8000000},spent:{materials:10500000,labor:5200000,legal:1800000,marketing:1500000,admin:2800000,contingency:1200000},progress:54},
+  {id:'BGT-002',name:'Jolshiri Abason',type:'Apartment',budget:120000000,allocated:{materials:38000000,labor:22000000,legal:6000000,marketing:8000000,admin:10000000,contingency:36000000},spent:{materials:20500000,labor:9500000,legal:2800000,marketing:5200000,admin:4500000,contingency:5000000},progress:38}
+]);
+window.mockTaxEntries = DB.init('tax_entries', [
+  {id:'TAX-001',type:'VAT',desc:'VAT on Booking - Muktodhara',project:'Muktodhara',amount:25000,rate:'5%',status:'Paid',date:'2024-10-20'},
+  {id:'TAX-002',type:'TDS',desc:'TDS on Contractor - Shah Cement',vendor:'Shah Cement',project:'Jolshiri',amount:55000,rate:'10%',status:'Pending',date:'2024-10-25'},
+  {id:'TAX-003',type:'AIT',desc:'AIT on Land Purchase - Muktodhara',project:'Muktodhara',amount:90000,rate:'3%',status:'Paid',date:'2024-09-15'},
+  {id:'TAX-004',type:'VAT',desc:'VAT on Booking - Jolshiri',project:'Jolshiri',amount:40000,rate:'5%',status:'Paid',date:'2024-10-24'},
+  {id:'TAX-005',type:'TDS',desc:'TDS on Consultancy Fee',vendor:'Architect Consultancy',project:'Muktodhara',amount:7500,rate:'10%',status:'Paid',date:'2024-10-08'}
 ]);
 window.mockTasks = DB.init('tasks', [
   {id:1,title:'Call Tariqul Islam regarding Muktodhara plot',status:'To Do',priority:'High'},
@@ -940,15 +966,191 @@ function renderSubTable(el, mod, items, headers, fields, title){
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${items.map(i=>`<tr>${fields.map(f=>`<td>${i[f]||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div></div>`;
 }
 
+let financeTab='dashboard';
+function fmtNum(v){return v.toLocaleString('en-IN');}
 function renderFinance(el){
-  const pF=_pg('finance',mockTransactions);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Finance</div><div class="page-subtitle">${mockTransactions.length} transactions</div>
-    <div class="stats-row" style="margin-bottom:10px">${[
-      ['Inflows',mockTransactions.filter(t=>t.type==='Inflow').length,'#2e7d32'],
-      ['Outflows',mockTransactions.filter(t=>t.type==='Outflow').length,'#c62828'],
-      ['Total',mockTransactions.length,'']
-    ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div></div>`).join('')}</div>
-    <div class="card"><div class="card-header"><h3>Transactions</h3><button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Description</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${pF.items.map(t=>`<tr style="cursor:pointer" onclick="openTransaction('${t.id}')"><td style="font-weight:500">${t.id}</td><td>${t.desc}</td><td><span class="badge-status ${t.type==='Inflow'?'badge-active':'badge-sold'}">${t.type}</span></td><td class="num" style="font-weight:600;color:${t.type==='Inflow'?'#2e7d32':'#c62828'}">${t.amount}</td><td><span class="badge-status ${t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved'}">${t.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('finance',pF.total,pF.page,pF.totalPages,pF.perPage)}</div></div></div></div>`;
+  const finT=financeTab;
+  const GRp=t=>t.type==='Inflow'?t.amount:0;
+  const GRm=t=>t.type==='Inflow'?0:t.amount;
+  const grossIncome=mockTransactions.reduce((s,t)=>s+GRp(t),0);
+  const grossExpense=mockTransactions.reduce((s,t)=>s+GRm(t),0);
+  const netProfit=grossIncome-grossExpense;
+  const bankTotal=mockBankAccounts.reduce((s,b)=>{const n=parseInt(b.balance.replace(/[₹,]/g,''));return s+(isNaN(n)?0:n);},0);
+
+  el.innerHTML=`<div class="fade-in">
+    <div class="page-title">Finance Dashboard</div><div class="page-subtitle">${mockTransactions.length} transactions \u00B7 \u09F3 ${fmtNum(netProfit)} net</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','bank_accounts','budgets','tax'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','bank_accounts':'\uD83C\uDFE6 Banks','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax'}[t]}</div>`).join('')}</div>
+    </div>
+    ${finT==='dashboard'?renderFinanceDashboard(grossIncome,grossExpense,netProfit,bankTotal):
+      finT==='transactions'?renderFinanceTransactions():
+      finT==='receive_payment'?renderReceivePayment():
+      finT==='record_expense'?renderRecordExpense():
+      finT==='bank_accounts'?renderFinanceBankAccounts():
+      finT==='budgets'?renderProjectBudgets():
+      finT==='tax'?renderTaxAdjustments():''}
+  </div>`;
+  if(finT==='dashboard')setTimeout(renderFinanceCharts,50);
+}
+
+function renderFinanceDashboard(gI,gE,nP,bT){
+  const recent=mockTransactions.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  return `<div class="stats-row" style="margin-bottom:8px">${[
+    ['Gross Income','\u09F3 '+fmtNum(gI),'#2e7d32'],
+    ['Operating Expenses','\u09F3 '+fmtNum(gE),'#c62828'],
+    ['Net Profit','\u09F3 '+fmtNum(nP),nP>=0?'#2e7d32':'#c62828'],
+    ['Bank Balances','\u09F3 '+fmtNum(bT),'#1565c0']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:10px;margin-bottom:8px">
+      <div class="card"><div class="card-header"><h3>\uD83D\uDCC8 Income vs Expense</h3></div><div class="card-body" style="padding:8px;height:180px"><canvas id="finRevChart"></canvas></div></div>
+      <div class="card"><div class="card-header"><h3>\uD83E\uDDE9 Expense Breakdown</h3></div><div class="card-body" style="padding:8px;height:180px"><canvas id="finExpChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:10px">
+      <div class="card"><div class="card-header"><h3>\uD83D\uDCCA Monthly Trend</h3></div><div class="card-body" style="padding:8px;height:170px"><canvas id="finTrendChart"></canvas></div></div>
+      <div class="card"><div class="card-header"><h3>\uD83D\uDD50 Recent Transactions</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>#</th><th style="font-weight:500;font-size:9px">Description</th><th class="num" style="font-size:9px">Amount</th></tr></thead><tbody>${recent.map(t=>'<tr style="cursor:pointer" onclick="openTransaction(\''+t.id+'\')"><td style="width:50px;font-family:monospace;font-size:8px">'+t.id+'</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.desc+'</td><td class="num" style="font-weight:600;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.fmt+'</td></tr>').join('')}</tbody></table></div></div>
+    </div>
+    <div class="card" style="margin-top:8px"><div class="card-header"><h3>\uD83C\uDFE6 Bank Balances</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Bank</th><th>Account</th><th>Type</th><th class="num">Balance</th></tr></thead><tbody>${mockBankAccounts.map(b=>'<tr><td style="font-weight:500">'+b.name+'</td><td style="font-family:monospace;font-size:9px">'+b.account+'</td><td>'+b.type+'</td><td class="num" style="font-weight:600">'+b.balance+'</td></tr>').join('')}</tbody></table></div></div>`;
+}
+
+function renderFinanceTransactions(){
+  const typeFilter=(document.getElementById('finTypeFilter')||{}).value||'all';
+  const catFilter=(document.getElementById('finCatFilter')||{}).value||'all';
+  var filtered=mockTransactions.filter(t=>{
+    if(typeFilter!=='all'&&t.type!==typeFilter)return false;
+    if(catFilter!=='all'&&(t.category||'')!==catFilter)return false;
+    return true;
+  });
+  const pF=_pg('finance',filtered);
+  return `<div class="toolbar" style="margin-bottom:6px">
+    <select id="finTypeFilter" onchange="_PG['finance']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px">
+      <option value="all">All Types</option><option value="Inflow"${typeFilter==='Inflow'?' selected':''}>Inflow</option><option value="Outflow"${typeFilter==='Outflow'?' selected':''}>Outflow</option>
+    </select>
+    <select id="finCatFilter" onchange="_PG['finance']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px">
+      <option value="all">All Categories</option>${['Booking','Installment','Materials','Labor','Marketing','Admin','Legal','Professional Fees','Utilities','Tax'].map(c=>'<option value="'+c+'"'+(catFilter===c?' selected':'')+'>'+c+'</option>').join('')}
+    </select>
+    <div class="spacer"></div>
+    <button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add Transaction</button>
+  </div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${
+    pF.items.map(t=>'<tr style="cursor:pointer" onclick="openTransaction(\''+t.id+'\')"><td style="font-weight:500;font-family:monospace;font-size:9px">'+t.id+'</td><td style="font-size:10px;color:#666">'+t.date+'</td><td>'+t.desc+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:9px;background:#f0f4ff;color:#2F80ED">'+(t.category||'\u2014')+'</span></td><td><span class="badge-status '+(t.type==='Inflow'?'badge-active':'badge-sold')+'">'+t.type+'</span></td><td class="num" style="font-weight:600;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.fmt+'</td><td><span class="badge-status '+(t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved')+'">'+t.status+'</span></td></tr>').join('')
+  }</tbody></table>${_pgHtml('finance',pF.total,pF.page,pF.totalPages,pF.perPage)}</div></div></div>`;
+}
+
+function renderReceivePayment(){
+  return `<div class="card"><div class="card-header"><h3>\u2B07\uFE0F Receive Payment</h3><button class="action-btn primary" onclick="crudReceivePayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Date</th><th>Client</th><th>Project</th><th>Category</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${
+    mockTransactions.filter(t=>t.type==='Inflow').sort((a,b)=>b.date.localeCompare(a.date)).map(t=>'<tr style="cursor:pointer" onclick="openTransaction(\''+t.id+'\')"><td>'+t.date+'</td><td style="font-weight:500">'+(t.client||'\u2014')+'</td><td>'+(t.project||'\u2014')+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:9px;background:#e8f5e9;color:#2e7d32">'+(t.category||'\u2014')+'</span></td><td class="num" style="font-weight:600;color:#2e7d32">'+t.fmt+'</td><td><span class="badge-status '+(t.status==='Received'?'badge-active':'badge-pending')+'">'+t.status+'</span></td></tr>').join('')
+    }</tbody></table></div></div></div>`;
+}
+
+function renderRecordExpense(){
+  return `<div class="card"><div class="card-header"><h3>\u2B06\uFE0F Record Expense</h3><button class="action-btn primary" onclick="crudExpense()" style="padding:3px 8px;font-size:10px">+ Record Expense</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Date</th><th>Description</th><th>Project</th><th>Category</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${
+    mockTransactions.filter(t=>t.type==='Outflow').sort((a,b)=>b.date.localeCompare(a.date)).map(t=>'<tr style="cursor:pointer" onclick="openTransaction(\''+t.id+'\')"><td>'+t.date+'</td><td style="font-weight:500">'+t.desc+'</td><td>'+(t.project||'\u2014')+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:9px;background:#fce4ec;color:#c62828">'+(t.category||'\u2014')+'</span></td><td class="num" style="font-weight:600;color:#c62828">'+t.fmt+'</td><td><span class="badge-status '+(t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-sold')+'">'+t.status+'</span></td></tr>').join('')
+    }</tbody></table></div></div></div>`;
+}
+
+function renderFinanceBankAccounts(){
+  return `<div class="stats-row" style="margin-bottom:8px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">${mockBankAccounts.map(b=>{
+    return '<div class="stat-card" style="text-align:left;padding:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-weight:600;font-size:11px">'+b.name+'</span><span class="badge-status badge-active" style="font-size:8px">'+b.type+'</span></div><div style="font-size:9px;color:#888;margin-bottom:2px">'+b.account+'</div><div style="font-size:13px;font-weight:700;color:#1565c0">'+b.balance+'</div></div>';
+  }).join('')}</div>
+  <div class="card"><div class="card-header"><h3>Manage Bank Accounts</h3><button class="action-btn primary" onclick="settingsAddBank()" style="padding:3px 8px;font-size:10px">+ Add Account</button></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Bank</th><th>Account</th><th>Branch</th><th>Type</th><th class="num">Balance</th></tr></thead><tbody>${mockBankAccounts.map(b=>'<tr><td style="font-weight:500">'+b.name+'</td><td style="font-family:monospace">'+b.account+'</td><td>'+b.branch+'</td><td>'+b.type+'</td><td class="num" style="font-weight:600">'+b.balance+'</td></tr>').join('')}</tbody></table></div></div>`;
+}
+
+function renderProjectBudgets(){
+  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${mockProjectBudgets.map(b=>{
+    const allocTotal=Object.values(b.allocated).reduce((s,v)=>s+v,0);
+    const spentTotal=Object.values(b.spent).reduce((s,v)=>s+v,0);
+    const pct=allocTotal>0?Math.round(spentTotal/allocTotal*100):0;
+    return '<div class="card"><div class="card-header"><h3>'+b.name+'</h3><span class="badge-status '+(b.progress>50?'badge-active':b.progress>25?'badge-pending':'badge-reserved')+'">'+b.progress+'% complete</span></div><div class="card-body" style="padding:10px">'+
+      '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px"><span style="color:#888">Budget: \u09F3 '+fmtNum(b.budget)+'</span><span style="font-weight:600">Spent: \u09F3 '+fmtNum(spentTotal)+' ('+pct+'%)</span></div>'+
+      '<div class="progress-bar" style="height:6px;margin-bottom:8px"><div class="fill" style="width:'+Math.min(pct,100)+'%;background:'+(pct>80?'#c62828':pct>50?'#ff9800':'#2e7d32')+'"></div></div>'+
+      '<table style="font-size:9px;width:100%"><thead><tr><th>Category</th><th class="num">Allocated</th><th class="num">Spent</th><th class="num">Remaining</th><th class="num">%</th></tr></thead><tbody>'+
+      Object.keys(b.allocated).map(k=>{
+        const al=b.allocated[k],sp=b.spent[k],rem=al-sp,x=al>0?Math.round(sp/al*100):0;
+        return '<tr><td style="text-transform:capitalize">'+k+'</td><td class="num">\u09F3 '+fmtNum(al)+'</td><td class="num">\u09F3 '+fmtNum(sp)+'</td><td class="num" style="color:'+(rem>=0?'#2e7d32':'#c62828')+'">\u09F3 '+fmtNum(Math.abs(rem))+(rem<0?' \uD83D\uDD34':'')+'</td><td class="num"><div style="width:40px;height:4px;background:#e0e0e0;border-radius:2px;display:inline-block"><div style="width:'+x+'%;height:4px;background:'+(x>80?'#c62828':x>50?'#ff9800':'#2e7d32')+';border-radius:2px"></div></div></td></tr>';
+      }).join('')+'</tbody></table></div></div>';
+  }).join('')}</div>`;
+}
+
+function renderTaxAdjustments(){
+  const totalVAT=mockTaxEntries.filter(x=>x.type==='VAT').reduce((s,x)=>s+x.amount,0);
+  const totalTDS=mockTaxEntries.filter(x=>x.type==='TDS').reduce((s,x)=>s+x.amount,0);
+  const totalAIT=mockTaxEntries.filter(x=>x.type==='AIT').reduce((s,x)=>s+x.amount,0);
+  const totalTax=totalVAT+totalTDS+totalAIT;
+  return `<div class="stats-row" style="margin-bottom:8px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">${
+    [['VAT','\u09F3 '+fmtNum(totalVAT),'#1565c0'],
+    ['TDS','\u09F3 '+fmtNum(totalTDS),'#e65100'],
+    ['AIT','\u09F3 '+fmtNum(totalAIT),'#7b1fa2'],
+    ['Total Tax','\u09F3 '+fmtNum(totalTax),'#555']].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div class="card"><div class="card-header"><h3>\uD83E\uDDFE Tax & Adjustments</h3><button class="action-btn primary" onclick="crudTaxEntry()" style="padding:3px 8px;font-size:10px">+ Add Entry</button></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>ID</th><th>Date</th><th>Type</th><th>Description</th><th class="num">Amount</th><th>Rate</th><th>Status</th></tr></thead><tbody>${
+    mockTaxEntries.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>'<tr><td style="font-family:monospace;font-size:9px">'+x.id+'</td><td>'+x.date+'</td><td><span class="badge-status '+(x.type==='VAT'?'badge-active':x.type==='TDS'?'badge-pending':'badge-reserved')+'">'+x.type+'</span></td><td>'+x.desc+'</td><td class="num" style="font-weight:600">\u09F3 '+fmtNum(x.amount)+'</td><td>'+x.rate+'</td><td><span class="badge-status '+(x.status==='Paid'?'badge-active':'badge-pending')+'">'+x.status+'</span></td></tr>').join('')
+  }</tbody></table></div></div>`;
+}
+
+function renderFinanceCharts(){
+  if(window._finCharts)window._finCharts.forEach(c=>c.destroy());
+  window._finCharts=[];
+  const rCtx=document.getElementById('finRevChart');
+  if(rCtx)try{window._finCharts.push(new Chart(rCtx,{type:'bar',data:{labels:['Sep','Oct'],datasets:[{label:'Income',data:[22,38],backgroundColor:'rgba(46,125,50,.7)',borderColor:'#2e7d32',borderWidth:1,borderRadius:3},{label:'Expense',data:[12,22],backgroundColor:'rgba(198,40,40,.6)',borderColor:'#c62828',borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}}));}catch(e){}
+  const eCtx=document.getElementById('finExpChart');
+  if(eCtx)try{const cats={};mockTransactions.filter(t=>t.type==='Outflow').forEach(t=>{cats[t.category||'Other']=(cats[t.category||'Other']||0)+t.amount});const l=Object.keys(cats),d=Object.values(cats),cl=['#1565c0','#e65100','#2e7d32','#7b1fa2','#00897b','#888','#f9a825','#c62828','#4e342e'];window._finCharts.push(new Chart(eCtx,{type:'doughnut',data:{labels:l,datasets:[{data:d,backgroundColor:cl.slice(0,l.length),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'40%',plugins:{legend:{position:'right',labels:{boxWidth:8,font:{size:8}}}}}}));}catch(e){}
+  const tCtx=document.getElementById('finTrendChart');
+  if(tCtx)try{window._finCharts.push(new Chart(tCtx,{type:'line',data:{labels:['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'],datasets:[{label:'Net Profit (L)',data:[6,8,5,7,10,6,10,13],borderColor:'#1565c0',backgroundColor:'rgba(21,101,192,.08)',fill:true,tension:.3,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}}));}catch(e){}
+}
+
+function crudReceivePayment(){
+  openModal('Record Payment',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Amount (\u09F3)','rp_amt','','number',true)+selectField('Client','rp_client','Tariqul Islam',['Tariqul Islam','Dr. Rubina Ali','Shamim Reza','Mrs. Jahanara Begum','Engr. Salahuddin','Md. Taher Uddin','Mr. Abdul Karim'],true)+inputField('Description','rp_desc','')+selectField('Category','rp_cat','Booking',['Booking','Installment','Downpayment','Other'])+selectField('Project','rp_proj','Muktodhara',['Muktodhara','Jolshiri'])+selectField('Status','rp_stat','Received',['Received','Processing','Pending'])+'</div>',
+    function(){
+      const amt=parseInt(document.getElementById('rp_amt').value)||0;
+      if(!amt)return showToast('Enter a valid amount','error');
+      const desc=document.getElementById('rp_desc').value||'Payment from '+document.getElementById('rp_client').value;
+      addItem(mockTransactions,{
+        id:'RCP-'+(8830+Math.floor(Math.random()*9000)),date:new Date().toISOString().slice(0,10),
+        desc:desc,client:document.getElementById('rp_client').value,project:document.getElementById('rp_proj').value,
+        type:'Inflow',category:document.getElementById('rp_cat').value,status:document.getElementById('rp_stat').value,amount:amt,
+        fmt:'+ \u09F3'+amt.toLocaleString('en-IN')
+      },'transactions');
+      showToast('Payment recorded!','success');renderModule();
+    }
+  );
+}
+
+function crudExpense(){
+  openModal('Record Expense',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Amount (\u09F3)','ex_amt','','number',true)+inputField('Description','ex_desc','','',true)+selectField('Category','ex_cat','Materials',['Materials','Labor','Marketing','Admin','Legal','Professional Fees','Utilities','Tax'],true)+selectField('Project','ex_proj','Muktodhara',['Muktodhara','Jolshiri','N/A'])+selectField('Status','ex_stat','Paid',['Paid','Pending'])+selectField('Vendor/Supplier','ex_vend','N/A',['Shah Cement','BSRM','Facebook Ads','Signboard','N/A'])+'</div>',
+    function(){
+      const amt=parseInt(document.getElementById('ex_amt').value)||0;
+      if(!amt)return showToast('Enter a valid amount','error');
+      const vendor=document.getElementById('ex_vend').value;
+      addItem(mockTransactions,{
+        id:'EXP-'+(9900+Math.floor(Math.random()*900)),date:new Date().toISOString().slice(0,10),
+        desc:document.getElementById('ex_desc').value,
+        vendor:vendor==='N/A'?'':vendor,
+        project:document.getElementById('ex_proj').value==='N/A'?'':document.getElementById('ex_proj').value,
+        type:'Outflow',category:document.getElementById('ex_cat').value,
+        status:document.getElementById('ex_stat').value,amount:amt,
+        fmt:'- \u09F3'+amt.toLocaleString('en-IN')
+      },'transactions');
+      showToast('Expense recorded!','success');renderModule();
+    }
+  );
+}
+
+function crudTaxEntry(){
+  openModal('Add Tax Entry',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+selectField('Type','tx_type','VAT',['VAT','TDS','AIT'],true)+inputField('Amount (\u09F3)','tx_amt','','number',true)+inputField('Description','tx_desc','','',true)+selectField('Status','tx_stat','Paid',['Paid','Pending'])+selectField('Project','tx_proj','Muktodhara',['Muktodhara','Jolshiri'])+inputField('Rate (%)','tx_rate','')+'</div>',
+    function(){
+      const amt=parseInt(document.getElementById('tx_amt').value)||0;
+      if(!amt)return showToast('Enter a valid amount','error');
+      addItem(mockTaxEntries,{
+        id:'TAX-'+(100+Math.floor(Math.random()*900)),type:document.getElementById('tx_type').value,
+        desc:document.getElementById('tx_desc').value,project:document.getElementById('tx_proj').value,amount:amt,
+        rate:document.getElementById('tx_rate').value||'\u2014',status:document.getElementById('tx_stat').value,
+        date:new Date().toISOString().slice(0,10)
+      },'tax_entries');
+      showToast('Tax entry added!','success');renderModule();
+    }
+  );
 }
 
 function renderStock(el){
@@ -1293,7 +1495,7 @@ function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name
 function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',formRow(inputField('Client','f_client',b.client,'',true),inputField('Property','f_prop',b.property,'',true))+formRow(inputField('Unit','f_unit',b.unit),inputField('Price','f_price',b.price,'',true))+formRow(inputField('Advance','f_adv',b.advance),selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed'])),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
 function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',formRow(inputField('Name','f_name',e.name,'',true),inputField('Designation','f_desig',e.designation,'',true))+formRow(selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT']),inputField('Phone','f_phone',e.phone)),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees'):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}),'employees')})}
 function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',quantity:'',status:'Adequate',reorder:0}:item;openModal(n?'New Stock Item':'Edit Item',formRow(inputField('Name','f_item',i.item,'',true),selectField('Site','f_site',i.site,['Muktodhara','Jolshiri','Corporate']))+formRow(inputField('Quantity','f_qty',i.quantity,'',true),selectField('Status','f_stat',i.status,['Adequate','Warning','Critical']))+inputField('Reorder','f_reorder',i.reorder),function(){const d={item:g('f_item'),site:g('f_site'),quantity:g('f_qty'),status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
-function crudTransaction(){openModal('New Transaction',formRow(inputField('Description','f_desc','','',true),selectField('Type','f_type','Inflow',['Inflow','Outflow'],true))+formRow(inputField('Amount','f_amt','','',true),selectField('Status','f_stat','Received',['Received','Pending','Paid'])),function(){addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:g('f_type'),amount:g('f_amt'),status:g('f_stat'),project:'—'})})}
+function crudTransaction(){openModal('New Transaction','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Description','f_desc','','',true)+selectField('Type','f_type','Inflow',['Inflow','Outflow'],true)+inputField('Amount','f_amt','','',true)+selectField('Category','f_cat','Booking',['Booking','Installment','Materials','Labor','Marketing','Admin','Legal','Professional Fees','Utilities','Tax'])+selectField('Status','f_stat','Received',['Received','Pending','Paid'])+inputField('Project','f_proj','')+'</div>',function(){const amt=parseInt(g('f_amt'))||0;const type=g('f_type');addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:type,category:g('f_cat'),amount:amt,status:g('f_stat'),project:g('f_proj')||'—',fmt:(type==='Inflow'?'+ \u09F3':'— \u09F3')+amt.toLocaleString('en-IN')},'transactions')})}
 function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:'',status:'Pending Approval'}:item;openModal(n?'New PO':'Edit PO',formRow(inputField('Vendor','f_vendor',p.vendor,'',true),inputField('Items','f_items',p.items,'',true))+formRow(inputField('Amount','f_amt',p.amount,'',true),selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled'])),function(){const d={vendor:g('f_vendor'),items:g('f_items'),amount:g('f_amt'),status:g('f_stat'),site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*100))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
 
 // ═══ DETAIL PANELS ═══
@@ -1327,7 +1529,7 @@ function openTransaction(id){
   const t=mockTransactions.find(function(x){return x.id===id});if(!t)return;
   showDetailPanel('Transaction: '+t.id,
     detailStatRow([['ID',t.id],['Date',t.date],['Description',t.desc],['Client/Vendor',t.client||t.vendor||'—'],['Project',t.project||'—'],['Type',t.type],['Status',t.status]])+
-    '<div style="margin-top:12px;text-align:center;padding:18px;background:#fff;border:1px solid #e8e8e8;border-radius:8px"><div style="font-size:24px;font-weight:700;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.amount+'</div><div style="font-size:10px;color:#888;margin-top:3px">'+(t.type==='Inflow'?'Inflow (Received)':'Outflow (Payment)')+'</div></div>',
+    '<div style="margin-top:12px;text-align:center;padding:18px;background:#fff;border:1px solid #e8e8e8;border-radius:8px"><div style="font-size:24px;font-weight:700;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+(t.fmt||t.amount)+'</div><div style="font-size:10px;color:#888;margin-top:3px">'+(t.type==='Inflow'?'Inflow (Received)':'Outflow (Payment)')+'</div></div>',
     '<div class="lead-footer"><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
