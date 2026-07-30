@@ -616,7 +616,7 @@
 const GROUPS = {
   executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'}] },
   sales_crm:     { label:'Sales & CRM',   icon:'👥', mods:[{id:'customers',    label:'Customers'},{id:'crm',          label:'CRM & Leads'},{id:'contacts',label:'Contact Book'},{id:'sales_marketing',label:'Sales & Marketing'},{id:'dues_recovery',label:'Dues & Recovery'}] },
-  land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
+  land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
   construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
   finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
@@ -698,6 +698,121 @@ window.mockComplaints = DB.init('complaints', [
   {id:'CMP-006',client:'Shahidul Islam',project:'Muktodhara Green Park',unit:'Plot 15',type:'Delayed Possession',desc:'Possession delayed by 2 months from agreed handover date',priority:'Critical',status:'Escalated',assigned:'Director',filedDate:'2026-05-20',sla:45,resolvedDate:null,satisfaction:null,owner:'MD Hasanul Banna'},
   {id:'CMP-007',client:'Engr. Salahuddin',project:'Muktodhara Green Park',unit:'Plot 22',type:'Payment',desc:'Duplicate service charge billed for June',priority:'Low',status:'Resolved',assigned:'Accounts',filedDate:'2026-06-01',sla:7,resolvedDate:'2026-06-03',satisfaction:5,owner:'Iftekhar Ahmad'},
   {id:'CMP-008',client:'Laily Akhter',project:'Muktodhara Green Park',unit:'3 Katha',type:'Maintenance',desc:'Common area water pump noisy after 10 PM',priority:'Low',status:'Open',assigned:'Service Team',filedDate:'2026-06-13',sla:5,resolvedDate:null,satisfaction:null,owner:'Sales Team A'},
+]);
+window.mockProperties = DB.init('properties', [
+  {id:'PROJ-001', name:'Jolshiri Abason', location:'Purbachal', type:'Apartment',
+   totalFloors:5, unitsPerFloor:4, totalUnits:20,
+   status:'Active', startDate:'Jan 2024', endDate:'Dec 2026',
+   units:[
+     {id:'U-101', number:'101', floor:1, type:'3BHK', size:'1350 sqft',
+      price:22000000, facing:'South', status:'Sold', customer:'Dr. Rubina Ali', bookingId:'BKG-102'},
+     {id:'U-102', number:'102', floor:1, type:'2BHK', size:'1100 sqft',
+      price:18000000, facing:'East', status:'Booked', customer:'Tariqul Islam', bookingId:'BKG-103'},
+     {id:'U-103', number:'103', floor:1, type:'2BHK', size:'1100 sqft',
+      price:17500000, facing:'West', status:'Available'},
+     {id:'U-104', number:'104', floor:1, type:'3BHK', size:'1350 sqft',
+      price:22500000, facing:'North', status:'Available'},
+     {id:'U-201', number:'201', floor:2, type:'3BHK', size:'1450 sqft',
+      price:24000000, facing:'South', status:'Reserved', customer:'Fatima Begum'},
+     {id:'U-202', number:'202', floor:2, type:'3BHK', size:'1450 sqft',
+      price:24500000, facing:'East', status:'Available'},
+     {id:'U-203', number:'203', floor:2, type:'2BHK', size:'1150 sqft',
+      price:19000000, facing:'West', status:'Available'},
+     {id:'U-204', number:'204', floor:2, type:'2BHK', size:'1150 sqft',
+      price:18500000, facing:'North', status:'Available'},
+     {id:'U-301', number:'301', floor:3, type:'4BHK', size:'2000 sqft',
+      price:38000000, facing:'South', status:'Available'},
+     {id:'U-302', number:'302', floor:3, type:'3BHK', size:'1500 sqft',
+      price:25000000, facing:'East', status:'Sold', customer:'Kamrul Hasan', bookingId:'BKG-101'},
+     {id:'U-303', number:'303', floor:3, type:'3BHK', size:'1350 sqft',
+      price:22000000, facing:'West', status:'Booked', customer:'Jahanara Begum'},
+     {id:'U-304', number:'304', floor:3, type:'3BHK', size:'1350 sqft',
+      price:21500000, facing:'North', status:'Available'},
+     {id:'U-401', number:'401', floor:4, type:'4BHK', size:'2000 sqft',
+      price:42000000, facing:'South', status:'Sold', customer:'Abdul Karim'},
+     {id:'U-402', number:'402', floor:4, type:'3BHK', size:'1500 sqft',
+      price:26000000, facing:'East', status:'Available'},
+     {id:'U-403', number:'403', floor:4, type:'3BHK', size:'1400 sqft',
+      price:23500000, facing:'West', status:'Available'},
+     {id:'U-404', number:'404', floor:4, type:'2BHK', size:'1100 sqft',
+      price:19500000, facing:'North', status:'Available'},
+     {id:'U-501', number:'501', floor:5, type:'Penthouse', size:'2500 sqft',
+      price:55000000, facing:'South', status:'Available'},
+     {id:'U-502', number:'502', floor:5, type:'Penthouse', size:'2500 sqft',
+      price:52000000, facing:'East', status:'Reserved', customer:'Kazi Nizam'},
+     {id:'U-503', number:'503', floor:5, type:'3BHK', size:'1500 sqft',
+      price:28000000, facing:'West', status:'Available'},
+     {id:'U-504', number:'504', floor:5, type:'3BHK', size:'1500 sqft',
+      price:27000000, facing:'North', status:'Available'},
+   ]},
+  {id:'PROJ-002', name:'Muktodhara Green Park', location:'Rupganj', type:'Plot',
+   totalFloors:1, unitsPerFloor:20, totalUnits:20,
+   status:'Active', startDate:'Mar 2024', endDate:'Jun 2027',
+   units:[
+     {id:'P-01', number:'1', floor:1, type:'Plot', size:'1800 sqft',
+      price:15000000, facing:'South', status:'Sold', customer:'Tariqul Islam'},
+     {id:'P-02', number:'2', floor:1, type:'Plot', size:'1800 sqft',
+      price:15000000, facing:'East', status:'Sold', customer:'Syed Rahman'},
+     {id:'P-03', number:'3', floor:1, type:'Plot', size:'1080 sqft',
+      price:9500000, facing:'West', status:'Booked', customer:'Laily Akhter'},
+     {id:'P-04', number:'4', floor:1, type:'Plot', size:'1080 sqft',
+      price:9500000, facing:'North', status:'Available'},
+     {id:'P-05', number:'5', floor:1, type:'Plot', size:'1800 sqft',
+      price:15500000, facing:'South', status:'Available'},
+     {id:'P-06', number:'6', floor:1, type:'Plot', size:'1800 sqft',
+      price:15000000, facing:'East', status:'Reserved'},
+     {id:'P-07', number:'7', floor:1, type:'Plot', size:'1200 sqft',
+      price:10000000, facing:'West', status:'Available'},
+     {id:'P-08', number:'8', floor:1, type:'Plot', size:'1200 sqft',
+      price:10500000, facing:'North', status:'Available'},
+     {id:'P-09', number:'9', floor:1, type:'Plot', size:'2500 sqft',
+      price:28000000, facing:'South', status:'Available'},
+     {id:'P-10', number:'10', floor:1, type:'Plot', size:'2500 sqft',
+      price:30000000, facing:'East', status:'Sold', customer:'Abdur Rahim'},
+     {id:'P-11', number:'11', floor:1, type:'Plot', size:'1800 sqft',
+      price:16000000, facing:'West', status:'Available'},
+     {id:'P-12', number:'12', floor:1, type:'Plot', size:'1200 sqft',
+      price:11000000, facing:'North', status:'Available'},
+     {id:'P-13', number:'13', floor:1, type:'Plot', size:'1800 sqft',
+      price:15000000, facing:'South', status:'Booked', customer:'Shamim Reza'},
+     {id:'P-14', number:'14', floor:1, type:'Plot', size:'900 sqft',
+      price:7500000, facing:'East', status:'Available'},
+     {id:'P-15', number:'15', floor:1, type:'Plot', size:'1200 sqft',
+      price:10000000, facing:'West', status:'Available'},
+     {id:'P-16', number:'16', floor:1, type:'Plot', size:'1200 sqft',
+      price:10500000, facing:'North', status:'Available'},
+     {id:'P-17', number:'17', floor:1, type:'Plot', size:'1500 sqft',
+      price:12500000, facing:'South', status:'Available'},
+     {id:'P-18', number:'18', floor:1, type:'Plot', size:'1080 sqft',
+      price:9500000, facing:'East', status:'Available'},
+     {id:'P-19', number:'19', floor:1, type:'Plot', size:'1200 sqft',
+      price:10000000, facing:'West', status:'Available'},
+     {id:'P-20', number:'20', floor:1, type:'Plot', size:'1500 sqft',
+      price:13000000, facing:'North', status:'Sold', customer:'Shahidul Islam'},
+   ]},
+  {id:'PROJ-003', name:'Green Valley', location:'Savar', type:'Mixed',
+   totalFloors:3, unitsPerFloor:6, totalUnits:18,
+   status:'Planning', startDate:'Jun 2025', endDate:'Jun 2028',
+   units:[
+     {id:'G-101', number:'101', floor:1, type:'Plot', size:'1080 sqft', price:8500000, facing:'South', status:'Available'},
+     {id:'G-102', number:'102', floor:1, type:'3BHK', size:'1350 sqft', price:21000000, facing:'East', status:'Available'},
+     {id:'G-103', number:'103', floor:1, type:'3BHK', size:'1350 sqft', price:21500000, facing:'West', status:'Sold', customer:'Fatima Begum'},
+     {id:'G-104', number:'104', floor:1, type:'2BHK', size:'1100 sqft', price:16000000, facing:'North', status:'Available'},
+     {id:'G-105', number:'105', floor:1, type:'Plot', size:'1800 sqft', price:12000000, facing:'South', status:'Reserved'},
+     {id:'G-106', number:'106', floor:1, type:'Plot', size:'1080 sqft', price:8500000, facing:'North', status:'Available'},
+     {id:'G-201', number:'201', floor:2, type:'3BHK', size:'1400 sqft', price:23000000, facing:'South', status:'Available'},
+     {id:'G-202', number:'202', floor:2, type:'3BHK', size:'1400 sqft', price:23500000, facing:'East', status:'Available'},
+     {id:'G-203', number:'203', floor:2, type:'2BHK', size:'1100 sqft', price:17000000, facing:'West', status:'Available'},
+     {id:'G-204', number:'204', floor:2, type:'2BHK', size:'1100 sqft', price:17500000, facing:'North', status:'Available'},
+     {id:'G-205', number:'205', floor:2, type:'3BHK', size:'1500 sqft', price:25000000, facing:'South', status:'Available'},
+     {id:'G-206', number:'206', floor:2, type:'3BHK', size:'1500 sqft', price:25500000, facing:'East', status:'Available'},
+     {id:'G-301', number:'301', floor:3, type:'4BHK', size:'2000 sqft', price:35000000, facing:'South', status:'Available'},
+     {id:'G-302', number:'302', floor:3, type:'4BHK', size:'2000 sqft', price:36000000, facing:'East', status:'Available'},
+     {id:'G-303', number:'303', floor:3, type:'3BHK', size:'1500 sqft', price:27000000, facing:'West', status:'Available'},
+     {id:'G-304', number:'304', floor:3, type:'3BHK', size:'1500 sqft', price:27500000, facing:'North', status:'Available'},
+     {id:'G-305', number:'305', floor:3, type:'Penthouse', size:'2500 sqft', price:48000000, facing:'South', status:'Available'},
+     {id:'G-306', number:'306', floor:3, type:'Penthouse', size:'2500 sqft', price:50000000, facing:'East', status:'Available'},
+   ]},
 ]);
 window.mockProjects = DB.init('projects', [
   {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
@@ -1549,6 +1664,7 @@ function switchModule(mod) {
     case 'contacts': renderContacts(el); break;
     case 'land_mgmt': renderLandMgmt(el); break;
     case 'plots': renderPlots(el); break;
+    case 'properties_units': renderPropertiesUnits(el); break;
     case 'projects': renderProjects(el); break;
     case 'compliance': renderCompliance(el); break;
     case 'bookings': renderBookings(el); break;
@@ -2840,6 +2956,309 @@ function renderPlots(el){
       <div class="plot-grid">${mockPlots.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`}).join('')}</div>
     </div></div>
     <div class="card" style="margin-top:10px"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${pP2.items.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages,pP2.perPage)}</div></div></div></div>`;
+}</div></div></div></div>`;
+
+// ═══ PROPERTY & UNIT INVENTORY ═══
+var propUnitTab = 'dashboard';
+var propFilter = 'all';
+
+function renderPropertiesUnits(el) {
+  var totalProps = mockProperties.length;
+  var totalUnits = mockProperties.reduce(function(s, p) { return s + p.units.length; }, 0);
+  var availUnits = countUnitsByStatus('Available');
+  var soldUnits = countUnitsByStatus('Sold');
+  var bookedUnits = countUnitsByStatus('Booked');
+  var reservedUnits = countUnitsByStatus('Reserved');
+  var totalValue = mockProperties.reduce(function(s, p) {
+    return s + p.units.reduce(function(s2, u) { return s2 + u.price; }, 0);
+  }, 0);
+
+  el.innerHTML = '<div class="fade-in">' +
+    '<div class="page-title">🏢 Property & Unit Inventory</div>' +
+    '<div class="page-subtitle">' + totalProps + ' projects · ' + totalUnits + ' units · ৳' + (totalValue / 10000000).toFixed(1) + 'Cr total value</div>' +
+    '<div class="stats-row" style="margin-bottom:8px">' +
+      ['Available', availUnits, '#4caf50', '🟢'].map(function(s) {
+        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
+      }).join('') +
+      ['Booked', bookedUnits, '#2196f3', '🔵'].map(function(s) {
+        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
+      }).join('') +
+      ['Reserved', reservedUnits, '#ff9800', '🟡'].map(function(s) {
+        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
+      }).join('') +
+      ['Sold', soldUnits, '#e53935', '🔴'].map(function(s) {
+        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
+      }).join('') +
+      ['Total Units', totalUnits, '#2F80ED', '📊'].map(function(s) {
+        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
+      }).join('') +
+    '</div>' +
+    '<div class="toolbar" style="margin-bottom:6px">' +
+      '<div class="tabs">' +
+        '<div class="tab ' + (propUnitTab === 'dashboard' ? 'active' : '') + '" onclick="propUnitTab=\\'dashboard\\';renderModule()">📊 Dashboard</div>' +
+        '<div class="tab ' + (propUnitTab === 'grid' ? 'active' : '') + '" onclick="propUnitTab=\\'grid\\';renderModule()">📐 Unit Grid</div>' +
+        '<div class="tab ' + (propUnitTab === 'projects' ? 'active' : '') + '" onclick="propUnitTab=\\'projects\\';renderModule()">🏗 Projects</div>' +
+      '</div>' +
+      '<div class="spacer"></div>' +
+      '<button class="action-btn primary" onclick="crudProperty()" data-perm="Property & Units:Create">+ New Property</button>' +
+    '</div>' +
+    (propUnitTab === 'dashboard' ? renderPropDashboard() : '') +
+    (propUnitTab === 'grid' ? renderPropGrid() : '') +
+    (propUnitTab === 'projects' ? renderPropProjects() : '') +
+  '</div>';
+}
+
+function countUnitsByStatus(status) {
+  return mockProperties.reduce(function(s, p) {
+    return s + p.units.filter(function(u) { return u.status === status; }).length;
+  }, 0);
+}
+
+function renderPropDashboard() {
+  var projectCards = mockProperties.map(function(p) {
+    var statusColor = { 'Active': '#4caf50', 'Planning': '#ff9800', 'Completed': '#2196f3' }[p.status] || '#888';
+    var unitAvail = p.units.filter(function(u) { return u.status === 'Available'; }).length;
+    var unitSold = p.units.filter(function(u) { return u.status === 'Sold'; }).length;
+    var unitBooked = p.units.filter(function(u) { return u.status === 'Booked'; }).length;
+    var unitReserved = p.units.filter(function(u) { return u.status === 'Reserved'; }).length;
+    var progPct = p.units.length > 0 ? Math.round((unitSold + unitBooked) / p.units.length * 100) : 0;
+    return '<div class="card" style="cursor:pointer" onclick="propUnitTab=\\'grid\\';propFilter=\\'' + p.id + '\\';renderModule()">' +
+      '<div class="card-body">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+      '<div><div style="font-size:13px;font-weight:600">' + p.name + '</div><div style="font-size:10px;color:#888">' + p.location + ' · ' + p.type + '</div></div>' +
+      '<span class="badge-status badge-active" style="background:' + statusColor + '">' + p.status + '</span></div>' +
+      '<div style="display:flex;gap:10px;margin-bottom:4px;font-size:10px">' +
+      '<span>🟢 ' + unitAvail + ' avail</span><span>🔵 ' + unitBooked + ' booked</span><span>🟡 ' + unitReserved + ' reserved</span><span>🔴 ' + unitSold + ' sold</span>' +
+      '</div>' +
+      '<div style="margin-bottom:3px"><div style="display:flex;justify-content:space-between;font-size:9px"><span>Occupancy</span><span>' + progPct + '%</span></div>' +
+      '<div class="progress-bar"><div class="fill" style="width:' + progPct + '%;background:' + (progPct > 60 ? '#4caf50' : progPct > 30 ? '#ff9800' : '#2196f3') + '"></div></div></div>' +
+      '<div style="font-size:9px;color:#888">' + p.totalFloors + ' floors · ' + p.totalUnits + ' units · ' + p.startDate + ' → ' + p.endDate + '</div>' +
+      '</div></div>';
+  }).join('');
+
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px">' + projectCards + '</div>';
+}
+
+function renderPropGrid() {
+  var projects = mockProperties;
+  if (propFilter !== 'all') {
+    projects = projects.filter(function(p) { return p.id === propFilter; });
+  }
+
+  return '<div class="toolbar" style="margin-bottom:6px">' +
+    '<select onchange="propFilter=this.value;renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px">' +
+    '<option value="all"' + (propFilter === 'all' ? ' selected' : '') + '>All Projects</option>' +
+    mockProperties.map(function(p) { return '<option value="' + p.id + '"' + (propFilter === p.id ? ' selected' : '') + '>' + p.name + '</option>'; }).join('') +
+    '</select>' +
+    '<div class="spacer"></div>' +
+    '<span style="font-size:9px;color:#888">' +
+    '<span style="display:inline-block;width:8px;height:8px;background:#4caf50;border-radius:2px;margin:0 2px 0 6px"></span> Available' +
+    '<span style="display:inline-block;width:8px;height:8px;background:#2196f3;border-radius:2px;margin:0 2px 0 6px"></span> Booked' +
+    '<span style="display:inline-block;width:8px;height:8px;background:#ff9800;border-radius:2px;margin:0 2px 0 6px"></span> Reserved' +
+    '<span style="display:inline-block;width:8px;height:8px;background:#e53935;border-radius:2px;margin:0 2px 0 6px"></span> Sold' +
+    '</span>' +
+    '</div>' +
+    projects.map(function(p) {
+      return '<div class="card" style="margin-bottom:10px">' +
+        '<div class="card-header"><h3>' + p.name + '</h3><span style="font-size:9px;color:#888">' + p.location + ' · ' + p.type + '</span></div>' +
+        '<div class="card-body" style="padding:10px">' +
+        renderUnitGrid(p) +
+        '</div></div>';
+    }).join('');
+}
+
+function renderUnitGrid(project) {
+  var floors = {};
+  project.units.forEach(function(u) {
+    if (!floors[u.floor]) floors[u.floor] = [];
+    floors[u.floor].push(u);
+  });
+  var floorNums = Object.keys(floors).sort(function(a, b) { return b - a; });
+
+  var statusColors = {
+    'Available': '#4caf50',
+    'Booked': '#2196f3',
+    'Reserved': '#ff9800',
+    'Sold': '#e53935'
+  };
+
+  return floorNums.map(function(fNum) {
+    var floorUnits = floors[fNum];
+    return '<div style="margin-bottom:8px">' +
+      '<div style="font-size:9px;font-weight:600;color:#888;margin-bottom:3px;padding:2px 0;border-bottom:1px solid #eee">Floor ' + fNum + '</div>' +
+      '<div style="display:flex;gap:4px;flex-wrap:wrap">' +
+      floorUnits.map(function(u) {
+        var color = statusColors[u.status] || '#999';
+        return '<div style="width:72px;height:68px;border-radius:4px;background:' + color + '15;border:1.5px solid ' + color + ';cursor:pointer;padding:3px;text-align:center" onclick="openUnitDetail(\\'' + project.id + '\\',\\'' + u.id + '\\')" title="' + u.number + ' · ' + u.type + ' · ' + u.size + ' · ' + u.status + '">' +
+          '<div style="font-size:10px;font-weight:700;color:' + color + '">' + u.number + '</div>' +
+          '<div style="font-size:7px;color:#888;margin-top:1px;white-space:nowrap;overflow:hidden">' + u.type + '</div>' +
+          '<div style="font-size:7px;color:#888;white-space:nowrap;overflow:hidden">' + u.size.split(' ')[0] + '</div>' +
+          '<div style="font-size:6px;font-weight:600;color:' + color + ';margin-top:1px;text-transform:uppercase">' + u.status.slice(0, 4) + '</div>' +
+          '</div>';
+      }).join('') +
+      '</div></div>';
+  }).join('');
+}
+
+function renderPropProjects() {
+  var pP = _pg('prop_inv', mockProperties);
+  return '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Location</th><th>Type</th><th>Floors</th><th>Units</th><th>Status</th><th>Timeline</th><th></th></tr></thead><tbody>' +
+    pP.items.map(function(p) {
+      var statusColor = { 'Active': '#4caf50', 'Planning': '#ff9800', 'Completed': '#2196f3' }[p.status] || '#888';
+      return '<tr style="cursor:pointer" onclick="propUnitTab=\\'grid\\';propFilter=\\'' + p.id + '\\';renderModule()">' +
+        '<td style="font-weight:500;font-size:10px;font-family:monospace">' + p.id + '</td>' +
+        '<td style="font-weight:500">' + p.name + '</td>' +
+        '<td style="font-size:10px;color:#555">' + p.location + '</td>' +
+        '<td>' + p.type + '</td>' +
+        '<td>' + p.totalFloors + '</td>' +
+        '<td>' + p.units.length + '</td>' +
+        '<td><span class="badge-status badge-active" style="background:' + statusColor + '">' + p.status + '</span></td>' +
+        '<td style="font-size:9px;color:#888">' + p.startDate + ' — ' + p.endDate + '</td>' +
+        '<td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudProperty(mockProperties.find(function(x){return x.id===\\x27' + p.id + '\\x27}))" data-perm="Property & Units:Edit">✎</span>' +
+        ' <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteProperty(\'' + p.id + '\')" data-perm="Property & Units:Delete">✕</span></td></tr>';
+    }).join('') +
+    '</tbody></table>' + _pgHtml('prop_inv', pP.total, pP.page, pP.totalPages, pP.perPage) + '</div></div></div>';
+}
+
+function openUnitDetail(projId, unitId) {
+  var proj = mockProperties.find(function(p) { return p.id === projId; });
+  if (!proj) return;
+  var unit = proj.units.find(function(u) { return u.id === unitId; });
+  if (!unit) return;
+
+  var col = { 'Available': '#4caf50', 'Booked': '#2196f3', 'Reserved': '#ff9800', 'Sold': '#e53935' }[unit.status] || '#888';
+  var details = [
+    ['Unit No', unit.number], ['Type', unit.type], ['Size', unit.size],
+    ['Facing', unit.facing], ['Price', '৳' + (unit.price / 100000).toFixed(1) + 'L'],
+    ['Floor', 'Floor ' + unit.floor], ['Project', proj.name],
+    ['Location', proj.location]
+  ];
+  if (unit.customer) details.push(['Customer', unit.customer]);
+  if (unit.bookingId) details.push(['Booking', unit.bookingId]);
+
+  var footerBtns = '';
+  if (unit.status === 'Available') {
+    footerBtns = '<button class="lead-foot-btn success" onclick="crudBooking();closeLeadPanel()">📋 Book Unit</button>';
+  }
+  if (unit.status === 'Available' || unit.status === 'Booked' || unit.status === 'Reserved') {
+    footerBtns += '<button class="lead-foot-btn primary" onclick="editUnitStatus(\'' + projId + '\',\'' + unitId + '\');closeLeadPanel()">✎ Change Status</button>';
+  }
+  footerBtns += '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button>';
+
+  showDetailPanel(
+    '🏢 ' + proj.name + ' — Unit ' + unit.number,
+    '<div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">' +
+    details.map(function(d) {
+      return '<div class="stat-card"><div class="label">' + d[0] + '</div><div style="font-size:12px;font-weight:600;margin-top:2px">' + (d[1] || '—') + '</div></div>';
+    }).join('') +
+    '</div>' +
+    '<div style="margin-top:8px;text-align:center"><span class="badge-status badge-active" style="font-size:11px;padding:4px 16px;background:' + col + '">' + unit.status + '</span></div>',
+    footerBtns
+  );
+}
+
+function editUnitStatus(projId, unitId) {
+  var proj = mockProperties.find(function(p) { return p.id === projId; });
+  if (!proj) return;
+  var unit = proj.units.find(function(u) { return u.id === unitId; });
+  if (!unit) return;
+
+  var statuses = ['Available', 'Booked', 'Reserved', 'Sold'];
+  showModal('Change Status — Unit ' + unit.number,
+    '<div style="padding:8px"><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">New Status</label>' +
+    '<select id="f_status" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px">' +
+    statuses.map(function(s) { return '<option value="' + s + '"' + (s === unit.status ? ' selected' : '') + '>' + s + '</option>'; }).join('') +
+    '</select>' +
+    '<label style="font-size:11px;font-weight:500;display:block;margin:8px 0 4px">Customer (if booked/sold)</label>' +
+    '<input id="f_customer" value="' + (unit.customer || '') + '" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px" placeholder="Customer name"/>' +
+    '</div>',
+    [
+      { label: 'Cancel', action: 'close', secondary: true },
+      { label: 'Update', action: function() {
+        unit.status = document.getElementById('f_status').value;
+        unit.customer = document.getElementById('f_customer').value.trim() || undefined;
+        DB.save('properties');
+        showToast('Status updated to ' + unit.status, 'success');
+        closeDrawer();
+        renderModule();
+      }}
+    ]
+  );
+}
+
+function deleteProperty(id) {
+  if (!confirm('Delete this property and all its units?')) return;
+  var idx = mockProperties.findIndex(function(p) { return p.id === id; });
+  if (idx >= 0) mockProperties.splice(idx, 1);
+  DB.save('properties');
+  showToast('Property deleted', 'info');
+  renderModule();
+}
+
+function crudProperty(item) {
+  var n = !item;
+  showModal(
+    n ? 'New Property' : 'Edit Property',
+    '<div class="form-grid">' +
+    '<div class="field-row" style="grid-template-columns:1fr"><label>Property Name *</label><input id="f_name" value="' + (item ? item.name.replace(/'/g, '&#39;') : '') + '" style="width:100%;padding:6px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px"/></div>' +
+    '<div class="field-row" style="grid-template-columns:1fr 1fr"><label>Location</label><label>Type</label><input id="f_location" value="' + (item ? item.location : '') + '" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/>' +
+    '<select id="f_type" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="Apartment"' + (item && item.type === 'Apartment' ? ' selected' : '') + '>Apartment</option><option value="Plot"' + (item && item.type === 'Plot' ? ' selected' : '') + '>Plot</option><option value="Mixed"' + (item && item.type === 'Mixed' ? ' selected' : '') + '>Mixed</option><option value="Commercial"' + (item && item.type === 'Commercial' ? ' selected' : '') + '>Commercial</option></select></div>' +
+    '<div class="field-row" style="grid-template-columns:1fr 1fr 1fr"><label>Floors</label><label>Units/Floor</label><label>Status</label><input id="f_floors" value="' + (item ? item.totalFloors : '') + '" type="number" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/>' +
+    '<input id="f_perFloor" value="' + (item ? item.unitsPerFloor : '') + '" type="number" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/>' +
+    '<select id="f_status" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="Planning"' + (item && item.status === 'Planning' ? ' selected' : '') + '>Planning</option><option value="Active"' + (item && item.status === 'Active' ? ' selected' : '') + '>Active</option><option value="Completed"' + (item && item.status === 'Completed' ? ' selected' : '') + '>Completed</option></select></div>' +
+    '<div class="field-row" style="grid-template-columns:1fr 1fr"><label>Start Date</label><label>Est. Completion</label><input id="f_start" value="' + (item ? item.startDate : '') + '" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/>' +
+    '<input id="f_end" value="' + (item ? item.endDate : '') + '" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/></div>' +
+    '</div>',
+    [
+      { label: 'Cancel', action: 'close', secondary: true },
+      { label: n ? 'Create Property' : 'Save Changes', action: function() {
+        var name = document.getElementById('f_name').value.trim();
+        if (!name) { showToast('Name is required', 'error'); return; }
+        if (n) {
+          var floors = parseInt(document.getElementById('f_floors').value) || 1;
+          var upf = parseInt(document.getElementById('f_perFloor').value) || 4;
+          var genUnits = [];
+          for (var f = 1; f <= floors; f++) {
+            for (var u = 1; u <= upf; u++) {
+              var unum = '' + f + (u < 10 ? '0' : '') + u;
+              genUnits.push({
+                id: 'U-' + (mockProperties.length + 1) + '-' + unum,
+                number: unum, floor: f,
+                type: '3BHK', size: '1350 sqft',
+                price: 20000000, facing: ['South', 'East', 'West', 'North'][(u - 1) % 4],
+                status: 'Available'
+              });
+            }
+          }
+          mockProperties.push({
+            id: 'PROJ-' + String(mockProperties.length + 1).padStart(3, '0'),
+            name: name,
+            location: document.getElementById('f_location').value || 'TBD',
+            type: document.getElementById('f_type').value,
+            totalFloors: floors, unitsPerFloor: upf, totalUnits: genUnits.length,
+            status: document.getElementById('f_status').value,
+            startDate: document.getElementById('f_start').value || new Date().toISOString().slice(0, 10),
+            endDate: document.getElementById('f_end').value || 'TBD',
+            units: genUnits
+          });
+          showToast('Property created with ' + genUnits.length + ' units', 'success');
+        } else {
+          item.name = name;
+          item.location = document.getElementById('f_location').value || 'TBD';
+          item.type = document.getElementById('f_type').value;
+          item.totalFloors = parseInt(document.getElementById('f_floors').value) || 1;
+          item.unitsPerFloor = parseInt(document.getElementById('f_perFloor').value) || 4;
+          item.status = document.getElementById('f_status').value;
+          item.startDate = document.getElementById('f_start').value || item.startDate;
+          item.endDate = document.getElementById('f_end').value || item.endDate;
+          showToast('Property updated', 'success');
+        }
+        DB.save('properties');
+        closeDrawer();
+        renderModule();
+      }}
+    ]
+  );
 }
 
 const stageNames=['identification','due_diligence','negotiation','agreement','registration','possession'];
@@ -5441,7 +5860,7 @@ window.mockCOA = DB.init('coa', [
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Land Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Layout','Projects','Compliance','Bookings','Customer Portal','Handover','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Finance','Stock & Procurement','HR','Data Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Layout','Projects','Property & Units','Compliance','Bookings','Customer Portal','Handover','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Finance','Stock & Procurement','HR','Data Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -5455,12 +5874,14 @@ const MOCK_PERMISSIONS = {
     m==='Tasks'?['✓','✓','✓','✓','','','']:
     m==='Data Vault'?['✓','✓','✓','','','','']:
     m==='Finance'?['✓','','','','✓','','']:
+    m==='Property & Units'?['✓','✓','✓','✓','✓','','']:
     ['✓','','','','','','']
   ),
   'Sales Rep':PERMISSION_MODULES.map(m=>
     ['CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Bookings'].indexOf(m)>=0?['✓','✓','✓','','✓','','']:
     ['Dashboard','Customer Portal'].indexOf(m)>=0?['✓','','','','','','']:
     m==='Tasks'?['✓','✓','','','','','']:
+    m==='Property & Units'?['✓','✓','✓','','','','']:
     ['✓','','','','','','']
   ),
   'Accounts':PERMISSION_MODULES.map(m=>
@@ -6904,6 +7325,26 @@ function nextId(a){return Math.max(0,...a.map(function(i){return i.id||0}))+1}
 function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');renderModule()}
 function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');renderModule()}}
 function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info');renderModule()}}
+// showModal: button-array based modal (used by Property & Units module)
+function showModal(title, body, buttons) {
+  var footerHtml = buttons.map(function(b) {
+    var cls = b.secondary ? 'drawer-btn secondary' : 'drawer-btn primary';
+    var onclick = b.action === 'close' ? 'closeDrawer()' : 'window._showModalAction=function(){' + b.action.toString().replace(/"/g, '&quot;') + ';window._showModalAction=null}';
+    return '<button class="' + cls + '" onclick="' + onclick + '">' + b.label + '</button>';
+  }).join('');
+  var d = document.getElementById('appDrawer');
+  document.getElementById('drawerTitle').textContent = title;
+  document.getElementById('drawerBody').innerHTML = body;
+  document.getElementById('drawerFooter').innerHTML = footerHtml;
+  window._drawerOnSave = null;
+  d.classList.add('active');
+  setTimeout(function() {
+    document.addEventListener('keydown', __drawerKeyHandler = function(e) {
+      if (!document.getElementById('appDrawer').classList.contains('active')) return;
+      if (e.key === 'Escape') { closeDrawer(); e.preventDefault(); }
+    });
+  }, 50);
+}
 // Pipeline stage order (index = order)
 const LEAD_STAGES = ['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'];
 const isConvertedStage = function(s){ return ['Booking','Downpayment','Installments','Possession','Handover'].indexOf(s) >= 0; };
@@ -8450,6 +8891,34 @@ function checkMobile(){
 switchGroup('executive');
 checkMobile();
 window.addEventListener('resize',checkMobile);
+function crudTask(item) {
+  var n = !item;
+  var t = n ? { id: null, title: '', assignee: '', dueDate: '', priority: 'Medium', status: 'Pending', category: 'General' } : item;
+  openModal(n ? 'New Task' : 'Edit Task',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">' +
+    inputField('Title', 'f_task_title', t.title, '', true) +
+    selectField('Assignee', 'f_task_assignee', t.assignee, ['Unassigned', 'Me', 'Team'].concat(mockEmployees ? mockEmployees.map(function(e) { return e.name; }) : []), true) +
+    inputField('Due Date', 'f_task_due', t.dueDate, 'YYYY-MM-DD') +
+    selectField('Priority', 'f_task_pri', t.priority, ['Low', 'Medium', 'High', 'Critical']) +
+    selectField('Category', 'f_task_cat', t.category, ['General', 'Sales', 'Construction', 'Finance', 'HR', 'Legal', 'Customer']) +
+    '</div>',
+    function() {
+      var title = g('f_task_title').trim();
+      if (!title) { showToast('Title is required', 'error'); return; }
+      var d = { title: title, assignee: g('f_task_assignee'), dueDate: g('f_task_due'), priority: g('f_task_pri'), category: g('f_task_cat'), status: t.status || 'Pending' };
+      if (n) {
+        d.id = nextId(mockTasks);
+        d.createdAt = new Date().toISOString().slice(0, 10);
+        addItem(mockTasks, d, 'tasks');
+      } else {
+        updateItem(mockTasks, t.id, d, 'tasks');
+      }
+    }
+  );
+}
+function deleteTask(id) {
+  deleteItem(mockTasks, id, 'task', 'tasks');
+}
 </script>
 </body>
 </html>
