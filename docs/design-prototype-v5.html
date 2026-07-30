@@ -1813,12 +1813,11 @@ function renderAnalytics(el){
     '<div class="page-title">📊 Analytics Dashboard</div>'+
     '<div class="page-subtitle">'+totalUnits+' units · '+mockProperties.length+' properties · ৳'+(totalRevenue/100000).toFixed(1)+'L revenue</div>'+
     '<div class="stats-row" style="margin-bottom:12px">'+
-      ['Total Units',totalUnits+'','#2F80ED','Available',avail+'','#2e7d32','Sold',sold+'','#c62828','Booked',booked+'','#e65100','Reserved',reserved+'','#1565c0','Revenue','৳'+(totalRevenue/100000).toFixed(1)+'L','#00838f','Collection',collRate+'%','#7b1fa2'].reduce(function(r,v,i){
-        if(i%3===0)r.push('<div class="stat-card"><div class="label">'+v+'</div>');
-        else if(i%3===1)r.push('<div class="value" style="color:'+r.pop()+'">'+v+'</div></div>');
-        else r.push(v);
-        return r;
-      },[]).join('')+
+      function(){
+        var a=['Total Units',totalUnits+'','#2F80ED','Available',avail+'','#2e7d32','Sold',sold+'','#c62828','Booked',booked+'','#e65100','Reserved',reserved+'','#1565c0','Revenue','৳'+(totalRevenue/100000).toFixed(1)+'L','#00838f','Collection',collRate+'%','#7b1fa2'],h='';
+        for(var i=0;i<a.length;i+=3)h+='<div class="stat-card"><div class="label">'+a[i]+'</div><div class="value" style="color:'+a[i+2]+'">'+a[i+1]+'</div></div>';
+        return h;
+      }()+
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
       '<div class="card"><div class="card-header"><h3>📍 Occupancy Distribution</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anOccChart"></canvas></div></div>'+
