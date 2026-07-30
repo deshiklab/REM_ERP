@@ -614,7 +614,7 @@
 <script>
 // ═══ GROUP DEFINITIONS ═══
 const GROUPS = {
-  executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'}] },
+  executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'},{id:'analytics', label:'Analytics', badge:true}] },
   sales_crm:     { label:'Sales & CRM',   icon:'👥', mods:[{id:'customers',    label:'Customers'},{id:'crm',          label:'CRM & Leads'},{id:'contacts',label:'Contact Book'},{id:'sales_marketing',label:'Sales & Marketing'},{id:'dues_recovery',label:'Dues & Recovery'}] },
   land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
@@ -1655,6 +1655,14 @@ function switchGroup(group) {
   else {document.getElementById('mainContent').innerHTML='<div class="fade-in" style="padding:40px;text-align:center;color:#999"><div style="font-size:32px;margin-bottom:10px">🔒</div><div style="font-size:14px;font-weight:500;margin-bottom:4px">No Access</div><div style="font-size:11px">This group has no modules accessible to your role.</div></div>';}
 }
 
+// Cross-module navigation helpers
+function navigateTo(mod, state) { if (state) Object.assign(window, state); switchModule(mod); }
+function openUnit(unitId) { window._navUnitId = unitId; switchModule('properties_units'); }
+function openCrmCustomer(name) { window._navCustName = name; switchModule('customers'); }
+function openBookingRef(id) { window._navBookingId = id; switchModule('bookings'); }
+function openInvoiceRef(id) { window._navInvoiceId = id; switchModule('finance'); }
+function openPropertyRef(name) { window._navPropertyName = name; switchModule('properties_units'); }
+
 function switchModule(mod) {
   closeLeadPanel();
   currentModule = mod;
@@ -1673,6 +1681,7 @@ function switchModule(mod) {
     case 'invoices_view': crmSubView='invoices';crmInvTab='all';switchModule('crm');return;
     case 'payments_view': crmSubView='payments';switchModule('crm');return;
     case 'dashboard': renderDashboard(el); break;
+    case 'analytics': renderAnalytics(el); break;
     case 'customers': renderCustomers(el); break;
     case 'crm': renderCRM(el); break;
     case 'sales_marketing': renderSalesMarketing(el); break;
@@ -1787,6 +1796,70 @@ function renderDashboardCharts(){
   var eCtx=document.getElementById('expChart');if(eCtx)try{window._dbCharts.push(new Chart(eCtx,{type:'doughnut',data:{labels:['Construction','Materials','Marketing','Admin','Labor','Other'],datasets:[{data:[38,25,12,10,8,7],backgroundColor:['#1565c0','#e65100','#2e7d32','#7b1fa2','#00897b','#888'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
   var lCtx=document.getElementById('leadChart');if(lCtx)try{window._dbCharts.push(new Chart(lCtx,{type:'line',data:{labels:months.slice(0,9),datasets:[{label:'Inquiries',data:[8,12,9,15,11,18,14,20,16],borderColor:'#1565c0',backgroundColor:'rgba(21,101,192,.1)',fill:true,tension:.35,pointRadius:3},{label:'Conversions',data:[2,3,4,5,4,7,6,8,7],borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.1)',fill:true,tension:.35,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}}));}catch(e){}
 }
+function renderAnalytics(el){
+  if(window._anCharts)window._anCharts.forEach(function(c){c.destroy()});
+  window._anCharts=[];
+  var totalUnits=0,avail=0,sold=0,booked=0,reserved=0;
+  mockProperties.forEach(function(p){p.units.forEach(function(u){totalUnits++;if(u.status==='Available')avail++;else if(u.status==='Sold')sold++;else if(u.status==='Booked')booked++;else if(u.status==='Reserved')reserved++;});});
+  var totalRevenue=mockTransactions.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
+  var totalPmts=mockPayments.length;
+  var clrPmts=mockPayments.filter(function(p){return p.status==='Cleared'}).length;
+  var collRate=totalPmts>0?Math.round(clrPmts/totalPmts*100):0;
+  var pmtStatuses={Cleared:0,Pending:0,Failed:0};
+  mockPayments.forEach(function(p){if(p.status==='Cleared')pmtStatuses.Cleared++;else if(p.status==='Pending')pmtStatuses.Pending++;else pmtStatuses.Failed++;});
+  var topProps=mockProperties.slice().sort(function(a,b){var aV=a.units.reduce(function(s,u){return s+(u.price||0)},0);var bV=b.units.reduce(function(s,u){return s+(u.price||0)},0);return bV-aV;}).slice(0,5);
+  var recentPmts=mockPayments.slice().sort(function(a,b){return b.date.localeCompare(a.date)}).slice(0,5);
+  el.innerHTML='<div class="module-container">'+
+    '<div class="page-title">📊 Analytics Dashboard</div>'+
+    '<div class="page-subtitle">'+totalUnits+' units · '+mockProperties.length+' properties · ৳'+(totalRevenue/100000).toFixed(1)+'L revenue</div>'+
+    '<div class="stats-row" style="margin-bottom:12px">'+
+      ['Total Units',totalUnits+'','#2F80ED','Available',avail+'','#2e7d32','Sold',sold+'','#c62828','Booked',booked+'','#e65100','Reserved',reserved+'','#1565c0','Revenue','৳'+(totalRevenue/100000).toFixed(1)+'L','#00838f','Collection',collRate+'%','#7b1fa2'].reduce(function(r,v,i){
+        if(i%3===0)r.push('<div class="stat-card"><div class="label">'+v+'</div>');
+        else if(i%3===1)r.push('<div class="value" style="color:'+r.pop()+'">'+v+'</div></div>');
+        else r.push(v);
+        return r;
+      },[]).join('')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+      '<div class="card"><div class="card-header"><h3>📍 Occupancy Distribution</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anOccChart"></canvas></div></div>'+
+      '<div class="card"><div class="card-header"><h3>📈 Sales Pipeline</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anPipeChart"></canvas></div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
+      '<div class="card"><div class="card-header"><h3>💰 Payment Collection</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anPmtChart"></canvas></div></div>'+
+      '<div class="card"><div class="card-header"><h3>📊 Monthly Revenue Trend (2026)</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anRevChart"></canvas></div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
+      '<div class="card"><div class="card-header"><h3>🏆 Top Properties by Value</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Property</th><th>Location</th><th class="num">Units</th><th class="num">Total Value</th></tr></thead><tbody>'+
+        topProps.map(function(p){var val=p.units.reduce(function(s,u){return s+(u.price||0)},0);return '<tr><td style="font-weight:500">'+p.name+'</td><td style="font-size:9px;color:#888">'+p.location+'</td><td class="num">'+p.units.length+'</td><td class="num" style="font-weight:600;color:#2e7d32">৳'+(val/100000).toFixed(1)+'L</td></tr>';}).join('')+
+      '</tbody></table></div></div></div>'+
+      '<div class="card"><div class="card-header"><h3>🕐 Recent Payments</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th class="num">Amount</th><th>Date</th><th>Status</th></tr></thead><tbody>'+
+        recentPmts.map(function(p){var badge=p.status==='Cleared'?'badge-active':p.status==='Pending'?'badge-pending':'badge-sold';return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+p.id+'</td><td>'+p.client+'</td><td class="num" style="font-weight:600">৳'+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+p.date+'</td><td><span class="badge-status '+badge+'">'+p.status+'</span></td></tr>';}).join('')+
+      '</tbody></table></div></div></div>'+
+    '</div>'+
+  '</div>';
+  setTimeout(function(){
+    if(window._anCharts)window._anCharts.forEach(function(c){c.destroy()});
+    window._anCharts=[];
+    // Chart 1: Occupancy Donut
+    var oCtx=document.getElementById('anOccChart');
+    if(oCtx)try{window._anCharts.push(new Chart(oCtx,{type:'doughnut',data:{labels:['Available','Sold','Booked','Reserved'],datasets:[{data:[avail,sold,booked,reserved],backgroundColor:['#4caf50','#c62828','#e65100','#1565c0'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
+    // Chart 2: Sales Pipeline Bar
+    var pStages=['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments'];
+    var pData=pStages.map(function(s){return mockLeads.filter(function(l){return l.status===s}).length;});
+    var pCtx=document.getElementById('anPipeChart');
+    if(pCtx)try{window._anCharts.push(new Chart(pCtx,{type:'bar',data:{labels:pStages,datasets:[{label:'Leads',data:pData,backgroundColor:'rgba(21,101,192,.7)',borderColor:'#1565c0',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},stepSize:1}}}}}));}catch(e){}
+    // Chart 3: Payment Collection Bar
+    var pmCtx=document.getElementById('anPmtChart');
+    if(pmCtx)try{window._anCharts.push(new Chart(pmCtx,{type:'bar',data:{labels:['Cleared','Pending','Failed'],datasets:[{label:'Payments',data:[pmtStatuses.Cleared,pmtStatuses.Pending,pmtStatuses.Failed],backgroundColor:['rgba(46,125,50,.7)','rgba(255,152,0,.7)','rgba(198,40,40,.6)'],borderColor:['#2e7d32','#e65100','#c62828'],borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},stepSize:1}}}}}));}catch(e){}
+    // Chart 4: Monthly Revenue Trend line
+    var rCtx=document.getElementById('anRevChart');
+    if(rCtx)try{
+      var mnths=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var rData=mnths.map(function(m,i){var mi=i+1;var mm=mi<10?'0'+mi:''+mi;return Math.round(mockTransactions.filter(function(t){return t.type==='Inflow'&&t.date&&t.date.indexOf('2026-'+mm)===0}).reduce(function(s,t){return s+(t.amount||0)},0)/1000);});
+      window._anCharts.push(new Chart(rCtx,{type:'line',data:{labels:mnths,datasets:[{label:'Revenue (₹K)',data:rData,borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.1)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#2e7d32'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:function(v){return'₹'+v+'K'}}}}}}));
+    }catch(e){}
+  },100);
+}
 
 var crmSubView='leads';
 var crmInvTab='all'; // invoices tab filter: all/sent/paid/overdue/draft
@@ -1843,6 +1916,13 @@ function renderCustomers(el){
       return '<tr style="cursor:pointer" onclick="openCustomer(\''+e.id+'\')"><td style="padding:4px 4px 4px 8px;width:26px"><div style="width:24px;height:24px;border-radius:50%;background:'+typeColor+'22;color:'+typeColor+';display:flex;align-items:center;justify-content:center;font-size:10px">'+typeIcon+'</div></td><td style="font-weight:500;font-size:11px">'+displayName+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td><td style="font-size:8px">'+roleBadges+'</td><td style="font-size:10px;color:#555">'+e.phone+'</td><td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td><td style="font-size:10px;font-weight:600;color:#2e7d32">'+(e.totalValue?'৳'+(e.totalValue/100000).toFixed(1)+'L':'—')+'</td><td>'+repeat+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEntity(\''+e.id+'\')" data-perm="CRM & Leads:Edit">✎</span></td></tr>';
     }).join('')+
     '</tbody></table>'+_pgHtml('customers',pcust.total,pcust.page,pcust.totalPages,pcust.perPage)+'</div></div></div></div>';
+  // Handle cross-module navigation: pre-fill search for customer name
+  if (window._navCustName) {
+    var nc = window._navCustName; delete window._navCustName;
+    var inp = document.getElementById('custSearch');
+    if (inp) { inp.value = nc; }
+    renderModule();
+  }
 }
 
 function openCustomer(id,tab){
@@ -3024,6 +3104,34 @@ function renderPropertiesUnits(el) {
     (propUnitTab === 'grid' ? renderPropGrid() : '') +
     (propUnitTab === 'projects' ? renderPropProjects() : '') +
   '</div>';
+  // Handle cross-module navigation: auto-select unit or property
+  setTimeout(function() {
+    if (window._navUnitId) {
+      var nu = window._navUnitId; delete window._navUnitId;
+      for (var pi = 0; pi < mockProperties.length; pi++) {
+        var p = mockProperties[pi];
+        for (var ui = 0; ui < p.units.length; ui++) {
+          var u = p.units[ui];
+          if (u.id === nu || u.number === nu) {
+            propUnitTab = 'grid'; propFilter = p.id;
+            renderModule();
+            setTimeout('openUnitDetail("' + p.id + '","' + u.id + '")', 300);
+            return;
+          }
+        }
+      }
+    }
+    if (window._navPropertyName) {
+      var np = window._navPropertyName; delete window._navPropertyName;
+      for (var pi = 0; pi < mockProperties.length; pi++) {
+        if (mockProperties[pi].name === np) {
+          propUnitTab = 'grid'; propFilter = mockProperties[pi].id;
+          renderModule();
+          return;
+        }
+      }
+    }
+  }, 50);
 }
 
 function countUnitsByStatus(status) {
@@ -3608,8 +3716,13 @@ function renderBookings(el){
       var bPmts=mockPayments.filter(function(p){return p.client===b.client});
       var invBadge=bInvs.length?'<span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openBooking(\'+b.id+\')">'+bInvs.length+' \ud83d\udcc4</span>':'<span style="color:#999;font-size:9px">\u2014</span>';
       var pmtBadge=bPmts.length?'<span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:#2e7d32;cursor:pointer" onclick="event.stopPropagation();openBooking(\'+b.id+\')">\u09f3'+(bPmts.reduce(function(s,p){return s+(p.amount||0)},0)/100000).toFixed(1)+'L</span>':'<span style="color:#999;font-size:9px">\u2014</span>';
-      return '<tr style="cursor:pointer" onclick="openBooking(\'+b.id+\')"><td style="font-weight:500">'+b.id+'</td><td>'+b.client+'</td><td>'+b.property+'</td><td>'+b.unit+'</td><td class="num">'+b.price+'</td><td class="num">'+b.advance+'</td><td style="text-align:center">'+invBadge+'</td><td style="text-align:center">'+pmtBadge+'</td><td><span class="badge-status '+(b.status==='Confirmed'?'badge-active':'badge-pending')+'">'+b.status+'</span></td></tr>';
+      return '<tr style="cursor:pointer" onclick="openBooking(\'+b.id+\')"><td style="font-weight:500">'+b.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+b.client.replace(/'/g,"\\'")+'\')">'+b.client+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openPropertyRef(\''+b.property.replace(/'/g,"\\'")+'\')">'+b.property+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openUnit(\''+b.unit+'\')">'+b.unit+'</td><td class="num">'+b.price+'</td><td class="num">'+b.advance+'</td><td style="text-align:center">'+invBadge+'</td><td style="text-align:center">'+pmtBadge+'</td><td><span class="badge-status '+(b.status==='Confirmed'?'badge-active':'badge-pending')+'">'+b.status+'</span></td></tr>';
     }).join('')}</tbody></table>${_pgHtml('bookings',pB.total,pB.page,pB.totalPages,pB.perPage)}</div></div></div></div>`;
+  // Handle cross-module navigation: auto-open booking
+  if (window._navBookingId) {
+    var nb = window._navBookingId; delete window._navBookingId;
+    setTimeout('openBooking("' + nb.replace(/"/g,'\\"') + '")', 200);
+  }
 }
 
 var cpTab='dashboard';
@@ -3981,7 +4094,7 @@ function renderHndPipeline(){
   pH.items.map(function(h){
     var sc={'Completed':'#2e7d32','Handover Scheduled':'#ff8f00','Inspection Pending':'#c62828','Construction Ongoing':'#1565c0'}[h.status]||'#888';
     var sbg={'Completed':'#e8f5e9','Handover Scheduled':'#fff8e1','Inspection Pending':'#ffebee','Construction Ongoing':'#e3f2fd'}[h.status]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openHandover(\x27'+h.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+h.id+'</td><td style="font-weight:500">'+h.unit+'</td><td>'+h.customer+'</td><td style="font-size:9px">'+h.project+'</td><td style="font-size:9px;color:#888">'+h.type+'</td><td style="font-size:9px;color:#888">'+h.date+'</td><td class="num" style="font-weight:600;color:'+(h.snags>0?'#c62828':'#2e7d32')+'">'+h.snags+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+h.status+'</span></td><td style="font-size:9px;color:#888">'+(h.posDate||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudHandover(mockHandover.find(function(x){return x.id===\x27'+h.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockHandover.findIndex(function(x){return x.id===\x27'+h.id+'\x27});if(idx>=0)mockHandover.splice(idx,1);DB.save(\x27handover\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Handover:Delete">✕</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openHandover(\x27'+h.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+h.id+'</td><td style="font-weight:500">'+h.unit+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\x27'+h.customer.replace(/'/g,"\\x27")+'\x27)">'+h.customer+'</td><td style="font-size:9px">'+h.project+'</td><td style="font-size:9px;color:#888">'+h.type+'</td><td style="font-size:9px;color:#888">'+h.date+'</td><td class="num" style="font-weight:600;color:'+(h.snags>0?'#c62828':'#2e7d32')+'">'+h.snags+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+h.status+'</span></td><td style="font-size:9px;color:#888">'+(h.posDate||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudHandover(mockHandover.find(function(x){return x.id===\x27'+h.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockHandover.findIndex(function(x){return x.id===\x27'+h.id+'\x27});if(idx>=0)mockHandover.splice(idx,1);DB.save(\x27handover\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Handover:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('hnd',pH.total,pH.page,pH.totalPages,pH.perPage)+'</div></div></div>';
 }
 function renderHndSnags(){
@@ -5468,6 +5581,12 @@ function renderFinance(el){
       finT==='tax'?renderTaxAdjustments():''}
   </div>`;
   if(finT==='dashboard')setTimeout(renderFinanceCharts,50);
+  // Handle cross-module navigation: switch to invoices tab for invoice ref
+  if (window._navInvoiceId) {
+    var ni = window._navInvoiceId; delete window._navInvoiceId;
+    financeTab = 'invoices';
+    renderModule();
+  }
 }
 
 function renderFinanceDashboard(gI,gE,nP,bT){
@@ -5539,7 +5658,7 @@ function renderFinanceInvoices(){
   invs.map(function(inv){
     var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[inv.status]||'#888';
     var stBg={Draft:'#f5f5f5',Sent:'#fff3e0',Paid:'#e8f5e9',Overdue:'#ffebee'}[inv.status]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td style="font-weight:600;color:#2F80ED">'+inv.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="openLead('+inv.leadId+')">'+inv.client+'</td><td style="font-weight:600;color:#2e7d32">\u09F3'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')">\uD83D\uDC41</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td style="font-weight:600;color:#2F80ED">'+inv.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+inv.client.replace(/'/g,"\\'")+'\')">'+inv.client+'</td><td style="font-weight:600;color:#2e7d32">\u09F3'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')">\uD83D\uDC41</span></td></tr>';
   }).join('')+
   '</tbody></table></div></div></div>';
 }
