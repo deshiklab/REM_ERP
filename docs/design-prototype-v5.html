@@ -1956,24 +1956,7 @@ function renderCustBody(e,tab,relatedBookings,totalPaid,totalPending,typeIcon,ty
       '<div class="stat-card"><div class="label">Total Value</div><div style="font-size:16px;font-weight:700;color:#2e7d32;margin-top:2px">৳'+((e.totalValue||0)/100000).toFixed(1)+'L</div></div>'+
       '</div>';
     if(e.properties&&e.properties.length>0){tabContent+='<div>'+e.properties.map(function(p,i){return '<div class="installment-item"><div><div style="font-size:11px;font-weight:600">'+(typeof p==='string'?p:(p.name||'Property '+(i+1)))+'</div><div style="font-size:9px;color:#888">'+(typeof p==='string'?'—':(p.unit||p.type||''))+'</div></div></div>';}).join('')+'</div>';}else{tabContent+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No properties assigned.</div>';}
-    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Inventory Units</h3>' +
-    (function() {
-      var displayName = e.type === 'company' ? e.companyName : e.name;
-      var linked = [];
-      mockProperties.forEach(function(p) {
-        p.units.forEach(function(u) {
-          if (u.customer === displayName) linked.push({proj: p, unit: u});
-        });
-      });
-      if (!linked.length) return '<div style="padding:8px;text-align:center;font-size:10px;color:#999">No linked inventory units</div>';
-      return '<div style="display:flex;gap:4px;flex-wrap:wrap">' + linked.map(function(l) {
-        var cols = {Available:'#4caf50', Booked:'#2196f3', Reserved:'#ff9800', Sold:'#e53935'};
-        var c = cols[l.unit.status] || '#999';
-        return '<div style="cursor:pointer;padding:6px 8px;border:1px solid ' + c + ';border-radius:6px;background:' + c + '10;font-size:10px" onclick="propFilter=\'' + "' + l.proj.id + '" + '\';switchModule(\'properties_units\');setTimeout(function(){openUnitDetail(\'' + "' + l.proj.id + '" + '\',\'' + "' + l.unit.id + '" + '\')},400)">' +
-        '<div style="font-weight:600;color:' + c + '">' + l.proj.name + ' - ' + l.unit.number + '</div>' +
-        '<div style="font-size:8px;color:#888">' + l.unit.type + ' · ' + l.unit.size + ' · ' + l.unit.status + '</div></div>';
-      }).join('') + '</div>';
-    })() +
+
     if(relatedBookings.length>0){tabContent+='<h3 style="font-size:11px;font-weight:600;color:#555;margin:8px 0 4px;display:flex;align-items:center;gap:4px">📋 Related Bookings</h3>'+relatedBookings.map(function(b){return '<div class="installment-item"><div><div style="font-size:11px;font-weight:600">'+(b.property||'—')+' — '+(b.client||'')+'</div><div style="font-size:9px;color:#888">'+b.id+' · '+b.date+'</div></div><span class="lead-badge" style="background:'+(b.status==='Confirmed'?'#e8f5e9':b.status==='Pending Review'?'#fff3e0':'#e3f2fd')+';color:'+(b.status==='Confirmed'?'#2e7d32':b.status==='Pending Review'?'#e65100':'#1565c0')+';border:1px solid '+(b.status==='Confirmed'?'#c8e6c9':b.status==='Pending Review'?'#ffe0b2':'#bbdefb')+';font-size:8px;display:inline-block">'+b.status+'</span></div>';}).join('');}
   }else if(tab==='tasks'){
     tabContent='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="font-size:11px;font-weight:600;color:#555;display:flex;align-items:center;gap:4px">✅ Tasks</h3><button onclick="addCustTask(\''+e.id+'\')" class="mini-btn">+ Add Task</button></div>';
@@ -3152,7 +3135,7 @@ function openUnitDetail(projId, unitId) {
     ['Floor', 'Floor ' + unit.floor], ['Project', proj.name],
     ['Location', proj.location]
   ];
-  if (unit.customer) details.push(['Customer', '<span style="color:#2F80ED;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();findAndOpenCustomer(\'' + unit.customer.replace(/'/g,\'\\\'\') + '\')">' + unit.customer + ' \u279c</span>']);
+  if (unit.customer) details.push(['Customer', '<span style="color:#2F80ED;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();findAndOpenCustomer(\'' + unit.customer.replace(/'/g, "\\'") + '\')">' + unit.customer + ' \u279c</span>']);
   if (unit.bookingId) details.push(['Booking', '<span style="color:#2F80ED;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();openBookingByRef(\'' + unit.bookingId + '\')">' + unit.bookingId + ' \u279c</span>']);
 
   var footerBtns = '';
@@ -3493,7 +3476,7 @@ function openBooking(id){
         '<tr><td colspan="0" style="text-align:right;font-weight:600">Total</td><td style="font-weight:700;color:#2e7d32">\u09f3'+(totalPmt/100000).toFixed(1)+'L</td><td colspan="2"></td></tr>'+
       '</tbody></table>':'<div style="color:#999;padding:8px;text-align:center">No payments</div>')+
     '</div>',
-    '<button class="drawer-btn" onclick="closeModal();switchToPropertyUnit('' + b.client + '')">View Unit</button><button onclick="closeModal()">Close</button>'
+    '<button class="drawer-btn" onclick="closeModal();switchToPropertyUnit(\' + b.client + \')">View Unit</button><button onclick="closeModal()">Close</button>'
   );
 }
 function renderBookings(el){
