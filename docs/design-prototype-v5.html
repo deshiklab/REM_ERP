@@ -2086,7 +2086,7 @@ function renderInvoices(filtered){
     return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td style="font-weight:600;font-size:10px;color:#2F80ED">'+inv.id+'</td><td style="font-weight:500">'+inv.client+'</td><td style="font-size:10px">'+inv.project+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+inv.issuedDate+'</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span><br><span style="font-size:7px;color:#888">Due: ৳'+(dueAmt/100000).toFixed(1)+'L</span></td><td style="white-space:nowrap">'+
       (inv.status==='Sent'||inv.status==='Draft'?'<span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();markInvoicePaid(\''+inv.id+'\')">✓ Mark Paid</span> ':'')+
       (inv.status!=='Overdue'?'<span style="color:#e65100;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();markInvoiceOverdue(\''+inv.id+'\')">⚠ Overdue</span> ':'')+
-      '<span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();crudInvoice(mockInvoices.find(function(x){return x.id===\''+inv.id+'\'}))">✎</span>'+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')" title="View">👁</span> <span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudInvoice(mockInvoices.find(function(x){return x.id===\''+inv.id+'\'}))">✎</span>'+
     '</td></tr>';
   }).join('')+
   '</tbody></table>'+_pgHtml('invoices',pi.total,pi.page,pi.totalPages,pi.perPage)+'</div></div></div>';
@@ -2115,7 +2115,7 @@ function renderPayments(){
   pp.items.map(function(p){
     var stCol=p.status==='Cleared'?'#2e7d32':'#e65100';
     var stBg=p.status==='Cleared'?'#e8f5e9':'#fff3e0';
-    return '<tr><td style="font-weight:500;font-size:10px;color:#2F80ED">'+p.id+'</td><td style="font-weight:500">'+p.client+'</td><td style="font-size:10px;color:#888">'+(p.invoiceId||'—')+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px">'+p.date+'</td><td><span style="padding:1px 4px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+p.method+'</span></td><td style="font-size:9px;color:#888">'+(p.reference||'—')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+p.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="crudPayment(mockPayments.find(function(x){return x.id==='+p.id+'}))">✎</span></td></tr>';
+    return '<tr><td style="font-weight:500;font-size:10px;color:#2F80ED">'+p.id+'</td><td style="font-weight:500">'+p.client+'</td><td style="font-size:10px;color:#888">'+(p.invoiceId||'—')+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px">'+p.date+'</td><td><span style="padding:1px 4px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+p.method+'</span></td><td style="font-size:9px;color:#888">'+(p.reference||'—')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+p.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="openPayment(\''+p.id+'\')" title="View">👁</span> <span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudPayment(mockPayments.find(function(x){return x.id==='+p.id+'}))">✎</span></td></tr>';
   }).join('')+
   '</tbody></table>'+_pgHtml('payments',pp.total,pp.page,pp.totalPages,pp.perPage)+'</div></div></div>';
 }
@@ -2190,6 +2190,31 @@ function crudInvoice(item){
 }
 
 // ═══ PAYMENTS ═══
+function openPayment(id){
+  var p=mockPayments.find(function(x){return x.id===id});if(!p)return;
+  var inv=mockInvoices.find(function(i){return i.id===p.invoiceId});
+  var stCol=p.status==='Cleared'?'#2e7d32':'#e65100';
+  var stBg=p.status==='Cleared'?'#e8f5e9':'#fff3e0';
+  openModal('💰 '+p.id+' — '+p.client,
+    '<div style="font-size:10px;line-height:1.6">'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+
+        '<div class="stat-card"><div class="label">Client</div><div style="font-size:13px;font-weight:600">'+p.client+'</div></div>'+
+        '<div class="stat-card"><div class="label">Amount</div><div style="font-size:16px;font-weight:700;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div></div>'+
+      '</div>'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+
+        '<div class="stat-card"><div class="label">Date</div><div style="font-size:11px;font-weight:500">'+p.date+'</div></div>'+
+        '<div class="stat-card"><div class="label">Method</div><div><span style="display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:500;background:#f0f4ff;color:#2F80ED">'+p.method+'</span></div></div>'+
+      '</div>'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+
+        '<div class="stat-card"><div class="label">Reference</div><div style="font-size:11px;font-family:monospace">'+(p.reference||'—')+'</div></div>'+
+        '<div class="stat-card"><div class="label">Status</div><div><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+p.status+'</span></div></div>'+
+      '</div>'+
+      (inv?'<div class="stat-card" style="margin-bottom:6px"><div class="label">Linked Invoice</div><div style="font-size:11px;color:#2F80ED;cursor:pointer" onclick="closeModal();openInvoice(\''+inv.id+'\')">'+inv.id+' — '+inv.client+' (৳'+(inv.amount/100000).toFixed(1)+'L) →</div></div>':'')+
+      (p.notes?'<h3 style="font-size:10px;font-weight:600;color:#555;margin:6px 0 3px">📝 Notes</h3><div class="stat-card" style="white-space:pre-wrap">'+p.notes+'</div>':'')+
+    '</div>',
+    '<button class="action-btn secondary" onclick="crudPayment(mockPayments.find(function(x){return x.id===\''+p.id+'\'}))" style="padding:3px 8px;font-size:9px">✎ Edit</button><button onclick="closeModal()">Close</button>'
+  );
+}
 function crudPayment(item){
   var n=!item;
   var pymt=n?{id:'PAY-'+(100+Math.floor(Math.random()*900)),invoiceId:null,leadId:null,client:'',amount:0,date:new Date().toISOString().slice(0,10),method:'Bank Transfer',reference:'',status:'Pending',notes:''}:item;
