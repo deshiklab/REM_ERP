@@ -796,6 +796,102 @@ window.mockTransactions = DB.init('transactions', [
   {id:'RCP-8844',date:'2026-06-05',desc:'Booking - Laily Akhter',client:'Laily Akhter',project:'Muktodhara',type:'Inflow',category:'Booking',status:'Received',amount:475000,fmt:'+ ₹4,75,000'},
   {id:'PAY-3316',date:'2026-06-04',desc:'Office utilities & rent',client:'',project:'',type:'Outflow',category:'Admin',status:'Paid',amount:125000,fmt:'- ₹1,25,000'}
 ]);
+
+function renderCRMReports(){
+  var total=mockLeads.length;
+  var hot=mockLeads.filter(function(l){return l.priority==='High'}).length;
+  var conv=mockLeads.filter(function(l){return ['Booking','Downpayment','Installments','Possession','Handover'].indexOf(l.status)>=0}).length;
+  var convRate=total>0?Math.round(conv/total*100):0;
+  var sources={};mockLeads.forEach(function(l){sources[l.source]=(sources[l.source]||0)+1});
+  var stages={};mockLeads.forEach(function(l){stages[l.status]=(stages[l.status]||0)+1});
+  var owners={};mockLeads.forEach(function(l){if(l.owner)owners[l.owner]=(owners[l.owner]||0)+1});
+  var topSrc=Object.keys(sources).sort(function(a,b){return sources[b]-sources[a]}).slice(0,5);
+  var topOwners=Object.keys(owners).sort(function(a,b){return owners[b]-owners[a]}).slice(0,5);
+  var totalInv=mockInvoices.reduce(function(s,i){return s+(i.amount||0)},0);
+  var totalPmt=mockPayments.reduce(function(s,p){return s+(p.amount||0)},0);
+  var totalComp=mockComplaints.length;
+  var resolvedComp=mockComplaints.filter(function(c){return c.status==='Resolved'}).length;
+  var totalBrokers=mockBrokers.length;
+  var totalDeals=mockBrokers.reduce(function(s,b){return s+b.dealsClosed},0);
+  return '<div class="fade-in">'+
+    '<div class="stats-row" style="margin-bottom:8px;grid-template-columns:repeat(auto-fill,minmax(110px,1fr))">'+[
+      ['Total Leads',total,'#2F80ED'],
+      ['Hot Leads',hot,'#c62828'],
+      ['Conversion Rate',convRate+'%','#2e7d32'],
+      ['Invoices Value','\u09F3'+(totalInv/10000000).toFixed(1)+'Cr','#1565c0'],
+      ['Payments Collected','\u09F3'+(totalPmt/10000000).toFixed(1)+'Cr','#2e7d32'],
+      ['Complaints',totalComp,totalComp>0?'#e65100':'#888'],
+      ['Resolved %',totalComp>0?Math.round(resolvedComp/totalComp*100)+'%':'0%','#4caf50'],
+      ['Brokers',totalBrokers,'#7b1fa2'],
+      ['Broker Deals',totalDeals,'#ff8f00']
+    ].map(function(s){return '<div class="stat-card" style="padding:5px"><div class="label" style="font-size:8px">'+s[0]+'</div><div class="value" style="font-size:16px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">'+
+      '<div class="card"><div class="card-header"><h3>\uD83D\uDCC5 Lead Sources</h3></div><div class="card-body" style="padding:8px">'+
+      topSrc.map(function(s,i){var pct=Math.round(sources[s]/total*100);var cols=['#1565c0','#e65100','#2e7d32','#7b1fa2','#00838f'];return '<div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="font-size:9px;width:100px">'+s+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(cols[i]||'#888')+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+sources[s]+'</div></div>';}).join('')+
+      '</div></div>'+
+      '<div class="card"><div class="card-header"><h3>\uD83D\uDCC8 Pipeline Stages</h3></div><div class="card-body" style="padding:8px">'+
+      ['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'].map(function(st){
+        var cnt=stages[st]||0;var pct=total>0?Math.round(cnt/total*100):0;
+        var cols={'New Inquiry':'#1565c0','Contacted':'#e65100','Site Visit':'#c62828','Negotiation':'#7b1fa2','Booking':'#2e7d32','Downpayment':'#00838f','Installments':'#f9a825','Possession':'#00695c','Handover':'#33691e'};
+        return '<div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="font-size:9px;width:90px">'+st+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+cols[st]+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+cnt+'</div></div>';
+      }).join('')+
+      '</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+      '<div class="card"><div class="card-header"><h3>\uD83D\uDC65 Team Performance</h3></div><div class="card-body" style="padding:8px">'+
+      topOwners.map(function(o){var cnt=owners[o];var pct=total>0?Math.round(cnt/total*100):0;return '<div style="display:flex;align-items:center;gap:6px;padding:2px 0"><div style="font-size:9px;width:120px">'+o+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#2F80ED;border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+cnt+' leads</div></div>';}).join('')+
+      '</div></div>'+
+      '<div class="card"><div class="card-header"><h3>\uD83C\uDFF7 Recent Activity</h3></div><div class="card-body" style="padding:8px">'+
+      function(){
+        var acts=[];mockLeads.forEach(function(l){if(l.dateContacted)acts.push({date:l.dateContacted,text:l.name+' added as lead from '+l.source,icon:'\uD83C\uDFC1'});});
+        if(acts.length===0)acts.push({date:'2026-06-01',text:'CRM operational',icon:'\uD83D\uDD14'});
+        return acts.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0}).slice(0,6).map(function(a){
+          return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid #f5f5f5"><span>'+a.icon+'</span><div style="flex:1;font-size:9px">'+a.text+'</div><span style="font-size:8px;color:#999">'+a.date+'</span></div>';
+        }).join('');
+      }()+
+      '</div></div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderCRMActivities(){
+  var typeFilter=(document.getElementById('actType')||{}).value||'';
+  var activities=[];
+  mockLeads.forEach(function(l){
+    if(!typeFilter||typeFilter==='lead'){
+      activities.push({date:l.dateContacted||'2026-06-01',text:l.name+' was added as a new lead from '+l.source,type:'lead',icon:'\uD83C\uDFC1',leadId:l.id,client:l.name});
+    }
+  });
+  mockInvoices.forEach(function(inv){
+    if(!typeFilter||typeFilter==='payment'){
+      var actText=inv.status==='Paid'?'Invoice '+inv.id+' ('+inv.client+') was marked Paid \u2705':inv.status==='Sent'?'Invoice '+inv.id+' ('+inv.client+') was sent to client':inv.status==='Overdue'?'Invoice '+inv.id+' ('+inv.client+') is now Overdue \u26A0':'Invoice '+inv.id+' was created for '+inv.client;
+      activities.push({date:inv.issuedDate,text:actText,type:'payment',icon:inv.status==='Paid'?'\u2705':inv.status==='Overdue'?'\u26A0':'\uD83D\uDCC4',leadId:inv.leadId,client:inv.client});
+    }
+  });
+  mockPayments.forEach(function(p){
+    if(!typeFilter||typeFilter==='payment'){
+      activities.push({date:p.date,text:'Payment '+p.id+' ('+p.client+') of \u09F9'+(p.amount/100000).toFixed(1)+'L received via '+p.method+' ['+p.status+']',type:'payment',icon:'\uD83D\uDCB0',leadId:p.leadId,client:p.client});
+    }
+  });
+  mockComplaints.forEach(function(c){
+    if(!typeFilter||typeFilter==='complaint'){
+      var actText=c.status==='Resolved'?'Complaint '+c.id+' ('+c.client+') resolved with satisfaction '+c.satisfaction+'/5':'Complaint '+c.id+' ('+c.client+') filed - '+c.type+' ['+c.priority+']';
+      activities.push({date:c.filedDate,text:actText,type:'complaint',icon:c.status==='Resolved'?'\u2705':'\uD83D\uDD27',client:c.client});
+    }
+  });
+  activities.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0});
+  if(activities.length===0) return '<div class="card"><div class="card-body" style="padding:20px;text-align:center;color:#888;font-size:11px">No activities found.</div></div>';
+  return '<div class="card"><div class="card-header"><h3>\uD83D\uDD0D Activity Log</h3><span style="font-size:9px;color:#888">'+activities.length+' events</span></div><div class="card-body" style="padding:6px 10px;max-height:60vh;overflow-y:auto">'+
+    activities.map(function(a,i){
+      var dateStr=a.date.split('-');
+      var monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var displayDate=dateStr.length===3?parseInt(dateStr[2])+' '+monthNames[parseInt(dateStr[1])-1]:a.date;
+      var leadLink=a.leadId?' <span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="closeLeadPanel();openLead('+a.leadId+')">\uD83D\uDC49 '+a.client+'</span>':' <span style="font-size:9px;color:#888">'+a.client+'</span>';
+      return '<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5"><div style="width:24px;height:24px;border-radius:6px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">'+a.icon+'</div><div style="flex:1;min-width:0"><div style="font-size:9px;line-height:1.4">'+a.text+leadLink+'</div></div><div style="font-size:8px;color:#999;white-space:nowrap;flex-shrink:0">'+displayDate+'</div></div>';
+    }).join('')+
+  '</div></div>';
+}
+
 // ═══ INVOICES ═══
 window.mockInvoices = DB.init('invoices', [
   {id:'INV-001',leadId:1,client:'Tariqul Islam',project:'Muktodhara',unit:'5 Katha',amount:15000000,status:'Sent',dueDate:'2026-07-15',issuedDate:'2026-06-15',desc:'Downpayment invoice for 5 Katha plot - Muktodhara',items:[{desc:'Plot Booking Fee',qty:1,rate:5000000},{desc:'Registration & Legal',qty:1,rate:150000},{desc:'Service Charge',qty:1,rate:50000}]},
@@ -1561,6 +1657,8 @@ function renderDashboardCharts(){
 
 var crmSubView='leads';
 var crmInvTab='all'; // invoices tab filter: all/sent/paid/overdue/draft
+var smTab='dashboard';
+var duesTab='dashboard';
 function renderCustomers(el){
   var f=getSmartFilters();
   var filtered=mockEntities.filter(function(e){return e.roles.indexOf('customer')>=0||e.roles.indexOf('buyer')>=0||true});
@@ -1873,7 +1971,7 @@ function renderCRM(el){
       return '<div class="stat-card" style="padding:5px 6px"><div class="label" style="font-size:8px">'+s+'</div><div class="value" style="font-size:13px;color:'+{NIC:'#1565c0',CT:'#e65100',SV:'#c62828',NG:'#7b1fa2',BK:'#2e7d32',DP:'#00838f',IN:'#f9a825',PS:'#00695c',HO:'#33691e'}[{NIC:'NIC',CT:'CT',SV:'SV',NG:'NG',BK:'BK',DP:'DP',IN:'IN',PS:'PS',HO:'HO'}[s.slice(0,2)]||'NIC']+'">'+c+'</div></div>';
     }).join('')}</div>`:''}
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Pipeline</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div></div>
+      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Pipeline</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div><div class="tab ${crmSubView==='reports'?'active':''}" onclick="crmSubView='reports';renderModule()">Reports</div><div class="tab ${crmSubView==='activities'?'active':''}" onclick="crmSubView='activities';renderModule()">Activities</div></div>
       ${crmSubView==='leads'||crmSubView==='pipeline'?`
       <input id="crmSearch" placeholder="Search name/phone/property..." oninput="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${LEAD_STAGES.map(function(s){return '<option value="'+s+'"'+(f.sf===s?' selected':'')+'>'+s+'</option>'}).join('')}<option value="Lost"${f.sf==='Lost'?' selected':''}>Lost</option><option value="Junk"${f.sf==='Junk'?' selected':''}>Junk</option></select>
@@ -1915,7 +2013,7 @@ function renderCRM(el){
       <button class="action-btn primary" onclick="crudPayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button>
       `:''}
     </div>
-    ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):crmSubView==='complaints'?renderComplaints(pcomp):crmSubView==='invoices'?renderInvoices(filtered):crmSubView==='payments'?renderPayments():''}
+    ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):crmSubView==='complaints'?renderComplaints(pcomp):crmSubView==='invoices'?renderInvoices(filtered):crmSubView==='payments'?renderPayments():crmSubView==='reports'?renderCRMReports():crmSubView==='activities'?renderCRMActivities():''}
   </div>`;
 }
 
@@ -1975,7 +2073,7 @@ function showBrokerDetail(id){
     '</div>'+
     '<h3 style="font-size:10px;font-weight:600;color:#555;margin-bottom:4px">📋 Referred Leads</h3>'+
     (leads.length?'<table style="width:100%;font-size:9px"><thead><tr><th>Name</th><th>Property</th><th>Stage</th><th>Value</th></tr></thead><tbody>'+
-      leads.map(function(l){return '<tr><td>'+l.name+'</td><td>'+l.property+'</td><td>'+l.status+'</td><td>'+l.value+'</td></tr>'}).join('')+'</tbody></table>'
+      leads.map(function(l){return '<tr style="cursor:pointer" onclick="closeModal();openLead('+l.id+')"><td style="color:#2F80ED;font-weight:500">'+l.name+'</td><td>'+l.property+'</td><td>'+l.status+'</td><td>'+l.value+'</td></tr>'}).join('')+'</tbody></table>'
     :'<div style="color:#999;padding:8px;text-align:center">No referred leads yet.</div>')+
     '</div>',
     '<button onclick="closeModal()">Close</button>'
@@ -2012,7 +2110,7 @@ return `<div class="card"><div class="card-header"><h3>Complaints &amp; Issues</
     }else{
       stars='<span style="color:#ccc;font-size:9px">\u2014</span>';
     }
-    return '<tr style="cursor:pointer" onclick="openComplaint(\''+c.id+'\')"><td style="font-weight:500;font-size:10px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.client+'</td><td style="font-size:10px">'+c.project+'</td><td style="font-size:10px;color:#555">'+c.unit+'</td><td style="font-size:12px">'+(typeIcons[c.type]||'')+' '+c.type+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(priColors[c.priority]||'#888')+'">'+c.priority+'</span></td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:'+(statusColors[c.status]||'#888')+';background:'+(statusBg[c.status]||'#f5f5f5')+'">'+c.status+'</span></td><td style="font-size:10px;color:#555">'+c.assigned+'</td><td>'+slaStr+'</td><td>'+stars+'</td></tr>';
+    return '<tr style="cursor:pointer" onclick="openComplaint(\''+c.id+'\')"><td style="font-weight:500;font-size:10px;color:#888">'+c.id+'</td><td style="font-weight:500;color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();var cl=mockLeads.find(function(x){return x.name===\''+c.client+'\'});if(cl)openLead(cl.id)">'+c.client+'</td><td style="font-size:10px">'+c.project+'</td><td style="font-size:10px;color:#555">'+c.unit+'</td><td style="font-size:12px">'+(typeIcons[c.type]||'')+' '+c.type+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(priColors[c.priority]||'#888')+'">'+c.priority+'</span></td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:'+(statusColors[c.status]||'#888')+';background:'+(statusBg[c.status]||'#f5f5f5')+'">'+c.status+'</span></td><td style="font-size:10px;color:#555">'+c.assigned+'</td><td>'+slaStr+'</td><td>'+stars+'</td></tr>';
   }).join('')
 }</tbody></table>${_pgHtml('complaints',pcomp.total,pcomp.page,pcomp.totalPages,pcomp.perPage)}</div></div></div>`;
 }
@@ -2030,7 +2128,7 @@ function openComplaint(id){
   openModal('📋 '+c.id+' — '+c.type,
     '<div style="font-size:10px;line-height:1.6">'+
       '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+
-        '<div class="stat-card"><div class="label">Client</div><div style="font-size:12px;font-weight:600">'+c.client+'</div></div>'+
+        '<div class="stat-card"><div class="label">Client</div><div style="font-size:12px;font-weight:600;color:#2F80ED;cursor:pointer" onclick="closeModal();var cl=mockLeads.find(function(x){return x.name===\''+c.client+'\'});if(cl)openLead(cl.id)">'+c.client+'</div></div>'+
         '<div class="stat-card"><div class="label">Assigned</div><div style="font-size:12px;font-weight:600">'+c.assigned+'</div></div>'+
       '</div>'+
       '<div class="stats-row" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:6px">'+
@@ -3355,12 +3453,12 @@ function renderBOQ(el){
   var drafts=mockBOQ.filter(function(b){return b.status==='Draft'}).length;
   var pending=mockBOQ.filter(function(b){return b.status==='Pending Review'}).length;
   var totalVal=mockBOQ.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0);
-  el.innerHTML='<div class="fade-in"><div class="page-title">BOQ & Cost Control</div><div class="page-subtitle">'+total+' items \\u00B7 \\u09F3 '+(totalVal/100000).toFixed(1)+'L total \\u00B7 '+apps+' approved</div>'+
+  el.innerHTML='<div class="fade-in"><div class="page-title">BOQ & Cost Control</div><div class="page-subtitle">'+total+' items \u00B7 \u09F3 '+(totalVal/100000).toFixed(1)+'L total \u00B7 '+apps+' approved</div>'+
     '<div class="toolbar" style="margin-bottom:6px">'+
       '<div class="tabs">'+[
-        ['dashboard','\\uD83D\\uDCCA Dashboard'],
-        ['items','\\uD83D\\uDCCB BOQ Items'],
-        ['rate_analysis','\\uD83D\\uDCC8 Rate Analysis']
+        ['dashboard','\uD83D\uDCCA Dashboard'],
+        ['items','\uD83D\uDCCB BOQ Items'],
+        ['rate_analysis','\uD83D\uDCC8 Rate Analysis']
       ].map(function(t){
         return '<div class="tab '+(bt===t[0]?'active':'')+'" onclick="boqTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
@@ -3389,7 +3487,7 @@ function renderBOQDashboard(){
     ['Approved',apps,'#2e7d32'],
     ['Pending Review',pending,pending>0?'#e65100':'#999'],
     ['Drafts',drafts,drafts>0?'#ff8f00':'#999'],
-    ['Total Value','\\u09F3 '+(totalVal/100000).toFixed(1)+'L','#7b1fa2'],
+    ['Total Value','\u09F3 '+(totalVal/100000).toFixed(1)+'L','#7b1fa2'],
     ['Categories',catNames.length,'#00838f']
   ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
@@ -3397,12 +3495,12 @@ function renderBOQDashboard(){
     catNames.map(function(cn){
       var pct=Math.round(byCat[cn]/totalVal*100);
       var colors={'Excavation':'#1565c0','Concrete':'#2e7d32','Brickwork':'#e65100','Finishing':'#7b1fa2','MEP':'#00838f','Plumbing':'#00897b','Sanitary':'#00695c','Structural':'#c62828'};
-      return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f0f0f0"><div style="width:70px;font-weight:500;color:'+(colors[cn]||'#555')+'">'+cn+'</div><div style="flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(colors[cn]||'#2F80ED')+';border-radius:3px"></div></div><div style="width:60px;text-align:right;font-weight:600;font-size:9px">\\u09F3 '+(byCat[cn]/100000).toFixed(1)+'L</div><div style="width:36px;text-align:right;color:#888">'+pct+'%</div></div>';
+      return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f0f0f0"><div style="width:70px;font-weight:500;color:'+(colors[cn]||'#555')+'">'+cn+'</div><div style="flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(colors[cn]||'#2F80ED')+';border-radius:3px"></div></div><div style="width:60px;text-align:right;font-weight:600;font-size:9px">\u09F3 '+(byCat[cn]/100000).toFixed(1)+'L</div><div style="width:36px;text-align:right;color:#888">'+pct+'%</div></div>';
     }).join('')+'</div></div>'+
     '<div class="card"><div class="card-header"><h3>Highest Value Items</h3></div><div class="card-body" style="padding:6px">'+
     topItems.map(function(b,i){
       var colors={'Excavation':'#1565c0','Concrete':'#2e7d32','Brickwork':'#e65100','Finishing':'#7b1fa2','MEP':'#00838f','Plumbing':'#00897b','Sanitary':'#00695c','Structural':'#c62828'};
-      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0"><div style="width:18px;height:18px;border-radius:4px;background:'+(colors[b.category]||'#eef3ff')+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:9px;font-weight:500">'+b.item.substring(0,35)+(b.item.length>35?'...':'')+'</div><div style="font-size:8px;color:#888">'+b.project+' \\u00B7 \\u09F3 '+((b.qtyNum*b.rateNum)/100000).toFixed(1)+'L</div></div></div>';
+      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0"><div style="width:18px;height:18px;border-radius:4px;background:'+(colors[b.category]||'#eef3ff')+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:9px;font-weight:500">'+b.item.substring(0,35)+(b.item.length>35?'...':'')+'</div><div style="font-size:8px;color:#888">'+b.project+' \u00B7 \u09F3 '+((b.qtyNum*b.rateNum)/100000).toFixed(1)+'L</div></div></div>';
     }).join('')+'</div></div>'+
   '</div>';
 }
@@ -3431,26 +3529,26 @@ function renderBOQItems(){
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>BOQ ID</th><th>Item</th><th>Category</th><th>Project</th><th class="num">Qty</th><th>Unit</th><th class="num">Rate</th><th class="num">Total</th><th>Status</th><th></th></tr></thead><tbody>'+
   pB.items.map(function(b){
     var itemTotal=b.qtyNum*b.rateNum;
-    return '<tr style="cursor:pointer" onclick="openBOQItem(\x27'+b.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+b.id+'</td><td style="font-weight:500;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(b.catColor||'#eef3ff')+'15;color:'+(b.catColor||'#2F80ED')+'">'+b.category+'</span></td><td style="font-size:9px;color:#888">'+b.project+'</td><td class="num">'+b.qty+'</td><td>'+b.unit+'</td><td class="num">\\u09F3 '+(b.rateNum).toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+itemTotal.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudBOQ(mockBOQ.find(function(x){return x.id===\x27'+b.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+b.item+'?\x27)){var idx=mockBOQ.findIndex(function(x){return x.id===\x27'+b.id+'\x27});if(idx>=0)mockBOQ.splice(idx,1);DB.save(\x27boq\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openBOQItem(\x27'+b.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+b.id+'</td><td style="font-weight:500;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+b.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(b.catColor||'#eef3ff')+'15;color:'+(b.catColor||'#2F80ED')+'">'+b.category+'</span></td><td style="font-size:9px;color:#888">'+b.project+'</td><td class="num">'+b.qty+'</td><td>'+b.unit+'</td><td class="num">\u09F3 '+(b.rateNum).toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:#2e7d32">\u09F3 '+itemTotal.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(b.status==='Approved'?'badge-active':b.status==='Pending Review'?'badge-pending':'badge-closed')+'">'+b.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudBOQ(mockBOQ.find(function(x){return x.id===\x27'+b.id+'\x27}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+b.item+'?\x27)){var idx=mockBOQ.findIndex(function(x){return x.id===\x27'+b.id+'\x27});if(idx>=0)mockBOQ.splice(idx,1);DB.save(\x27boq\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('boq',pB.total,pB.page,pB.totalPages,pB.perPage)+'</div></div></div>'+
-  '<div style="margin-top:4px;text-align:right;font-size:9px;color:#888;padding:0 4px">Total BOQ Value: \\u09F3 '+filtered.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0).toLocaleString('en-IN')+'</div>';
+  '<div style="margin-top:4px;text-align:right;font-size:9px;color:#888;padding:0 4px">Total BOQ Value: \u09F3 '+filtered.reduce(function(s,b){return s+b.qtyNum*b.rateNum},0).toLocaleString('en-IN')+'</div>';
 }
 
 function renderRateAnalysis(){
   var rates=mockBOQ.slice().sort(function(a,b){return b.rateNum-a.rateNum});
   var pR=_pg('rate',rates);
   return '<div class="stats-row" style="margin-bottom:6px">'+[
-    ['Avg Rate','\\u09F3 '+Math.round(rates.reduce(function(s,r){return s+r.rateNum},0)/rates.length).toLocaleString('en-IN'),'#1565c0'],
-    ['Highest Rate','\\u09F3 '+rates[0].rateNum.toLocaleString('en-IN'),'#c62828'],
-    ['Lowest Rate','\\u09F3 '+rates[rates.length-1].rateNum.toLocaleString('en-IN'),'#2e7d32'],
+    ['Avg Rate','\u09F3 '+Math.round(rates.reduce(function(s,r){return s+r.rateNum},0)/rates.length).toLocaleString('en-IN'),'#1565c0'],
+    ['Highest Rate','\u09F3 '+rates[0].rateNum.toLocaleString('en-IN'),'#c62828'],
+    ['Lowest Rate','\u09F3 '+rates[rates.length-1].rateNum.toLocaleString('en-IN'),'#2e7d32'],
     ['Total Quantity',rates.reduce(function(s,r){return s+r.qtyNum},0).toLocaleString('en-IN'),'#7b1fa2'],
     ['Units Used',new Set(rates.map(function(r){return r.unit})).size,'#00838f'],
     ['Categories',new Set(rates.map(function(r){return r.category})).size,'#e65100']
   ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+';font-size:13px">'+s[1]+'</div></div>';}).join('')+'</div>'+
-  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Item</th><th>Category</th><th>Unit</th><th class="num">Rate (\\u09F3)</th><th class="num">Total Qty</th><th class="num">Extended Value</th><th>Unit Rate / Qty</th></tr></thead><tbody>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Item</th><th>Category</th><th>Unit</th><th class="num">Rate (\u09F3)</th><th class="num">Total Qty</th><th class="num">Extended Value</th><th>Unit Rate / Qty</th></tr></thead><tbody>'+
   pR.items.map(function(r){
     var ext=r.qtyNum*r.rateNum;
-    return '<tr><td style="font-weight:500">'+r.item.substring(0,35)+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(r.catColor||'#eef3ff')+'15;color:'+(r.catColor||'#2F80ED')+'">'+r.category+'</span></td><td>'+r.unit+'</td><td class="num" style="font-weight:600">'+r.rateNum.toLocaleString('en-IN')+'</td><td class="num">'+r.qty+'</td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+ext.toLocaleString('en-IN')+'</td><td style="font-size:9px;color:#888">\\u09F3 '+r.rateNum.toLocaleString('en-IN')+' / '+r.unit+'</td></tr>';
+    return '<tr><td style="font-weight:500">'+r.item.substring(0,35)+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(r.catColor||'#eef3ff')+'15;color:'+(r.catColor||'#2F80ED')+'">'+r.category+'</span></td><td>'+r.unit+'</td><td class="num" style="font-weight:600">'+r.rateNum.toLocaleString('en-IN')+'</td><td class="num">'+r.qty+'</td><td class="num" style="font-weight:600;color:#2e7d32">\u09F3 '+ext.toLocaleString('en-IN')+'</td><td style="font-size:9px;color:#888">\u09F3 '+r.rateNum.toLocaleString('en-IN')+' / '+r.unit+'</td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('rate',pR.total,pR.page,pR.totalPages,pR.perPage)+'</div></div></div>';
 }
 
@@ -3469,15 +3567,15 @@ function openBOQItem(id){
       ['Project',b.project],
       ['Category',b.category],
       ['Quantity',b.qty+' '+b.unit],
-      ['Unit Rate','\\u09F3 '+b.rateNum.toLocaleString('en-IN')],
-      ['Total Value','\\u09F3 '+total.toLocaleString('en-IN')],
+      ['Unit Rate','\u09F3 '+b.rateNum.toLocaleString('en-IN')],
+      ['Total Value','\u09F3 '+total.toLocaleString('en-IN')],
       ['Status',b.status],
       ['Last Updated',b.updated||b.date||'---']
     ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
     '<div style="padding:10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center">'+
       '<div style="font-size:9px;color:#888;margin-bottom:4px">Total Cost for this Item</div>'+
-      '<div style="font-size:24px;font-weight:700;color:#2e7d32">\\u09F3 '+total.toLocaleString('en-IN')+'</div>'+
-      '<div style="font-size:9px;color:#888;margin-top:4px">'+b.qty+' '+b.unit+' \\u00D7 \\u09F3 '+b.rateNum.toLocaleString('en-IN')+'</div>'+
+      '<div style="font-size:24px;font-weight:700;color:#2e7d32">\u09F3 '+total.toLocaleString('en-IN')+'</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:4px">'+b.qty+' '+b.unit+' \u00D7 \u09F3 '+b.rateNum.toLocaleString('en-IN')+'</div>'+
     '</div>',
     '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
       '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudBOQ(mockBOQ.find(function(x){return x.id===\x27'+b.id+'\x27}))">Edit</button>'+
@@ -3488,7 +3586,7 @@ function openBOQItem(id){
 
 function crudBOQ(item){
   var n=!item;
-  var b=n?{id:'BOQ-'+String(mockBOQ.length+1).padStart(3,'0'),item:'',category:'Excavation',catColor:'#1565c0',project:'Muktodhara Green Park',qty:'0',qtyNum:0,unit:'CFT',rate:'\\u09F3 0',rateNum:0,status:'Draft',updated:new Date().toISOString().split('T')[0]}:item;
+  var b=n?{id:'BOQ-'+String(mockBOQ.length+1).padStart(3,'0'),item:'',category:'Excavation',catColor:'#1565c0',project:'Muktodhara Green Park',qty:'0',qtyNum:0,unit:'CFT',rate:'\u09F3 0',rateNum:0,status:'Draft',updated:new Date().toISOString().split('T')[0]}:item;
   var cats=['Excavation','Concrete','Brickwork','Finishing','MEP','Plumbing','Sanitary','Structural','Roofing','Painting','Earthwork'];
   var projs=['Muktodhara Green Park','Jolshiri Abason'];
   var units=['CFT','SFT','Pcs','Set','Lump Sum','RFT','Bag','Kg','Meter'];
@@ -3511,7 +3609,7 @@ function crudBOQ(item){
         qty:qty.toLocaleString('en-IN'),
         qtyNum:qty,
         unit:g('bq_unit'),
-        rate:'\\u09F3 '+rate.toLocaleString('en-IN'),
+        rate:'\u09F3 '+rate.toLocaleString('en-IN'),
         rateNum:rate,
         status:g('bq_status'),
         updated:new Date().toISOString().split('T')[0],
@@ -3532,12 +3630,12 @@ function renderEquipment(el){
   var op=mockEquipment.filter(function(e){return e.status==='Operational'}).length;
   var repair=mockEquipment.filter(function(e){return e.status==='Under Repair'||e.status==='Maintenance'}).length;
   var idle=mockEquipment.filter(function(e){return e.status==='Idle'}).length;
-  el.innerHTML='<div class="fade-in"><div class="page-title">Equipment & Machinery</div><div class="page-subtitle">'+total+' assets \\u00B7 '+op+' operational \\u00B7 '+repair+' in maintenance</div>'+
+  el.innerHTML='<div class="fade-in"><div class="page-title">Equipment & Machinery</div><div class="page-subtitle">'+total+' assets \u00B7 '+op+' operational \u00B7 '+repair+' in maintenance</div>'+
     '<div class="toolbar" style="margin-bottom:6px">'+
       '<div class="tabs">'+[
-        ['dashboard','\\uD83D\\uDCCA Dashboard'],
-        ['equipment','\\u2699\\uFE0F Equipment'],
-        ['maintenance','\\uD83D\\uDD27 Maintenance']
+        ['dashboard','\uD83D\uDCCA Dashboard'],
+        ['equipment','\u2699\uFE0F Equipment'],
+        ['maintenance','\uD83D\uDD27 Maintenance']
       ].map(function(t){
         return '<div class="tab '+(et===t[0]?'active':'')+'" onclick="eqTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
@@ -3580,13 +3678,13 @@ function renderEqDashboard(){
     }).join('')+'</div></div>'+
     '<div class="card"><div class="card-header"><h3>Highest Running Hours</h3></div><div class="card-body" style="padding:6px">'+
     topHours.map(function(e,i){
-      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0"><div style="width:18px;height:18px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:9px;font-weight:500">'+e.name+'</div><div style="font-size:8px;color:#888">'+e.model+' \\u00B7 '+e.site+' \\u00B7 '+e.hours+' hrs</div></div></div>';
+      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0"><div style="width:18px;height:18px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:9px;font-weight:500">'+e.name+'</div><div style="font-size:8px;color:#888">'+e.model+' \u00B7 '+e.site+' \u00B7 '+e.hours+' hrs</div></div></div>';
     }).join('')+'</div></div>'+
   '</div>'+
   '<div class="card"><div class="card-header"><h3>Cost Summary</h3></div><div class="card-body" style="padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">'+
-    '<div style="padding:8px;background:#e3f2fd;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#1565c0">\\u09F3 '+(fuelC/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Fuel Cost</div></div>'+
-    '<div style="padding:8px;background:#fff3e0;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#e65100">\\u09F3 '+(maintC/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Maintenance Cost</div></div>'+
-    '<div style="padding:8px;background:#e8f5e9;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#2e7d32">\\u09F3 '+((fuelC+maintC)/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Total Cost</div></div>'+
+    '<div style="padding:8px;background:#e3f2fd;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#1565c0">\u09F3 '+(fuelC/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Fuel Cost</div></div>'+
+    '<div style="padding:8px;background:#fff3e0;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#e65100">\u09F3 '+(maintC/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Maintenance Cost</div></div>'+
+    '<div style="padding:8px;background:#e8f5e9;border-radius:6px"><div style="font-size:16px;font-weight:700;color:#2e7d32">\u09F3 '+((fuelC+maintC)/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Total Cost</div></div>'+
   '</div></div>';
 }
 
@@ -3614,7 +3712,7 @@ function renderEqList(){
     return '<div style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openEquipment(\x27'+e.id+'\x27)">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="display:flex;align-items:center;gap:6px">'+
-          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(e.icon||'\\uD83D\\uDD27')+'</div>'+
+          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(e.icon||'\uD83D\uDD27')+'</div>'+
           '<div><div style="font-size:11px;font-weight:600;color:#222">'+e.name+'</div><div style="font-size:9px;color:#888">'+e.model+'</div></div>'+
         '</div>'+
         '<span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+e.status+'</span>'+
@@ -3622,12 +3720,12 @@ function renderEqList(){
       '<div style="display:flex;gap:6px;margin-top:6px">'+
         '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e3f2fd;color:#1565c0">'+e.site+'</span>'+
         '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f3e5f5;color:#7b1fa2">'+e.hours+' hrs</span>'+
-        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e8f5e9;color:#2e7d32">\\u09F3 '+(e.fuelCost||0).toLocaleString('en-IN')+' fuel</span>'+
+        '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e8f5e9;color:#2e7d32">\u09F3 '+(e.fuelCost||0).toLocaleString('en-IN')+' fuel</span>'+
       '</div>'+
       '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
         '<span style="font-size:8px;color:#999">'+(e.operator?'Operator: '+e.operator:'No operator')+'</span>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEquipment(mockEquipment.find(function(x){return x.id===\x27'+e.id+'\x27}))">\\u270E</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEquipment(mockEquipment.find(function(x){return x.id===\x27'+e.id+'\x27}))">\u270E</span>'+
           '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+e.name+'?\x27)){var idx=mockEquipment.findIndex(function(x){return x.id===\x27'+e.id+'\x27});if(idx>=0)mockEquipment.splice(idx,1);DB.save(\x27equipment\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span>'+
         '</div>'+
       '</div>'+
@@ -3664,18 +3762,18 @@ function openEquipment(id){
   var sc={'Operational':'#2e7d32','Idle':'#ff8f00','Under Repair':'#c62828','Maintenance':'#e65100'}[e.status]||'#888';
   var logs=mockMaintenanceLog.filter(function(m){return m.equipment===e.name});
   var logHtml=logs.length>0?logs.map(function(m){
-    return '<div style="display:flex;justify-content:space-between;font-size:9px;padding:4px 0;border-bottom:1px solid #f0f0f0"><span>'+m.date+' <span style="color:#888">'+m.type+'</span></span><span>\\u09F3 '+m.cost.toLocaleString('en-IN')+'</span></div>';
+    return '<div style="display:flex;justify-content:space-between;font-size:9px;padding:4px 0;border-bottom:1px solid #f0f0f0"><span>'+m.date+' <span style="color:#888">'+m.type+'</span></span><span>\u09F3 '+m.cost.toLocaleString('en-IN')+'</span></div>';
   }).join(''):'<div style="font-size:9px;color:#888;text-align:center;padding:6px">No maintenance logs</div>';
   showDetailPanel('Equipment: '+e.name,
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
-      '<div style="width:44px;height:44px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">'+(e.icon||'\\uD83D\\uDD27')+'</div>'+
+      '<div style="width:44px;height:44px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">'+(e.icon||'\uD83D\uDD27')+'</div>'+
       '<div><div style="font-size:14px;font-weight:600">'+e.name+'</div><div style="font-size:10px;color:#888">'+e.model+'</div></div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
       ['Status',e.status],
       ['Site',e.site],
       ['Hours Run',e.hours+' hrs'],
-      ['Fuel Cost','\\u09F3 '+(e.fuelCost||0).toLocaleString('en-IN')],
+      ['Fuel Cost','\u09F3 '+(e.fuelCost||0).toLocaleString('en-IN')],
       ['Operator',e.operator||'Unassigned'],
       ['Last Service',e.lastService||'---']
     ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
@@ -3691,7 +3789,7 @@ function openEquipment(id){
 
 function crudEquipment(item){
   var n=!item;
-  var e=n?{id:'EQ-'+String(mockEquipment.length+1).padStart(3,'0'),name:'',model:'',type:'Heavy',site:'Muktodhara',status:'Operational',hours:'0',fuelCost:0,operator:'',lastService:'',icon:'\\uD83D\\uDD27'}:item;
+  var e=n?{id:'EQ-'+String(mockEquipment.length+1).padStart(3,'0'),name:'',model:'',type:'Heavy',site:'Muktodhara',status:'Operational',hours:'0',fuelCost:0,operator:'',lastService:'',icon:'\uD83D\uDD27'}:item;
   var sites=['Muktodhara','Jolshiri','Head Office','Warehouse'];
   var types=['Heavy','Light','Tool','Vehicle'];
   openModal(n?'New Equipment':'Edit Equipment',
@@ -3701,7 +3799,7 @@ function crudEquipment(item){
     formRow(inputField('Fuel Cost (Tk)','eq_fuel',String(e.fuelCost)),inputField('Operator','eq_oper',e.operator))+
     inputField('Last Service Date','eq_lastSvc',e.lastService),
     function(){
-      var d={id:e.id,name:g('eq_name'),model:g('eq_model'),type:g('eq_type'),site:g('eq_site'),status:g('eq_status'),hours:g('eq_hours')||'0',fuelCost:parseInt(g('eq_fuel'))||0,operator:g('eq_oper'),lastService:g('eq_lastSvc'),icon:e.icon||'\\uD83D\\uDD27'};
+      var d={id:e.id,name:g('eq_name'),model:g('eq_model'),type:g('eq_type'),site:g('eq_site'),status:g('eq_status'),hours:g('eq_hours')||'0',fuelCost:parseInt(g('eq_fuel'))||0,operator:g('eq_oper'),lastService:g('eq_lastSvc'),icon:e.icon||'\uD83D\uDD27'};
       if(n){mockEquipment.push(d);DB.save('equipment');showToast('Equipment added','success');}
       else{var idx=mockEquipment.findIndex(function(x){return x.id===e.id});if(idx>=0){mockEquipment[idx]=d;DB.save('equipment');showToast('Updated','info');}}
       renderModule();
@@ -3745,7 +3843,7 @@ function renderDesigns(el){
   const rejs=mockDesigns.filter(d=>d.status==='Rejected').length;
   const uniqDes=new Set(mockDesigns.map(d=>d.designer)).size;
   const dsgTypes=mockDesigns.reduce(function(acc,d){if(acc.indexOf(d.type)<0)acc.push(d.type);return acc;},[]);
-  el.innerHTML='<div class="fade-in"><div class="page-title">Design Management</div><div class="page-subtitle">'+total+' designs \\u00B7 '+apps+' approved \\u00B7 '+uniqDes+' designers</div>'+
+  el.innerHTML='<div class="fade-in"><div class="page-title">Design Management</div><div class="page-subtitle">'+total+' designs \u00B7 '+apps+' approved \u00B7 '+uniqDes+' designers</div>'+
     '<div class="stats-row" style="margin-bottom:6px">'+[
       ['Total Designs',total,'#1565c0'],
       ['Approved',apps,'#2e7d32'],
@@ -3781,7 +3879,7 @@ function renderDesignCards(){
     return '<div class="ds-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px;cursor:pointer" onclick="openDesign(\x27'+d.id+'\x27)">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="display:flex;align-items:center;gap:6px">'+
-          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(d.typeIcon||'\\uD83D\\uDCCB')+'</div>'+
+          '<div style="width:32px;height:32px;border-radius:6px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+(d.typeIcon||'\uD83D\uDCCB')+'</div>'+
           '<div><div style="font-size:11px;font-weight:600;color:#222">'+d.name+'</div><div style="font-size:9px;color:#2F80ED">'+d.project+'</div></div>'+
         '</div>'+
         '<div style="display:flex;gap:3px">'+
@@ -3789,12 +3887,12 @@ function renderDesignCards(){
           '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f0f0f0;color:#666">'+d.version+'</span>'+
         '</div>'+
       '</div>'+
-      '<div style="font-size:9px;color:#888">'+d.designer+' \\u00B7 '+d.type+'</div>'+
+      '<div style="font-size:9px;color:#888">'+d.designer+' \u00B7 '+d.type+'</div>'+
       '<div style="font-size:9px;color:#888;max-height:28px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+d.description.substring(0,80)+(d.description.length>80?'...':'')+'</div>'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">'+
         '<div style="font-size:8px;color:#999">Submitted: '+d.submitted+'</div>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudDesign(mockDesigns.find(function(x){return x.id===\x27'+d.id+'\x27}))">\\u270E Edit</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudDesign(mockDesigns.find(function(x){return x.id===\x27'+d.id+'\x27}))">\u270E Edit</span>'+
           '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+d.name+'?\x27)){var idx=mockDesigns.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockDesigns.splice(idx,1);DB.save(\x27designs\x27);showToast(\x27Design deleted\x27,\x27info\x27);renderModule()}">\u2715 Delete</span>'+
         '</div>'+
       '</div>'+
@@ -3819,7 +3917,7 @@ function openDesign(id){
   }).join(''):'<div style="font-size:10px;color:#888;padding:8px;text-align:center">No version history</div>';
   showDetailPanel('Design: '+d.name,
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
-      '<div style="width:40px;height:40px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">'+(d.typeIcon||'\\uD83D\\uDCCB')+'</div>'+
+      '<div style="width:40px;height:40px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">'+(d.typeIcon||'\uD83D\uDCCB')+'</div>'+
       '<div><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+d.status+'</span><span style="margin-left:4px;font-size:9px;color:#888">'+d.version+'</span></div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+[
@@ -3829,7 +3927,7 @@ function openDesign(id){
       ['Type',d.type],
       ['Submitted',d.submitted||'---'],
       ['Approved',d.approved||'---'],
-      ['Download','<span style="color:#2F80ED;cursor:pointer" onclick="showToast(\x27Download started\x27,\x27info\x27)">Download PDF \\u2193</span>']
+      ['Download','<span style="color:#2F80ED;cursor:pointer" onclick="showToast(\x27Download started\x27,\x27info\x27)">Download PDF \u2193</span>']
     ].map(function(r){
       return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';
     }).join('')+'</div>'+
@@ -3847,7 +3945,7 @@ function openDesign(id){
 
 function crudDesign(item){
   var n=!item;
-  var d=n?{id:'DSG-'+(String(mockDesigns.length+1).padStart(3,'0')),name:'',type:'Master Plan',typeIcon:'\\uD83D\\uDCCB',version:'v1.0',status:'Draft',project:'Muktodhara Green Park',designer:'',description:''}:item;
+  var d=n?{id:'DSG-'+(String(mockDesigns.length+1).padStart(3,'0')),name:'',type:'Master Plan',typeIcon:'\uD83D\uDCCB',version:'v1.0',status:'Draft',project:'Muktodhara Green Park',designer:'',description:''}:item;
   var dsgTypes=['Master Plan','Architecture','Structural','Landscape','Electrical','Plumbing','Interior','Elevation','Safety','Site Plan','MEP','Civil','Infrastructure'];
   var projects=['Muktodhara Green Park','Jolshiri Abason'];
   var statuses=['Draft','In Review','Approved','Rejected'];
@@ -3861,7 +3959,7 @@ function crudDesign(item){
         id:d.id,
         name:g('df_name'),
         type:g('df_type'),
-        typeIcon:{'Master Plan':'\\uD83D\\uDCCB','Architecture':'\\uD83C\\uDFD7\\uFE0F','Structural':'\\uD83C\\uDFD7\\uFE0F','Landscape':'\\uD83C\\uDF3F','Electrical':'\\u26A1','Plumbing':'\\uD83D\\uDCA7','Interior':'\\uD83D\\uDDBC\\uFE0F','Elevation':'\\uD83C\\uDFD8\\uFE0F','Safety':'\\uD83D\\uDD25','Site Plan':'\\uD83C\\uDF0D','MEP':'\\u2699\\uFE0F','Civil':'\\uD83C\\uDFED','Infrastructure':'\\uD83D\\uDEE4\\uFE0F'}[g('df_type')]||'\\uD83D\\uDCCB',
+        typeIcon:{'Master Plan':'\uD83D\uDCCB','Architecture':'\uD83C\uDFD7\uFE0F','Structural':'\uD83C\uDFD7\uFE0F','Landscape':'\uD83C\uDF3F','Electrical':'\u26A1','Plumbing':'\uD83D\uDCA7','Interior':'\uD83D\uDDBC\uFE0F','Elevation':'\uD83C\uDFD8\uFE0F','Safety':'\uD83D\uDD25','Site Plan':'\uD83C\uDF0D','MEP':'\u2699\uFE0F','Civil':'\uD83C\uDFED','Infrastructure':'\uD83D\uDEE4\uFE0F'}[g('df_type')]||'\uD83D\uDCCB',
         version:g('df_ver')||'v1.0',
         status:g('df_status'),
         project:g('df_project'),
@@ -3899,13 +3997,13 @@ function renderContractors(el){
   var woTotal=mockWorkOrders.length;
   var woActive=mockWorkOrders.filter(function(w){return w.status==='Active'||w.status==='Pending'}).length;
   var totalPay=mockContractorPayments.reduce(function(s,p){return s+p.amount},0);
-  el.innerHTML='<div class="fade-in"><div class="page-title">Contractor Management</div><div class="page-subtitle">'+total+' contractors \\u00B7 '+woTotal+' work orders \\u00B7 ৳'+(totalPay/100000).toFixed(1)+'L paid</div>'+
+  el.innerHTML='<div class="fade-in"><div class="page-title">Contractor Management</div><div class="page-subtitle">'+total+' contractors \u00B7 '+woTotal+' work orders \u00B7 ৳'+(totalPay/100000).toFixed(1)+'L paid</div>'+
     '<div class="toolbar" style="margin-bottom:6px">'+
       '<div class="tabs">'+[
-        ['dashboard','\\uD83D\\uDCCA Dashboard'],
-        ['contractors','\\uD83C\\uDFED Contractors'],
-        ['work_orders','\\uD83D\\uDCDD Work Orders'],
-        ['payments','\\uD83D\\uDCB5 Payments']
+        ['dashboard','\uD83D\uDCCA Dashboard'],
+        ['contractors','\uD83C\uDFED Contractors'],
+        ['work_orders','\uD83D\uDCDD Work Orders'],
+        ['payments','\uD83D\uDCB5 Payments']
       ].map(function(t){
         return '<div class="tab '+(ct===t[0]?'active':'')+'" onclick="ctTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
@@ -3943,16 +4041,16 @@ function renderContractorDashboard(){
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
     '<div class="card"><div class="card-header"><h3>Top Rated Contractors</h3></div><div class="card-body" style="padding:6px">'+
     top.map(function(c,i){
-      var stars='\\u2B50'.repeat(c.rating)+(c.rating<5?'\\u2606'.repeat(5-c.rating):'');
-      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="ctTab=\x27contractors\x27;renderModule()"><div style="width:22px;height:22px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:10px;font-weight:500">'+c.name+'</div><div style="font-size:8px;color:#888">'+c.type+' \\u00B7 '+stars+'</div></div></div>';
+      var stars='\u2B50'.repeat(c.rating)+(c.rating<5?'\u2606'.repeat(5-c.rating):'');
+      return '<div style="display:flex;gap:6px;padding:5px 4px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="ctTab=\x27contractors\x27;renderModule()"><div style="width:22px;height:22px;border-radius:4px;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+(i+1)+'</div><div style="flex:1"><div style="font-size:10px;font-weight:500">'+c.name+'</div><div style="font-size:8px;color:#888">'+c.type+' \u00B7 '+stars+'</div></div></div>';
     }).join('')+'</div></div>'+
     '<div class="card"><div class="card-header"><h3>Payment Summary</h3></div><div class="card-body" style="padding:10px;text-align:center">'+
-      '<div style="font-size:22px;font-weight:700;color:#2e7d32">\\u09F3 '+(totalPay/100000).toFixed(1)+'L</div>'+
+      '<div style="font-size:22px;font-weight:700;color:#2e7d32">\u09F3 '+(totalPay/100000).toFixed(1)+'L</div>'+
       '<div style="font-size:9px;color:#888;margin-top:2px">Total Paid to Contractors</div>'+
       '<div style="margin-top:8px;display:flex;gap:6px;justify-content:center">'+
         '<div style="padding:4px 8px;background:#e8f5e9;border-radius:4px"><div style="font-size:12px;font-weight:600;color:#2e7d32">'+woComplete+'</div><div style="font-size:8px;color:#666">Completed WOs</div></div>'+
         '<div style="padding:4px 8px;background:#fff3e0;border-radius:4px"><div style="font-size:12px;font-weight:600;color:#e65100">'+woActive+'</div><div style="font-size:8px;color:#666">Active WOs</div></div>'+
-        '<div style="padding:4px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:12px;font-weight:600;color:#1565c0">\\u09F3 '+(totalPayCr/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Total Contracted</div></div>'+
+        '<div style="padding:4px 8px;background:#e3f2fd;border-radius:4px"><div style="font-size:12px;font-weight:600;color:#1565c0">\u09F3 '+(totalPayCr/100000).toFixed(1)+'L</div><div style="font-size:8px;color:#666">Total Contracted</div></div>'+
       '</div>'+
     '</div></div>'+
   '</div>';
@@ -3973,7 +4071,7 @@ function renderContractorList(){
   '</div>'+
   '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">'+
   pC.items.map(function(c){
-    var stars='';for(var si=0;si<5;si++)stars+=si<c.rating?'\\u2B50':'\\u2606';
+    var stars='';for(var si=0;si<5;si++)stars+=si<c.rating?'\u2B50':'\u2606';
     return '<div class="ct-card" style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer" onclick="openContractor(\x27'+c.id+'\x27)">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="display:flex;align-items:center;gap:6px">'+
@@ -3983,7 +4081,7 @@ function renderContractorList(){
         '<span class="badge-status '+(c.status==='Active'?'badge-active':'badge-closed')+'">'+c.status+'</span>'+
       '</div>'+
       '<div style="font-size:9px;color:#888;margin-top:4px">'+stars+'</div>'+
-      '<div style="font-size:9px;color:#888;margin-top:2px">'+c.contact+(c.email?' \\u00B7 '+c.email:'')+'</div>'+
+      '<div style="font-size:9px;color:#888;margin-top:2px">'+c.contact+(c.email?' \u00B7 '+c.email:'')+'</div>'+
       '<div style="display:flex;gap:4px;margin-top:6px">'+
         '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#e3f2fd;color:#1565c0">'+(c.license?'License: '+c.license:'No license')+'</span>'+
         '<span style="padding:1px 5px;border-radius:3px;font-size:8px;background:'+(c.insurance?'#e8f5e9':'#ffebee')+';color:'+(c.insurance?'#2e7d32':'#c62828')+'">'+(c.insurance?'Insured':'No insurance')+'</span>'+
@@ -3991,7 +4089,7 @@ function renderContractorList(){
       '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
         '<span style="font-size:8px;color:#999">'+(c.projects?c.projects.length+' projects':'0 projects')+'</span>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudContractor(mockContractors.find(function(x){return x.id===\x27'+c.id+'\x27}))">\\u270E</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudContractor(mockContractors.find(function(x){return x.id===\x27'+c.id+'\x27}))">\u270E</span>'+
           '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+c.name+'?\x27)){var idx=mockContractors.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockContractors.splice(idx,1);DB.save(\x27contractors\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span>'+
         '</div>'+
       '</div>'+
@@ -4021,7 +4119,7 @@ function renderWorkOrders(){
   pW.items.map(function(w){
     var sc={'Pending':'#ff8f00','Active':'#1565c0','Completed':'#2e7d32','Cancelled':'#c62828'}[w.status]||'#888';
     var sbg={'Pending':'#fff8e1','Active':'#e3f2fd','Completed':'#e8f5e9','Cancelled':'#ffebee'}[w.status]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openWorkOrder(\x27'+w.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+w.id+'</td><td style="font-weight:500">'+(ctNames[w.contractor]||w.contractor)+'</td><td>'+w.project+'</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.scope+'</td><td class="num" style="font-weight:600">\\u09F3 '+(w.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+w.date+'</td><td style="font-size:9px;color:#888">'+w.deadline+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+w.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\x27'+w.id+'\x27}))">\\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete WO '+w.id+'?\x27)){var idx=mockWorkOrders.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockWorkOrders.splice(idx,1);DB.save(\x27workOrders\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openWorkOrder(\x27'+w.id+'\x27)"><td style="font-weight:500;font-family:monospace;font-size:9px">'+w.id+'</td><td style="font-weight:500">'+(ctNames[w.contractor]||w.contractor)+'</td><td>'+w.project+'</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+w.scope+'</td><td class="num" style="font-weight:600">\u09F3 '+(w.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+w.date+'</td><td style="font-size:9px;color:#888">'+w.deadline+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+w.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorkOrder(mockWorkOrders.find(function(x){return x.id===\x27'+w.id+'\x27}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete WO '+w.id+'?\x27)){var idx=mockWorkOrders.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockWorkOrders.splice(idx,1);DB.save(\x27workOrders\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('wo',pW.total,pW.page,pW.totalPages,pW.perPage)+'</div></div></div>';
 }
 
@@ -4029,7 +4127,7 @@ function renderContractorPayments(){
   var pP=_pg('ctp',mockContractorPayments);
   var ctNames={};mockContractors.forEach(function(c){ctNames[c.id]=c.name});
   return '<div class="stats-row" style="margin-bottom:6px">'+[
-    ['Total Paid','\\u09F3 '+(mockContractorPayments.reduce(function(s,p){return s+p.amount},0)/100000).toFixed(1)+'L','#2e7d32'],
+    ['Total Paid','\u09F3 '+(mockContractorPayments.reduce(function(s,p){return s+p.amount},0)/100000).toFixed(1)+'L','#2e7d32'],
     ['Transactions',mockContractorPayments.length,'#1565c0'],
     ['Advance',mockContractorPayments.filter(function(p){return p.type==='Advance'}).reduce(function(s,p){return s+p.amount},0)/100000+'L','#e65100'],
     ['Milestone',mockContractorPayments.filter(function(p){return p.type==='Milestone'}).reduce(function(s,p){return s+p.amount},0)/100000+'L','#7b1fa2'],
@@ -4038,14 +4136,14 @@ function renderContractorPayments(){
   ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Contractor</th><th>Type</th><th class="num">Amount</th><th>Date</th><th>Work Order</th><th>Status</th></tr></thead><tbody>'+
   pP.items.map(function(p){
-    return '<tr><td style="font-family:monospace;font-size:9px">'+p.id+'</td><td style="font-weight:500">'+(ctNames[p.contractor]||'---')+'</td><td><span class="badge-status" style="background:'+(p.type==='Advance'?'#fff3e0':p.type==='Milestone'?'#e8f5e9':p.type==='Final'?'#e3f2fd':'#ffebee')+';color:'+(p.type==='Advance'?'#e65100':p.type==='Milestone'?'#2e7d32':p.type==='Final'?'#1565c0':'#c62828')+'">'+p.type+'</span></td><td class="num" style="font-weight:600;color:#2e7d32">\\u09F3 '+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+p.date+'</td><td style="font-family:monospace;font-size:9px;color:#888">'+p.workOrder+'</td><td><span class="badge-status '+(p.status==='Paid'?'badge-active':'badge-pending')+'">'+p.status+'</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px">'+p.id+'</td><td style="font-weight:500">'+(ctNames[p.contractor]||'---')+'</td><td><span class="badge-status" style="background:'+(p.type==='Advance'?'#fff3e0':p.type==='Milestone'?'#e8f5e9':p.type==='Final'?'#e3f2fd':'#ffebee')+';color:'+(p.type==='Advance'?'#e65100':p.type==='Milestone'?'#2e7d32':p.type==='Final'?'#1565c0':'#c62828')+'">'+p.type+'</span></td><td class="num" style="font-weight:600;color:#2e7d32">\u09F3 '+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+p.date+'</td><td style="font-family:monospace;font-size:9px;color:#888">'+p.workOrder+'</td><td><span class="badge-status '+(p.status==='Paid'?'badge-active':'badge-pending')+'">'+p.status+'</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('ctp',pP.total,pP.page,pP.totalPages,pP.perPage)+'</div></div></div>';
 }
 
 function openContractor(id){
   var c=mockContractors.find(function(x){return x.id===id});
   if(!c)return;
-  var stars='';for(var si=0;si<5;si++)stars+=si<c.rating?'\\u2B50':'\\u2606';
+  var stars='';for(var si=0;si<5;si++)stars+=si<c.rating?'\u2B50':'\u2606';
   var wis=mockWorkOrders.filter(function(w){return w.contractor===c.id});
   var cPay=mockContractorPayments.filter(function(p){return p.contractor===c.id});
   var totalPay=cPay.reduce(function(s,p){return s+p.amount},0);
@@ -4063,16 +4161,16 @@ function openContractor(id){
       ['Contact',c.contact],
       ['Email',c.email||'---'],
       ['License',c.license||'None'],
-      ['Insurance',c.insurance?'\\u2705 '+c.insurance:'\\u274C No insurance'],
-      ['Rating',c.rating+'/5 '+(c.rating>=4?'\\uD83C\\uDFC6':'')]
+      ['Insurance',c.insurance?'\u2705 '+c.insurance:'\u274C No insurance'],
+      ['Rating',c.rating+'/5 '+(c.rating>=4?'\uD83C\uDFC6':'')]
     ].map(function(r){return '<div style="padding:4px 8px;background:#fff;border:1px solid #e8e8e8;border-radius:4px"><div style="font-size:8px;color:#888;text-transform:uppercase">'+r[0]+'</div><div style="font-size:11px;font-weight:500;margin-top:1px">'+r[1]+'</div></div>';}).join('')+'</div>'+
     '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;margin-bottom:4px">Work Orders ('+wis.length+')</div>'+
     '<div style="padding:6px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+wisHtml+'</div></div>'+
     '<div><div style="font-size:11px;font-weight:600;margin-bottom:4px">Payment Summary</div>'+
     '<div class="stats-row" style="grid-template-columns:repeat(3,1fr)">'+[
-      ['Total Paid','\\u09F3 '+(totalPay/100000).toFixed(1)+'L','#2e7d32'],
+      ['Total Paid','\u09F3 '+(totalPay/100000).toFixed(1)+'L','#2e7d32'],
       ['Payments',cPay.length,'#1565c0'],
-      ['Avg','\\u09F3 '+(cPay.length>0?((totalPay/cPay.length)/100000).toFixed(1):'0')+'L','#7b1fa2']
+      ['Avg','\u09F3 '+(cPay.length>0?((totalPay/cPay.length)/100000).toFixed(1):'0')+'L','#7b1fa2']
     ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+';font-size:13px">'+s[1]+'</div></div>';}).join('')+'</div></div>',
     '<div class="lead-footer" style="padding:10px 16px;border-top:1px solid #e8e8e8;background:#fff;display:flex;gap:6px">'+
       '<button class="lead-foot-btn primary" onclick="event.stopPropagation();closeLeadPanel();crudContractor(mockContractors.find(function(x){return x.id===\x27'+c.id+'\x27}))">Edit</button>'+
@@ -4094,7 +4192,7 @@ function openWorkOrder(id){
       ['Contractor',ctNames[w.contractor]||'---'],
       ['Project',w.project],
       ['Scope',w.scope],
-      ['Amount','\\u09F3 '+(w.amount/100000).toFixed(1)+'L'],
+      ['Amount','\u09F3 '+(w.amount/100000).toFixed(1)+'L'],
       ['Issue Date',w.date],
       ['Deadline',w.deadline],
       ['Status',w.status]
