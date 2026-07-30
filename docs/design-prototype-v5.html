@@ -812,9 +812,25 @@ window.mockProperties = DB.init('properties', [
      {id:'G-304', number:'304', floor:3, type:'3BHK', size:'1500 sqft', price:27500000, facing:'North', status:'Available'},
      {id:'G-305', number:'305', floor:3, type:'Penthouse', size:'2500 sqft', price:48000000, facing:'South', status:'Available'},
      {id:'G-306', number:'306', floor:3, type:'Penthouse', size:'2500 sqft', price:50000000, facing:'East', status:'Available'},
-   ]},
-]);
-window.mockProjects = DB.init('projects', [
+     ]},
+     ]);
+     // Seed initial unit history
+     mockProperties.forEach(function(p) {
+     p.units.forEach(function(u) {
+       if (!u.history) u.history = [];
+       if (u.history.length === 0) {
+         u.history.push({date: p.startDate || 'Jan 2024', from: '—', to: 'Available', user: 'System', note: 'Unit created in ' + p.name});
+         if (u.status === 'Booked' || u.status === 'Reserved') {
+           u.history.push({date: 'Apr 2024', from: 'Available', to: u.status, user: 'System', note: u.customer ? 'Customer: ' + u.customer : 'Reserved'});
+         }
+         if (u.status === 'Sold') {
+           u.history.push({date: 'Mar 2024', from: 'Available', to: 'Booked', user: 'System', note: u.customer ? 'Booked by ' + u.customer : ''});
+           u.history.push({date: 'Jun 2024', from: 'Booked', to: 'Sold', user: 'System', note: 'Sale confirmed'});
+         }
+       }
+     });
+     });
+     window.mockProjects = DB.init('projects', [
   {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
   {id:'P-102',name:'Jolshiri Abason',type:'flat',location:'Rupganj, Narayanganj',status:'In Progress',progress:42,budget:'৳120.0 Cr',manager:'Iftekhar Ahmad',units:48,stats:{sold:36,reserved:2,available:10}},
   {id:'P-103',name:'Green Valley Estate',type:'land',location:'Savar, Dhaka',status:'Planning',progress:10,budget:'৳25.0 Cr',manager:'Tariqul Islam',plots:80,stats:{sold:20,reserved:10,available:50}},
@@ -3222,7 +3238,8 @@ function openUnitDetail(projId, unitId) {
     }).join('') +
     '</div>' +
     '<div style="margin-top:8px;text-align:center"><span class="badge-status badge-active" style="font-size:11px;padding:4px 16px;background:' + col + '">' + unit.status + '</span></div>' +
-    buildPaymentSchedule(unit, proj),
+    buildPaymentSchedule(unit, proj) +
+    buildUnitHistory(unit),
     footerBtns
   );
 }
@@ -3276,8 +3293,18 @@ function editUnitStatus(projId, unitId) {
     [
       { label: 'Cancel', action: 'close', secondary: true },
       { label: 'Update', action: function() {
-        unit.status = document.getElementById('f_status').value;
+        var oldStatus = unit.status;
+        var newStatus = document.getElementById('f_status').value;
+        unit.status = newStatus;
         unit.customer = document.getElementById('f_customer').value.trim() || undefined;
+        if (!unit.history) unit.history = [];
+        unit.history.push({
+          date: new Date().toISOString().slice(0, 10),
+          from: oldStatus,
+          to: newStatus,
+          user: currentRole || 'System',
+          note: 'Status changed via form'
+        });
         DB.save('properties');
         showToast('Status updated to ' + unit.status, 'success');
         closeDrawer();
@@ -3285,6 +3312,30 @@ function editUnitStatus(projId, unitId) {
       }}
     ]
   );
+}
+
+function buildUnitHistory(unit) {
+  if (!unit.history || !unit.history.length) return '';
+  var html = '<div style="margin-top:12px;border-top:1px solid #e0e0e0;padding-top:10px">' +
+    '<div style="font-size:12px;font-weight:700;color:#333;margin-bottom:6px">📜 Unit History</div>' +
+    '<div style="font-size:10px;max-height:200px;overflow-y:auto">';
+
+  // Sort by date (newest first)
+  var sorted = unit.history.slice().sort(function(a, b) { return b.date.localeCompare(a.date); });
+
+  for (var i = 0; i < sorted.length; i++) {
+    var h = sorted[i];
+    var color = { 'Available': '#4caf50', 'Booked': '#2196f3', 'Reserved': '#ff9800', 'Sold': '#e53935' }[h.to] || '#888';
+    html += '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #f0f0f0">' +
+      '<div style="width:6px;height:6px;border-radius:50%;background:' + color + ';margin-top:5px;flex-shrink:0"></div>' +
+      '<div style="flex:1"><div style="display:flex;justify-content:space-between">' +
+      '<span style="font-weight:600;color:' + color + '">' + h.from + ' → ' + h.to + '</span>' +
+      '<span style="color:#999;font-size:8px">' + h.date + '</span></div>' +
+      '<div style="color:#888;font-size:8px">' + (h.user || 'System') + (h.note ? ' · ' + h.note : '') + '</div></div></div>';
+  }
+
+  html += '</div></div>';
+  return html;
 }
 
 function deleteProperty(id) {
@@ -3327,7 +3378,8 @@ function crudProperty(item) {
                 number: unum, floor: f,
                 type: '3BHK', size: '1350 sqft',
                 price: 20000000, facing: ['South', 'East', 'West', 'North'][(u - 1) % 4],
-                status: 'Available'
+                status: 'Available',
+                history: [{date: new Date().toISOString().slice(0,10), from: '—', to: 'Available', user: currentRole || 'System', note: 'Unit created via form'}]
               });
             }
           }
