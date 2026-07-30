@@ -1827,7 +1827,7 @@ function renderCRM(el){
   var f=getSmartFilters();
   var filtered=filterLeads();
   const HOT=mockLeads.filter(l=>l.priority==='High').length;
-  const CONV=mockLeads.filter(l=>l.status==='Booking'||l.status==='Downpayment'||l.status==='Installments'||l.status==='Possession'||l.status==='Handover').length;
+  const CONV=mockLeads.filter(l=>isConvertedStage(l.status)).length;
   const NEW=mockLeads.filter(l=>l.status==='New Inquiry').length;
   const CONVR=mockLeads.length>0?Math.round(CONV/mockLeads.length*100):0;
   const AVGSCORE=mockLeads.length>0?Math.round(mockLeads.reduce(function(s,l){return s+calcLeadScore(l)},0)/mockLeads.length):0;
@@ -1836,6 +1836,8 @@ function renderCRM(el){
   const pcrm=_pg('crm',filtered);
   const pbro=_pg('brokers',mockBrokers);
   const pcomp=_pg('complaints',mockComplaints);
+  // Collect unique cities
+  var cities=[...new Set(mockLeads.map(function(l){return l.city}).filter(function(c){return c}))];
   el.innerHTML=`<div class="fade-in"><div class="page-title">CRM &amp; Leads</div><div class="page-subtitle">${mockLeads.length} total · ${HOT} hot · ${CONV} converted (${CONVR}%) · ${NEW} new · Avg Score: ${AVGSCORE}</div>
     ${crmSubView==='leads'||crmSubView==='pipeline'?`<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(85px,1fr))">${['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'].map(function(s){
       var c=mockLeads.filter(function(l){return l.status===s}).length;
@@ -1845,18 +1847,19 @@ function renderCRM(el){
       <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Pipeline</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div></div>
       ${crmSubView==='leads'||crmSubView==='pipeline'?`
       <input id="crmSearch" placeholder="Search name/phone/property..." oninput="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
-      <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'].map(function(s){return '<option value="'+s+'"'+(f.sf===s?' selected':'')+'>'+s+'</option>'}).join('')}</select>
+      <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${LEAD_STAGES.map(function(s){return '<option value="'+s+'"'+(f.sf===s?' selected':'')+'>'+s+'</option>'}).join('')}<option value="Lost"${f.sf==='Lost'?' selected':''}>Lost</option><option value="Junk"${f.sf==='Junk'?' selected':''}>Junk</option></select>
       <select id="crmFPriority" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Priority</option><option value="High"${f.pf==='High'?' selected':''}>High</option><option value="Medium"${f.pf==='Medium'?' selected':''}>Medium</option><option value="Low"${f.pf==='Low'?' selected':''}>Low</option></select>
       <select id="crmFType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Type</option><option value="Local"${f.tf==='Local'?' selected':''}>Local</option><option value="NRB"${f.tf==='NRB'?' selected':''}>NRB</option></select>
       <select id="crmFValRange" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Value</option><option value="low"${f.vf==='low'?' selected':''}>Below 1Cr</option><option value="mid"${f.vf==='mid'?' selected':''}>1-5 Cr</option><option value="high"${f.vf==='high'?' selected':''}>5Cr+</option></select>
       <select id="crmFScore" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Score</option><option value="hot"${f.scf==='hot'?' selected':''}>🔥 Hot</option><option value="warm"${f.scf==='warm'?' selected':''}>⭐ Warm</option><option value="cold"${f.scf==='cold'?' selected':''}>💤 Cold</option></select>
-      <select id="crmFOwner" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Owner</option>${owners.map(function(o){return '<option value="'+o+'"'+(f.of===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
-      <select id="crmFSource" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Source</option>${['Website','Facebook','Referral','Walk-in','Agent','Bikroy.com','PropertyBarta','Broker','NRB Direct','Cold Call','Real Estate Fair'].map(function(o){return '<option value="'+o+'"'+(f.srcf===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
+      <select id="crmFOwner" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Owner</option><option value="_unassigned"${f.of==='_unassigned'?' selected':''}>🚫 Unassigned</option>${owners.map(function(o){return '<option value="'+o+'"'+(f.of===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
+      <select id="crmFSource" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Source</option>${LEAD_SOURCES.map(function(o){return '<option value="'+o+'"'+(f.srcf===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
       <select id="crmFFlatType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Flat Type</option><option value="Plot"${f.ff==='Plot'?' selected':''}>Plot</option><option value="2BHK"${f.ff==='2BHK'?' selected':''}>2BHK</option><option value="3BHK"${f.ff==='3BHK'?' selected':''}>3BHK</option><option value="4BHK"${f.ff==='4BHK'?' selected':''}>4BHK</option></select>
       <select id="crmFFacing" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Facing</option><option value="South"${f.fdf==='South'?' selected':''}>South</option><option value="East"${f.fdf==='East'?' selected':''}>East</option><option value="West"${f.fdf==='West'?' selected':''}>West</option><option value="North"${f.fdf==='North'?' selected':''}>North</option></select>
       <select id="crmFPlan" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Plan</option><option value="Construction Link"${f.ppf==='Construction Link'?' selected':''}>Construction Link</option><option value="Bank Loan"${f.ppf==='Bank Loan'?' selected':''}>Bank Loan</option><option value="Full Payment"${f.ppf==='Full Payment'?' selected':''}>Full Payment</option><option value="3-Year Installment"${f.ppf==='3-Year Installment'?' selected':''}>3-Yr Install</option><option value="5-Year Installment"${f.ppf==='5-Year Installment'?' selected':''}>5-Yr Install</option></select>
+      <select id="crmFCity" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">City</option>${cities.map(function(c){return '<option value="'+c+'"'+(f.cf===c?' selected':'')+'>'+c+'</option>'}).join('')}</select>
       <div class="spacer"></div>
-      ${bc>0?'<span style="font-size:9px;color:#2F80ED;font-weight:600;padding:0 4px">'+bc+' selected</span><button class="action-btn secondary" onclick="bulkActionStatus(\'Negotiation\')" style="padding:2px 6px;font-size:8px">Advance</button><button class="action-btn secondary" onclick="bulkActionAssign()" style="padding:2px 6px;font-size:8px">Assign</button><button class="action-btn secondary" onclick="bulkActionPriority(\'High\')" style="padding:2px 6px;font-size:8px">🔥 Priority</button><button class="action-btn secondary" onclick="bulkActionDelete()" style="padding:2px 6px;font-size:8px;color:#e53935">Delete</button><button class="action-btn" onclick="_bulkSel={};renderModule()" style="padding:2px 6px;font-size:8px">Clear</button>':''}
+      ${bc>0?'<span style="font-size:9px;color:#2F80ED;font-weight:600;padding:0 4px">'+bc+' selected</span><button class="action-btn secondary" onclick="bulkActionStatus(\'Negotiation\')" style="padding:2px 6px;font-size:8px">Advance</button><button class="action-btn secondary" onclick="bulkActionAssign()" style="padding:2px 6px;font-size:8px">Assign</button><button class="action-btn secondary" onclick="bulkActionPriority(\'High\')" style="padding:2px 6px;font-size:8px">🔥 Priority</button><button class="action-btn secondary" onclick="bulkActionFollowUp()" style="padding:2px 6px;font-size:8px" title="Set follow-up date">📅 F/U</button><button class="action-btn secondary" onclick="bulkActionDelete()" style="padding:2px 6px;font-size:8px;color:#e53935">Delete</button><button class="action-btn" onclick="_bulkSel={};renderModule()" style="padding:2px 6px;font-size:8px">Clear</button>':''}
       <button class="action-btn secondary" onclick="importData(mockLeads,'Leads','leads',IMPORT_FIELDS.leads)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button>
       <button class="action-btn primary" onclick="crudLead()" style="padding:3px 8px;font-size:10px">+ Add Lead</button>
       `:crmSubView==='complaints'?`
@@ -1911,12 +1914,32 @@ function renderCRMKanban(){
 }
 
 function renderBrokersList(pbro){
-return `<div class="card"><div class="card-header"><h3>Broker Directory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Tier</th><th>Region</th><th class="num">Leads Referred</th><th class="num">Deals Closed</th><th class="num">Commission Paid</th><th>Status</th></tr></thead><tbody>${
+return `<div class="card"><div class="card-header"><h3>Broker Directory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Tier</th><th>Region</th><th class="num">Referred</th><th class="num">Linked Leads</th><th class="num">Deals Closed</th><th class="num">Commission Paid</th><th>Status</th></tr></thead><tbody>${
   pbro.items.map(function(b){
     var tierColor={'Platinum':'#9c27b0','Gold':'#ff8f00','Silver':'#757575'}[b.tier]||'#888';
-    return '<tr><td style="font-weight:500;font-size:10px;color:#888">'+b.id+'</td><td style="font-weight:500">'+b.name+'</td><td style="font-size:10px">'+b.phone+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+tierColor+'">'+b.tier+'</span></td><td style="font-size:10px;color:#555">'+b.region+'</td><td class="num" style="font-size:10px;font-weight:500">'+b.leadsReferred+'</td><td class="num" style="font-size:10px;font-weight:500">'+b.dealsClosed+'</td><td class="num" style="font-size:10px;font-weight:600;color:#2e7d32">'+b.commissionPaid+'</td><td><span class="badge-status '+(b.status==='Active'?'badge-active':'badge-closed')+'">'+b.status+'</span></td></tr>';
+    var linkedLeads=mockLeads.filter(function(l){return l.brokerId===b.id}).length;
+    return '<tr style="cursor:pointer" onclick="showBrokerDetail(\''+b.id+'\')"><td style="font-weight:500;font-size:10px;color:#888">'+b.id+'</td><td style="font-weight:500">'+b.name+'</td><td style="font-size:10px">'+b.phone+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+tierColor+'">'+b.tier+'</span></td><td style="font-size:10px;color:#555">'+b.region+'</td><td class="num" style="font-size:10px;font-weight:500">'+b.leadsReferred+'</td><td class="num" style="font-size:10px;font-weight:600;color:#2F80ED">'+linkedLeads+'</td><td class="num" style="font-size:10px;font-weight:500">'+b.dealsClosed+'</td><td class="num" style="font-size:10px;font-weight:600;color:#2e7d32">'+b.commissionPaid+'</td><td><span class="badge-status '+(b.status==='Active'?'badge-active':'badge-closed')+'">'+b.status+'</span></td></tr>';
   }).join('')
 }</tbody></table>${_pgHtml('brokers',pbro.total,pbro.page,pbro.totalPages,pbro.perPage)}</div></div></div>`;
+}
+
+function showBrokerDetail(id){
+  var b=mockBrokers.find(function(x){return x.id===id});if(!b)return;
+  var leads=mockLeads.filter(function(l){return l.brokerId===id});
+  var dealsClosed=mockBookings.filter(function(bk){return leads.some(function(l){return l.name===bk.client})}).length;
+  openModal('🏢 Broker: '+b.name,
+    '<div style="font-size:10px;line-height:1.6"><div class="stats-row" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:6px">'+
+      '<div class="stat-card" style="padding:4px"><div class="label">Leads</div><div class="value" style="font-size:14px;color:#2F80ED">'+leads.length+'</div></div>'+
+      '<div class="stat-card" style="padding:4px"><div class="label">Deals</div><div class="value" style="font-size:14px;color:#2e7d32">'+dealsClosed+'</div></div>'+
+      '<div class="stat-card" style="padding:4px"><div class="label">Commission</div><div class="value" style="font-size:14px;color:#e65100">'+b.commissionPaid+'</div></div>'+
+    '</div>'+
+    '<h3 style="font-size:10px;font-weight:600;color:#555;margin-bottom:4px">📋 Referred Leads</h3>'+
+    (leads.length?'<table style="width:100%;font-size:9px"><thead><tr><th>Name</th><th>Property</th><th>Stage</th><th>Value</th></tr></thead><tbody>'+
+      leads.map(function(l){return '<tr><td>'+l.name+'</td><td>'+l.property+'</td><td>'+l.status+'</td><td>'+l.value+'</td></tr>'}).join('')+'</tbody></table>'
+    :'<div style="color:#999;padding:8px;text-align:center">No referred leads yet.</div>')+
+    '</div>',
+    '<button onclick="closeModal()">Close</button>'
+  );
 }
 
 function renderComplaints(pcomp){
@@ -1949,9 +1972,52 @@ return `<div class="card"><div class="card-header"><h3>Complaints &amp; Issues</
     }else{
       stars='<span style="color:#ccc;font-size:9px">\u2014</span>';
     }
-    return '<tr><td style="font-weight:500;font-size:10px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.client+'</td><td style="font-size:10px">'+c.project+'</td><td style="font-size:10px;color:#555">'+c.unit+'</td><td style="font-size:12px">'+(typeIcons[c.type]||'')+' '+c.type+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(priColors[c.priority]||'#888')+'">'+c.priority+'</span></td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:'+(statusColors[c.status]||'#888')+';background:'+(statusBg[c.status]||'#f5f5f5')+'">'+c.status+'</span></td><td style="font-size:10px;color:#555">'+c.assigned+'</td><td>'+slaStr+'</td><td>'+stars+'</td></tr>';
+    return '<tr style="cursor:pointer" onclick="openComplaint(\''+c.id+'\')"><td style="font-weight:500;font-size:10px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.client+'</td><td style="font-size:10px">'+c.project+'</td><td style="font-size:10px;color:#555">'+c.unit+'</td><td style="font-size:12px">'+(typeIcons[c.type]||'')+' '+c.type+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(priColors[c.priority]||'#888')+'">'+c.priority+'</span></td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:'+(statusColors[c.status]||'#888')+';background:'+(statusBg[c.status]||'#f5f5f5')+'">'+c.status+'</span></td><td style="font-size:10px;color:#555">'+c.assigned+'</td><td>'+slaStr+'</td><td>'+stars+'</td></tr>';
   }).join('')
 }</tbody></table>${_pgHtml('complaints',pcomp.total,pcomp.page,pcomp.totalPages,pcomp.perPage)}</div></div></div>`;
+}
+
+function openComplaint(id){
+  var c=mockComplaints.find(function(x){return x.id===id});if(!c)return;
+  var typeIcons={'Quality':'🔧','Maintenance':'🔩','Parking':'🔅','Legal':'⚖','Delayed Possession':'🏗','Payment':'💰'};
+  var priColors={'Critical':'#d50000','High':'#c62828','Medium':'#e65100','Low':'#888'};
+  var now=new Date();var filed=new Date(c.filedDate);var slaMs=c.sla*86400000;
+  var dueDate=new Date(filed.getTime()+slaMs);var diffDays=Math.ceil((dueDate-now)/86400000);
+  var slaStr=diffDays<0?'<span style="color:#d50000;font-weight:600">Overdue by '+Math.abs(diffDays)+'d</span>':diffDays===0?'<span style="color:#e65100;font-weight:600">Due Today</span>':'<span style="color:#555">'+diffDays+'d left</span>';
+  if(c.status==='Resolved') slaStr='<span style="color:#4caf50">✅ Resolved</span>';
+  var stars='';if(c.satisfaction){stars='<span style="color:#ff8f00;font-size:14px">'+'★'.repeat(c.satisfaction)+'☆'.repeat(5-c.satisfaction)+'</span>';}else{stars='<span style="color:#ccc">—</span>';}
+  var resolveBtn=(c.status!=='Resolved')?'<button class="action-btn secondary" onclick="resolveComplaint(\''+c.id+'\')" style="padding:3px 8px;font-size:9px">✅ Mark Resolved</button>':'';
+  openModal('📋 '+c.id+' — '+c.type,
+    '<div style="font-size:10px;line-height:1.6">'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+
+        '<div class="stat-card"><div class="label">Client</div><div style="font-size:12px;font-weight:600">'+c.client+'</div></div>'+
+        '<div class="stat-card"><div class="label">Assigned</div><div style="font-size:12px;font-weight:600">'+c.assigned+'</div></div>'+
+      '</div>'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:6px">'+
+        '<div class="stat-card"><div class="label">Project</div><div style="font-size:11px">'+c.project+'</div></div>'+
+        '<div class="stat-card"><div class="label">Unit</div><div style="font-size:11px">'+(c.unit||'—')+'</div></div>'+
+        '<div class="stat-card"><div class="label">Filed</div><div style="font-size:11px">'+c.filedDate+'</div></div>'+
+      '</div>'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+
+        '<div class="stat-card"><div class="label">Priority</div><div><span style="display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:600;color:#fff;background:'+(priColors[c.priority]||'#888')+'">'+c.priority+'</span></div></div>'+
+        '<div class="stat-card"><div class="label">Status</div><div><span style="display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:600;color:#fff;background:'+(c.status==='Resolved'?'#4caf50':c.status==='Open'?'#ff9800':c.status==='Escalated'?'#d32f2f':'#1565c0')+'">'+c.status+'</span></div></div>'+
+      '</div>'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+
+        '<div class="stat-card"><div class="label">SLA</div><div style="font-size:11px">'+slaStr+'</div></div>'+
+        '<div class="stat-card"><div class="label">Satisfaction</div><div>'+stars+'</div></div>'+
+      '</div>'+
+      (c.desc?'<h3 style="font-size:10px;font-weight:600;color:#555;margin:6px 0 3px">📝 Description</h3><div class="stat-card" style="white-space:pre-wrap">'+c.desc+'</div>':'')+
+    '</div>',
+    resolveBtn+'<button onclick="closeModal()">Close</button>'
+  );
+}
+
+function resolveComplaint(id){
+  var c=mockComplaints.find(function(x){return x.id===id});if(!c)return;
+  var sat=prompt('Rate satisfaction (1-5):');if(!sat)return;
+  var s=parseInt(sat);if(isNaN(s)||s<1||s>5){showToast('Enter 1-5','error');return;}
+  c.status='Resolved';c.resolvedDate=new Date().toISOString().slice(0,10);c.satisfaction=s;
+  DB.save('complaints');renderModule();closeModal();showToast('Complaint resolved! ✅','success');
 }
 
 function crudBroker(item){
@@ -1988,6 +2054,9 @@ var next={'New Inquiry':'Contacted','Contacted':'Site Visit','Site Visit':'Negot
   if(!next||next==='Completed')return showToast('Pipeline complete','info');
   l.status=next;
   l.lastContact='Just now';
+  if(!l.activities)l.activities=[];
+  l.activities.unshift({type:'System',user:'System',date:'Just now',text:'Advanced to '+next});
+  DB.save('leads');renderModule();showToast('➡ '+next,'success');
 }
 function renderSalesMarketing(el){
   const totalBudget=mockCampaigns.reduce((s,c)=>s+(c.budget||0),0);
@@ -5719,7 +5788,14 @@ function toggleFullScreen(){if(!document.fullscreenElement){document.documentEle
 function leadBadgeColor(v){return{High:'#c62828',Medium:'#e65100',Low:'#888',hot:'#c62828',warm:'#e65100',cold:'#888','New Inquiry':'#1565c0','Site Visit':'#ff9800',Negotiation:'#e65100','Booking':'#2e7d32',Local:'#1565c0',NRB:'#7b1fa2',Facebook:'#1877f2',Referral:'#00897b','Walk-in':'#ff8f00',Website:'#1565c0',Agent:'#2F80ED',Bikroy:'#e91e63',Bikroycom:'#e91e63','Bikroy.com':'#e91e63',PropertyBarta:'#00bcd4','Property Barta':'#00bcd4',Broker:'#ff5722','NRB Direct':'#9c27b0','Cold Call':'#607d8b','Real Estate Fair':'#4caf50',South:'#1b5e20',East:'#01579b',West:'#e65100',North:'#37474f',Plot:'#33691e','2BHK':'#00695c','3BHK':'#4a148c','4BHK':'#880e4f','Construction Link':'#1565c0','Bank Loan':'#e65100','Full Payment':'#2e7d32','3-Year Installment':'#00838f','5-Year Installment':'#f9a825'}[v]||'#888'}
 function leadFupColor(v){if(!v||v==='—')return'#999';return v.startsWith('Overdue')?'#c62828':v.startsWith('Today')?'#e65100':'#2e7d32'}
 function leadGetInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
-function inlineSetLeadStatus(id,status){const l=mockLeads.find(x=>x.id===id);if(l){l.status=status;l.lastContact='Just now';DB.save('leads');renderModule();showToast(status,'info')}}
+function inlineSetLeadStatus(id,status){
+  const l=mockLeads.find(x=>x.id===id);if(!l)return;
+  if(!canSetLeadStage(l, status)) { showToast('Cannot move backward from '+l.status+' stage','error'); return; }
+  l.status=status;l.lastContact='Just now';
+  if(!l.activities)l.activities=[];
+  l.activities.unshift({type:'System',user:'System',date:'Just now',text:'Status changed to '+status});
+  DB.save('leads');renderModule();showToast(status,'info');
+}
 function openLead(id){openLeadPanel(id,'profile')}
 function openLeadPanel(leadId,tab){
   const l=mockLeads.find(x=>x.id===leadId);if(!l)return;
@@ -6012,16 +6088,19 @@ function addLeadChatHistory(id){
 }
 function convertToCustomer(id){
   const l=mockLeads.find(x=>x.id===id);if(!l)return;
+  // Double-conversion guard
+  if(l.linkedEntityId){ showToast(l.name+' is already converted!','error'); return; }
+  if(isConvertedStage(l.status)){ showToast('Lead is already in converted stage: '+l.status,'error'); return; }
   if(!confirm('Convert '+l.name+' to customer? This will create a customer record and move the lead to Booking stage.'))return;
   // Create entity for the unified customer model
-  var newEntity={id:'CUS-'+(1000+mockEntities.length+1),type:'individual',name:l.name,companyName:'',phone:l.phone||'',email:l.email||'',address:l.address||(l.city?l.city:''),nid:'',dob:'',occupation:'',roles:['customer'],nationality:'Bangladeshi',source:l.source||'Lead Conversion',priority:'Normal',notes:l.description||'',totalProperties:1,totalValue:parseInt(String(l.value).replace(/[^\d]/g,''))||0,properties:[l.property||'TBD'],totalBookings:1,createdAt:new Date().toISOString().slice(0,10),createdBy:'System',tags:l.tags||[]};
+  var newEntity={id:'ENT-'+(100+Math.floor(Math.random()*9000)),type:'individual',name:l.name,companyName:'',phone:l.phone||'',email:l.email||'',address:l.address||(l.city?l.city:''),nid:'',dob:'',occupation:'',roles:['customer'],nationality:'Bangladeshi',source:l.source||'Lead Conversion',priority:'Normal',notes:l.description||'',totalProperties:1,totalValue:parseInt(String(l.value).replace(/[^\d]/g,''))||0,properties:[l.property||'TBD'],totalBookings:1,createdAt:new Date().toISOString().slice(0,10),createdBy:'System',tags:l.tags||[]};
   mockEntities.push(newEntity);DB.save('entities');
   // Create booking
-  mockBookings.push({id:'BKG-'+(100+mockBookings.length+1),client:l.name,customerId:newEntity.id,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:l.property?l.property.split('-')[0].trim():'TBD',unit:l.property?l.property.split('-')[1]||'—':'—',price:l.value||'—',advance:'৳0',status:'Pending Review',type:l.flatType||'Plot'});
+  mockBookings.push({id:'BKG-'+(100+Math.floor(Math.random()*9000)),client:l.name,customerId:newEntity.id,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:l.property?l.property.split('-')[0].trim():'TBD',unit:l.property?l.property.split('-')[1]||'—':'—',price:l.value||'—',advance:'৳0',status:'Pending Review',type:l.flatType||'Plot'});
   // Update lead
-  l.status='Booking';l.priority='Low';
+  l.status='Booking';l.priority='Low';l.linkedEntityId=newEntity.id;
   if(!l.activities)l.activities=[];
-  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'Converted to customer. Entity: '+newEntity.id});
+  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'✅ Converted to customer. Entity: '+newEntity.id});
   DB.save('leads');DB.save('bookings');
   closeLeadPanel();renderModule();showToast(l.name+' converted to customer! ✅','success');
 }
@@ -6030,7 +6109,7 @@ function markLeadLost(id){
   if(!confirm('Mark '+l.name+' as Lost?'))return;
   l.status='Lost';l.priority='Low';
   if(!l.activities)l.activities=[];
-  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'Lead marked as Lost.'});
+  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'❌ Lead marked as Lost.'});
   DB.save('leads');closeLeadPanel();renderModule();showToast('Marked as Lost','info');
 }
 function markLeadJunk(id){
@@ -6038,7 +6117,7 @@ function markLeadJunk(id){
   if(!confirm('Mark '+l.name+' as Junk?'))return;
   l.status='Junk';l.priority='Low';
   if(!l.activities)l.activities=[];
-  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'Lead marked as Junk.'});
+  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'🗑 Lead marked as Junk.'});
   DB.save('leads');closeLeadPanel();renderModule();showToast('Marked as Junk','info');
 }
 function reactivateLead(id){
@@ -6046,7 +6125,7 @@ function reactivateLead(id){
   if(!confirm('Reactivate '+l.name+'?'))return;
   l.status='New Inquiry';l.priority='Medium';
   if(!l.activities)l.activities=[];
-  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'Lead reactivated.'});
+  l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'🔄 Lead reactivated.'});
   DB.save('leads');closeLeadPanel();renderModule();showToast('Lead reactivated!','success');
 }
 function showLeadInfo(id){
@@ -6086,6 +6165,9 @@ function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.fin
 // ═══ LEAD SCORING ═══
 function calcLeadScore(l){
   var score=0;
+  // Negative scores for Lost/Junk
+  if(l.status==='Lost') return Math.max(5, 50 - (l.activities?Math.min(l.activities.length*5,45):0));
+  if(l.status==='Junk') return 0;
   if(l.priority==='High')score+=25;else if(l.priority==='Medium')score+=15;else score+=5;
   var val=parseInt(String(l.value).replace(/[^\d]/g,''))||0;
   if(val>=50000000)score+=30;else if(val>=20000000)score+=25;else if(val>=10000000)score+=20;else if(val>=5000000)score+=15;else if(val>=1000000)score+=10;else score+=3;
@@ -6094,7 +6176,15 @@ function calcLeadScore(l){
   if(l.type==='NRB')score+=5;
   if(l.activities)score+=Math.min(l.activities.length*2,10);
   if(l.nextFollowUp&&l.nextFollowUp!=='—'){if(l.nextFollowUp.toLowerCase().includes('today'))score+=8;else if(l.nextFollowUp.toLowerCase().includes('tomorrow'))score+=5;else score+=2;}
-  return Math.min(score,100);
+  // Time decay: recency of lastContact
+  if(l.lastContact){
+    if(l.lastContact.toLowerCase().indexOf('just now')>=0||l.lastContact.toLowerCase().indexOf('min')>=0)score+=5;
+    else if(l.lastContact.toLowerCase().indexOf('h')>=0&&l.lastContact.toLowerCase().indexOf(' ago')>=0){
+      var h=parseInt(l.lastContact); if(h<6)score+=4; else score+=2;
+    }
+    else if(l.lastContact.toLowerCase().indexOf('d')>=0)score+=1;
+  }
+  return Math.min(Math.max(score,0),100);
 }
 function leadScoreColor(s){if(s>=80)return '#2e7d32';if(s>=60)return '#1565c0';if(s>=40)return '#e65100';return '#888';}
 // ═══ BULK ACTIONS ═══
@@ -6125,6 +6215,13 @@ function bulkActionDelete(){
   if(!confirm('Delete '+ids.length+' leads?'))return;
   ids.forEach(function(id){var i=mockLeads.findIndex(function(x){return x.id===parseInt(id)});if(i>=0)mockLeads.splice(i,1);});
   DB.save('leads');_bulkSel={};showToast('Deleted '+ids.length+' leads','info');renderModule();
+}
+function bulkActionFollowUp(){
+  var ids=Object.keys(_bulkSel);if(ids.length===0){showToast('Select leads first','error');return}
+  var date=prompt('Set follow-up date for '+ids.length+' leads (e.g. Today, 3:00 PM or Dec 25):');
+  if(!date||!date.trim())return;
+  ids.forEach(function(id){var l=mockLeads.find(function(x){return x.id===parseInt(id)});if(l){l.nextFollowUp=date.trim();if(!l.activities)l.activities=[];l.activities.unshift({type:'System',user:'System',date:'Just now',text:'Follow-up set to: '+date});}});
+  DB.save('leads');_bulkSel={};showToast('Follow-up set for '+ids.length+' leads','success');renderModule();
 }
 function bulkActionPriority(priority){
   var ids=Object.keys(_bulkSel);if(ids.length===0){showToast('Select leads first','error');return}
@@ -6189,20 +6286,22 @@ function getSmartFilters(){
   var ff=(document.getElementById('crmFFlatType')||{}).value||'';
   var fdf=(document.getElementById('crmFFacing')||{}).value||'';
   var ppf=(document.getElementById('crmFPlan')||{}).value||'';
-  return {sq:sq,sf:sf,pf:pf,tf:tf,vf:vf,of:of,scf:scf,srcf:srcf,ff:ff,fdf:fdf,ppf:ppf};
+  var cf=(document.getElementById('crmFCity')||{}).value||'';
+  return {sq:sq,sf:sf,pf:pf,tf:tf,vf:vf,of:of,scf:scf,srcf:srcf,ff:ff,fdf:fdf,ppf:ppf,cf:cf};
 }
 function filterLeads(){
   var f=getSmartFilters();
   return mockLeads.filter(function(l){
-    if(f.sq&&l.name.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.phone.indexOf(f.sq)===-1&&l.property.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.source.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.email.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.facingDir.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.floorPref.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.flatType.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.sizeSqFt||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.paymentPlan.toLowerCase().indexOf(f.sq.toLowerCase())===-1)return false;
+    if(f.sq&&l.name.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.phone.indexOf(f.sq)===-1&&l.property.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.source.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.email.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.facingDir.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.floorPref.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.flatType.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.sizeSqFt||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.paymentPlan.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.city||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.state||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1)return false;
     if(f.sf&&l.status!==f.sf)return false;
     if(f.pf&&l.priority!==f.pf)return false;
     if(f.tf&&l.type!==f.tf)return false;
-    if(f.of&&l.owner!==f.of)return false;
+    if(f.of==='_unassigned'&&l.owner!=='Unassigned')return false;else if(f.of&&f.of!=='_unassigned'&&l.owner!==f.of)return false;
     if(f.srcf&&l.source!==f.srcf)return false;
     if(f.ff&&l.flatType!==f.ff)return false;
     if(f.fdf&&l.facingDir!==f.fdf)return false;
     if(f.ppf&&l.paymentPlan!==f.ppf)return false;
+    if(f.cf&&(l.city||'')!==f.cf)return false;
     if(f.vf){var val=parseInt(String(l.value).replace(/[^\d]/g,''))||0;if(f.vf==='low'&&val>=10000000)return false;if(f.vf==='mid'&&(val<10000000||val>50000000))return false;if(f.vf==='high'&&val<=50000000)return false;}
     if(f.scf){var sc=calcLeadScore(l);if(f.scf==='hot'&&sc<80)return false;if(f.scf==='warm'&&(sc<60||sc>=80))return false;if(f.scf==='cold'&&sc>=60)return false;}
     return true;
@@ -6256,7 +6355,56 @@ function nextId(a){return Math.max(0,...a.map(function(i){return i.id||0}))+1}
 function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');renderModule()}
 function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');renderModule()}}
 function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info');renderModule()}}
-function crudLead(item){var n=!item;var stages=['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'];var sources=['Website','Facebook','Referral','Walk-in','Agent','Bikroy.com','PropertyBarta','Broker','NRB Direct','Cold Call','Real Estate Fair','LinkedIn','Word of Mouth','Newspaper','Trade Show'];var l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',position:'',website:'',company:'',property:'',status:stages[0],priority:'Medium',type:'Local',source:'Website',value:'',lastContact:'Just now',owner:'Unassigned',nextFollowUp:'',paymentStatus:'Pending',facingDir:'',floorPref:'',flatType:'',sizeSqFt:'',paymentPlan:'',brokerId:null,installments:[],documents:[],activities:[],address:'',city:'',state:'',country:'Bangladesh',zip:'',lang:'English',desc:'',tags:'',dateContacted:new Date().toISOString().slice(0,10),whatsappEnabled:'Enable',linkedEntityId:null}:item;openModal(n?'New Lead':'Edit Lead','<div style=\"max-height:55vh;overflow-y:auto;padding-right:4px\"><div style=\"font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:6px;padding:2px 6px;background:#eef3ff;border-radius:4px\">📋 Contact Info</div>'+formRow(inputField('Name *','f_lname',l.name,'',true),inputField('Phone *','f_lphone',l.phone,'',true))+formRow(inputField('Email','f_lemail',l.email),inputField('Position','f_lpos',l.position||''))+formRow(inputField('Website','f_lweb',l.website||''),inputField('Company','f_lcomp',l.company||''))+'<div style=\"font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px\">📍 Address</div>'+inputField('Address','f_laddr',l.address||'')+formRow(inputField('City','f_lcity',l.city||''),inputField('State','f_lstate',l.state||''))+formRow(selectField('Country','f_lcountry',l.country||'Bangladesh',['Bangladesh','India','USA','UK','UAE','Saudi Arabia','Malaysia','Singapore','Canada','Australia','Other']),inputField('Zip','f_lzip',l.zip||''))+'<div style=\"font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px\">🏦 Property Interest</div>'+formRow(inputField('Property','f_lprop',l.property,'',true),selectField('Flat Type','f_lflat',l.flatType,['','Plot','2BHK','3BHK','4BHK','Studio','Commercial']))+formRow(selectField('Facing','f_lfacing',l.facingDir,['','South','East','West','North']),selectField('Floor Pref','f_lfloor',l.floorPref,['','Any','Ground','Mid-level','Top']))+formRow(inputField('Size (sqft)','f_lsize',l.sizeSqFt),inputField('Value','f_lval',l.value))+formRow(selectField('Payment Plan','f_lplan',l.paymentPlan,['','Construction Link','Bank Loan','Full Payment','3-Year Installment','5-Year Installment']),selectField('Stage','f_lstatus',l.status,stages))+'<div style=\"font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px\">⚙ Settings</div>'+formRow(selectField('Source','f_lsource',l.source,sources),selectField('Priority','f_lpri',l.priority,['High','Medium','Low']))+formRow(selectField('Type','f_ltype',l.type,['Local','NRB']),selectField('WhatsApp','f_lwapp',l.whatsappEnabled||'Enable',['Enable','Disable']))+formRow(inputField('Next Follow-up','f_lfup',l.nextFollowUp),inputField('Date Contacted','f_ldc',l.dateContacted))+inputField('Tags (comma-sep)','f_ltags',l.tags||'')+inputField('Notes','f_lnotes',l.desc||'')+'</div>',function(){var d={id:l.id,name:g('f_lname'),phone:g('f_lphone'),email:g('f_lemail'),property:g('f_lprop'),status:g('f_lstatus'),priority:g('f_lpri'),type:g('f_ltype'),source:g('f_lsource'),value:g('f_lval'),lastContact:'Just now',owner:l.owner||'Unassigned',nextFollowUp:g('f_lfup'),paymentStatus:'Pending',facingDir:g('f_lfacing'),floorPref:g('f_lfloor'),flatType:g('f_lflat'),sizeSqFt:g('f_lsize'),paymentPlan:g('f_lplan'),brokerId:null,installments:l.installments||[],documents:l.documents||[],activities:l.activities||[],position:g('f_lpos')||'',website:g('f_lweb')||'',company:g('f_lcomp')||'',address:g('f_laddr')||'',city:g('f_lcity')||'',state:g('f_lstate')||'',country:g('f_lcountry')||'Bangladesh',zip:g('f_lzip')||'',lang:'English',desc:g('f_lnotes')||'',tags:g('f_ltags')||'',dateContacted:g('f_ldc')||new Date().toISOString().slice(0,10),whatsappEnabled:g('f_lwapp')||'Enable',linkedEntityId:null};n?addItem(mockLeads,d,'leads'):updateItem(mockLeads,l.id,d,'leads')})}
+// Pipeline stage order (index = order)
+const LEAD_STAGES = ['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'];
+const isConvertedStage = function(s){ return ['Booking','Downpayment','Installments','Possession','Handover'].indexOf(s) >= 0; };
+const isLostStage = function(s){ return s === 'Lost' || s === 'Junk'; };
+const LEAD_SOURCES = ['Website','Facebook','Referral','Walk-in','Agent','Bikroy.com','PropertyBarta','Broker','NRB Direct','Cold Call','Real Estate Fair','LinkedIn','Word of Mouth','Newspaper','Trade Show'];
+
+// Stage validation: allow forward only from current, never backward past Booking
+function canSetLeadStage(lead, newStatus) {
+  if (!lead || !lead.status) return true;
+  if (isLostStage(lead.status) || isLostStage(newStatus)) return true;
+  if (isConvertedStage(lead.status) && !isConvertedStage(newStatus)) return false;
+  var curI = LEAD_STAGES.indexOf(lead.status);
+  var newI = LEAD_STAGES.indexOf(newStatus);
+  if (curI < 0 || newI < 0) return true;
+  return newI >= curI;
+}
+
+function crudLead(item){
+  var n=!item;
+  var sources=LEAD_SOURCES;
+  var allTags = []; mockLeads.forEach(function(ld){ if(ld.tags) ld.tags.split(',').map(function(t){ t=t.trim(); if(t && allTags.indexOf(t)<0) allTags.push(t); }); });
+  var tagOpts = allTags.length ? '<select id="f_ltags" style="width:100%;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;outline:none" multiple size="3"><option value="">-- Existing tags --</option>'+allTags.map(function(t){ return '<option value="'+t+'">'+t+'</option>' }).join('')+'</select><input id="f_ltagCustom" placeholder="Or type new tag(s) comma-sep..." style="width:100%;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;margin-top:4px;outline:none"/>' : '<input id="f_ltags" placeholder="Tags (comma-separated)..." value="'+(item ? (item.tags||'') : '')+'" style="width:100%;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;outline:none"/>';
+  var dupMsg = '';
+  if(item && item.phone){
+    var existing = mockLeads.filter(function(ld){ return ld.id !== item.id && ld.phone === item.phone; });
+    if(existing.length) dupMsg = '<div style="font-size:9px;color:#e53935;padding:2px 6px;margin-bottom:4px;background:#fff5f5;border-radius:4px;border:1px solid #ffcdd2">&#9888; Duplicate phone: '+existing[0].name+' ('+existing[0].phone+')</div>';
+  }
+  var l=n?{id:nextId(mockLeads),name:'',phone:'',email:'',position:'',website:'',company:'',property:'',status:LEAD_STAGES[0],priority:'Medium',type:'Local',source:'Website',value:'',lastContact:'Just now',owner:'Unassigned',nextFollowUp:'',paymentStatus:'Pending',facingDir:'',floorPref:'',flatType:'',sizeSqFt:'',paymentPlan:'',brokerId:null,installments:[],documents:[],activities:[],address:'',city:'',state:'',country:'Bangladesh',zip:'',lang:'English',desc:'',tags:'',dateContacted:new Date().toISOString().slice(0,10),whatsappEnabled:'Enable',linkedEntityId:null}:item;
+  openModal(n?'New Lead':'Edit Lead',
+    dupMsg+'<div style="max-height:55vh;overflow-y:auto;padding-right:4px"><div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:6px;padding:2px 6px;background:#eef3ff;border-radius:4px">&#128203; Contact Info</div>'+formRow(inputField('Name *','f_lname',l.name,'',true),inputField('Phone *','f_lphone',l.phone,'',true))+formRow(inputField('Email','f_lemail',l.email),inputField('Position','f_lpos',l.position||''))+formRow(inputField('Website','f_lweb',l.website||''),inputField('Company','f_lcomp',l.company||''))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#128205; Address</div>'+inputField('Address','f_laddr',l.address||'')+formRow(inputField('City','f_lcity',l.city||''),inputField('State','f_lstate',l.state||''))+formRow(selectField('Country','f_lcountry',l.country||'Bangladesh',['Bangladesh','India','USA','UK','UAE','Saudi Arabia','Malaysia','Singapore','Canada','Australia','Other']),inputField('Zip','f_lzip',l.zip||''))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#127974; Property Interest</div>'+formRow(inputField('Property','f_lprop',l.property,'',true),selectField('Flat Type','f_lflat',l.flatType,['','Plot','2BHK','3BHK','4BHK','Studio','Commercial']))+formRow(selectField('Facing','f_lfacing',l.facingDir,['','South','East','West','North']),selectField('Floor Pref','f_lfloor',l.floorPref,['','Any','Ground','Mid-level','Top']))+formRow(inputField('Size (sqft)','f_lsize',l.sizeSqFt),inputField('Value','f_lval',l.value))+formRow(selectField('Payment Plan','f_lplan',l.paymentPlan,['','Construction Link','Bank Loan','Full Payment','3-Year Installment','5-Year Installment']),selectField('Stage','f_lstatus',l.status,LEAD_STAGES))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#9881; Settings</div>'+formRow(selectField('Source','f_lsource',l.source,sources),selectField('Priority','f_lpri',l.priority,['High','Medium','Low']))+formRow(selectField('Type','f_ltype',l.type,['Local','NRB']),selectField('WhatsApp','f_lwapp',l.whatsappEnabled||'Enable',['Enable','Disable']))+formRow(inputField('Next Follow-up','f_lfup',l.nextFollowUp),inputField('Date Contacted','f_ldc',l.dateContacted))+'<div style="font-size:9px;font-weight:600;color:#555;margin-top:4px;margin-bottom:2px">Tags</div>'+tagOpts+inputField('Notes','f_lnotes',l.desc||'')+'</div>',
+    function(){
+      var tagVal = '';
+      var tagSelect = document.getElementById('f_ltags');
+      var tagCustom = document.getElementById('f_ltagCustom');
+      if(tagSelect && tagSelect.options && tagSelect.multiple) {
+        var selected = [];
+        for(var ti=0;ti<tagSelect.options.length;ti++){ if(tagSelect.options[ti].selected) selected.push(tagSelect.options[ti].value); }
+        tagVal = selected.join(',');
+      }
+      if(tagCustom && tagCustom.value.trim()) {
+        if(tagVal) tagVal += ',' + tagCustom.value.trim();
+        else tagVal = tagCustom.value.trim();
+      }
+      if(!tagVal && tagSelect && !tagSelect.multiple){ tagVal = tagSelect.value; }
+      var d={id:l.id,name:g('f_lname'),phone:g('f_lphone'),email:g('f_lemail'),property:g('f_lprop'),status:g('f_lstatus'),priority:g('f_lpri'),type:g('f_ltype'),source:g('f_lsource'),value:g('f_lval'),lastContact:'Just now',owner:l.owner||'Unassigned',nextFollowUp:g('f_lfup'),paymentStatus:'Pending',facingDir:g('f_lfacing'),floorPref:g('f_lfloor'),flatType:g('f_lflat'),sizeSqFt:g('f_lsize'),paymentPlan:g('f_lplan'),brokerId:null,installments:l.installments||[],documents:l.documents||[],activities:l.activities||[],position:g('f_lpos')||'',website:g('f_lweb')||'',company:g('f_lcomp')||'',address:g('f_laddr')||'',city:g('f_lcity')||'',state:g('f_lstate')||'',country:g('f_lcountry')||'Bangladesh',zip:g('f_lzip')||'',lang:'English',desc:g('f_lnotes')||'',tags:tagVal||(g('f_ltags')||''),dateContacted:g('f_ldc')||new Date().toISOString().slice(0,10),whatsappEnabled:g('f_lwapp')||'Enable',linkedEntityId:null};
+      if(!canSetLeadStage(l, d.status)) { showToast('Cannot move backward from '+l.status+' stage','error'); return; }
+      n?addItem(mockLeads,d,'leads'):updateItem(mockLeads,l.id,d,'leads');
+    }
+  );
+}
 function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',formRow(inputField('Name','f_name',p.name,'',true),inputField('Location','f_loc',p.location,'',true))+formRow(selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed']),selectField('Type','f_type',p.type,['land','flat']))+formRow(inputField('Budget','f_budget',p.budget),inputField('Manager','f_mgr',p.manager))+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')})}
 function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',formRow(inputField('Client','f_client',b.client,'',true),inputField('Property','f_prop',b.property,'',true))+formRow(inputField('Unit','f_unit',b.unit),inputField('Price','f_price',b.price,'',true))+formRow(inputField('Advance','f_adv',b.advance),selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed'])),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
 function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',formRow(inputField('Name','f_name',e.name,'',true),inputField('Designation','f_desig',e.designation,'',true))+formRow(selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT']),inputField('Phone','f_phone',e.phone)),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees'):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}),'employees')})}
