@@ -1576,10 +1576,11 @@ function switchModule(mod) {
     case 'backup_restore': renderBackupRestore(el); break;
     default: renderDashboard(el);
   }
+  setTimeout(applyPerms,0);
 }
 
 // ═══ PAGINATION SYSTEM ═══
-const _PG={};
+var _PG={};
 let _pgPerPage=10;
 function _pg(id,data,perPage){
   if(!_PG[id])_PG[id]={page:1,perPage:perPage||_pgPerPage};
@@ -1695,7 +1696,7 @@ function renderCustomers(el){
       '<select id="custFRole" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Roles</option><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="broker">Broker</option><option value="employee">Employee</option></select>'+
       '<select id="custFGroup" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Groups</option><option value="VIP">VIP</option><option value="NRB">NRB</option><option value="Corporate">Corporate</option><option value="Repeat">Repeat Buyer</option><option value="Institutional">Institutional</option><option value="Partner">Partner</option><option value="Staff">Staff</option></select>'+
       '<div class="spacer"></div>'+
-      '<button class="action-btn primary" onclick="crudEntity()" style="padding:3px 8px;font-size:10px">+ New Customer</button>'+
+      '<button class="action-btn primary" onclick="crudEntity()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ New Customer</button>'+
     '</div>'+
     '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name / Company</th><th>Type</th><th>Roles</th><th>Phone</th><th>Properties</th><th>Total Value</th><th>Repeat?</th><th></th></tr></thead><tbody>'+
     pcust.items.map(function(e){
@@ -1707,7 +1708,7 @@ function renderCustomers(el){
         return '<span style="display:inline-block;padding:0 5px;border-radius:3px;font-size:7px;font-weight:600;color:#fff;background:'+rc+';margin:0 1px">'+r+'</span>';
       }).join('');
       var repeat=(e.totalProperties||0)>1?'<span style="color:#2e7d32;font-size:10px">🔄 Yes ('+(e.totalProperties||0)+')</span>':'<span style="color:#999;font-size:9px">—</span>';
-      return '<tr style="cursor:pointer" onclick="openCustomer(\''+e.id+'\')"><td style="padding:4px 4px 4px 8px;width:26px"><div style="width:24px;height:24px;border-radius:50%;background:'+typeColor+'22;color:'+typeColor+';display:flex;align-items:center;justify-content:center;font-size:10px">'+typeIcon+'</div></td><td style="font-weight:500;font-size:11px">'+displayName+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td><td style="font-size:8px">'+roleBadges+'</td><td style="font-size:10px;color:#555">'+e.phone+'</td><td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td><td style="font-size:10px;font-weight:600;color:#2e7d32">'+(e.totalValue?'৳'+(e.totalValue/100000).toFixed(1)+'L':'—')+'</td><td>'+repeat+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEntity(\''+e.id+'\')">✎</span></td></tr>';
+      return '<tr style="cursor:pointer" onclick="openCustomer(\''+e.id+'\')"><td style="padding:4px 4px 4px 8px;width:26px"><div style="width:24px;height:24px;border-radius:50%;background:'+typeColor+'22;color:'+typeColor+';display:flex;align-items:center;justify-content:center;font-size:10px">'+typeIcon+'</div></td><td style="font-weight:500;font-size:11px">'+displayName+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td><td style="font-size:8px">'+roleBadges+'</td><td style="font-size:10px;color:#555">'+e.phone+'</td><td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td><td style="font-size:10px;font-weight:600;color:#2e7d32">'+(e.totalValue?'৳'+(e.totalValue/100000).toFixed(1)+'L':'—')+'</td><td>'+repeat+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEntity(\''+e.id+'\')" data-perm="CRM & Leads:Edit">✎</span></td></tr>';
     }).join('')+
     '</tbody></table>'+_pgHtml('customers',pcust.total,pcust.page,pcust.totalPages,pcust.perPage)+'</div></div></div></div>';
 }
@@ -1852,7 +1853,7 @@ function renderCustBody(e,tab,relatedBookings,totalPaid,totalPending,typeIcon,ty
     if(e.vaultItems.length>0){for(var vi=0;vi<e.vaultItems.length;vi++){var vl=e.vaultItems[vi];tabContent+='<div class="installment-item"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">'+(vl.type==='NID'?'🆔':vl.type==='Deed'?'📜':vl.type==='Passport'?'🛂':vl.type==='Tax'?'🧾':'🔐')+'</span><div><div style="font-size:11px;font-weight:500">'+vl.title+'</div><div style="font-size:9px;color:#888">'+vl.type+' · '+vl.date+'</div></div></div><span style="color:#2F80ED;font-size:10px;cursor:pointer">👁</span></div>';}}else{tabContent+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">Vault is empty.</div>';}
   }else if(tab==='reminders'){
     tabContent='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="font-size:11px;font-weight:600;color:#555;display:flex;align-items:center;gap:4px">🔔 Reminders</h3><button onclick="addCustReminder(\''+e.id+'\')" class="mini-btn">+ Set Reminder</button></div>';
-    if(e.reminders.length>0){for(var ri=0;ri<e.reminders.length;ri++){var rm=e.reminders[ri];tabContent+='<div class="installment-item"><div><div style="font-size:11px;font-weight:500">'+(rm.title||'Reminder')+'</div><div style="font-size:9px;color:'+(rm.status==='Overdue'?'#e53935':'#2e7d32')+'">'+(rm.status==='Overdue'?'🔴 ':'🟢 ')+rm.dateTime+'</div></div><div style="display:flex;gap:4px"><span style="font-size:9px;color:#888">'+(rm.type||'')+'</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteCustReminder(\''+e.id+'\','+ri+')">✕</span></div></div>';}}else{tabContent+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No reminders set.</div>';}
+    if(e.reminders.length>0){for(var ri=0;ri<e.reminders.length;ri++){var rm=e.reminders[ri];tabContent+='<div class="installment-item"><div><div style="font-size:11px;font-weight:500">'+(rm.title||'Reminder')+'</div><div style="font-size:9px;color:'+(rm.status==='Overdue'?'#e53935':'#2e7d32')+'">'+(rm.status==='Overdue'?'🔴 ':'🟢 ')+rm.dateTime+'</div></div><div style="display:flex;gap:4px"><span style="font-size:9px;color:#888">'+(rm.type||'')+'</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteCustReminder(\''+e.id+'\','+ri+')" data-perm="CRM & Leads:Delete">✕</span></div></div>';}}else{tabContent+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No reminders set.</div>';}
   }else if(tab==='map'){
     var mapAddr=e.address||displayName;var mapLink='https://www.google.com/maps/search/'+encodeURIComponent(mapAddr+', Bangladesh');
     tabContent='<h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:4px">🗺 Property / Address Map</h3>'+
@@ -1987,30 +1988,30 @@ function renderCRM(el){
       <select id="crmFCity" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">City</option>${cities.map(function(c){return '<option value="'+c+'"'+(f.cf===c?' selected':'')+'>'+c+'</option>'}).join('')}</select>
       <div class="spacer"></div>
       ${bc>0?'<span style="font-size:9px;color:#2F80ED;font-weight:600;padding:0 4px">'+bc+' selected</span><button class="action-btn secondary" onclick="bulkActionStatus(\'Negotiation\')" style="padding:2px 6px;font-size:8px">Advance</button><button class="action-btn secondary" onclick="bulkActionAssign()" style="padding:2px 6px;font-size:8px">Assign</button><button class="action-btn secondary" onclick="bulkActionPriority(\'High\')" style="padding:2px 6px;font-size:8px">🔥 Priority</button><button class="action-btn secondary" onclick="bulkActionFollowUp()" style="padding:2px 6px;font-size:8px" title="Set follow-up date">📅 F/U</button><button class="action-btn secondary" onclick="bulkActionDelete()" style="padding:2px 6px;font-size:8px;color:#e53935">Delete</button><button class="action-btn" onclick="_bulkSel={};renderModule()" style="padding:2px 6px;font-size:8px">Clear</button>':''}
-      <button class="action-btn secondary" onclick="importData(mockLeads,'Leads','leads',IMPORT_FIELDS.leads)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button>
-      <button class="action-btn primary" onclick="crudLead()" style="padding:3px 8px;font-size:10px">+ Add Lead</button>
+      <button class="action-btn secondary" onclick="importData(mockLeads,'Leads','leads',IMPORT_FIELDS.leads)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="CRM & Leads:Import">📥</button>
+      <button class="action-btn primary" onclick="crudLead()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ Add Lead</button>
       `:crmSubView==='complaints'?`
       <input id="cmpSearch" placeholder="Search client/project..." oninput="_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <select id="cmpFStatus" onchange="_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Resolved">Resolved</option><option value="Escalated">Escalated</option></select>
       <select id="cmpFType" onchange="_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option value="Quality">Quality</option><option value="Maintenance">Maintenance</option><option value="Parking">Parking</option><option value="Legal">Legal</option><option value="Delayed Possession">Delayed Possession</option><option value="Payment">Payment</option></select>
       <select id="cmpFPriority" onchange="_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Priority</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudComplaint()" style="padding:3px 8px;font-size:10px">+ File Complaint</button>
+      <button class="action-btn primary" onclick="crudComplaint()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ File Complaint</button>
       `:crmSubView==='brokers'?`
       <input id="brkSearch" placeholder="Search broker name/phone/region..." oninput="_PG['brokers']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudBroker()" style="padding:3px 8px;font-size:10px">+ Add Broker</button>
+      <button class="action-btn primary" onclick="crudBroker()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ Add Broker</button>
       `:crmSubView==='invoices'?`
       <input id="invSearch" placeholder="Search client/invoice..." oninput="_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <div class="tabs" style="margin:0 4px 0 0"><div class="tab ${crmInvTab==='all'?'active':''}" onclick="crmInvTab='all';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">All</div><div class="tab ${crmInvTab==='draft'?'active':''}" onclick="crmInvTab='draft';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Draft</div><div class="tab ${crmInvTab==='sent'?'active':''}" onclick="crmInvTab='sent';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Sent</div><div class="tab ${crmInvTab==='paid'?'active':''}" onclick="crmInvTab='paid';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Paid</div><div class="tab ${crmInvTab==='overdue'?'active':''}" onclick="crmInvTab='overdue';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Overdue</div></div>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudInvoice()" style="padding:3px 8px;font-size:10px">+ New Invoice</button>
+      <button class="action-btn primary" onclick="crudInvoice()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ New Invoice</button>
       `:crmSubView==='payments'?`
       <input id="paySearch" placeholder="Search client/payment..." oninput="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <select id="payMethod" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Method</option><option value="Bank Transfer">Bank Transfer</option><option value="Cheque">Cheque</option><option value="Cash">Cash</option><option value="Online">Online</option></select>
       <select id="payStatus" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Status</option><option value="Cleared">Cleared</option><option value="Pending">Pending</option></select>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudPayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button>
+      <button class="action-btn primary" onclick="crudPayment()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ Record Payment</button>
       `:''}
     </div>
     ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):crmSubView==='complaints'?renderComplaints(pcomp):crmSubView==='invoices'?renderInvoices(filtered):crmSubView==='payments'?renderPayments():crmSubView==='reports'?renderCRMReports():crmSubView==='activities'?renderCRMActivities():''}
@@ -2028,8 +2029,8 @@ function renderCRMList(filtered,pcrm){
       return '<tr style="cursor:pointer;'+sel+'" data-lead-id="'+l.id+'" onclick="openLead('+l.id+')"><td style="padding:4px 2px 4px 4px;width:24px"><input type="checkbox" '+(Object.keys(_bulkSel).length>0?'style="accent-color:#2F80ED" onclick="event.stopPropagation();toggleBulkLead('+l.id+')"':'style="accent-color:#2F80ED;visibility:hidden"')+' '+(_bulkSel[l.id]?'checked':'')+'/></td><td style="font-weight:500">'+l.name+'</td><td style="font-size:10px">'+l.phone+'</td><td style="font-size:10px">'+l.property+'</td><td><span style="display:inline-flex;align-items:center;gap:2px"><span style="width:5px;height:5px;border-radius:50%;background:'+leadBadgeColor(l.source)+'"></span>'+l.source+'</span></td><td style="font-weight:500;color:#2e7d32;font-size:10px">'+l.value+'</td><td><span style="display:inline-flex;align-items:center;gap:2px;padding:1px 5px;border-radius:8px;font-size:8px;font-weight:600;background:'+leadScoreColor(sc)+'22;color:'+leadScoreColor(sc)+';border:1px solid '+leadScoreColor(sc)+'55">'+sc+'</span></td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+leadBadgeColor(l.priority)+'">'+l.priority+'</span></td><td style="font-size:10px;color:#555">'+(l.owner||'\u2014')+'</td><td style="font-size:9px;font-weight:500;color:'+leadFupColor(l.nextFollowUp)+'">'+(l.nextFollowUp||'\u2014')+'</td><td><select onchange="event.stopPropagation();inlineSetLeadStatus('+l.id+',this.value)" onclick="event.stopPropagation()" style="padding:1px 3px;font-size:8px;border:1px solid #e0e0e0;border-radius:3px;cursor:pointer;max-width:100px;background:'+scc+';color:'+stc+';font-weight:600;outline:none">'+['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'].map(function(s){return '<option value="'+s+'"'+(l.status===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></td><td style="white-space:nowrap">'+
       '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id==='+l.id+'))">\u270E</span>'+
       ' <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();deleteLead('+l.id+')">\u2715</span>'+
-      (next&&next!=='Completed'?' <span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();advanceLeadStage('+l.id+')">\u25B6 '+next+'</span>':'')+
-      (l.status==='Booking'||l.status==='Downpayment'||l.status==='Installments'||l.status==='Possession'||l.status==='Handover'?'':' <span style="color:#1565c0;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking('+l.id+')">\uD83D\uDCCB</span>')+
+      (next&&next!=='Completed'?' <span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();advanceLeadStage('+l.id+')" data-perm="CRM & Leads:Edit">\u25B6 '+next+'</span>':'')+
+      (l.status==='Booking'||l.status==='Downpayment'||l.status==='Installments'||l.status==='Possession'||l.status==='Handover'?'':' <span style="color:#1565c0;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking('+l.id+')" data-perm="CRM & Leads:Edit">\uD83D\uDCCB</span>')+
     '</td></tr>'
     }).join('')
   }</tbody></table>${_pgHtml('crm',pcrm.total,pcrm.page,pcrm.totalPages,pcrm.perPage)}</div></div></div>`;
@@ -2044,7 +2045,7 @@ function renderCRMKanban(){
     items.map(function(l){
       var next={'New Inquiry':'Contacted','Contacted':'Site Visit','Site Visit':'Negotiation','Negotiation':'Booking','Booking':'Downpayment','Downpayment':'Installments','Installments':'Possession','Possession':'Handover'}[l.status];
       return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'lead\','+l.id+')" ondragend="dragEnd(event)" style="margin-bottom:4px;cursor:pointer;position:relative" onclick="openLead('+l.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:10px;font-weight:600">'+l.name+'</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:8px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id==='+l.id+'))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:8px" onclick="event.stopPropagation();deleteLead('+l.id+')">\u2715</span></div></div><div style="font-size:9px;color:#888;margin-top:2px">'+l.property+'</div><div style="font-size:9px;color:#888">'+l.value+' \u00B7 '+l.source+'</div><div style="margin-top:3px;display:flex;gap:2px;align-items:center;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:2px;padding:0 5px;border-radius:6px;font-size:7px;font-weight:600;background:'+leadScoreColor(calcLeadScore(l))+'22;color:'+leadScoreColor(calcLeadScore(l))+';border:1px solid '+leadScoreColor(calcLeadScore(l))+'55">'+calcLeadScore(l)+'</span><span class="badge-status '+(l.priority==='High'?'badge-sold':l.priority==='Medium'?'badge-pending':'badge-closed')+'" style="font-size:7px">'+l.priority+'</span><span class="badge-status '+(l.type==='NRB'?'badge-reserved':'badge-closed')+'" style="font-size:7px">'+l.type+'</span>'+
-      (next&&next!=='Completed'?'<span style="color:#2e7d32;cursor:pointer;font-size:8px;font-weight:600;padding:1px 4px;background:#e8f5e9;border-radius:3px" onclick="event.stopPropagation();advanceLeadStage('+l.id+')">\u25B6</span>':'')+
+      (next&&next!=='Completed'?'<span style="color:#2e7d32;cursor:pointer;font-size:8px;font-weight:600;padding:1px 4px;background:#e8f5e9;border-radius:3px" onclick="event.stopPropagation();advanceLeadStage('+l.id+')" data-perm="CRM & Leads:Edit">\u25B6</span>':'')+
       '</div></div>';
     }).join('')+
     '</div></div>';
@@ -2184,7 +2185,7 @@ function renderInvoices(filtered){
     return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td style="font-weight:600;font-size:10px;color:#2F80ED">'+inv.id+'</td><td style="font-weight:500;color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openLead('+inv.leadId+')">'+inv.client+'</td><td style="font-size:10px">'+inv.project+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+inv.issuedDate+'</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span><br><span style="font-size:7px;color:#888">Due: ৳'+(dueAmt/100000).toFixed(1)+'L</span></td><td style="white-space:nowrap">'+
       (inv.status==='Sent'||inv.status==='Draft'?'<span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();markInvoicePaid(\''+inv.id+'\')">✓ Mark Paid</span> ':'')+
       (inv.status!=='Overdue'?'<span style="color:#e65100;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();markInvoiceOverdue(\''+inv.id+'\')">⚠ Overdue</span> ':'')+
-      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')" title="View">👁</span> <span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudInvoice(mockInvoices.find(function(x){return x.id===\''+inv.id+'\'}))">✎</span>'+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')" title="View">👁</span> <span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudInvoice(mockInvoices.find(function(x){return x.id===\''+inv.id+'\'}))" data-perm="CRM & Leads:Edit">✎</span>'+
     '</td></tr>';
   }).join('')+
   '</tbody></table>'+_pgHtml('invoices',pi.total,pi.page,pi.totalPages,pi.perPage)+'</div></div></div>';
@@ -2213,7 +2214,7 @@ function renderPayments(){
   pp.items.map(function(p){
     var stCol=p.status==='Cleared'?'#2e7d32':'#e65100';
     var stBg=p.status==='Cleared'?'#e8f5e9':'#fff3e0';
-    return '<tr><td style="font-weight:500;font-size:10px;color:#2F80ED">'+p.id+'</td><td style="font-weight:500;color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openLead('+p.leadId+')">'+p.client+'</td><td style="font-size:10px;color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openPayment(\''+p.id+'\')">'+(p.invoiceId||'—')+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px">'+p.date+'</td><td><span style="padding:1px 4px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+p.method+'</span></td><td style="font-size:9px;color:#888">'+(p.reference||'—')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+p.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="openPayment(\''+p.id+'\')" title="View">👁</span> <span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudPayment(mockPayments.find(function(x){return x.id==='+p.id+'}))">✎</span></td></tr>';
+    return '<tr><td style="font-weight:500;font-size:10px;color:#2F80ED">'+p.id+'</td><td style="font-weight:500;color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openLead('+p.leadId+')">'+p.client+'</td><td style="font-size:10px;color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openPayment(\''+p.id+'\')">'+(p.invoiceId||'—')+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px">'+p.date+'</td><td><span style="padding:1px 4px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+p.method+'</span></td><td style="font-size:9px;color:#888">'+(p.reference||'—')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+p.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="openPayment(\''+p.id+'\')" title="View">👁</span> <span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudPayment(mockPayments.find(function(x){return x.id==='+p.id+'}))" data-perm="CRM & Leads:Edit">✎</span></td></tr>';
   }).join('')+
   '</tbody></table>'+_pgHtml('payments',pp.total,pp.page,pp.totalPages,pp.perPage)+'</div></div></div>';
 }
@@ -2257,7 +2258,7 @@ function openInvoice(id){
           return '<div class="installment-item"><div><div style="font-size:10px;font-weight:500">'+p.id+'</div><div style="font-size:9px;color:#888">'+p.date+' · '+p.method+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div><span style="font-size:8px;color:'+(p.status==='Cleared'?'#2e7d32':'#e65100')+'">'+p.status+'</span></div></div>';
         }).join(''):'')+
     '</div>',
-    actions+'<button onclick="closeModal()">Close</button>'
+    actions+'<button class="action-btn secondary" onclick="printInvoice(id)" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(id)" style="padding:3px 8px;font-size:9px">📥 Download</button> <button onclick="closeModal()">Close</button>'
   );
 }
 function markInvoicePaid(id){
@@ -2310,7 +2311,7 @@ function openPayment(id){
       (inv?'<div class="stat-card" style="margin-bottom:6px"><div class="label">Linked Invoice</div><div style="font-size:11px;color:#2F80ED;cursor:pointer" onclick="closeModal();openInvoice(\''+inv.id+'\')">'+inv.id+' — '+inv.client+' (৳'+(inv.amount/100000).toFixed(1)+'L) →</div></div>':'')+
       (p.notes?'<h3 style="font-size:10px;font-weight:600;color:#555;margin:6px 0 3px">📝 Notes</h3><div class="stat-card" style="white-space:pre-wrap">'+p.notes+'</div>':'')+
     '</div>',
-    '<button class="action-btn secondary" onclick="crudPayment(mockPayments.find(function(x){return x.id===\''+p.id+'\'}))" style="padding:3px 8px;font-size:9px">✎ Edit</button><button onclick="closeModal()">Close</button>'
+    '<button class="action-btn secondary" onclick="crudPayment(mockPayments.find(function(x){return x.id===\''+p.id+'\'}))" style="padding:3px 8px;font-size:9px">✎ Edit</button> <button class="action-btn secondary" onclick="printPayment(\''+p.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadPayment(\''+p.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button onclick="closeModal()">Close</button>'
   );
 }
 function crudPayment(item){
@@ -2331,6 +2332,115 @@ function crudPayment(item){
       n?addItem(mockPayments,d,'payments'):updateItem(mockPayments,pymt.id,d,'payments');
     }
   );
+}
+
+
+// ═══ INVOICE & PAYMENT PRINT / DOWNLOAD ═══
+function printInvoice(id){
+  var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
+  var paidAmt=mockPayments.filter(function(p){return p.invoiceId===inv.id}).reduce(function(s,p){return s+(p.amount||0)},0);
+  var dueAmt=Math.max(0,inv.amount-paidAmt);
+  var itemsHtml=inv.items.map(function(it,i){return '<tr><td>'+(i+1)+'</td><td>'+it.desc+'</td><td class="num">'+it.qty+'</td><td class="num">Tk '+it.rate.toLocaleString('en-IN')+'</td><td class="num">Tk '+(it.qty*it.rate).toLocaleString('en-IN')+'</td></tr>';}).join('');
+  var payHtml=mockPayments.filter(function(p){return p.invoiceId===inv.id}).map(function(p){return '<tr><td>'+p.id+'</td><td>'+p.date+'</td><td>'+p.method+'</td><td class="num">Tk '+(p.amount).toLocaleString('en-IN')+'</td><td>'+p.status+'</td></tr>';}).join('');
+  var w=window.open('','_blank','width=800,height=700');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice '+inv.id+'</title><style>'+
+    'body{font-family:"Inter",Arial,sans-serif;max-width:700px;margin:30px auto;padding:20px;color:#222}'+
+    '.header{display:flex;justify-content:space-between;align-items:start;padding-bottom:20px;border-bottom:2px solid #2F80ED;margin-bottom:20px}'+
+    '.header .title{font-size:24px;font-weight:700;color:#2F80ED}.header .sub{font-size:11px;color:#666}'+
+    '.info{display:flex;gap:20px;margin-bottom:16px}.info-box{flex:1;padding:10px;background:#f8f9fa;border-radius:6px}'+
+    '.info-box .lbl{font-size:9px;color:#888;text-transform:uppercase;margin-bottom:2px}.info-box .val{font-size:13px;font-weight:600}'+
+    'table{width:100%;border-collapse:collapse;font-size:11px;margin:12px 0}th{background:#f0f4ff;padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase;color:#555}'+
+    'td{padding:5px 8px;border-bottom:1px solid #eee}.num{text-align:right}.total-row td{padding:5px 8px;border-bottom:none}.grand{font-weight:700;font-size:13px;color:#2F80ED}'+
+    '.footer{margin-top:20px;padding-top:12px;border-top:1px solid #ddd;font-size:9px;color:#999;text-align:center}'+
+    '@media print{body{margin:0;padding:15px}.no-print{display:none}}'+
+    '.status-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:'+(inv.status==='Paid'?'#2e7d32':inv.status==='Overdue'?'#c62828':inv.status==='Sent'?'#1565c0':'#888')+'}'+
+    '</style></head><body>'+
+    '<div class="no-print" style="text-align:center;margin-bottom:20px"><button onclick="window.print()" style="padding:8px 20px;background:#2F80ED;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">\U0001F5A8 Print This Invoice</button></div>'+
+    '<div class="header"><div><div class="title">INVOICE</div><div class="sub">'+inv.id+'</div></div><div><span class="status-badge">'+inv.status+'</span></div></div>'+
+    '<div class="info"><div class="info-box"><div class="lbl">Bill To</div><div class="val">'+inv.client+'</div><div style="font-size:10px;color:#666;margin-top:4px">'+inv.project+(inv.unit?' \u00B7 '+inv.unit:'')+'</div></div>'+
+    '<div class="info-box"><div class="lbl">Invoice Details</div><div class="val" style="font-size:11px">Issued: '+inv.issuedDate+'</div><div class="val" style="font-size:11px">Due: '+inv.dueDate+'</div></div></div>'+
+    (inv.desc?'<div style="font-size:11px;color:#666;margin-bottom:10px;padding:8px;background:#f8f9fa;border-radius:4px">'+inv.desc+'</div>':'')+
+    '<table><thead><tr><th>#</th><th>Description</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Total</th></tr></thead><tbody>'+itemsHtml+
+    '<tr><td colspan="4" class="num" style="font-weight:600;padding-top:10px">Subtotal</td><td class="num grand" style="padding-top:10px">Tk '+inv.amount.toLocaleString('en-IN')+'</td></tr>'+
+    (paidAmt?'<tr><td colspan="4" class="num" style="color:#2e7d32">Paid</td><td class="num" style="color:#2e7d32;font-weight:600">Tk '+paidAmt.toLocaleString('en-IN')+'</td></tr>':'')+
+    (dueAmt?'<tr><td colspan="4" class="num" style="color:#c62828;font-weight:600">Due</td><td class="num" style="color:#c62828;font-weight:700;font-size:13px">Tk '+dueAmt.toLocaleString('en-IN')+'</td></tr>':'')+
+    '</tbody></table>'+
+    (payHtml?'<h3 style="font-size:11px;font-weight:600;margin:16px 0 4px">Payments on this Invoice</h3><table><thead><tr><th>ID</th><th>Date</th><th>Method</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>'+payHtml+'</tbody></table>':'')+
+    '<div class="footer">REM ERP \u2014 MARS Construction Ltd. \u00B7 This is a computer-generated invoice.</div>'+
+    '</body></html>');
+  w.document.close();
+}
+function downloadInvoice(id){
+  var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
+  var paidAmt=mockPayments.filter(function(p){return p.invoiceId===inv.id}).reduce(function(s,p){return s+(p.amount||0)},0);
+  var dueAmt=Math.max(0,inv.amount-paidAmt);
+  var itemsHtml=inv.items.map(function(it,i){return '<tr><td>'+(i+1)+'</td><td>'+it.desc+'</td><td>'+it.qty+'</td><td>Tk '+it.rate.toLocaleString('en-IN')+'</td><td style="text-align:right">Tk '+(it.qty*it.rate).toLocaleString('en-IN')+'</td></tr>';}).join('');
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+inv.id+'</title>'+
+    '<style>body{font-family:Arial,sans-serif;max-width:700px;margin:30px auto;padding:20px}'+
+    'h1{color:#2F80ED;border-bottom:2px solid #2F80ED;padding-bottom:10px}'+
+    '.info{margin:10px 0}table{width:100%;border-collapse:collapse}th,td{padding:6px;border:1px solid #ddd;text-align:left}'+
+    '.r{text-align:right}.g{font-weight:700;color:#2F80ED}.f{margin-top:20px;font-size:11px;color:#999;text-align:center}'+
+    '</style></head><body>'+
+    '<h1>INVOICE '+inv.id+'</h1>'+
+    '<div class="info"><strong>Client:</strong> '+inv.client+'<br><strong>Project:</strong> '+inv.project+(inv.unit?' \u00B7 '+inv.unit:'')+'<br>'+
+    '<strong>Issued:</strong> '+inv.issuedDate+' | <strong>Due:</strong> '+inv.dueDate+' | <strong>Status:</strong> '+inv.status+'</div>'+
+    (inv.desc?'<p>'+inv.desc+'</p>':'')+
+    '<table><tr><th>#</th><th>Description</th><th>Qty</th><th>Rate</th><th>Total</th></tr>'+itemsHtml+
+    '<tr><td colspan="4" class="r"><strong>Subtotal</strong></td><td class="r g">Tk '+inv.amount.toLocaleString('en-IN')+'</td></tr>'+
+    (paidAmt?'<tr><td colspan="4" class="r" style="color:#2e7d32">Paid</td><td class="r" style="color:#2e7d32">Tk '+paidAmt.toLocaleString('en-IN')+'</td></tr>':'')+
+    (dueAmt?'<tr><td colspan="4" class="r" style="color:#c62828">Due</td><td class="r" style="color:#c62828">Tk '+dueAmt.toLocaleString('en-IN')+'</td></tr>':'')+
+    '</table><div class="f">MARS Construction Ltd. \u00B7 Computer-generated invoice</div></body></html>';
+  var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=inv.id+' - '+inv.client+'.html';a.click();URL.revokeObjectURL(a.href);
+}
+function printPayment(id){
+  var p=mockPayments.find(function(x){return x.id===id});if(!p)return;
+  var inv=mockInvoices.find(function(i){return i.id===p.invoiceId});
+  var w=window.open('','_blank','width=700,height=600');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Payment Receipt '+p.id+'</title><style>'+
+    'body{font-family:"Inter",Arial,sans-serif;max-width:600px;margin:30px auto;padding:20px;color:#222}'+
+    '.header{display:flex;justify-content:space-between;align-items:start;padding-bottom:16px;border-bottom:2px solid #2e7d32;margin-bottom:16px}'+
+    '.header .title{font-size:22px;font-weight:700;color:#2e7d32}.header .sub{font-size:11px;color:#666}'+
+    '.row{display:flex;gap:12px;margin-bottom:10px}.box{flex:1;padding:8px 10px;background:#f8f9fa;border-radius:6px}'+
+    '.box .lbl{font-size:9px;color:#888;text-transform:uppercase}.box .val{font-size:13px;font-weight:600}'+
+    '.big-amount{font-size:24px;font-weight:700;color:#2e7d32;text-align:center;padding:16px;margin:10px 0;background:#f0faf0;border-radius:8px}'+
+    '.footer{margin-top:20px;padding-top:12px;border-top:1px solid #ddd;font-size:9px;color:#999;text-align:center}'+
+    '@media print{body{margin:0;padding:15px}.no-print{display:none}}'+
+    '</style></head><body>'+
+    '<div class="no-print" style="text-align:center;margin-bottom:20px"><button onclick="window.print()" style="padding:8px 20px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">\U0001F5A8 Print Receipt</button></div>'+
+    '<div class="header"><div><div class="title">PAYMENT RECEIPT</div><div class="sub">'+p.id+'</div></div><div><span style="display:inline-block;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:'+(p.status==='Cleared'?'#2e7d32':'#e65100')+'">'+p.status+'</span></div></div>'+
+    '<div class="big-amount">Tk '+p.amount.toLocaleString('en-IN')+'</div>'+
+    '<div class="row"><div class="box"><div class="lbl">Client</div><div class="val">'+p.client+'</div></div>'+
+    '<div class="box"><div class="lbl">Date</div><div class="val">'+p.date+'</div></div></div>'+
+    '<div class="row"><div class="box"><div class="lbl">Method</div><div class="val">'+p.method+'</div></div>'+
+    '<div class="box"><div class="lbl">Reference</div><div class="val">'+(p.reference||'\u2014')+'</div></div></div>'+
+    (inv?'<div style="padding:8px;background:#f0f4ff;border-radius:6px;font-size:11px"><strong>Linked Invoice:</strong> '+inv.id+' \u2014 '+inv.client+' (Tk '+inv.amount.toLocaleString('en-IN')+')</div>':'')+
+    (p.notes?'<div style="margin-top:10px;padding:8px;background:#f8f9fa;border-radius:6px;font-size:11px;color:#555"><strong>Notes:</strong> '+p.notes+'</div>':'')+
+    '<div class="footer">REM ERP \u2014 MARS Construction Ltd. \u00B7 Computer-generated receipt.</div>'+
+    '</body></html>');
+  w.document.close();
+}
+function downloadPayment(id){
+  var p=mockPayments.find(function(x){return x.id===id});if(!p)return;
+  var inv=mockInvoices.find(function(i){return i.id===p.invoiceId});
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receipt '+p.id+'</title>'+
+    '<style>body{font-family:Arial,sans-serif;max-width:600px;margin:30px auto;padding:20px}'+
+    'h1{color:#2e7d32;border-bottom:2px solid #2e7d32;padding-bottom:10px}'+
+    '.amt{font-size:22px;font-weight:700;color:#2e7d32;text-align:center;padding:12px;margin:10px 0;background:#f0faf0;border-radius:8px}'+
+    'table{width:100%}td{padding:4px 8px}.l{color:#888}.r{text-align:right}.f{margin-top:20px;font-size:11px;color:#999;text-align:center}'+
+    '</style></head><body>'+
+    '<h1>PAYMENT RECEIPT '+p.id+'</h1>'+
+    '<div class="amt">Tk '+p.amount.toLocaleString('en-IN')+'</div>'+
+    '<table><tr><td class="l">Client</td><td><strong>'+p.client+'</strong></td></tr>'+
+    '<tr><td class="l">Date</td><td>'+p.date+'</td></tr>'+
+    '<tr><td class="l">Method</td><td>'+p.method+'</td></tr>'+
+    '<tr><td class="l">Reference</td><td>'+(p.reference||'\u2014')+'</td></tr>'+
+    '<tr><td class="l">Status</td><td>'+p.status+'</td></tr>'+
+    (inv?'<tr><td class="l">Invoice</td><td>'+inv.id+' \u2014 '+inv.client+'</td></tr>':'')+
+    '</table>'+(p.notes?'<p><strong>Notes:</strong> '+p.notes+'</p>':'')+
+    '<div class="f">MARS Construction Ltd. \u00B7 Computer-generated receipt</div></body></html>';
+  var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=p.id+' - '+p.client+'.html';a.click();URL.revokeObjectURL(a.href);
 }
 
 function crudBroker(item){
@@ -2385,7 +2495,7 @@ function renderSalesMarketing(el){
     <div class="toolbar" style="margin-bottom:6px">
       <div class="tabs">${['dashboard','campaigns','agents','sources'].map(t=>`<div class="tab ${smTab===t?'active':''}" onclick="smTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','campaigns':'\uD83D\uDCE2 Campaigns','agents':'\uD83D\uDC64 Agents','sources':'\uD83D\uDD0D Sources'}[t]}</div>`).join('')}</div>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudCampaign()" style="padding:3px 8px;font-size:10px">+ New Campaign</button>
+      <button class="action-btn primary" onclick="crudCampaign()" style="padding:3px 8px;font-size:10px">+ New Campaign</button data-perm="Sales & Marketing:Create">
     </div>
     ${smTab==='dashboard'?renderSMDashboard(totalBudget,totalSpent,totalLeads,totalConv,activeCamp,totalDeals,totalComm,convRate):
       smTab==='campaigns'?renderSMCampaigns():
@@ -2439,7 +2549,7 @@ function renderSMCampaigns(){
     <select id="smFStatus" onchange="_PG['campaigns']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option>${['Active','Completed'].map(s=>'<option value="'+s+'"'+(sf===s?' selected':'')+'>'+s+'</option>').join('')}</select>
     <select id="smFChannel" onchange="_PG['campaigns']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Channels</option>${chs.map(c=>'<option value="'+c+'"'+(cf===c?' selected':'')+'>'+c+'</option>').join('')}</select>
     <div class="spacer"></div>
-    <button class="action-btn primary" onclick="crudCampaign()" style="padding:3px 8px;font-size:10px">+ New Campaign</button>
+    <button class="action-btn primary" onclick="crudCampaign()" style="padding:3px 8px;font-size:10px">+ New Campaign</button data-perm="Sales & Marketing:Create">
   </div>
   <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Campaign</th><th>Channel</th><th class="num">Budget</th><th class="num">Spent</th><th>Period</th><th class="num">Leads</th><th class="num">Conv.</th><th class="num">Conv.%</th><th>ROI</th><th>Status</th></tr></thead><tbody>${
     pC.items.map(function(c){
@@ -2746,7 +2856,7 @@ function renderLandMgmt(el){
     <div class="toolbar" style="margin-bottom:6px">
       <div class="tabs">${['dashboard','pipeline','proposals'].map(t=>`<div class="tab ${landTab===t?'active':''}" onclick="landTab='${t}';Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','pipeline':'\uD83D\uDCCB Pipeline','proposals':'\uD83D\uDCC4 Proposals'}[t]}</div>`).join('')}</div>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px">+ New Proposal</button>
+      <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Land Acquisition:Create">+ New Proposal</button>
     </div>
     ${landTab==='dashboard'?renderLandDashboard():
       landTab==='pipeline'?renderLandPipeline():
@@ -2806,7 +2916,7 @@ function renderLandProposals(){
     <select id="landFStage" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${stageNames.map(s=>'<option value="'+s+'"'+(sf===s?' selected':'')+'>'+stageLabels[s].split(' ').slice(1).join(' ')+'</option>').join('')}</select>
     <select id="landFRisk" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Risk</option><option value="Low"${rf==='Low'?' selected':''}>Low</option><option value="Medium"${rf==='Medium'?' selected':''}>Medium</option><option value="High"${rf==='High'?' selected':''}>High</option></select>
     <div class="spacer"></div>
-    <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px">+ New Proposal</button>
+    <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px">+ New Proposal</button data-perm="Land Acquisition:Create">
   </div>
   <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Property</th><th>Location</th><th>Area</th><th class="num">Value</th><th>Stage</th><th>Status</th><th>Risk</th><th>ROI</th><th>Priority</th><th>Progress</th><th></th></tr></thead><tbody>${
     pL.items.map(function(p){
@@ -2874,7 +2984,7 @@ function crudProposal(item){
 
 function renderProjects(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active projects</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockProjects,'Projects','projects',IMPORT_FIELDS.projects)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudProject()">+ New Project</button></div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockProjects,'Projects','projects',IMPORT_FIELDS.projects)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Projects:Import">📥</button><button class="action-btn primary" onclick="crudProject()" data-perm="Projects:Create">+ New Project</button></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
       <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><div style="font-size:12px;font-weight:600">${p.name}</div><div style="font-size:10px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
       <div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:10px"><span>Progress</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div></div>
@@ -2920,7 +3030,7 @@ function openBooking(id){
 function renderBookings(el){
   const pB=_pg('bookings',mockBookings);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Bookings</div><div class="page-subtitle">${mockBookings.length} bookings \u00b7 ${mockBookings.filter(b=>b.status==='Confirmed').length} confirmed \u00b7 ${mockInvoices.filter(function(i){return mockBookings.some(function(b){return b.client===i.client})}).length} invoiced</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudBooking()">+ New Booking</button></div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudBooking()" data-perm="Bookings:Create">+ New Booking</button></div>
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Invoices</th><th>Payments</th><th>Status</th></tr></thead><tbody>${pB.items.map(b=>{
       var bInvs=mockInvoices.filter(function(i){return i.client===b.client});
       var bPmts=mockPayments.filter(function(p){return p.client===b.client});
@@ -2949,9 +3059,9 @@ function renderCustomerPortal(el){
         return '<div class="tab '+(cpTab===t[0]?'active':'')+'" onclick="cpTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
       '<div class="spacer"></div>'+
-      '<button class="action-btn primary" onclick="crudCustomer()" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='customers'?'':'none')+'">+ Add Customer</button>'+
-      '<button class="action-btn primary" onclick="crudCustomerDoc()" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='documents'?'':'none')+'">+ Upload Doc</button>'+
-      '<button class="action-btn primary" onclick="crudTicket()" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='tickets'?'':'none')+'">+ New Ticket</button>'+
+      '<button class="action-btn primary" onclick="crudCustomer()" data-perm="Customer Portal:Create" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='customers'?'':'none')+'">+ Add Customer</button>'+
+      '<button class="action-btn primary" onclick="crudCustomerDoc()" data-perm="Customer Portal:Create" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='documents'?'':'none')+'">+ Upload Doc</button>'+
+      '<button class="action-btn primary" onclick="crudTicket()" data-perm="Customer Portal:Create" style="padding:3px 8px;font-size:10px;display:'+(cpTab==='tickets'?'':'none')+'">+ New Ticket</button>'+
     '</div>'+
     (cpTab==='dashboard'?renderCustDashboard():
      cpTab==='customers'?renderCustList():
@@ -3044,8 +3154,8 @@ function renderCustList(){
       '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
         '<span style="font-size:8px;color:#999">Tk'+(c.propertyValue/100000).toFixed(1)+'L property</span>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCustomer(mockCustomers.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+c.name+'?\x27)){var idx=mockCustomers.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCustomers.splice(idx,1);DB.save(\x27customers\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCustomer(mockCustomers.find(function(x){return x.id===\x27'+c.id+'\x27}))" data-perm="Customer Portal:Edit">✎</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+c.name+'?\x27)){var idx=mockCustomers.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCustomers.splice(idx,1);DB.save(\x27customers\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Customer Portal:Delete">✕</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -3078,7 +3188,7 @@ function renderCustDocs(){
   '</div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Customer</th><th>Document Type</th><th>Project</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>'+
   pD.items.map(function(d){
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+d.id+'</td><td style="font-weight:500">'+d.customerName+'</td><td>'+d.docType+'</td><td style="font-size:9px">'+d.project+'</td><td style="font-size:9px;color:#888">'+d.date+'</td><td><span class="badge-status '+(d.status==='Verified'?'badge-active':'badge-pending')+'">'+d.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCustomerDoc(mockCustomerDocs.find(function(x){return x.id===\x27'+d.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCustomerDocs.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockCustomerDocs.splice(idx,1);DB.save(\x27customerDocs\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+d.id+'</td><td style="font-weight:500">'+d.customerName+'</td><td>'+d.docType+'</td><td style="font-size:9px">'+d.project+'</td><td style="font-size:9px;color:#888">'+d.date+'</td><td><span class="badge-status '+(d.status==='Verified'?'badge-active':'badge-pending')+'">'+d.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCustomerDoc(mockCustomerDocs.find(function(x){return x.id===\x27'+d.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCustomerDocs.findIndex(function(x){return x.id===\x27'+d.id+'\x27});if(idx>=0)mockCustomerDocs.splice(idx,1);DB.save(\x27customerDocs\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Customer Portal:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('cd',pD.total,pD.page,pD.totalPages,pD.perPage)+'</div></div></div>';
 }
 function renderCustTickets(){
@@ -3109,7 +3219,7 @@ function renderCustTickets(){
   '</div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Subject</th><th>Customer</th><th>Category</th><th>Priority</th><th>Date</th><th>Assigned</th><th>Status</th><th></th></tr></thead><tbody>'+
   pT.items.map(function(t){
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+t.id+'</td><td style="font-weight:500;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+t.subject+'">'+t.subject+'</td><td>'+t.customerName+'</td><td style="font-size:9px">'+t.category+'</td><td><span class="badge-status" style="background:'+(t.priority==='High'?'#ffebee':t.priority==='Medium'?'#fff3e0':'#f5f5f5')+';color:'+(t.priority==='High'?'#c62828':t.priority==='Medium'?'#e65100':'#888')+'">'+t.priority+'</span></td><td style="font-size:9px;color:#888">'+t.date+'</td><td style="font-size:9px">'+t.assignedTo+'</td><td><span class="badge-status" style="background:'+(t.status==='Open'?'#ffebee':t.status==='In Progress'?'#fff8e1':'#e8f5e9')+';color:'+(t.status==='Open'?'#c62828':t.status==='In Progress'?'#ff8f00':'#2e7d32')+'">'+t.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudTicket(mockSupportTickets.find(function(x){return x.id===\x27'+t.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockSupportTickets.findIndex(function(x){return x.id===\x27'+t.id+'\x27});if(idx>=0)mockSupportTickets.splice(idx,1);DB.save(\x27supportTickets\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+t.id+'</td><td style="font-weight:500;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+t.subject+'">'+t.subject+'</td><td>'+t.customerName+'</td><td style="font-size:9px">'+t.category+'</td><td><span class="badge-status" style="background:'+(t.priority==='High'?'#ffebee':t.priority==='Medium'?'#fff3e0':'#f5f5f5')+';color:'+(t.priority==='High'?'#c62828':t.priority==='Medium'?'#e65100':'#888')+'">'+t.priority+'</span></td><td style="font-size:9px;color:#888">'+t.date+'</td><td style="font-size:9px">'+t.assignedTo+'</td><td><span class="badge-status" style="background:'+(t.status==='Open'?'#ffebee':t.status==='In Progress'?'#fff8e1':'#e8f5e9')+';color:'+(t.status==='Open'?'#c62828':t.status==='In Progress'?'#ff8f00':'#2e7d32')+'">'+t.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudTicket(mockSupportTickets.find(function(x){return x.id===\x27'+t.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockSupportTickets.findIndex(function(x){return x.id===\x27'+t.id+'\x27});if(idx>=0)mockSupportTickets.splice(idx,1);DB.save(\x27supportTickets\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Customer Portal:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('tkt',pT.total,pT.page,pT.totalPages,pT.perPage)+'</div></div></div>';
 }
 function openCustomerPortal(id){
@@ -3299,7 +3409,7 @@ function renderHndPipeline(){
   pH.items.map(function(h){
     var sc={'Completed':'#2e7d32','Handover Scheduled':'#ff8f00','Inspection Pending':'#c62828','Construction Ongoing':'#1565c0'}[h.status]||'#888';
     var sbg={'Completed':'#e8f5e9','Handover Scheduled':'#fff8e1','Inspection Pending':'#ffebee','Construction Ongoing':'#e3f2fd'}[h.status]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openHandover(\x27'+h.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+h.id+'</td><td style="font-weight:500">'+h.unit+'</td><td>'+h.customer+'</td><td style="font-size:9px">'+h.project+'</td><td style="font-size:9px;color:#888">'+h.type+'</td><td style="font-size:9px;color:#888">'+h.date+'</td><td class="num" style="font-weight:600;color:'+(h.snags>0?'#c62828':'#2e7d32')+'">'+h.snags+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+h.status+'</span></td><td style="font-size:9px;color:#888">'+(h.posDate||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudHandover(mockHandover.find(function(x){return x.id===\x27'+h.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockHandover.findIndex(function(x){return x.id===\x27'+h.id+'\x27});if(idx>=0)mockHandover.splice(idx,1);DB.save(\x27handover\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openHandover(\x27'+h.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+h.id+'</td><td style="font-weight:500">'+h.unit+'</td><td>'+h.customer+'</td><td style="font-size:9px">'+h.project+'</td><td style="font-size:9px;color:#888">'+h.type+'</td><td style="font-size:9px;color:#888">'+h.date+'</td><td class="num" style="font-weight:600;color:'+(h.snags>0?'#c62828':'#2e7d32')+'">'+h.snags+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+h.status+'</span></td><td style="font-size:9px;color:#888">'+(h.posDate||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudHandover(mockHandover.find(function(x){return x.id===\x27'+h.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockHandover.findIndex(function(x){return x.id===\x27'+h.id+'\x27});if(idx>=0)mockHandover.splice(idx,1);DB.save(\x27handover\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Handover:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('hnd',pH.total,pH.page,pH.totalPages,pH.perPage)+'</div></div></div>';
 }
 function renderHndSnags(){
@@ -3330,7 +3440,7 @@ function renderHndSnags(){
   '</div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Unit</th><th>Customer</th><th>Item</th><th>Category</th><th>Priority</th><th>Date</th><th>Assigned</th><th>Status</th><th></th></tr></thead><tbody>'+
   pS.items.map(function(s){
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+s.id+'</td><td style="font-weight:500">'+s.unit+'</td><td>'+s.customer+'</td><td style="font-size:9px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.item+'">'+s.item+'</td><td style="font-size:9px;color:#888">'+s.category+'</td><td><span class="badge-status" style="background:'+(s.priority==='High'?'#ffebee':s.priority==='Medium'?'#fff8e1':'#f5f5f5')+';color:'+(s.priority==='High'?'#c62828':s.priority==='Medium'?'#ff8f00':'#888')+'">'+s.priority+'</span></td><td style="font-size:9px;color:#888">'+s.date+'</td><td style="font-size:9px">'+s.assignedTo+'</td><td><span class="badge-status" style="background:'+(s.status==='Open'?'#ffebee':s.status==='In Progress'?'#fff8e1':'#e8f5e9')+';color:'+(s.status==='Open'?'#c62828':s.status==='In Progress'?'#ff8f00':'#2e7d32')+'">'+s.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudSnag(mockSnags.find(function(x){return x.id===\x27'+s.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockSnags.findIndex(function(x){return x.id===\x27'+s.id+'\x27});if(idx>=0)mockSnags.splice(idx,1);DB.save(\x27snags\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+s.id+'</td><td style="font-weight:500">'+s.unit+'</td><td>'+s.customer+'</td><td style="font-size:9px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.item+'">'+s.item+'</td><td style="font-size:9px;color:#888">'+s.category+'</td><td><span class="badge-status" style="background:'+(s.priority==='High'?'#ffebee':s.priority==='Medium'?'#fff8e1':'#f5f5f5')+';color:'+(s.priority==='High'?'#c62828':s.priority==='Medium'?'#ff8f00':'#888')+'">'+s.priority+'</span></td><td style="font-size:9px;color:#888">'+s.date+'</td><td style="font-size:9px">'+s.assignedTo+'</td><td><span class="badge-status" style="background:'+(s.status==='Open'?'#ffebee':s.status==='In Progress'?'#fff8e1':'#e8f5e9')+';color:'+(s.status==='Open'?'#c62828':s.status==='In Progress'?'#ff8f00':'#2e7d32')+'">'+s.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudSnag(mockSnags.find(function(x){return x.id===\x27'+s.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockSnags.findIndex(function(x){return x.id===\x27'+s.id+'\x27});if(idx>=0)mockSnags.splice(idx,1);DB.save(\x27snags\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Handover:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('snag',pS.total,pS.page,pS.totalPages,pS.perPage)+'</div></div></div>';
 }
 function renderHndAfterSales(){
@@ -3357,7 +3467,7 @@ function renderHndAfterSales(){
   '</div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Service</th><th>Unit</th><th>Customer</th><th>Date</th><th>Assigned</th><th class="num">Cost</th><th>Status</th><th></th></tr></thead><tbody>'+
   pA.items.map(function(a){
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.serviceType+'</td><td>'+a.unit+'</td><td style="font-size:9px">'+a.customer+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.assignedTo+'</td><td class="num" style="font-weight:600;color:#e65100">Tk'+(a.cost/1000).toFixed(1)+'K</td><td><span class="badge-status" style="background:'+(a.status==='Completed'?'#e8f5e9':a.status==='In Progress'?'#fff8e1':a.status==='Scheduled'?'#e3f2fd':'#ffebee')+';color:'+(a.status==='Completed'?'#2e7d32':a.status==='In Progress'?'#ff8f00':a.status==='Scheduled'?'#1565c0':'#c62828')+'">'+a.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAfterSale(mockAfterSales.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockAfterSales.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAfterSales.splice(idx,1);DB.save(\x27afterSales\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.serviceType+'</td><td>'+a.unit+'</td><td style="font-size:9px">'+a.customer+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.assignedTo+'</td><td class="num" style="font-weight:600;color:#e65100">Tk'+(a.cost/1000).toFixed(1)+'K</td><td><span class="badge-status" style="background:'+(a.status==='Completed'?'#e8f5e9':a.status==='In Progress'?'#fff8e1':a.status==='Scheduled'?'#e3f2fd':'#ffebee')+';color:'+(a.status==='Completed'?'#2e7d32':a.status==='In Progress'?'#ff8f00':a.status==='Scheduled'?'#1565c0':'#c62828')+'">'+a.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAfterSale(mockAfterSales.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockAfterSales.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAfterSales.splice(idx,1);DB.save(\x27afterSales\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Handover:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('afs',pA.total,pA.page,pA.totalPages,pA.perPage)+'</div></div></div>';
 }
 function openHandover(id){
@@ -3831,7 +3941,7 @@ function crudMaintenance(){
 function renderVariations(el){
   const pV=_pg('variations',mockVariations);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Variation Orders</div><div class="page-subtitle">${mockVariations.length} changes tracked</div>
-    <div class="card"><div class="card-header"><h3>Variation Register</h3><button class="action-btn primary" onclick="crudVariation()" style="padding:3px 7px;font-size:9px">+ New VO</button></div>
+    <div class="card"><div class="card-header"><h3>Variation Register</h3><button class="action-btn primary" onclick="crudVariation()" style="padding:3px 7px;font-size:9px">+ New VO</button></div data-perm="Variation Orders:Create">
     <div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>VO ID</th><th>Project</th><th>Title</th><th>Status</th><th>Cost Impact</th><th>Schedule</th><th>Originator</th></tr></thead><tbody>${pV.items.map(v=>`<tr><td style="font-weight:500">${v.id}</td><td>${v.project}</td><td>${v.title}</td><td><span class="badge-status ${v.status==='Approved'?'badge-active':v.status==='Pending Review'?'badge-pending':'badge-closed'}">${v.status}</span></td><td style="color:#c62828;font-weight:600">${v.impact}</td><td style="color:#e65100;font-size:10px">${v.schedule}</td><td style="font-size:10px">${v.originator}</td></tr>`).join('')}</tbody></table>${_pgHtml('variations',pV.total,pV.page,pV.totalPages,pV.perPage)}</div></div></div></div>`;
 }
 
@@ -4290,7 +4400,7 @@ function renderKB(el){
     <div class="toolbar" style="margin-bottom:6px">
       <div class="tabs">${['dashboard','articles','categories','favorites'].map(t=>`<div class="tab ${kbTab===t?'active':''}" onclick="kbTab='${t}';Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','articles':'\uD83D\uDCC4 All Articles','categories':'\uD83D\uDCC1 Categories','favorites':'\u2B50 Favorites'}[t]}</div>`).join('')}</div>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudArticle()" style="padding:3px 8px;font-size:10px">+ New Article</button>
+      <button class="action-btn primary" onclick="crudArticle()" style="padding:3px 8px;font-size:10px">+ New Article</button data-perm="Knowledge Base:Create">
     </div>
     ${kbTab==='dashboard'?renderKBDashboard():
       kbTab==='articles'?renderKBArticles():
@@ -4346,7 +4456,7 @@ function renderKBArticles(){
     <select id="kbFStatus" onchange="_PG.kb={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option value="Published"${sf==='Published'?' selected':''}>Published</option><option value="Draft"${sf==='Draft'?' selected':''}>Draft</option></select>
     <label style="font-size:9px;display:flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="kbFavOnly"${fv?' checked':''} onchange="_PG.kb={page:1,perPage:_pgPerPage};renderModule()" style="margin:0"/> Favorites</label>
     <div class="spacer"></div>
-    <button class="action-btn primary" onclick="crudArticle()" style="padding:3px 8px;font-size:10px">+ New Article</button>
+    <button class="action-btn primary" onclick="crudArticle()" style="padding:3px 8px;font-size:10px">+ New Article</button data-perm="Knowledge Base:Create">
   </div>
   <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th></th><th>Article</th><th>Category</th><th>Tags</th><th>Author</th><th>Updated</th><th class="num">Views</th><th>Status</th><th></th></tr></thead><tbody>${
     pA.items.map(function(a){
@@ -4677,7 +4787,7 @@ function renderContacts(el){
         return '<span style="display:inline-block;padding:0 5px;border-radius:3px;font-size:7px;font-weight:600;color:#fff;background:'+rc+';margin:0 1px">'+r+'</span>';
       }).join('');
       var pc={'Hot':'#c62828','High':'#e65100','Normal':'#2F80ED','Low':'#999'};
-      return '<tr style="cursor:pointer" onclick="openContact(\''+e.id+'\')"><td style="padding:4px 4px 4px 8px;width:26px"><div style="width:24px;height:24px;border-radius:50%;background:'+typeColor+'22;color:'+typeColor+';display:flex;align-items:center;justify-content:center;font-size:10px">'+typeIcon+'</div></td><td style="font-weight:500;font-size:11px">'+displayName+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td><td style="font-size:8px">'+roleBadges+'</td><td style="font-size:10px">'+e.phone+'</td><td style="font-size:10px;color:#555">'+(e.email||'—')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+({Hot:'#c62828',High:'#e65100',Normal:'#2F80ED',Low:'#999'}[e.priority]||'#888')+'">'+(e.priority||'Normal')+'</span></td><td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEntity(\''+e.id+'\')">✎</span></td></tr>';
+      return '<tr style="cursor:pointer" onclick="openContact(\''+e.id+'\')"><td style="padding:4px 4px 4px 8px;width:26px"><div style="width:24px;height:24px;border-radius:50%;background:'+typeColor+'22;color:'+typeColor+';display:flex;align-items:center;justify-content:center;font-size:10px">'+typeIcon+'</div></td><td style="font-weight:500;font-size:11px">'+displayName+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td><td style="font-size:8px">'+roleBadges+'</td><td style="font-size:10px">'+e.phone+'</td><td style="font-size:10px;color:#555">'+(e.email||'—')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+({Hot:'#c62828',High:'#e65100',Normal:'#2F80ED',Low:'#999'}[e.priority]||'#888')+'">'+(e.priority||'Normal')+'</span></td><td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEntity(\''+e.id+'\')" data-perm="CRM & Leads:Edit">✎</span></td></tr>';
     }).join('')+
     '</tbody></table>'+_pgHtml('contacts',pagE.total,pagE.page,pagE.totalPages,pagE.perPage)+'</div></div></div></div>';
 }
@@ -4824,7 +4934,7 @@ function renderFinanceTransactions(){
       <option value="all">All Categories</option>${['Booking','Installment','Materials','Labor','Marketing','Admin','Legal','Professional Fees','Utilities','Tax'].map(c=>'<option value="'+c+'"'+(catFilter===c?' selected':'')+'>'+c+'</option>').join('')}
     </select>
     <div class="spacer"></div>
-    <button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add Transaction</button>
+    <button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add Transaction</button data-perm="Finance:Create">
   </div>
   <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${
     pF.items.map(t=>'<tr style="cursor:pointer" onclick="openTransaction(\''+t.id+'\')"><td style="font-weight:500;font-family:monospace;font-size:9px">'+t.id+'</td><td style="font-size:10px;color:#666">'+t.date+'</td><td>'+t.desc+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:9px;background:#f0f4ff;color:#2F80ED">'+(t.category||'\u2014')+'</span></td><td><span class="badge-status '+(t.type==='Inflow'?'badge-active':'badge-sold')+'">'+t.type+'</span></td><td class="num" style="font-weight:600;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.fmt+'</td><td><span class="badge-status '+(t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved')+'">'+t.status+'</span></td></tr>').join('')
@@ -5000,7 +5110,7 @@ function renderStock(el){
       ${stockTab==='inventory'?`<select id="invCatFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>${['Construction Material','Plumbing','Electrical','Finishes','Safety','Admin'].map(c=>'<option value="'+c+'"'+(g('invCatFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>
         <select id="invSiteFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Sites</option>${['Muktodhara','Jolshiri','Corporate'].map(c=>'<option value="'+c+'"'+(g('invSiteFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>`:''}
       <div class="spacer"></div>
-      <button class="action-btn secondary" onclick="importData(mockInventory,'Items','inventory',IMPORT_FIELDS.inventory)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudStockItem()" style="padding:3px 8px;font-size:10px">+ New</button>
+      <button class="action-btn secondary" onclick="importData(mockInventory,'Items','inventory',IMPORT_FIELDS.inventory)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudStockItem()" style="padding:3px 8px;font-size:10px">+ New</button data-perm="Stock & Procurement:Import">
     </div>
     ${stockTab==='inventory'?renderStockInv(pI):
       stockTab==='po'?renderStockPO(pPO):
@@ -5090,7 +5200,7 @@ function openSupplier(id){
 function renderHR(el){
   const pE=_pg('hr',mockEmployees);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Human Resources</div><div class="page-subtitle">${mockEmployees.length} employees</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockEmployees,'Employees','employees',IMPORT_FIELDS.employees)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockEmployees,'Employees','employees',IMPORT_FIELDS.employees)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div data-perm="HR:Import">
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${pE.items.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('hr',pE.total,pE.page,pE.totalPages,pE.perPage)}</div></div></div></div>`;
 }
 
@@ -5152,7 +5262,7 @@ function renderTasks(el){
             '<div style="display:flex;align-items:flex-start;gap:5px;margin-bottom:4px">'+
               '<span style="margin-top:3px;width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+(t.priority==='High'?'#e53935':t.priority==='Medium'?'#ff9800':'#999')+'"></span>'+
               '<div style="flex:1;font-size:11px;font-weight:500;word-break:break-word;line-height:1.3">'+t.title+'</div>'+
-              '<div style="display:flex;gap:2px;flex-shrink:0"><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();editTask('+t.id+')">✎</span><span style="color:#e53935;cursor:pointer;font-size:9px" onclick="event.stopPropagation();deleteTask('+t.id+')">✕</span></div>'+
+              '<div style="display:flex;gap:2px;flex-shrink:0"><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();editTask('+t.id+')">✎</span><span style="color:#e53935;cursor:pointer;font-size:9px" onclick="event.stopPropagation();deleteTask('+t.id+')" data-perm="Tasks:Delete">✕</span></div>'+
             '</div>'+
             '<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:3px">'+
               '<span style="font-size:8px;padding:1px 5px;border-radius:3px;background:#f0f4ff;color:#1565c0">'+t.project+'</span>'+
@@ -5869,6 +5979,18 @@ function toggleRoleMenu(){document.getElementById('roleMenuPanel').classList.tog
 function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remove('active')}
 // ═══ ROLE-BASED ACCESS CONTROL ═══
 var _rolePerms = {};
+function permBtn(mod,action,html){
+  return hasPerm(mod,action)?html:'';
+}
+function permSpan(mod,action,html){
+  return hasPerm(mod,action)?html:'';
+}
+function applyPerms(){
+  document.querySelectorAll('[data-perm]').forEach(function(el){
+    var p=el.getAttribute('data-perm').split(':');
+    if(!hasPerm(p[0],p[1])){el.style.display='none';}
+  });
+}
 // Initialize from saved localStorage or defaults
 ROLES.forEach(function(r){
   var saved=localStorage.getItem('rem_perms_'+r);
@@ -6294,7 +6416,7 @@ function openLeadPanel(leadId,tab){
       for(var ri=0; ri<l.reminders.length; ri++){
         var rm=l.reminders[ri];
         var isPast=new Date(rm.dateTime)<new Date();
-        rHTML+='<div class="installment-item"><div><div style="font-size:11px;font-weight:500">'+(rm.title||'Reminder')+'</div><div style="font-size:9px;color:'+(isPast?'#e53935':'#2e7d32')+'">'+(isPast?'🔴 Overdue: ':'🟢 ')+rm.dateTime+'</div></div><div style="display:flex;gap:4px"><span style="font-size:9px;color:#888">'+(rm.type||'Follow-up')+'</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteLeadReminder('+l.id+','+ri+')">✕</span></div></div>';
+        rHTML+='<div class="installment-item"><div><div style="font-size:11px;font-weight:500">'+(rm.title||'Reminder')+'</div><div style="font-size:9px;color:'+(isPast?'#e53935':'#2e7d32')+'">'+(isPast?'🔴 Overdue: ':'🟢 ')+rm.dateTime+'</div></div><div style="display:flex;gap:4px"><span style="font-size:9px;color:#888">'+(rm.type||'Follow-up')+'</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteLeadReminder('+l.id+','+ri+')" data-perm="System Manual:Delete">✕</span></div></div>';
       }
     }else{
       rHTML+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No reminders set.</div>';
@@ -6735,10 +6857,15 @@ function openModal(title,body,onSave){
   var d=document.getElementById('appDrawer');
   document.getElementById('drawerTitle').textContent=title;
   document.getElementById('drawerBody').innerHTML=body;
-  document.getElementById('drawerFooter').innerHTML=
-    '<button class="drawer-btn secondary" onclick="closeDrawer()">Cancel</button>'+
-    '<button class="drawer-btn primary" onclick="saveDrawer()" id="drawerSaveBtn">Save</button>';
-  window._drawerOnSave=onSave;
+  if(typeof onSave==='string'){
+    document.getElementById('drawerFooter').innerHTML=onSave;
+    window._drawerOnSave=null;
+  }else{
+    document.getElementById('drawerFooter').innerHTML=
+      '<button class="drawer-btn secondary" onclick="closeDrawer()">Cancel</button>'+
+      '<button class="drawer-btn primary" onclick="saveDrawer()" id="drawerSaveBtn">Save</button>';
+    window._drawerOnSave=onSave;
+  }
   d.classList.add('active');
   // Keyboard shortcuts
   setTimeout(function(){
@@ -6758,6 +6885,7 @@ function closeDrawer(){
     try{document.removeEventListener('keydown',__drawerKeyHandler);}catch(e){}
   },180);
 }
+function closeModal(){ closeDrawer(); }
 function saveDrawer(){
   // Check required fields
   var errors=[];var m=document.getElementById('appDrawer');
@@ -7549,8 +7677,8 @@ function renderWorkers(){
       '<div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0">'+
         '<span style="font-size:8px;color:#999">Joined '+w.joinDate+'</span>'+
         '<div style="display:flex;gap:4px">'+
-          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorker(mockLabor.find(function(x){return x.id===\x27'+w.id+'\x27}))">✎</span>'+
-          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+w.name+'?\x27)){var idx=mockLabor.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockLabor.splice(idx,1);DB.save(\x27labor\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span>'+
+          '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudWorker(mockLabor.find(function(x){return x.id===\x27'+w.id+'\x27}))" data-perm="Labor:Edit">✎</span>'+
+          '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete '+w.name+'?\x27)){var idx=mockLabor.findIndex(function(x){return x.id===\x27'+w.id+'\x27});if(idx>=0)mockLabor.splice(idx,1);DB.save(\x27labor\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Labor:Delete">✕</span>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -7588,7 +7716,7 @@ function renderAttendance(){
   pA.items.map(function(a){
     var sc={'Present':'#2e7d32','Absent':'#c62828','Half-Day':'#ff8f00'}[a.status]||'#888';
     var sbg={'Present':'#e8f5e9','Absent':'#ffebee','Half-Day':'#fff8e1'}[a.status]||'#f5f5f5';
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.workerName+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.site+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+a.status+'</span></td><td style="font-size:9px;color:#888;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(a.remarks||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAttendanceRecord(mockAttendance.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete record?\x27)){var idx=mockAttendance.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAttendance.splice(idx,1);DB.save(\x27attendance\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.workerName+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.site+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+a.status+'</span></td><td style="font-size:9px;color:#888;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(a.remarks||'---')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAttendanceRecord(mockAttendance.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete record?\x27)){var idx=mockAttendance.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAttendance.splice(idx,1);DB.save(\x27attendance\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="Labor:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('att',pA.total,pA.page,pA.totalPages,pA.perPage)+'</div></div></div>';
 }
 function renderPayroll(){
@@ -7839,7 +7967,7 @@ function renderQCInspections(){
     var rbg={'Pass':'#e8f5e9','Fail':'#ffebee','Pending':'#fff8e1'}[i.result]||'#f5f5f5';
     var sc={'Critical':'#c62828','Major':'#e65100','Minor':'#888'}[i.severity]||'#888';
     var sbg={'Critical':'#ffebee','Major':'#fff3e0','Minor':'#f5f5f5'}[i.severity]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openQCItem(\x27'+i.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+i.id+'</td><td style="font-weight:500;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+i.item+'">'+i.item+'</td><td>'+i.project+'</td><td style="font-size:9px">'+i.category+'</td><td style="font-size:9px;color:#888">'+i.date+'</td><td style="font-size:9px">'+i.inspector+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+i.severity+'</span></td><td><span class="badge-status" style="background:'+rbg+';color:'+rc+'">'+i.result+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCItem(mockQC.find(function(x){return x.id===\x27'+i.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQC.findIndex(function(x){return x.id===\x27'+i.id+'\x27});if(idx>=0)mockQC.splice(idx,1);DB.save(\x27qc\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openQCItem(\x27'+i.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+i.id+'</td><td style="font-weight:500;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+i.item+'">'+i.item+'</td><td>'+i.project+'</td><td style="font-size:9px">'+i.category+'</td><td style="font-size:9px;color:#888">'+i.date+'</td><td style="font-size:9px">'+i.inspector+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+i.severity+'</span></td><td><span class="badge-status" style="background:'+rbg+';color:'+rc+'">'+i.result+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCItem(mockQC.find(function(x){return x.id===\x27'+i.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQC.findIndex(function(x){return x.id===\x27'+i.id+'\x27});if(idx>=0)mockQC.splice(idx,1);DB.save(\x27qc\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="QC & Inspection:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('qci',pI.total,pI.page,pI.totalPages,pI.perPage)+'</div></div></div>';
 }
 function renderQCChecklists(){
@@ -7874,7 +8002,7 @@ function renderQCChecklists(){
   pC.items.map(function(c){
     var sc={'Pass':'#2e7d32','Fail':'#c62828','Pending':'#ff8f00'}[c.status]||'#888';
     var sbg={'Pass':'#e8f5e9','Fail':'#ffebee','Pending':'#fff8e1'}[c.status]||'#f5f5f5';
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.item+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px;color:#888">'+c.stage+'</td><td style="font-size:9px;color:#888">'+c.standard+'</td><td style="font-size:9px">'+c.checkedBy+'</td><td style="font-size:9px;color:#888">'+c.date+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCChecklist(mockQCChecklist.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQCChecklist.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockQCChecklist.splice(idx,1);DB.save(\x27qcChecklist\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.item+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px;color:#888">'+c.stage+'</td><td style="font-size:9px;color:#888">'+c.standard+'</td><td style="font-size:9px">'+c.checkedBy+'</td><td style="font-size:9px;color:#888">'+c.date+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCChecklist(mockQCChecklist.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQCChecklist.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockQCChecklist.splice(idx,1);DB.save(\x27qcChecklist\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="QC & Inspection:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('chk',pC.total,pC.page,pC.totalPages,pC.perPage)+'</div></div></div>';
 }
 function renderQCReports(){
@@ -7911,7 +8039,7 @@ function renderQCReports(){
   pR.items.map(function(r){
     var ss={'Submitted':'#2e7d32','Draft':'#ff8f00','Open':'#c62828','Closed':'#888'}[r.status]||'#888';
     var sbg={'Submitted':'#e8f5e9','Draft':'#fff8e1','Open':'#ffebee','Closed':'#f5f5f5'}[r.status]||'#f5f5f5';
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+r.id+'</td><td style="font-weight:500">'+r.type+'</td><td style="font-size:9px">'+r.project+'</td><td style="font-size:9px;color:#888">'+r.date+'</td><td style="font-size:9px">'+r.preparedBy+'</td><td class="num">'+r.findings+'</td><td class="num" style="color:#2e7d32">'+r.passed+'</td><td class="num" style="color:#c62828">'+r.failed+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+ss+'">'+r.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCReport(mockQCReports.find(function(x){return x.id===\x27'+r.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQCReports.findIndex(function(x){return x.id===\x27'+r.id+'\x27});if(idx>=0)mockQCReports.splice(idx,1);DB.save(\x27qcReports\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+r.id+'</td><td style="font-weight:500">'+r.type+'</td><td style="font-size:9px">'+r.project+'</td><td style="font-size:9px;color:#888">'+r.date+'</td><td style="font-size:9px">'+r.preparedBy+'</td><td class="num">'+r.findings+'</td><td class="num" style="color:#2e7d32">'+r.passed+'</td><td class="num" style="color:#c62828">'+r.failed+'</td><td><span class="badge-status" style="background:'+sbg+';color:'+ss+'">'+r.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudQCReport(mockQCReports.find(function(x){return x.id===\x27'+r.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockQCReports.findIndex(function(x){return x.id===\x27'+r.id+'\x27});if(idx>=0)mockQCReports.splice(idx,1);DB.save(\x27qcReports\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="QC & Inspection:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('rpt',pR.total,pR.page,pR.totalPages,pR.perPage)+'</div></div></div>';
 }
 function openQCItem(id){
@@ -8102,7 +8230,7 @@ function renderCmpItems(){
     var sbg={'Compliant':'#e8f5e9','Pending':'#fff8e1','Expired':'#ffebee'}[c.status]||'#f5f5f5';
     var pc={'Critical':'#c62828','High':'#e65100','Medium':'#ff8f00','Low':'#888'}[c.priority]||'#888';
     var pbg={'Critical':'#ffebee','High':'#fff3e0','Medium':'#fff8e1','Low':'#f5f5f5'}[c.priority]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openComplianceItem(\x27'+c.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.name+'">'+c.name+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px">'+c.type+'</td><td style="font-size:9px;color:#888;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.authority+'">'+c.authority+'</td><td style="font-size:9px;color:'+(c.status==='Expired'?'#c62828':'#888')+'">'+c.due+'</td><td><span class="badge-status" style="background:'+pbg+';color:'+pc+'">'+c.priority+'</span></td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCompliance(mockCompliance.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCompliance.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCompliance.splice(idx,1);DB.save(\x27compliance\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openComplianceItem(\x27'+c.id+'\x27)"><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.name+'">'+c.name+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px">'+c.type+'</td><td style="font-size:9px;color:#888;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.authority+'">'+c.authority+'</td><td style="font-size:9px;color:'+(c.status==='Expired'?'#c62828':'#888')+'">'+c.due+'</td><td><span class="badge-status" style="background:'+pbg+';color:'+pc+'">'+c.priority+'</span></td><td><span class="badge-status" style="background:'+sbg+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCompliance(mockCompliance.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCompliance.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCompliance.splice(idx,1);DB.save(\x27compliance\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="QC & Inspection:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('cmp',pC.total,pC.page,pC.totalPages,pC.perPage)+'</div></div></div>';
 }
 function renderCmpAudits(){
@@ -8136,7 +8264,7 @@ function renderCmpAudits(){
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Type</th><th>Project</th><th>Date</th><th>Auditor</th><th class="num">Findings</th><th class="num">Score</th><th>Status</th><th></th></tr></thead><tbody>'+
   pA.items.map(function(a){
     var sc=a.status==='Completed'?'#2e7d32':'#ff8f00';
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.type+'</td><td style="font-size:9px">'+a.project+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.auditor+'</td><td class="num">'+a.findings+'</td><td class="num" style="font-weight:600;color:'+(a.score>=90?'#2e7d32':a.score>=70?'#ff8f00':'#c62828')+'">'+(a.score>0?a.score+'%':'---')+'</td><td><span class="badge-status '+(a.status==='Completed'?'badge-active':'badge-pending')+'">'+a.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAudit(mockAudits.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockAudits.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAudits.splice(idx,1);DB.save(\x27audits\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.type+'</td><td style="font-size:9px">'+a.project+'</td><td style="font-size:9px;color:#888">'+a.date+'</td><td style="font-size:9px">'+a.auditor+'</td><td class="num">'+a.findings+'</td><td class="num" style="font-weight:600;color:'+(a.score>=90?'#2e7d32':a.score>=70?'#ff8f00':'#c62828')+'">'+(a.score>0?a.score+'%':'---')+'</td><td><span class="badge-status '+(a.status==='Completed'?'badge-active':'badge-pending')+'">'+a.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudAudit(mockAudits.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockAudits.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(idx>=0)mockAudits.splice(idx,1);DB.save(\x27audits\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="QC & Inspection:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('aud',pA.total,pA.page,pA.totalPages,pA.perPage)+'</div></div></div>';
 }
 function renderCmpCertificates(){
@@ -8169,7 +8297,7 @@ function renderCmpCertificates(){
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Certificate</th><th>Project</th><th>Type</th><th>Authority</th><th>Issued</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody>'+
   pC.items.map(function(c){
     var sc={'Active':'#2e7d32','Expired':'#c62828','Pending':'#ff8f00'}[c.status]||'#888';
-    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.name+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px">'+c.type+'</td><td style="font-size:9px;color:#888;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.authority+'">'+c.authority+'</td><td style="font-size:9px;color:#888">'+(c.issued||'---')+'</td><td style="font-size:9px;color:'+(c.status==='Expired'?'#c62828':'#888')+'">'+(c.expires||'---')+'</td><td><span class="badge-status" style="background:'+(c.status==='Active'?'#e8f5e9':c.status==='Expired'?'#ffebee':'#fff8e1')+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCertificate(mockCertificates.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCertificates.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCertificates.splice(idx,1);DB.save(\x27certificates\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}">✕</span></td></tr>';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500">'+c.name+'</td><td style="font-size:9px">'+c.project+'</td><td style="font-size:9px">'+c.type+'</td><td style="font-size:9px;color:#888;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.authority+'">'+c.authority+'</td><td style="font-size:9px;color:#888">'+(c.issued||'---')+'</td><td style="font-size:9px;color:'+(c.status==='Expired'?'#c62828':'#888')+'">'+(c.expires||'---')+'</td><td><span class="badge-status" style="background:'+(c.status==='Active'?'#e8f5e9':c.status==='Expired'?'#ffebee':'#fff8e1')+';color:'+sc+'">'+c.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCertificate(mockCertificates.find(function(x){return x.id===\x27'+c.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\x27Delete?\x27)){var idx=mockCertificates.findIndex(function(x){return x.id===\x27'+c.id+'\x27});if(idx>=0)mockCertificates.splice(idx,1);DB.save(\x27certificates\x27);renderModule();showToast(\x27Deleted\x27,\x27info\x27)}" data-perm="QC & Inspection:Delete">✕</span></td></tr>';
   }).join('')+'</tbody></table>'+_pgHtml('cert',pC.total,pC.page,pC.totalPages,pC.perPage)+'</div></div></div>';
 }
 function openComplianceItem(id){
