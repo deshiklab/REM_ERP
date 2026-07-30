@@ -2956,7 +2956,8 @@ function renderPlots(el){
       <div class="plot-grid">${mockPlots.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`}).join('')}</div>
     </div></div>
     <div class="card" style="margin-top:10px"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${pP2.items.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages,pP2.perPage)}</div></div></div></div>`;
-}</div></div></div></div>`;
+;
+}
 
 // ═══ PROPERTY & UNIT INVENTORY ═══
 var propUnitTab = 'dashboard';
@@ -2995,9 +2996,9 @@ function renderPropertiesUnits(el) {
     '</div>' +
     '<div class="toolbar" style="margin-bottom:6px">' +
       '<div class="tabs">' +
-        '<div class="tab ' + (propUnitTab === 'dashboard' ? 'active' : '') + '" onclick="propUnitTab=\\'dashboard\\';renderModule()">📊 Dashboard</div>' +
-        '<div class="tab ' + (propUnitTab === 'grid' ? 'active' : '') + '" onclick="propUnitTab=\\'grid\\';renderModule()">📐 Unit Grid</div>' +
-        '<div class="tab ' + (propUnitTab === 'projects' ? 'active' : '') + '" onclick="propUnitTab=\\'projects\\';renderModule()">🏗 Projects</div>' +
+        '<div class="tab ' + (propUnitTab === 'dashboard' ? 'active' : '') + '" onclick="propUnitTab=\'dashboard\';renderModule()">📊 Dashboard</div>' +
+        '<div class="tab ' + (propUnitTab === 'grid' ? 'active' : '') + '" onclick="propUnitTab=\'grid\';renderModule()">📐 Unit Grid</div>' +
+        '<div class="tab ' + (propUnitTab === 'projects' ? 'active' : '') + '" onclick="propUnitTab=\'projects\';renderModule()">🏗 Projects</div>' +
       '</div>' +
       '<div class="spacer"></div>' +
       '<button class="action-btn primary" onclick="crudProperty()" data-perm="Property & Units:Create">+ New Property</button>' +
@@ -3022,7 +3023,7 @@ function renderPropDashboard() {
     var unitBooked = p.units.filter(function(u) { return u.status === 'Booked'; }).length;
     var unitReserved = p.units.filter(function(u) { return u.status === 'Reserved'; }).length;
     var progPct = p.units.length > 0 ? Math.round((unitSold + unitBooked) / p.units.length * 100) : 0;
-    return '<div class="card" style="cursor:pointer" onclick="propUnitTab=\\'grid\\';propFilter=\\'' + p.id + '\\';renderModule()">' +
+    return '<div class="card" style="cursor:pointer" onclick="propUnitTab=\'grid\';renderModule()">' +
       '<div class="card-body">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
       '<div><div style="font-size:13px;font-weight:600">' + p.name + '</div><div style="font-size:10px;color:#888">' + p.location + ' · ' + p.type + '</div></div>' +
@@ -3089,7 +3090,7 @@ function renderUnitGrid(project) {
       '<div style="display:flex;gap:4px;flex-wrap:wrap">' +
       floorUnits.map(function(u) {
         var color = statusColors[u.status] || '#999';
-        return '<div style="width:72px;height:68px;border-radius:4px;background:' + color + '15;border:1.5px solid ' + color + ';cursor:pointer;padding:3px;text-align:center" onclick="openUnitDetail(\\'' + project.id + '\\',\\'' + u.id + '\\')" title="' + u.number + ' · ' + u.type + ' · ' + u.size + ' · ' + u.status + '">' +
+        return '<div style="width:72px;height:68px;border-radius:4px;background:' + color + '15;border:1.5px solid ' + color + ';cursor:pointer;padding:3px;text-align:center" onclick="openUnitDetail(\'' + project.id + '\')" title="' + u.number + ' · ' + u.type + ' · ' + u.size + ' · ' + u.status + '">' +
           '<div style="font-size:10px;font-weight:700;color:' + color + '">' + u.number + '</div>' +
           '<div style="font-size:7px;color:#888;margin-top:1px;white-space:nowrap;overflow:hidden">' + u.type + '</div>' +
           '<div style="font-size:7px;color:#888;white-space:nowrap;overflow:hidden">' + u.size.split(' ')[0] + '</div>' +
@@ -3105,7 +3106,7 @@ function renderPropProjects() {
   return '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Location</th><th>Type</th><th>Floors</th><th>Units</th><th>Status</th><th>Timeline</th><th></th></tr></thead><tbody>' +
     pP.items.map(function(p) {
       var statusColor = { 'Active': '#4caf50', 'Planning': '#ff9800', 'Completed': '#2196f3' }[p.status] || '#888';
-      return '<tr style="cursor:pointer" onclick="propUnitTab=\\'grid\\';propFilter=\\'' + p.id + '\\';renderModule()">' +
+      return '<tr style="cursor:pointer" onclick="propUnitTab=\'grid\';renderModule()">' +
         '<td style="font-weight:500;font-size:10px;font-family:monospace">' + p.id + '</td>' +
         '<td style="font-weight:500">' + p.name + '</td>' +
         '<td style="font-size:10px;color:#555">' + p.location + '</td>' +
