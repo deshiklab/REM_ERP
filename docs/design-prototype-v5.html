@@ -796,6 +796,30 @@ window.mockTransactions = DB.init('transactions', [
   {id:'RCP-8844',date:'2026-06-05',desc:'Booking - Laily Akhter',client:'Laily Akhter',project:'Muktodhara',type:'Inflow',category:'Booking',status:'Received',amount:475000,fmt:'+ ₹4,75,000'},
   {id:'PAY-3316',date:'2026-06-04',desc:'Office utilities & rent',client:'',project:'',type:'Outflow',category:'Admin',status:'Paid',amount:125000,fmt:'- ₹1,25,000'}
 ]);
+// ═══ INVOICES ═══
+window.mockInvoices = DB.init('invoices', [
+  {id:'INV-001',leadId:1,client:'Tariqul Islam',project:'Muktodhara',unit:'5 Katha',amount:15000000,status:'Sent',dueDate:'2026-07-15',issuedDate:'2026-06-15',desc:'Downpayment invoice for 5 Katha plot - Muktodhara',items:[{desc:'Plot Booking Fee',qty:1,rate:5000000},{desc:'Registration & Legal',qty:1,rate:150000},{desc:'Service Charge',qty:1,rate:50000}]},
+  {id:'INV-002',leadId:2,client:'Dr. Rubina Ali',project:'Jolshiri',unit:'Apt 4B',amount:22000000,status:'Paid',dueDate:'2026-06-01',issuedDate:'2026-05-15',desc:'Full booking invoice for Apt 4B - Jolshiri',items:[{desc:'Apartment Cost (3BHK)',qty:1,rate:18000000},{desc:'Car Parking',qty:1,rate:3000000},{desc:'Utility Connection',qty:1,rate:1000000}]},
+  {id:'INV-003',leadId:4,client:'Kamrul Hasan',project:'Jolshiri',unit:'Apt 9A',amount:18000000,status:'Paid',dueDate:'2026-05-20',issuedDate:'2026-04-20',desc:'Booking invoice for Apt 9A',items:[{desc:'Apartment Cost (3BHK)',qty:1,rate:15000000},{desc:'Car Parking',qty:1,rate:2000000},{desc:'Documentation Fee',qty:1,rate:1000000}]},
+  {id:'INV-004',leadId:8,client:'Mrs. Jahanara Begum',project:'Jolshiri',unit:'Apt 3C',amount:20000000,status:'Overdue',dueDate:'2026-05-30',issuedDate:'2026-04-30',desc:'Final installment invoice for Apt 3C',items:[{desc:'Balance Payment (2BHK)',qty:1,rate:16000000},{desc:'Maintenance Deposit',qty:1,rate:2000000},{desc:'Modification Charges',qty:1,rate:2000000}]},
+  {id:'INV-005',leadId:12,client:'Mr. Abdul Karim',project:'Jolshiri',unit:'Apt 12B',amount:28000000,status:'Draft',dueDate:'2026-08-01',issuedDate:'2026-07-01',desc:'Proforma invoice for Apt 12B - Jolshiri',items:[{desc:'Apartment Cost (4BHK)',qty:1,rate:24000000},{desc:'Premium Finishes',qty:1,rate:3000000},{desc:'Registration Fee',qty:1,rate:1000000}]},
+  {id:'INV-006',leadId:19,client:'Rashida Begum',project:'Skyline',unit:'Apt 12A',amount:38000000,status:'Sent',dueDate:'2026-07-10',issuedDate:'2026-06-10',desc:'Installment invoice for Apt 12A - Skyline Towers',items:[{desc:'5th Installment (4BHK)',qty:1,rate:35000000},{desc:'Interest Adjustment',qty:1,rate:2500000},{desc:'Late Fee Waiver',qty:1,rate:500000}]},
+  {id:'INV-007',leadId:19,client:'Rashida Begum',project:'Skyline',unit:'Apt 12A',amount:8000000,status:'Paid',dueDate:'2026-05-01',issuedDate:'2026-04-01',desc:'Downpayment invoice for Apt 12A',items:[{desc:'Booking Advance',qty:1,rate:5000000},{desc:'Agreement Fee',qty:1,rate:2000000},{desc:'Stamp Duty',qty:1,rate:1000000}]},
+  {id:'INV-008',leadId:18,client:'Delwar Hossain',project:'Muktodhara',unit:'Apt 4C',amount:8000000,status:'Overdue',dueDate:'2026-06-01',issuedDate:'2026-05-01',desc:'2nd installment invoice for Apt 4C',items:[{desc:'2nd Installment (3BHK)',qty:1,rate:7000000},{desc:'Maintenance Fee',qty:1,rate:1000000}]}
+]);
+// ═══ PAYMENTS ═══
+window.mockPayments = DB.init('payments', [
+  {id:'PAY-001',invoiceId:'INV-002',leadId:2,client:'Dr. Rubina Ali',amount:5000000,date:'2026-05-20',method:'Bank Transfer',reference:'TRF-2026-0451',status:'Cleared',notes:'Full downpayment received via wire transfer'},
+  {id:'PAY-002',invoiceId:'INV-002',leadId:2,client:'Dr. Rubina Ali',amount:17000000,date:'2026-06-01',method:'Cheque',reference:'CHQ-448921',status:'Cleared',notes:'Balance payment cleared'},
+  {id:'PAY-003',invoiceId:'INV-003',leadId:4,client:'Kamrul Hasan',amount:10000000,date:'2026-04-25',method:'Bank Transfer',reference:'TRF-2026-0387',status:'Cleared',notes:'Downpayment received'},
+  {id:'PAY-004',invoiceId:'INV-003',leadId:4,client:'Kamrul Hasan',amount:8000000,date:'2026-05-15',method:'Online',reference:'ONL-PAY-8891',status:'Cleared',notes:'Balance via bKash'},
+  {id:'PAY-005',invoiceId:'INV-007',leadId:19,client:'Rashida Begum',amount:5000000,date:'2026-04-05',method:'Bank Transfer',reference:'TRF-2026-0302',status:'Cleared',notes:'Booking advance'},
+  {id:'PAY-006',invoiceId:'INV-007',leadId:19,client:'Rashida Begum',amount:3000000,date:'2026-04-28',method:'Cheque',reference:'CHQ-447210',status:'Cleared',notes:'Agreement + stamp duty'},
+  {id:'PAY-007',invoiceId:'INV-004',leadId:8,client:'Mrs. Jahanara Begum',amount:8000000,date:'2026-05-01',method:'Cash',reference:'CASH-2026-05',status:'Cleared',notes:'Partial payment, balance overdue'},
+  {id:'PAY-008',invoiceId:'INV-001',leadId:1,client:'Tariqul Islam',amount:5000000,date:'2026-06-20',method:'Online',reference:'ONL-PAY-9012',status:'Pending',notes:'Advance payment, awaiting clearance'},
+  {id:'PAY-009',invoiceId:null,leadId:10,client:'Engr. Salahuddin',amount:2000000,date:'2026-06-10',method:'Bank Transfer',reference:'TRF-2026-0523',status:'Cleared',notes:'Site Visit deposit refundable'},
+  {id:'PAY-010',invoiceId:null,leadId:7,client:'Shamim Reza',amount:500000,date:'2026-06-12',method:'Cash',reference:'CASH-2026-06-12',status:'Cleared',notes:'Booking advance for Muktodhara plot'}
+]);
 window.mockProjectBudgets = DB.init('project_budgets', [
   {id:'BGT-001',name:'Muktodhara Green Park',type:'Land Plotting',budget:50000000,allocated:{materials:15000000,labor:8000000,legal:3000000,marketing:2000000,admin:4000000,contingency:8000000},spent:{materials:10500000,labor:5200000,legal:1800000,marketing:1500000,admin:2800000,contingency:1200000},progress:54},
   {id:'BGT-002',name:'Jolshiri Abason',type:'Apartment',budget:120000000,allocated:{materials:38000000,labor:22000000,legal:6000000,marketing:8000000,admin:10000000,contingency:36000000},spent:{materials:20500000,labor:9500000,legal:2800000,marketing:5200000,admin:4500000,contingency:5000000},progress:38}
@@ -1532,6 +1556,7 @@ function renderDashboardCharts(){
 }
 
 var crmSubView='leads';
+var crmInvTab='all'; // invoices tab filter: all/sent/paid/overdue/draft
 function renderCustomers(el){
   var f=getSmartFilters();
   var filtered=mockEntities.filter(function(e){return e.roles.indexOf('customer')>=0||e.roles.indexOf('buyer')>=0||true});
@@ -1844,7 +1869,7 @@ function renderCRM(el){
       return '<div class="stat-card" style="padding:5px 6px"><div class="label" style="font-size:8px">'+s+'</div><div class="value" style="font-size:13px;color:'+{NIC:'#1565c0',CT:'#e65100',SV:'#c62828',NG:'#7b1fa2',BK:'#2e7d32',DP:'#00838f',IN:'#f9a825',PS:'#00695c',HO:'#33691e'}[{NIC:'NIC',CT:'CT',SV:'SV',NG:'NG',BK:'BK',DP:'DP',IN:'IN',PS:'PS',HO:'HO'}[s.slice(0,2)]||'NIC']+'">'+c+'</div></div>';
     }).join('')}</div>`:''}
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Pipeline</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div></div>
+      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Pipeline</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div></div>
       ${crmSubView==='leads'||crmSubView==='pipeline'?`
       <input id="crmSearch" placeholder="Search name/phone/property..." oninput="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${LEAD_STAGES.map(function(s){return '<option value="'+s+'"'+(f.sf===s?' selected':'')+'>'+s+'</option>'}).join('')}<option value="Lost"${f.sf==='Lost'?' selected':''}>Lost</option><option value="Junk"${f.sf==='Junk'?' selected':''}>Junk</option></select>
@@ -1873,9 +1898,20 @@ function renderCRM(el){
       <input id="brkSearch" placeholder="Search broker name/phone/region..." oninput="_PG['brokers']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <div class="spacer"></div>
       <button class="action-btn primary" onclick="crudBroker()" style="padding:3px 8px;font-size:10px">+ Add Broker</button>
+      `:crmSubView==='invoices'?`
+      <input id="invSearch" placeholder="Search client/invoice..." oninput="_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
+      <div class="tabs" style="margin:0 4px 0 0"><div class="tab ${crmInvTab==='all'?'active':''}" onclick="crmInvTab='all';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">All</div><div class="tab ${crmInvTab==='draft'?'active':''}" onclick="crmInvTab='draft';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Draft</div><div class="tab ${crmInvTab==='sent'?'active':''}" onclick="crmInvTab='sent';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Sent</div><div class="tab ${crmInvTab==='paid'?'active':''}" onclick="crmInvTab='paid';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Paid</div><div class="tab ${crmInvTab==='overdue'?'active':''}" onclick="crmInvTab='overdue';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Overdue</div></div>
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="crudInvoice()" style="padding:3px 8px;font-size:10px">+ New Invoice</button>
+      `:crmSubView==='payments'?`
+      <input id="paySearch" placeholder="Search client/payment..." oninput="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
+      <select id="payMethod" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Method</option><option value="Bank Transfer">Bank Transfer</option><option value="Cheque">Cheque</option><option value="Cash">Cash</option><option value="Online">Online</option></select>
+      <select id="payStatus" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Status</option><option value="Cleared">Cleared</option><option value="Pending">Pending</option></select>
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="crudPayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button>
       `:''}
     </div>
-    ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):renderComplaints(pcomp)}
+    ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):crmSubView==='complaints'?renderComplaints(pcomp):crmSubView==='invoices'?renderInvoices(filtered):crmSubView==='payments'?renderPayments():''}
   </div>`;
 }
 
@@ -2018,6 +2054,156 @@ function resolveComplaint(id){
   var s=parseInt(sat);if(isNaN(s)||s<1||s>5){showToast('Enter 1-5','error');return;}
   c.status='Resolved';c.resolvedDate=new Date().toISOString().slice(0,10);c.satisfaction=s;
   DB.save('complaints');renderModule();closeModal();showToast('Complaint resolved! ✅','success');
+}
+
+
+// ═══ INVOICES ═══
+function renderInvoices(filtered){
+  var f=(document.getElementById('invSearch')||{}).value||'';
+  var invs=mockInvoices.filter(function(inv){
+    if(f&&inv.client.toLowerCase().indexOf(f.toLowerCase())===-1&&inv.id.toLowerCase().indexOf(f.toLowerCase())===-1)return false;
+    if(crmInvTab!=='all'&&inv.status.toLowerCase()!==crmInvTab)return false;
+    return true;
+  });
+  var totalAmt=invs.reduce(function(s,i){return s+(i.amount||0)},0);
+  var pi=_pg('invoices',invs);
+  return '<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr))">'+
+    ['All','Draft','Sent','Paid','Overdue'].map(function(s){ 
+      var c=mockInvoices.filter(function(i){return s==='All'?true:i.status.toLowerCase()===s.toLowerCase()}).length;
+      return '<div class="stat-card" style="padding:4px"><div class="label" style="font-size:8px">'+s+'</div><div class="value" style="font-size:14px;color:'+{All:'#2F80ED',Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[s]+'">'+c+'</div></div>';
+    }).join('')+
+    '<div class="stat-card" style="padding:4px"><div class="label" style="font-size:8px">Total Value</div><div class="value" style="font-size:14px;color:#2e7d32">৳'+(totalAmt/10000000).toFixed(1)+'Cr</div></div>'+
+  '</div><div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Client</th><th>Project</th><th>Amount</th><th>Issued</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+
+  pi.items.map(function(inv){
+    var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[inv.status]||'#888';
+    var stBg={Draft:'#f5f5f5',Sent:'#fff3e0',Paid:'#e8f5e9',Overdue:'#ffebee'}[inv.status]||'#f5f5f5';
+    var paidAmt=mockPayments.filter(function(p){return p.invoiceId===inv.id}).reduce(function(s,p){return s+(p.amount||0)},0);
+    var dueAmt=(inv.amount||0)-paidAmt;
+    return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td style="font-weight:600;font-size:10px;color:#2F80ED">'+inv.id+'</td><td style="font-weight:500">'+inv.client+'</td><td style="font-size:10px">'+inv.project+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+inv.issuedDate+'</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span><br><span style="font-size:7px;color:#888">Due: ৳'+(dueAmt/100000).toFixed(1)+'L</span></td><td style="white-space:nowrap">'+
+      (inv.status==='Sent'||inv.status==='Draft'?'<span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();markInvoicePaid(\''+inv.id+'\')">✓ Mark Paid</span> ':'')+
+      (inv.status!=='Overdue'?'<span style="color:#e65100;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();markInvoiceOverdue(\''+inv.id+'\')">⚠ Overdue</span> ':'')+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="event.stopPropagation();crudInvoice(mockInvoices.find(function(x){return x.id===\''+inv.id+'\'}))">✎</span>'+
+    '</td></tr>';
+  }).join('')+
+  '</tbody></table>'+_pgHtml('invoices',pi.total,pi.page,pi.totalPages,pi.perPage)+'</div></div></div>';
+}
+function renderPayments(){
+  var f=(document.getElementById('paySearch')||{}).value||'';
+  var mf=(document.getElementById('payMethod')||{}).value||'';
+  var sf=(document.getElementById('payStatus')||{}).value||'';
+  var pymts=mockPayments.filter(function(p){
+    if(f&&p.client.toLowerCase().indexOf(f.toLowerCase())===-1&&p.id.toLowerCase().indexOf(f.toLowerCase())===-1)return false;
+    if(mf&&p.method!==mf)return false;
+    if(sf&&p.status!==sf)return false;
+    return true;
+  });
+  var totalClr=pymts.filter(function(p){return p.status==='Cleared'}).reduce(function(s,p){return s+(p.amount||0)},0);
+  var totalPen=pymts.filter(function(p){return p.status==='Pending'}).reduce(function(s,p){return s+(p.amount||0)},0);
+  var pp=_pg('payments',pymts);
+  return '<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr))">'+
+    ['Total','Cleared','Pending'].map(function(s,i){ 
+      var amt=i===0?mockPayments.reduce(function(s,p){return s+(p.amount||0)},0):i===1?totalClr:totalPen;
+      var cols=['#2F80ED','#2e7d32','#e65100'];
+      return '<div class="stat-card" style="padding:4px"><div class="label" style="font-size:8px">'+s+'</div><div class="value" style="font-size:14px;color:'+cols[i]+'">৳'+(amt/100000).toFixed(1)+'L</div></div>';
+    }).join('')+
+    '<div class="stat-card" style="padding:4px"><div class="label" style="font-size:8px">Payments</div><div class="value" style="font-size:14px;color:#1565c0">'+pymts.length+'</div></div>'+
+  '</div><div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Invoice</th><th>Amount</th><th>Date</th><th>Method</th><th>Reference</th><th>Status</th><th></th></tr></thead><tbody>'+
+  pp.items.map(function(p){
+    var stCol=p.status==='Cleared'?'#2e7d32':'#e65100';
+    var stBg=p.status==='Cleared'?'#e8f5e9':'#fff3e0';
+    return '<tr><td style="font-weight:500;font-size:10px;color:#2F80ED">'+p.id+'</td><td style="font-weight:500">'+p.client+'</td><td style="font-size:10px;color:#888">'+(p.invoiceId||'—')+'</td><td style="font-weight:600;color:#2e7d32;font-size:10px">৳'+(p.amount/100000).toFixed(1)+'L</td><td style="font-size:9px">'+p.date+'</td><td><span style="padding:1px 4px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+p.method+'</span></td><td style="font-size:9px;color:#888">'+(p.reference||'—')+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+p.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:9px" onclick="crudPayment(mockPayments.find(function(x){return x.id==='+p.id+'}))">✎</span></td></tr>';
+  }).join('')+
+  '</tbody></table>'+_pgHtml('payments',pp.total,pp.page,pp.totalPages,pp.perPage)+'</div></div></div>';
+}
+function openInvoice(id){
+  var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
+  var paidAmt=mockPayments.filter(function(p){return p.invoiceId===id&&p.status==='Cleared'}).reduce(function(s,p){return s+(p.amount||0)},0);
+  var dueAmt=(inv.amount||0)-paidAmt;
+  var itemsHtml=inv.items.map(function(it,i){
+    return '<tr><td>'+(i+1)+'</td><td>'+it.desc+'</td><td class="num">'+it.qty+'</td><td class="num">৳'+(it.rate/100000).toFixed(2)+'L</td><td class="num" style="font-weight:600">৳'+((it.qty*it.rate)/100000).toFixed(2)+'L</td></tr>';
+  }).join('');
+  var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[inv.status]||'#888';
+  var actions='';
+  if(inv.status==='Draft'||inv.status==='Sent'){
+    actions='<button class="action-btn" onclick="markInvoicePaid('+inv.id+')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">✓ Mark Paid</button> ';
+  }
+  if(inv.status==='Sent'||inv.status==='Paid'){
+    actions+='<button class="action-btn secondary" onclick="markInvoiceOverdue('+inv.id+')" style="padding:3px 8px;font-size:9px">⚠ Overdue</button> ';
+  }
+  if(inv.status==='Overdue'){
+    actions+='<button class="action-btn" onclick="markInvoicePaid('+inv.id+')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">✓ Mark Paid (overdue)</button> ';
+  }
+  var statusHtml='<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:'+stCol+'">'+inv.status+'</span>';
+  var invLead=mockLeads.find(function(l){return l.id===inv.leadId});
+  openModal('📄 '+inv.id+' — '+inv.client,
+    '<div style="font-size:10px;line-height:1.6">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:14px;font-weight:700">'+inv.client+'</div><div style="color:#888">'+inv.project+(inv.unit?' · '+inv.unit:'')+'</div></div><div style="text-align:right">'+statusHtml+'</div></div>'+
+      '<div class="stats-row" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:8px">'+
+        '<div class="stat-card"><div class="label">Issued</div><div style="font-size:11px;font-weight:600">'+inv.issuedDate+'</div></div>'+
+        '<div class="stat-card"><div class="label">Due Date</div><div style="font-size:11px;font-weight:600;color:'+(inv.status==='Overdue'?'#c62828':'#333')+'">'+inv.dueDate+'</div></div>'+
+        '<div class="stat-card"><div class="label">Description</div><div style="font-size:10px">'+inv.desc+'</div></div>'+
+      '</div>'+
+      (invLead?'<div style="margin-bottom:6px;font-size:9px;color:#2F80ED;cursor:pointer" onclick="closeModal();openLead('+invLead.id+')">👤 View Lead: '+invLead.name+' →</div>':'')+
+      '<h3 style="font-size:10px;font-weight:600;color:#555;margin-bottom:4px">📋 Invoice Items</h3>'+
+      '<table style="width:100%;font-size:9px"><thead><tr><th>#</th><th>Description</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Total</th></tr></thead><tbody>'+itemsHtml+
+      '<tr><td colspan="4" style="text-align:right;font-weight:600;padding-top:6px">Subtotal</td><td class="num" style="font-weight:600;padding-top:6px">৳'+(inv.amount/100000).toFixed(2)+'L</td></tr>'+
+      '<tr><td colspan="4" style="text-align:right;color:#888">Paid</td><td class="num" style="color:#2e7d32;font-weight:600">৳'+(paidAmt/100000).toFixed(2)+'L</td></tr>'+
+      '<tr><td colspan="4" style="text-align:right;font-weight:600;color:'+(dueAmt>0?'#c62828':'#2e7d32')+'">Due</td><td class="num" style="font-weight:700;color:'+(dueAmt>0?'#c62828':'#2e7d32')+'">৳'+(dueAmt/100000).toFixed(2)+'L</td></tr>'+
+      '</tbody></table>'+
+      (mockPayments.filter(function(p){return p.invoiceId===id}).length?'<h3 style="font-size:10px;font-weight:600;color:#555;margin:8px 0 4px">💰 Payments on this Invoice</h3>'+
+        mockPayments.filter(function(p){return p.invoiceId===id}).map(function(p){
+          return '<div class="installment-item"><div><div style="font-size:10px;font-weight:500">'+p.id+'</div><div style="font-size:9px;color:#888">'+p.date+' · '+p.method+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div><span style="font-size:8px;color:'+(p.status==='Cleared'?'#2e7d32':'#e65100')+'">'+p.status+'</span></div></div>';
+        }).join(''):'')+
+    '</div>',
+    actions+'<button onclick="closeModal()">Close</button>'
+  );
+}
+function markInvoicePaid(id){
+  var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
+  inv.status='Paid';DB.save('invoices');showToast(inv.id+' marked Paid ✅','success');closeModal();renderModule();
+}
+function markInvoiceOverdue(id){
+  var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
+  inv.status='Overdue';DB.save('invoices');showToast(inv.id+' marked Overdue ⚠','info');closeModal();renderModule();
+}
+function crudInvoice(item){
+  var n=!item;
+  var inv=n?{id:'INV-'+(100+Math.floor(Math.random()*900)),leadId:null,client:'',project:'',unit:'',amount:0,status:'Draft',dueDate:'',issuedDate:new Date().toISOString().slice(0,10),desc:'',items:[{desc:'Item',qty:1,rate:0}]}:item;
+  var leadOpts=mockLeads.map(function(l){return '<option value="'+l.id+'"'+(inv.leadId===l.id?' selected':'')+'>'+l.name+' — '+l.property+'</option>'}).join('');
+  openModal(n?'New Invoice':'Edit Invoice',
+    '<div style="max-height:55vh;overflow-y:auto;padding-right:4px">'+
+    '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:4px;padding:2px 6px;background:#eef3ff;border-radius:4px">📄 Invoice Details</div>'+
+    formRow(inputField('Client *','f_invClient',inv.client,'',true),inputField('Project','f_invProj',inv.project))+
+    formRow(inputField('Unit','f_invUnit',inv.unit||''),inputField('Amount (BDT)','f_invAmt',inv.amount,'number',true))+
+    formRow(selectField('Status','f_invStatus',inv.status,['Draft','Sent','Paid','Overdue']),inputField('Due Date','f_invDue',inv.dueDate))+
+    inputField('Description','f_invDesc',inv.desc||'')+
+    '</div>',
+    function(){
+      var d={id:inv.id,leadId:inv.leadId,client:g('f_invClient'),project:g('f_invProj'),unit:g('f_invUnit')||'',amount:parseInt(g('f_invAmt'))||0,status:g('f_invStatus')||'Draft',dueDate:g('f_invDue'),issuedDate:inv.issuedDate,desc:g('f_invDesc')||'',items:inv.items};
+      n?addItem(mockInvoices,d,'invoices'):updateItem(mockInvoices,inv.id,d,'invoices');
+    }
+  );
+}
+
+// ═══ PAYMENTS ═══
+function crudPayment(item){
+  var n=!item;
+  var pymt=n?{id:'PAY-'+(100+Math.floor(Math.random()*900)),invoiceId:null,leadId:null,client:'',amount:0,date:new Date().toISOString().slice(0,10),method:'Bank Transfer',reference:'',status:'Pending',notes:''}:item;
+  var invOpts='<option value="">No invoice</option>'+mockInvoices.map(function(inv){ return '<option value="'+inv.id+'"'+(pymt.invoiceId===inv.id?' selected':'')+'>'+inv.id+' — '+inv.client+' (৳'+(inv.amount/100000).toFixed(1)+'L)</option>';}).join('');
+  openModal(n?'Record Payment':'Edit Payment',
+    '<div style="max-height:55vh;overflow-y:auto;padding-right:4px">'+
+    '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:4px;padding:2px 6px;background:#eef3ff;border-radius:4px">💰 Payment</div>'+
+    formRow(inputField('Client *','f_payClient',pymt.client,'',true),inputField('Amount (BDT) *','f_payAmt',pymt.amount,'number',true))+
+    formRow(inputField('Date','f_payDate',pymt.date),selectField('Method','f_payMethod',pymt.method,['Bank Transfer','Cheque','Cash','Online']))+
+    formRow(inputField('Reference','f_payRef',pymt.reference||''),selectField('Status','f_payStatus',pymt.status,['Cleared','Pending']))+
+    '<div style="margin-top:4px"><label style="font-size:9px;font-weight:600;color:#555;display:block;margin-bottom:2px">Link to Invoice</label><select id="f_payInv" style="width:100%;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;outline:none">'+invOpts+'</select></div>'+
+    inputField('Notes','f_payNotes',pymt.notes||'')+
+    '</div>',
+    function(){
+      var d={id:pymt.id,invoiceId:document.getElementById('f_payInv').value||null,leadId:pymt.leadId,client:g('f_payClient'),amount:parseInt(g('f_payAmt'))||0,date:g('f_payDate'),method:g('f_payMethod'),reference:g('f_payRef')||'',status:g('f_payStatus')||'Pending',notes:g('f_payNotes')||''};
+      n?addItem(mockPayments,d,'payments'):updateItem(mockPayments,pymt.id,d,'payments');
+    }
+  );
 }
 
 function crudBroker(item){
@@ -5804,8 +5990,8 @@ function openLeadPanel(leadId,tab){
   const isConverted=['Booking','Downpayment','Installments','Possession','Handover','Completed'].includes(l.status);
   const isLost=['Lost','Junk'].includes(l.status);
   // Lead tabs (pre-sales) — no financial/payment info
-  const tabs=['profile','proposals','tasks','attachments','reminders','notes','activities','chathistory'];
-  const tabLabels=['Profile','Proposals','Tasks','Attachments','Reminders','Notes','Activity Log','Chat/Contact'];
+  const tabs=['profile','proposals','tasks','attachments','reminders','notes','activities','chathistory','invoices','payments'];
+  const tabLabels=['Profile','Proposals','Tasks','Attachments','Reminders','Notes','Activity Log','Chat/Contact','Invoices','Payments'];
   let tabContent='';
   // ── PROFILE TAB ──
   if(tab==='profile'){
@@ -5958,6 +6144,36 @@ function openLeadPanel(leadId,tab){
       chHTML+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No contact history yet.</div>';
     }
     tabContent=chHTML;
+  // ── INVOICES TAB ──
+  }else if(tab==='invoices'){
+    var invs=mockInvoices.filter(function(inv){ return inv.leadId===l.id; });
+    var iHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="font-size:11px;font-weight:600;color:#555;display:flex;align-items:center;gap:4px">📄 Invoices</h3><button onclick="crudInvoice(mockInvoices.find(function(x){return x.leadId==='+l.id+'}))" class="mini-btn">+ New Invoice</button></div>';
+    if(invs.length>0){
+      for(var ii=0; ii<invs.length; ii++){
+        var inv=invs[ii];
+        var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[inv.status]||'#888';
+        var stBg={Draft:'#f5f5f5',Sent:'#fff3e0',Paid:'#e8f5e9',Overdue:'#ffebee'}[inv.status]||'#f5f5f5';
+        iHTML+='<div class="installment-item" style="cursor:pointer" onclick="openInvoice('+inv.id+')"><div><div style="font-size:11px;font-weight:600;color:#2F80ED">'+inv.id+'</div><div style="font-size:9px;color:#888">'+inv.project+(inv.unit?' · '+inv.unit:'')+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(inv.amount/100000).toFixed(1)+'L</div><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span></div></div>';
+      }
+    }else{
+      iHTML+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No invoices created yet.</div>';
+    }
+    tabContent=iHTML;
+  // ── PAYMENTS TAB ──
+  }else if(tab==='payments'){
+    var pmts=mockPayments.filter(function(p){ return p.leadId===l.id||(p.invoiceId&&mockInvoices.some(function(inv){return inv.leadId===l.id&&inv.id===p.invoiceId})); });
+    var totalPaid=pmts.reduce(function(s,p){return s+(p.amount||0)},0);
+    var pHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="font-size:11px;font-weight:600;color:#555;display:flex;align-items:center;gap:4px">💰 Payments</h3><div><span style="font-size:11px;font-weight:700;color:#2e7d32">Total: ৳'+(totalPaid/100000).toFixed(2)+'L</span> <button onclick="crudPayment()" class="mini-btn">+ Record Payment</button></div></div>';
+    if(pmts.length>0){
+      for(var pi2=0; pi2<pmts.length; pi2++){
+        var p=pmts[pi2];
+        var stCol=p.status==='Cleared'?'#2e7d32':'#e65100';
+        pHTML+='<div class="installment-item"><div><div style="font-size:10px;font-weight:500">'+p.id+'</div><div style="font-size:9px;color:#888">'+p.date+' · '+p.method+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div><span style="font-size:8px;color:'+stCol+'">'+p.status+'</span><br><span style="font-size:8px;color:#888">'+(p.reference||'')+'</span></div></div>';
+      }
+    }else{
+      pHTML+='<div style="text-align:center;padding:28px;color:#999;font-size:11px;border:2px dashed #e0e0e0;border-radius:8px">No payments recorded yet.</div>';
+    }
+    tabContent=pHTML;
   }
   // ── HEADER ──
   var headerHtml='<div class="lead-header" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;gap:10px;align-items:center"><div class="lead-avatar">'+leadGetInitials(l.name)+'</div><div><div class="lead-info-row" style="margin-bottom:3px">' +
