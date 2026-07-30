@@ -619,9 +619,9 @@ const GROUPS = {
   land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
   construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
-  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
-  collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'bi_reports',label:'BI Reports',badge:true},{id:'notifications_page',label:'Notifications'}] },
-  system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'}] }
+  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_reminders',label:'Payment Reminders',badge:true},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
+  collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'bi_reports',label:'BI Reports',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
+  system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] }
 };
 const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','collaboration','system'];
 
@@ -1034,6 +1034,8 @@ window.mockInvoices = DB.init('invoices', [
   {id:'INV-007',leadId:19,client:'Rashida Begum',project:'Skyline',unit:'Apt 12A',amount:8000000,status:'Paid',dueDate:'2026-05-01',issuedDate:'2026-04-01',desc:'Downpayment invoice for Apt 12A',items:[{desc:'Booking Advance',qty:1,rate:5000000},{desc:'Agreement Fee',qty:1,rate:2000000},{desc:'Stamp Duty',qty:1,rate:1000000}]},
   {id:'INV-008',leadId:18,client:'Delwar Hossain',project:'Muktodhara',unit:'Apt 4C',amount:8000000,status:'Overdue',dueDate:'2026-06-01',issuedDate:'2026-05-01',desc:'2nd installment invoice for Apt 4C',items:[{desc:'2nd Installment (3BHK)',qty:1,rate:7000000},{desc:'Maintenance Fee',qty:1,rate:1000000}]}
 ]);
+// ═══ ACTIVITY LOG (global audit trail) ═══
+window.mockActivityLog = DB.init('activity_log', []);
 // ═══ PAYMENTS ═══
 window.mockPayments = DB.init('payments', [
   {id:'PAY-001',invoiceId:'INV-002',leadId:2,client:'Dr. Rubina Ali',amount:5000000,date:'2026-05-20',method:'Bank Transfer',reference:'TRF-2026-0451',status:'Cleared',notes:'Full downpayment received via wire transfer'},
@@ -1711,6 +1713,9 @@ function switchModule(mod) {
     case 'workspace': renderWorkspace(el); break;
     case 'bi_reports': renderBIReports(el); break;
     case 'notifications_page': renderNotificationsPage(el); break;
+    case 'payment_reminders': renderPaymentReminders(el); break;
+    case 'activity_log': renderActivityLog(el); break;
+    case 'csv_import': renderCsvImport(el); break;
     case 'permissions': renderPermissions(el); break;
     case 'settings': renderSettings(el); break;
     case 'system_docs': renderSystemDocs(el); break;
@@ -1796,6 +1801,23 @@ function renderDashboardCharts(){
   var eCtx=document.getElementById('expChart');if(eCtx)try{window._dbCharts.push(new Chart(eCtx,{type:'doughnut',data:{labels:['Construction','Materials','Marketing','Admin','Labor','Other'],datasets:[{data:[38,25,12,10,8,7],backgroundColor:['#1565c0','#e65100','#2e7d32','#7b1fa2','#00897b','#888'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
   var lCtx=document.getElementById('leadChart');if(lCtx)try{window._dbCharts.push(new Chart(lCtx,{type:'line',data:{labels:months.slice(0,9),datasets:[{label:'Inquiries',data:[8,12,9,15,11,18,14,20,16],borderColor:'#1565c0',backgroundColor:'rgba(21,101,192,.1)',fill:true,tension:.35,pointRadius:3},{label:'Conversions',data:[2,3,4,5,4,7,6,8,7],borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.1)',fill:true,tension:.35,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}}));}catch(e){}
 }
+
+// ═══ ACTIVITY LOG HELPER ═══
+function logActivity(action, module, entity, entityId, details) {
+  if (!window.mockActivityLog) window.mockActivityLog = [];
+  mockActivityLog.push({
+    id: nextId(mockActivityLog),
+    timestamp: new Date().toISOString(),
+    user: typeof currentRole !== 'undefined' ? currentRole : 'System',
+    action: action,
+    module: module,
+    entity: entity || module,
+    entityId: entityId || '',
+    details: details || ''
+  });
+  DB.save('activity_log');
+}
+
 function renderAnalytics(el){
   if(window._anCharts)window._anCharts.forEach(function(c){c.destroy()});
   window._anCharts=[];
@@ -7593,9 +7615,9 @@ function inputField(l,id,v,p,r){return '<div class="form-group"><label class="fo
 function selectField(l,id,v,ops,r){return '<div class="form-group"><label class="form-label">'+l+(r?' <span style="color:#e53935">*</span>':'')+'</label><select class="form-input" id="'+id+'"'+(r?' required':'')+'>'+ops.map(function(o){return '<option value="'+o+'"'+(v===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'}
 function formRow(a,b){return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+a+b+'</div>'}
 function nextId(a){return Math.max(0,...a.map(function(i){return i.id||0}))+1}
-function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');renderModule()}
-function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');renderModule()}}
-function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info');renderModule()}}
+function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');logActivity('Created',k||'Unknown',k,i.id);renderModule()}
+function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');logActivity('Updated',k||'Unknown',k,id,JSON.stringify(u));renderModule()}}
+function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info');logActivity('Deleted',k||'Unknown',k,id,l);renderModule()}}
 // showModal: button-array based modal (used by Property & Units module)
 function showModal(title, body, buttons) {
   var footerHtml = buttons.map(function(b) {
@@ -9136,6 +9158,391 @@ function crudBIReport(id){
   );
 }
 
+
+// ═══ ENHANCED ACTIVITY LOG ═══
+function renderActivityLog(el) {
+  var log = window.mockActivityLog || [];
+  // Persist filter state on window so it survives re-renders
+  if (typeof window._actActionFilter === 'undefined') window._actActionFilter = '';
+  if (typeof window._actModuleFilter === 'undefined') window._actModuleFilter = '';
+  if (typeof window._actSearchFilter === 'undefined') window._actSearchFilter = '';
+  if (typeof window._actDateFrom === 'undefined') window._actDateFrom = '';
+  if (typeof window._actDateTo === 'undefined') window._actDateTo = '';
+  var actionFilter = window._actActionFilter;
+  var moduleFilter = window._actModuleFilter;
+  var searchFilter = window._actSearchFilter;
+  var dateRangeStart = window._actDateFrom;
+  var dateRangeEnd = window._actDateTo;
+
+  function buildTable() {
+    var filtered = log.filter(function(e) {
+      if (actionFilter && e.action !== actionFilter) return false;
+      if (moduleFilter && e.module !== moduleFilter) return false;
+      if (searchFilter) {
+        var s = searchFilter.toLowerCase();
+        if ((e.details||'').toLowerCase().indexOf(s) < 0 &&
+            (e.entity||'').toLowerCase().indexOf(s) < 0 &&
+            (e.entityId||'').toLowerCase().indexOf(s) < 0) return false;
+      }
+      if (dateRangeStart && e.timestamp.slice(0,10) < dateRangeStart) return false;
+      if (dateRangeEnd && e.timestamp.slice(0,10) > dateRangeEnd) return false;
+      return true;
+    });
+    // sort newest first
+    filtered = filtered.slice().sort(function(a,b) { return b.id - a.id; });
+    var pg = _pg('act_log', filtered, 15);
+    return pg.items.map(function(e) {
+      var ts = new Date(e.timestamp);
+      var fmtDate = ts.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      var fmtTime = ts.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+      var badgeColor = e.action === 'Created' ? '🟢' : e.action === 'Updated' ? '🔵' : '🔴';
+      var badgeClass = e.action === 'Created' ? 'badge-active' : e.action === 'Updated' ? 'badge-reserved' : 'badge-sold';
+      return '<tr><td style="font-size:9px;white-space:nowrap">'+fmtDate+'<br><span style="color:#999">'+fmtTime+'</span></td>'+
+        '<td style="font-size:10px">'+e.user+'</td>'+
+        '<td><span class="badge-status '+badgeClass+'" style="font-size:9px">'+badgeColor+' '+e.action+'</span></td>'+
+        '<td style="font-size:10px">'+(e.module||'')+'</td>'+
+        '<td style="font-size:10px">'+(e.entity||'')+'</td>'+
+        '<td style="font-size:9px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#888">'+((e.details||'').slice(0,80))+((e.details||'').length>80?'…':'')+'</td></tr>';
+    }).join('');
+  }
+
+  function render() {
+    // Build module filter options
+    var modules = [];
+    log.forEach(function(e) { if (e.module && modules.indexOf(e.module) < 0) modules.push(e.module); });
+    modules.sort();
+    var modOpts = '<option value="">All Modules</option>'+modules.map(function(m) { return '<option value="'+m+'"'+(m===moduleFilter?' selected':'')+'>'+m+'</option>'; }).join('');
+
+    var filtered = log.filter(function(e) {
+      if (actionFilter && e.action !== actionFilter) return false;
+      if (moduleFilter && e.module !== moduleFilter) return false;
+      if (searchFilter) {
+        var s = searchFilter.toLowerCase();
+        if ((e.details||'').toLowerCase().indexOf(s) < 0 &&
+            (e.entity||'').toLowerCase().indexOf(s) < 0 &&
+            (e.entityId||'').toLowerCase().indexOf(s) < 0) return false;
+      }
+      if (dateRangeStart && e.timestamp.slice(0,10) < dateRangeStart) return false;
+      if (dateRangeEnd && e.timestamp.slice(0,10) > dateRangeEnd) return false;
+      return true;
+    });
+    var pg = _pg('act_log', filtered, 15);
+
+    var html = '<div class="fade-in">'+
+      '<div class="page-title">📋 Activity Log</div>'+
+      '<div class="page-subtitle">'+log.length+' total entries · showing '+pg.items.length+'</div>'+
+      '<div class="card" style="margin-bottom:10px">'+
+        '<div class="card-body" style="padding:8px">'+
+          '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:end">'+
+            '<div><label style="font-size:9px;font-weight:600;color:#555;display:block;margin-bottom:2px">Action</label>'+
+              '<select id="act_filter_action" onchange="window._actActionFilter=this.value;renderModule()" style="padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px">'+
+                '<option value="">All</option><option value="Created">Created</option><option value="Updated">Updated</option><option value="Deleted">Deleted</option>'+
+              '</select></div>'+
+            '<div><label style="font-size:9px;font-weight:600;color:#555;display:block;margin-bottom:2px">Module</label>'+
+              '<select id="act_filter_module" onchange="window._actModuleFilter=this.value;renderModule()" style="padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;max-width:150px">'+modOpts+'</select></div>'+
+            '<div><label style="font-size:9px;font-weight:600;color:#555;display:block;margin-bottom:2px">From</label>'+
+              '<input type="date" id="act_filter_from" onchange="window._actDateFrom=this.value;renderModule()" style="padding:3px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px" value="'+dateRangeStart+'"></div>'+
+            '<div><label style="font-size:9px;font-weight:600;color:#555;display:block;margin-bottom:2px">To</label>'+
+              '<input type="date" id="act_filter_to" onchange="window._actDateTo=this.value;renderModule()" style="padding:3px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px" value="'+dateRangeEnd+'"></div>'+
+            '<div><label style="font-size:9px;font-weight:600;color:#555;display:block;margin-bottom:2px">Search</label>'+
+              '<input type="text" id="act_filter_search" placeholder="Search details…" oninput="window._actSearchFilter=this.value;renderModule()" style="padding:3px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;min-width:140px" value="'+searchFilter+'"></div>'+
+            '<div style="margin-left:auto"><button class="action-btn secondary" onclick="if(confirm(\'Clear entire activity log?\')){mockActivityLog=[];DB.save(\'activity_log\');renderModule()}" style="padding:4px 10px;font-size:10px;color:#c62828">🗑 Clear Log</button></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:65vh;overflow-y:auto"><table><thead><tr><th style="min-width:80px">Timestamp</th><th>User</th><th>Action</th><th>Module</th><th>Entity</th><th style="min-width:140px">Details</th></tr></thead><tbody>'+
+        (pg.items.length ? buildTable() : '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;font-size:12px">No activity log entries found</td></tr>')+
+      '</tbody></table></div>'+_pgHtml('act_log',pg.total,pg.page,pg.totalPages,pg.perPage)+'</div></div>'+
+    '</div>';
+    el.innerHTML = html;
+  }
+  render();
+}
+
+// ═══ PAYMENT REMINDERS ═══
+function renderPaymentReminders(el) {
+  var invoices = window.mockInvoices || [];
+  var payments = window.mockPayments || [];
+  var today = new Date();
+  today.setHours(0,0,0,0);
+
+  // Find overdue invoices (Sent or Overdue status, past due date)
+  var overdueInvs = invoices.filter(function(inv) {
+    if (inv.status !== 'Sent' && inv.status !== 'Overdue') return false;
+    if (!inv.dueDate) return false;
+    var due = new Date(inv.dueDate);
+    return due < today;
+  });
+
+  // Group by customer
+  var groups = {};
+  overdueInvs.forEach(function(inv) {
+    var client = inv.client || 'Unknown';
+    if (!groups[client]) groups[client] = { client: client, invoices: [], totalOverdue: 0 };
+    // Calculate paid amount
+    var paid = payments.filter(function(p) { return p.invoiceId === inv.id && p.status === 'Cleared'; })
+      .reduce(function(s,p) { return s + (p.amount || 0); }, 0);
+    var due = Math.max(0, (inv.amount || 0) - paid);
+    var dueDate = new Date(inv.dueDate);
+    var daysOverdue = Math.floor((today - dueDate) / (1000*60*60*24));
+    groups[client].invoices.push({ inv: inv, due: due, daysOverdue: daysOverdue, dueDate: inv.dueDate });
+    groups[client].totalOverdue += due;
+  });
+
+  var groupList = Object.keys(groups).sort().map(function(c) { return groups[c]; });
+
+  var html = '<div class="fade-in">'+
+    '<div class="page-title">📧 Payment Reminders</div>'+
+    '<div class="page-subtitle">'+overdueInvs.length+' overdue invoices across '+(groupList.length)+' customers</div>';
+
+  if (groupList.length === 0) {
+    html += '<div class="card"><div class="card-body" style="padding:30px;text-align:center;color:#999;font-size:13px">✅ No overdue invoices! All payments up to date.</div></div>';
+  } else {
+    groupList.forEach(function(g) {
+      html += '<div class="card" style="margin-bottom:10px">'+
+        '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center">'+
+          '<h3>👤 '+g.client+'</h3>'+
+          '<div style="display:flex;gap:8px;align-items:center">'+
+            '<span style="font-size:11px;color:#888">'+g.invoices.length+' invoice'+(g.invoices.length>1?'s':'')+' · ৳'+g.totalOverdue.toLocaleString('en-IN')+' overdue</span>'+
+            '<button class="action-btn primary" onclick="openReminderModal(\''+g.client.replace(/'/g,"\\'")+'\')" style="padding:4px 10px;font-size:10px">📧 Send Reminder</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Invoice ID</th><th class="num">Amount Due</th><th>Due Date</th><th class="num">Days Overdue</th><th>Status</th></tr></thead><tbody>';
+      g.invoices.forEach(function(gi) {
+        var daysCls = gi.daysOverdue > 60 ? '#c62828' : gi.daysOverdue > 30 ? '#e65100' : '#ff9800';
+        var statusBadge = gi.inv.status === 'Overdue' ? 'badge-sold' : 'badge-pending';
+        html += '<tr><td style="font-weight:500;font-size:10px;color:#2F80ED;cursor:pointer" onclick="openInvoice(\''+gi.inv.id+'\')">'+gi.inv.id+'</td>'+
+          '<td class="num" style="font-weight:600">৳'+gi.due.toLocaleString('en-IN')+'</td>'+
+          '<td style="font-size:10px">'+gi.dueDate+'</td>'+
+          '<td class="num" style="color:'+daysCls+';font-weight:600">'+gi.daysOverdue+' days</td>'+
+          '<td><span class="badge-status '+statusBadge+'">'+gi.inv.status+'</span></td></tr>';
+      });
+      html += '</tbody></table></div></div></div>';
+    });
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Define the openReminderModal function in window scope if not already
+  window.openReminderModal = function(clientName) {
+    var g = groups[clientName];
+    if (!g) return;
+    var lines = g.invoices.map(function(gi) {
+      return ' • Invoice '+gi.inv.id+' of ৳'+gi.due.toLocaleString('en-IN')+' (due '+gi.dueDate+', '+gi.daysOverdue+' days overdue)';
+    }).join('\n');
+    var reminderText = 'Dear '+clientName+',\n\nThis is a friendly reminder regarding your overdue invoices with REM ERP:\n\n'+lines+'\n\nTotal overdue amount: ৳'+g.totalOverdue.toLocaleString('en-IN')+'\n\nPlease arrange payment at your earliest convenience. If you have already made the payment, please disregard this message.\n\nThank you,\nREM ERP Accounts Team';
+
+    openModal('📧 Payment Reminder — '+clientName,
+      '<div style="font-size:11px;line-height:1.5">'+
+        '<div style="margin-bottom:8px;padding:6px 8px;background:#fff3e0;border-radius:4px;font-size:10px;color:#e65100">⚠ Please review and send the reminder below via email or WhatsApp.</div>'+
+        '<textarea id="reminderText" style="width:100%;height:200px;padding:8px;font-size:11px;font-family:monospace;border:1px solid #e0e0e0;border-radius:4px;outline:none;resize:vertical">'+reminderText.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</textarea>'+
+      '</div>',
+      function() {
+        var txt = document.getElementById('reminderText').value;
+        // Copy to clipboard
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('Reminder copied to clipboard!', 'success'); } catch(e) { showToast('Could not copy', 'error'); }
+        document.body.removeChild(ta);
+        logActivity('Sent Reminder', 'payment_reminders', 'Client', clientName, 'Reminder sent for '+g.invoices.length+' overdue invoice(s), total: ৳'+g.totalOverdue.toLocaleString('en-IN'));
+        closeDrawer();
+      }
+    );
+    // Customize footer
+    setTimeout(function() {
+      var footer = document.querySelector('.modal-footer');
+      if (footer) {
+        footer.innerHTML = '<button class="action-btn primary" onclick="window._drawerOnSave&&window._drawerOnSave()" style="padding:6px 14px;font-size:10px">📋 Copy to Clipboard</button> <button onclick="closeDrawer()" style="padding:6px 12px;font-size:10px">Close</button>';
+      }
+    }, 50);
+  };
+}
+
+// ═══ CSV DATA IMPORT ═══
+function renderCsvImport(el) {
+  var activeTab = (typeof window.activeTab !== 'undefined' ? window.activeTab : 'properties');
+  var csvText = '';
+  var previewData = null;
+
+  var sampleCSVs = {
+    properties: 'name,location,type,totalUnits\nMuktodhara Green Park,Dhaka,Land Plotting,120\nJolshiri Abason,Dhaka,Apartment,96\nSkyline Towers,Gulshan,Apartment,48',
+    customers: 'name,phone,email,type\nKamrul Hasan,01711-234567,kamrul@gmail.com,individual\nDr. Rubina Ali,+1 415 555 0198,rubina@example.com,individual\nPinnacle Real Estate,+44-20-7946-0202,info@pinnacle-re.com,company',
+    bookings: 'client,property,unit,price,status\nTariqul Islam,Muktodhara - 5 Katha,Plot M-103,1500000,Confirmed\nFatima Begum,Jolshiri - 3 Katha,Plot J-22,850000,Pending Review',
+    inventory: 'item,category,qty,unit,price\nCement,Construction Material,500,Bags,650\nSteel Rod,Construction Material,200,Pcs,8500\nPVC Pipe,Plumbing,150,Pcs,450'
+  };
+
+  var entityMap = {
+    properties: { arr: 'mockProperties', key: 'properties', fields: ['name','location','type','totalUnits','status','progress','manager','budget'] },
+    customers: { arr: 'mockEntities', key: 'entities', fields: ['name','phone','email','type','nid','address','occupation','nationality','source'] },
+    bookings: { arr: 'mockBookings', key: 'bookings', fields: ['client','property','unit','price','advance','status','type'] },
+    inventory: { arr: 'mockInventory', key: 'inventory', fields: ['item','category','site','qty','unit','price','status','reorder','supplier'] }
+  };
+
+  function parseCSV(text) {
+    var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
+    if (lines.length < 2) return null;
+    var headers = parseCSVLine(lines[0]);
+    var rows = [];
+    for (var i = 1; i < lines.length; i++) {
+      var vals = parseCSVLine(lines[i]);
+      if (vals.length === headers.length && vals.some(function(v) { return v.trim(); }))
+        rows.push(vals);
+    }
+    return { headers: headers, rows: rows };
+  }
+
+  function getPreview() {
+    var csv = document.getElementById('csv_textarea');
+    if (!csv) return;
+    csvText = csv.value;
+    document.getElementById('csv_status').textContent = '';
+    previewData = parseCSV(csvText);
+    if (!previewData) {
+      document.getElementById('csv_preview').innerHTML = '<div style="padding:10px;text-align:center;color:#999;font-size:11px">Enter valid CSV data with header row and at least one data row.</div>';
+      return;
+    }
+    var h = '<div style="font-size:10px;color:#888;margin-bottom:4px">'+previewData.rows.length+' data rows parsed</div><div class="table-wrap" style="max-height:300px;overflow-y:auto"><table style="font-size:10px"><thead><tr>';
+    previewData.headers.forEach(function(hdr) { h += '<th>'+hdr+'</th>'; });
+    h += '</tr></thead><tbody>';
+    previewData.rows.slice(0,20).forEach(function(row) {
+      h += '<tr>';
+      row.forEach(function(cell) { h += '<td>'+(cell||'')+'</td>'; });
+      h += '</tr>';
+    });
+    if (previewData.rows.length > 20) h += '<tr><td colspan="'+previewData.headers.length+'" style="text-align:center;color:#999;font-size:10px;padding:8px">… and '+(previewData.rows.length-20)+' more rows</td></tr>';
+    h += '</tbody></table></div>';
+    document.getElementById('csv_preview').innerHTML = h;
+  }
+
+  function doImport() {
+    if (!previewData) { showToast('Preview the data first', 'error'); return; }
+    var entityInfo = entityMap[activeTab];
+    if (!entityInfo) return;
+    var arr = window[entityInfo.arr];
+    if (!arr) { showToast('Target data store not found', 'error'); return; }
+    var fields = entityInfo.fields;
+    var imported = 0;
+    var skipped = 0;
+    var errors = [];
+
+    previewData.rows.forEach(function(row) {
+      var obj = { id: nextId(arr) };
+      var ok = true;
+      previewData.headers.forEach(function(hdr, idx) {
+        if (idx < row.length) {
+          var val = row[idx].trim();
+          if (val) {
+            var fname = hdr.toLowerCase().replace(/[^a-z]/g,'');
+            // Map headers to field names
+            if (fname === 'name') obj.name = val;
+            else if (fname === 'phone') obj.phone = val;
+            else if (fname === 'email') obj.email = val;
+            else if (fname === 'type' || fname === 'entitytype') obj.type = val;
+            else if (fname === 'location') obj.location = val;
+            else if (fname === 'status') obj.status = val;
+            else if (fname === 'totalunits' || fname === 'units') obj.totalUnits = parseInt(val) || 0;
+            else if (fname === 'property') obj.property = val;
+            else if (fname === 'unit') obj.unit = val;
+            else if (fname === 'price') obj.price = val;
+            else if (fname === 'advance') obj.advance = val;
+            else if (fname === 'client') obj.client = val;
+            else if (fname === 'item' || fname === 'itemname') obj.item = val;
+            else if (fname === 'category') obj.category = val;
+            else if (fname === 'site') obj.site = val;
+            else if (fname === 'qty' || fname === 'quantity') obj.qty = parseInt(val) || 0;
+            else if (fname === 'unit') obj.unit = val;
+            else if (fname === 'supplier') obj.supplier = val;
+            else if (fname === 'reorder' || fname === 'reorderlevel') obj.reorder = parseInt(val) || 0;
+            else if (fname === 'address') obj.address = val;
+            else if (fname === 'nid') obj.nid = val;
+            else if (fname === 'occupation') obj.occupation = val;
+            else if (fname === 'nationality') obj.nationality = val;
+            else if (fname === 'source') obj.source = val;
+            else if (fname === 'progress') obj.progress = parseInt(val) || 0;
+            else if (fname === 'manager') obj.manager = val;
+            else if (fname === 'budget') obj.budget = val;
+            // For entities/customers, default to individual
+            if (!obj.type && activeTab === 'customers') obj.type = 'individual';
+          }
+        }
+      });
+      if (ok && obj.name) {
+        // Add defaults for specific entity types
+        if (activeTab === 'properties') {
+          if (!obj.status) obj.status = 'Planning';
+          if (!obj.type) obj.type = 'Land Plotting';
+          obj.units = [];
+        }
+        if (activeTab === 'inventory') {
+          if (!obj.status) obj.status = 'Adequate';
+          obj.value = (obj.qty || 0) * (obj.price || 0);
+        }
+        if (activeTab === 'bookings') {
+          if (!obj.status) obj.status = 'Pending Review';
+          if (!obj.type) obj.type = 'Flat';
+          obj.date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        }
+        arr.push(obj);
+        DB.save(entityInfo.key);
+        logActivity('Imported', 'csv_import', entityInfo.key, obj.id, 'Imported via CSV into '+activeTab);
+        imported++;
+      } else {
+        skipped++;
+        if (!obj.name) errors.push('Row missing name');
+      }
+    });
+    showToast('✅ Imported '+imported+' '+activeTab+(skipped>0?' ('+skipped+' skipped)':''), imported>0?'success':'error');
+    previewData = null;
+    document.getElementById('csv_preview').innerHTML = '';
+    document.getElementById('csv_textarea').value = '';
+  }
+
+  function render() {
+    var tabs = [
+      { id: 'properties', label: '🏘 Properties' },
+      { id: 'customers', label: '👤 Customers' },
+      { id: 'bookings', label: '📋 Bookings' },
+      { id: 'inventory', label: '📦 Inventory' }
+    ];
+
+    var html = '<div class="fade-in">'+
+      '<div class="page-title">📥 CSV Data Import</div>'+
+      '<div class="page-subtitle">Paste CSV data below to import into REM ERP</div>'+
+      '<div class="card" style="margin-bottom:10px">'+
+        '<div class="card-body" style="padding:8px">'+
+          '<div class="tabs" style="margin-bottom:8px">'+
+            tabs.map(function(t) {
+              return '<span class="tab'+(t.id===activeTab?' active':'')+'" onclick="activeTab=\''+t.id+'\';renderModule()" style="cursor:pointer;padding:4px 10px;font-size:10px;border-radius:4px">'+t.label+'</span>';
+            }).join('')+
+          '</div>'+
+          '<div style="margin-bottom:6px;padding:6px 8px;background:#f0f4ff;border-radius:4px;font-size:10px;color:#555;line-height:1.5">'+
+            '<strong>📄 Sample CSV format:</strong><br><code style="font-size:9px;font-family:monospace;white-space:pre-wrap">'+sampleCSVs[activeTab]+'</code>'+
+          '</div>'+
+          '<textarea id="csv_textarea" placeholder="Paste your CSV data here...\\nFirst row should be column headers.\\n\\nExample:\\nname,location,type,totalUnits\\nMy Property,Dhaka,Land Plotting,50" style="width:100%;height:120px;padding:8px;font-size:10px;font-family:monospace;border:1px solid #e0e0e0;border-radius:4px;outline:none;resize:vertical">'+csvText+'</textarea>'+
+          '<div style="display:flex;gap:6px;margin-top:6px">'+
+            '<button class="action-btn primary" onclick="getPreview()" style="padding:5px 14px;font-size:10px">👁 Preview</button>'+
+            '<button class="action-btn success" onclick="doImport()" style="padding:5px 14px;font-size:10px">📥 Import</button>'+
+            '<span id="csv_status" style="font-size:10px;color:#888;align-self:center;margin-left:4px"></span>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card" id="csv_preview_card"><div class="card-header"><h3>Preview</h3></div><div class="card-body" style="padding:0"><div id="csv_preview" style="padding:10px;text-align:center;color:#999;font-size:11px">Click "Preview" to see parsed data</div></div></div>'+
+    '</div>';
+
+    el.innerHTML = html;
+
+    // Patch getPreview and doImport onto window so onclick works
+    window.getPreview = getPreview;
+    window.doImport = doImport;
+  }
+
+  // Expose activeTab to window for tab switching
+  window.activeTab = activeTab;
+  render();
+}
 
 function toggleMobileSidebar(){
   var sb=document.querySelector('#sidebar');
