@@ -964,6 +964,9 @@
       <div class="s-grp-sep"></div>
       <!-- G10: System -->
       <div class="sidebar-item" data-tip="System" onclick="switchGroup('system')" id="s_system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G11: Communication & AI -->
+      <div class="sidebar-item has-children" data-tip="Communication & AI" onclick="switchGroup('communication')" id="s_communication"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
     </div>
     <div class="sidebar-bottom">
     </div>
@@ -1063,14 +1066,15 @@ const GROUPS = {
   hr_admin:      { label:'Admin & Operations',icon:'💼',mods:[{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'},{id:'stock',label:'Stock & Procurement'}] },
   legal_compliance:{label:'Legal & Compliance',icon:'⚖️',mods:[{id:'compliance',label:'Compliance',badge:true},{id:'legal_contracts',label:'Legal Contracts',badge:true},{id:'qc',label:'QC & Inspection'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'calendar',label:'Calendar',badge:true},{id:'announcements',label:'Announcements',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
-  system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] }
+  system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] },
+  communication: { label:'Communication & AI', icon:'💬', mods:[{id:'whatsapp',label:'WhatsApp Engine'},{id:'chat',label:'Internal Chat'}] }
 };
-const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','hr_admin','legal_compliance','collaboration','system'];
+const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','hr_admin','legal_compliance','collaboration','system','communication'];
 
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -2476,6 +2480,8 @@ function switchModule(mod,skipSkel) {
       case 'payment_reminders': duesTab='reminders'; switchModule('dues_recovery'); break;
       case 'payment_heatmap': renderPaymentHeatmap(el); break;
       case 'activity_log': renderActivityLog(el); break;
+      case 'whatsapp': renderWhatsApp(el); break;
+      case 'chat': renderChat(el); break;
       case 'csv_import': renderCsvImport(el); break;
       case 'permissions': renderPermissions(el); break;
       case 'settings': renderSettings(el); break;
@@ -10186,7 +10192,7 @@ window.mockOpeningBalances = DB.init('opening_balances', (function(){
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Project Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements','WhatsApp Engine','Internal Chat'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -10951,9 +10957,13 @@ var _sdDatasetDefs=[
   {g:'Admin & Operations',arr:'mockDocuments',label:'Documents Vault',icon:'📁',mod:'documents',fields:['title','property','type']},
   {g:'Admin & Operations',arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
   // Group: Collaboration
-  {g:'Collaboration',arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']}
+  {g:'Collaboration',arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']},
+  // Group: Communication & AI
+  {g:'Communication & AI',arr:'mockWhatsAppTemplates',label:'WhatsApp Templates',icon:'📱',mod:'whatsapp',fields:['name','event','body']},
+  {g:'Communication & AI',arr:'mockWhatsAppLog',label:'WhatsApp Log',icon:'📤',mod:'whatsapp',fields:['contact','templateName','status']},
+  {g:'Communication & AI',arr:'mockChatMessages',label:'Chat Messages',icon:'💬',mod:'chat',fields:['from','text']}
 ];
-var _sdGroupOrder=['Executive','Sales & CRM','Projects','Bookings & Customer','Engineering & Construction','Accounts & Finance','Admin & Operations','Legal & Compliance','Collaboration'];
+var _sdGroupOrder=['Executive','Sales & CRM','Projects','Bookings & Customer','Engineering & Construction','Accounts & Finance','Admin & Operations','Legal & Compliance','Collaboration','Communication & AI'];
 var _sdModuleCount=Object.keys(GROUPS).reduce(function(s,g){return s+GROUPS[g].mods.length},0);
 function sdOpenResult(el){
   navigateSearch(el.getAttribute('data-mod'),el.getAttribute('data-title')||'');
@@ -11230,6 +11240,56 @@ window.mockNotifTemplates = DB.init('notif_templates', [
   {id:'NT-004',name:'Site Visit Reminder',channel:'SMS',subject:'',body:'Dear {{customer_name}}, your site visit at {{property}} is scheduled on {{due_date}}. Please confirm your attendance.',active:false},
   {id:'NT-005',name:'Overdue Dues Warning',channel:'Email',subject:'Overdue Payment Notice — {{customer_name}}',body:'Dear {{customer_name}}, your payment of {{amount}} for {{property}} is overdue since {{due_date}}. Kindly settle at the earliest.',active:true},
   {id:'NT-006',name:'Handover Invitation',channel:'Email',subject:'Unit Handover — {{property}}',body:'Dear {{customer_name}}, your unit at {{property}} is ready for handover. Please visit our head office with the agreement documents.',active:true}
+]);
+// ═══ PHASE 5 — COMMUNICATION & AI (store seeds: whatsapp + chat) ═══
+window.mockWhatsAppTemplates = DB.init('whatsapp_templates', [
+  {id:'WT-001',name:'Booking Confirmed',module:'Bookings',event:'booking_confirmed',body:'Dear {{customer_name}}, your booking for {{property}} ({{unit}}) has been confirmed. Booking No: {{booking_no}}. Total: {{amount}}. Welcome to MARS Construction!',active:true},
+  {id:'WT-002',name:'Installment Due Reminder',module:'Dues & Recovery',event:'due_reminder',body:'Dear {{customer_name}}, your installment of {{amount}} for {{property}} is due on {{due_date}}. Kindly pay on time to avoid late fees. — MARS Construction',active:true},
+  {id:'WT-003',name:'Payment Confirmation',module:'Accounts & Finance',event:'payment_received',body:'Dear {{customer_name}}, we have received your payment of {{amount}} for {{property}}. Thank you for your trust in MARS Construction!',active:true},
+  {id:'WT-004',name:'Handover Invitation',module:'Handover & Post-Sales',event:'handover',body:'Dear {{customer_name}}, your unit {{unit}} at {{property}} is ready for handover on {{handover_date}}. Please bring your NID and booking documents. — MARS Construction',active:true},
+  {id:'WT-005',name:'Site Visit Invitation',module:'CRM & Leads',event:'site_visit',body:'Dear {{customer_name}}, join our exclusive site visit at {{property}} on {{visit_date}}. Transport departs from our Dhanmondi office at 10:00 AM. — MARS Construction',active:true},
+  {id:'WT-006',name:'Overdue Warning',module:'Dues & Recovery',event:'overdue_warning',body:'Dear {{customer_name}}, your payment of {{amount}} for {{property}} is overdue since {{due_date}}. Please settle immediately to avoid escalation. — MARS Construction',active:false}
+]);
+window.mockWhatsAppLog = DB.init('whatsapp_log', [
+  {id:'WL-001',contact:'Kamrul Hasan',phone:'01711-234567',template:'WT-001',templateName:'Booking Confirmed',status:'Delivered',channel:'WhatsApp',time:'2026-06-10 09:14',shortcodes:{customer_name:'Kamrul Hasan',property:'Jolshiri - Apt 9A',unit:'9A',booking_no:'BKG-101',amount:'৳45,00,000'}},
+  {id:'WL-002',contact:'Dr. Rubina Ali',phone:'+1 415 555 0198',template:'WT-002',templateName:'Installment Due Reminder',status:'Read',channel:'WhatsApp',time:'2026-06-11 10:02',shortcodes:{customer_name:'Dr. Rubina Ali',property:'Jolshiri - Apt 4B',amount:'৳5,00,000',due_date:'2026-06-30'}},
+  {id:'WL-003',contact:'Tariqul Islam',phone:'+880 1711 000000',template:'WT-002',templateName:'Installment Due Reminder',status:'Delivered',channel:'WhatsApp',time:'2026-06-11 10:03',shortcodes:{customer_name:'Tariqul Islam',property:'Muktodhara - Plot M-103',amount:'৳3,50,000',due_date:'2026-06-20'}},
+  {id:'WL-004',contact:'Engr. Salahuddin',phone:'01744-567890',template:'WT-006',templateName:'Overdue Warning',status:'Failed',channel:'WhatsApp',time:'2026-06-09 18:45',shortcodes:{customer_name:'Engr. Salahuddin',property:'Muktodhara - Plot 22',amount:'৳8,00,000',due_date:'2026-05-15'}},
+  {id:'WL-005',contact:'Fatima Begum',phone:'01755-678901',template:'WT-003',templateName:'Payment Confirmation',status:'Read',channel:'WhatsApp',time:'2026-06-08 15:30',shortcodes:{customer_name:'Fatima Begum',property:'Jolshiri - Apt 7C',amount:'৳3,00,000'}},
+  {id:'WL-006',contact:'Md. Nazrul Islam',phone:'01777-890123',template:'WT-006',templateName:'Overdue Warning',status:'Delivered',channel:'WhatsApp',time:'2026-06-12 09:00',shortcodes:{customer_name:'Md. Nazrul Islam',property:'Muktodhara - Unit 201',amount:'৳15,00,000',due_date:'2026-04-30'}},
+  {id:'WL-007',contact:'Shamima Akhter',phone:'01788-901234',template:'WT-002',templateName:'Installment Due Reminder',status:'Sent',channel:'WhatsApp',time:'2026-06-12 09:01',shortcodes:{customer_name:'Shamima Akhter',property:'Muktodhara - Unit 305',amount:'৳2,00,000',due_date:'2026-06-25'}}
+]);
+window.mockWhatsAppBroadcasts = DB.init('whatsapp_broadcasts', [
+  {id:'WB-001',name:'June Installment Drive',template:'WT-002',segment:'Dues: Overdue',recipients:14,status:'Completed',time:'2026-06-01 09:00',sent:14,delivered:13,read:9,failed:1},
+  {id:'WB-002',name:'Site Visit Weekend — Muktodhara',template:'WT-005',segment:'Group: Prospect',recipients:2,status:'Completed',time:'2026-06-05 11:30',sent:2,delivered:2,read:2,failed:0}
+]);
+window.mockChatChannels = DB.init('chat_channels', [
+  {id:'general',name:'General',icon:'💬',members:12,desc:'Company-wide announcements & daily chatter'},
+  {id:'sales',name:'Sales',icon:'🎯',members:6,desc:'Leads, bookings & customer discussions'},
+  {id:'site',name:'Site',icon:'🔧',members:8,desc:'Construction progress & site coordination'},
+  {id:'finance',name:'Finance',icon:'💰',members:5,desc:'Payments, dues & reconciliations'}
+]);
+window.mockChatMessages = DB.init('chat_messages', [
+  {id:'CM-01',ch:'general',from:'Hasanul Banna',role:'Sales Lead',text:'Good morning team! Weekly sales review at 11 AM in the conference room.',time:'09:02 AM',date:'2026-06-12'},
+  {id:'CM-02',ch:'general',from:'Sultana Razia',role:'HR Manager',text:'Reminder: monthly leave reports are due Friday. Please submit timesheets.',time:'09:10 AM',date:'2026-06-12'},
+  {id:'CM-03',ch:'general',from:'Iftekhar Ahmad',role:'Sales Executive',text:'Got the Muktodhara site photos from the drone — uploading to the workspace.',time:'09:15 AM',date:'2026-06-12'},
+  {id:'CM-04',ch:'general',from:'Tanvir Ahmed',role:'Site Engineer',text:'Tower A slab casting is scheduled for Thursday. Need QC sign-off @Shahidul.',time:'09:22 AM',date:'2026-06-12'},
+  {id:'CM-05',ch:'sales',from:'Iftekhar Ahmad',role:'Sales Executive',text:'Lead L-025 (Shamim Reza) converted to booking BKG-112 today 🎉',time:'10:05 AM',date:'2026-06-12'},
+  {id:'CM-06',ch:'sales',from:'Hasanul Banna',role:'Sales Lead',text:'Great work! Update the deal board and schedule the agreement meeting.',time:'10:12 AM',date:'2026-06-12'},
+  {id:'CM-07',ch:'sales',from:'Nazma Akhter',role:'Finance Officer',text:'Installment schedule for BKG-112 generated — 19 installments, sum verified. 👍',time:'10:20 AM',date:'2026-06-12'},
+  {id:'CM-08',ch:'sales',from:'Shamim Reza',role:'Sales Executive',text:'Prospect from Bikroy asking about 5 katha plots at Purbachal. Sending him the brochure.',time:'10:35 AM',date:'2026-06-12'},
+  {id:'CM-09',ch:'sales',from:'Iftekhar Ahmad',role:'Sales Executive',text:'Note: Kamrul Hasan wants to switch installment from quarterly to monthly. @Nazma can we adjust?',time:'11:02 AM',date:'2026-06-12'},
+  {id:'CM-10',ch:'site',from:'Tanvir Ahmed',role:'Site Engineer',text:'Tower A: 12th floor column shuttering in progress. Pouring planned 2 PM.',time:'08:40 AM',date:'2026-06-12'},
+  {id:'CM-11',ch:'site',from:'Shahidul Islam',role:'QC Officer',text:'Steel lap splice inspection passed for 12th floor columns.',time:'09:05 AM',date:'2026-06-12'},
+  {id:'CM-12',ch:'site',from:'Tanvir Ahmed',role:'Site Engineer',text:'Need 30 bags of cement at Tower B by tomorrow morning. @Rofiqul please arrange.',time:'11:20 AM',date:'2026-06-12'},
+  {id:'CM-13',ch:'site',from:'Rofiqul Islam',role:'Procurement',text:'Cement PO raised (PO-24-091). Supplier confirmed delivery 7 AM tomorrow.',time:'11:45 AM',date:'2026-06-12'},
+  {id:'CM-14',ch:'finance',from:'Nazma Akhter',role:'Finance Officer',text:'June payroll run complete. Salary disbursement scheduled for the 28th.',time:'10:00 AM',date:'2026-06-12'},
+  {id:'CM-15',ch:'finance',from:'Sultana Razia',role:'HR Manager',text:'Overtime hours for May approved — included in this month\'s payroll.',time:'10:15 AM',date:'2026-06-12'},
+  {id:'CM-16',ch:'finance',from:'Nazma Akhter',role:'Finance Officer',text:'Bank reconciliation for May done. 2 items pending review. @Kabir please check.',time:'10:30 AM',date:'2026-06-12',unread:true},
+  {id:'CM-17',ch:'general',from:'Shahidul Islam',role:'QC Officer',text:'Monthly QC report is ready. 4/5 stock receipts passed this week.',time:'12:10 PM',date:'2026-06-12',unread:true},
+  {id:'CM-18',ch:'general',from:'Sultana Razia',role:'HR Manager',text:'Happy birthday to Shamim Reza! 🎂 Team lunch at 1:30 PM.',time:'12:30 PM',date:'2026-06-12'},
+  {id:'CM-19',ch:'site',from:'Rofiqul Islam',role:'Procurement',text:'BSRM steel delivery complete — 10 tons received, stock now 55 tons.',time:'01:10 PM',date:'2026-06-12',unread:true},
+  {id:'CM-20',ch:'general',from:'Hasanul Banna',role:'Sales Lead',text:'Team, thank you for a strong quarter! Sales targets exceeded by 12%. 🚀',time:'01:30 PM',date:'2026-06-12'}
 ]);
 var notifIcons = {lead:'🔵',payment:'🟢',approval:'🟡',due:'🔴',task:'📋',add:'🟢',edit:'🔵',delete:'⛔',info:'ℹ️',success:'✅',warning:'⚠️',error:'🚫','default':'🔔'};
 var notifBg = {lead:'#e3f2fd',payment:'#e8f5e9',approval:'#fff8e1',due:'#ffebee',task:'#f3e5f5',add:'#e8f5e9',edit:'#e3f2fd',delete:'#ffebee',info:'#e8eaf6',success:'#e8f5e9',warning:'#fff8e1',error:'#ffebee','default':'#f5f5f5'};
@@ -16767,6 +16827,241 @@ setTimeout(_pwaHashNav,300);
 
 // Restore badge on load
 _renderRecentTray();
+// ═══ 5.1 WHATSAPP ENGINE ═══
+var whatsAppTab='templates';
+var _waStatusFilter='all';
+function renderWhatsApp(el){
+  el.innerHTML='<div class="fade-in">'+
+    '<div class="page-title">📱 WhatsApp Engine</div>'+
+    '<div class="page-subtitle">'+mockWhatsAppTemplates.length+' templates · '+mockWhatsAppLog.length+' messages sent · হোয়াটসঅ্যাপ</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[['templates','📝 Templates'],['broadcast','📣 Broadcast'],['history','🕘 History']].map(function(t){return '<div class="tab '+(whatsAppTab===t[0]?'active':'')+'" onclick="whatsAppTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="openBroadcastComposer()" style="padding:3px 8px;font-size:10px">+ New Broadcast</button>'+
+    '</div>'+
+    (whatsAppTab==='templates'?renderWATemplates():whatsAppTab==='broadcast'?renderWABroadcast():renderWAHistory())+
+  '</div>';
+}
+function renderWATemplates(){
+  var active=mockWhatsAppTemplates.filter(function(t){return t.active;}).length;
+  var mods={};mockWhatsAppTemplates.forEach(function(t){mods[t.module]=(mods[t.module]||0)+1;});
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Templates',mockWhatsAppTemplates.length,'#2F80ED'],
+    ['Active',active,'#2e7d32'],
+    ['Modules Mapped',Object.keys(mods).length,'#7b1fa2'],
+    ['Messages Sent',mockWhatsAppLog.length,'#1565c0']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>📝 Template Library</h3><button class="action-btn primary" onclick="crudWATemplate()" style="padding:2px 8px;font-size:9px" data-perm="WhatsApp Engine:Create">+ New Template</button></div>'+
+  '<div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>ID</th><th>Name</th><th>Module / Event</th><th>Body</th><th>Status</th><th></th></tr></thead><tbody>'+
+  mockWhatsAppTemplates.map(function(t){
+    return '<tr><td style="font-weight:600;color:#2F80ED;font-size:9px">'+t.id+'</td>'+
+    '<td style="font-weight:500">'+t.name+'</td>'+
+    '<td><div style="font-size:9px;color:#555">'+t.module+'</div><div style="font-size:8px;color:#888">'+t.event+'</div></td>'+
+    '<td style="max-width:300px"><div style="font-size:9px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t.body.replace(/\{\{(\w+)\}\}/g,'<span style="color:#2F80ED;font-weight:600">{{$1}}</span>')+'</div></td>'+
+    '<td><span onclick="toggleWATemplate(\''+t.id+'\')" style="cursor:pointer;padding:1px 8px;border-radius:10px;font-size:9px;font-weight:600;background:'+(t.active?'#e8f5e9':'#f5f5f5')+';color:'+(t.active?'#2e7d32':'#999')+'">'+(t.active?'Active':'Inactive')+'</span></td>'+
+    '<td><span style="cursor:pointer;font-size:11px;color:#2F80ED" onclick="crudWATemplate(mockWhatsAppTemplates.find(function(x){return x.id===\''+t.id+'\';}))">✏️</span> <span style="cursor:pointer;font-size:11px;color:#c62828" onclick="delWATemplate(\''+t.id+'\')">🗑</span></td></tr>';
+  }).join('')+'</tbody></table></div></div>';
+}
+function toggleWATemplate(id){ var t=mockWhatsAppTemplates.find(function(x){return x.id===id;}); if(t){t.active=!t.active;DB.save('whatsapp_templates');renderModule();} }
+function delWATemplate(id){ mockWhatsAppTemplates=mockWhatsAppTemplates.filter(function(x){return x.id!==id;});DB.save('whatsapp_templates');showToast('Template '+id+' deleted','success');renderModule(); }
+function crudWATemplate(item){
+  var n=!item;
+  var b=n?{id:'WT-0'+(mockWhatsAppTemplates.length+1),name:'',module:'Bookings',event:'booking_confirmed',body:'',active:true}:item;
+  openModal((n?'+ New ':'✏️ Edit ')+'WhatsApp Template',
+    '<div class="form-group"><label class="form-label">Template Name <span style="color:#e53935">*</span></label><input class="form-input" id="wtName" value="'+(b.name||'')+'" placeholder="e.g. Booking Confirmed"/></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Module</label><select class="form-input" id="wtModule">'+['Bookings','Dues & Recovery','Accounts & Finance','Handover & Post-Sales','CRM & Leads'].map(function(o){return '<option '+(b.module===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Event</label><input class="form-input" id="wtEvent" value="'+(b.event||'')+'"/></div></div>'+
+    '<div class="form-group"><label class="form-label">Message Body <span style="color:#e53935">*</span></label><textarea class="form-input" id="wtBody" rows="4" style="min-height:90px">'+(b.body||'')+'</textarea></div>'+
+    '<div style="font-size:9px;color:#888;margin-top:4px">Shortcodes: <span style="color:#2F80ED">{{customer_name}}</span> <span style="color:#2F80ED">{{property}}</span> <span style="color:#2F80ED">{{unit}}</span> <span style="color:#2F80ED">{{amount}}</span> <span style="color:#2F80ED">{{due_date}}</span> <span style="color:#2F80ED">{{booking_no}}</span> <span style="color:#2F80ED">{{handover_date}}</span> <span style="color:#2F80ED">{{visit_date}}</span></div>'+
+    '<div class="form-group" style="margin-top:8px"><label class="form-label">Status</label><select class="form-input" id="wtActive">'+['Active','Inactive'].map(function(o){return '<option '+(b.active===true&&o==='Active'?'selected':b.active===false&&o==='Inactive'?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div>',
+    function(){
+      window._formRules=[
+        {id:'wtName',fn:function(v){return V.req(v,'Template name is required');}},
+        {id:'wtBody',fn:function(v){return V.req(v,'Message body is required');}}
+      ];
+      if(V.run(window._formRules))return false;
+      var nm=g('wtName').trim(), bd=g('wtBody').trim();
+      b.name=nm;b.module=g('wtModule');b.event=g('wtEvent').trim()||'custom';b.body=bd;b.active=g('wtActive')==='Active';
+      if(n)mockWhatsAppTemplates.push(b);
+      DB.save('whatsapp_templates');
+      showToast(n?'Template '+b.id+' created':'Template updated','success');
+      addNotification((n?'🆕 ':'✏️ ')+'WhatsApp template',b.name,'edit');
+      return true;
+    });
+}
+function buildSegments(){
+  var segs=[];
+  var groups={};
+  (window.mockEntities||[]).forEach(function(e){ if(e.group) groups[e.group]=(groups[e.group]||0)+1; });
+  Object.keys(groups).forEach(function(gr){ segs.push({key:'grp:'+gr,label:'Group: '+gr,count:groups[gr],contacts:(window.mockEntities||[]).filter(function(e){return e.group===gr;})}); });
+  ['Critical','Overdue','Upcoming'].forEach(function(s){
+    var d=(window.mockDues||[]).filter(function(x){return x.status===s;});
+    segs.push({key:'due:'+s,label:'Dues: '+s,count:d.length,contacts:d.map(function(x){return {name:x.customer,phone:x.phone};})});
+  });
+  segs.push({key:'all',label:'All Contacts',count:(window.mockEntities||[]).length,contacts:window.mockEntities||[]});
+  return segs;
+}
+function renderWABroadcast(){
+  var segs=buildSegments();
+  var completed=mockWhatsAppBroadcasts.filter(function(b){return b.status==='Completed';}).length;
+  var totSent=mockWhatsAppBroadcasts.reduce(function(a,b){return a+(b.sent||0);},0);
+  var totRead=mockWhatsAppBroadcasts.reduce(function(a,b){return a+(b.read||0);},0);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Campaigns',mockWhatsAppBroadcasts.length,'#2F80ED'],
+    ['Completed',completed,'#2e7d32'],
+    ['Recipients Reached',totSent,'#7b1fa2'],
+    ['Read Rate',totSent?Math.round(totRead/totSent*100)+'%':'—','#1565c0']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:8px">'+segs.filter(function(s){return s.key!=='all';}).map(function(s){
+    return '<div class="card" style="margin:0"><div class="card-body" style="padding:10px"><div style="font-size:9px;color:#888">'+s.label+'</div><div style="font-size:18px;font-weight:700;color:#2F80ED">'+s.count+'</div><div style="font-size:8px;color:#888">recipients</div></div></div>';
+  }).join('')+'</div>'+
+  '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>📣 Past Broadcasts</h3><button class="action-btn primary" onclick="openBroadcastComposer()" style="padding:2px 8px;font-size:9px" data-perm="WhatsApp Engine:Create">+ New Broadcast</button></div>'+
+  '<div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Campaign</th><th>Template</th><th>Segment</th><th>Recipients</th><th>Delivered</th><th>Read</th><th>Failed</th><th>Status</th></tr></thead><tbody>'+
+  (mockWhatsAppBroadcasts.length?mockWhatsAppBroadcasts.map(function(b){
+    return '<tr><td style="font-weight:500">'+b.name+'<div style="font-size:8px;color:#888">'+b.time+'</div></td>'+
+    '<td style="font-size:9px;color:#2F80ED;font-weight:600">'+b.template+'</td>'+
+    '<td style="font-size:9px;color:#555">'+b.segment+'</td>'+
+    '<td class="num">'+b.recipients+'</td>'+
+    '<td class="num" style="color:#2e7d32">'+b.delivered+'</td>'+
+    '<td class="num" style="color:#1565c0">'+b.read+'</td>'+
+    '<td class="num" style="color:'+(b.failed?'#c62828':'#999')+'">'+b.failed+'</td>'+
+    '<td><span class="badge-status '+(b.status==='Completed'?'badge-sold':'badge-pending')+'">'+b.status+'</span></td></tr>';
+  }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:16px">No broadcasts yet — compose your first one</td></tr>')+
+  '</tbody></table></div></div>';
+}
+function openBroadcastComposer(){
+  var segs=buildSegments();
+  var segOpts=segs.map(function(s){return '<option value="'+s.key+'">'+s.label+' ('+s.count+')</option>';}).join('');
+  openModal('📣 New WhatsApp Broadcast',
+    '<div class="form-group"><label class="form-label">Campaign Name <span style="color:#e53935">*</span></label><input class="form-input" id="wbName" placeholder="e.g. July Installment Drive"/></div>'+
+    '<div class="form-group"><label class="form-label">Template <span style="color:#e53935">*</span></label><select class="form-input" id="wbTemplate">'+mockWhatsAppTemplates.filter(function(t){return t.active;}).map(function(t){return '<option value="'+t.id+'">'+t.id+' — '+t.name+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Segment <span style="color:#e53935">*</span></label><select class="form-input" id="wbSegment" onchange="updateBroadcastPreview()">'+segOpts+'</select></div>'+
+    '<div id="wbPreview" style="background:#f7fafc;border:1px solid #e0e8f0;border-radius:8px;padding:10px;font-size:11px;margin-top:8px"></div>',
+    function(){
+      window._formRules=[
+        {id:'wbName',fn:function(v){return V.req(v,'Campaign name is required');}}
+      ];
+      if(V.run(window._formRules))return false;
+      var name=g('wbName').trim(), tplId=g('wbTemplate'), segKey=g('wbSegment');
+      var seg=buildSegments().find(function(s){return s.key===segKey;});
+      if(!seg||seg.count===0){showToast('Segment has no recipients','error');return false;}
+      var tpl=mockWhatsAppTemplates.find(function(t){return t.id===tplId;});
+      var now=new Date();
+      var ts=now.toISOString().slice(0,10)+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+      var wb={id:'WB-'+String(mockWhatsAppBroadcasts.length+3).padStart(3,'0'),name:name,template:tplId,segment:seg.label,recipients:seg.count,status:'Sending',time:ts,sent:0,delivered:0,read:0,failed:0};
+      mockWhatsAppBroadcasts.unshift(wb);
+      DB.save('whatsapp_broadcasts');
+      var stPick=['Delivered','Delivered','Read','Read','Read','Sent'];
+      seg.contacts.forEach(function(c){
+        if(!c||!c.phone)return;
+        var st=stPick[Math.floor(Math.random()*stPick.length)];
+        if(Math.random()<0.08)st='Failed';
+        mockWhatsAppLog.unshift({id:'WL-'+Date.now()+Math.random().toString(36).slice(2,5),contact:c.name||'Unknown',phone:c.phone,template:tplId,templateName:tpl?tpl.name:tplId,status:st,channel:'WhatsApp',time:ts,shortcodes:{customer_name:c.name||'Customer'}});
+        if(st==='Failed')wb.failed++; else if(st==='Read'){wb.read++;wb.delivered++;} else if(st==='Delivered'){wb.delivered++;}
+      });
+      wb.sent=seg.count;
+      wb.status='Completed';
+      DB.save('whatsapp_log'); DB.save('whatsapp_broadcasts');
+      addNotification('📣 Broadcast sent',name+' → '+seg.count+' recipients (WhatsApp)','success');
+      showToast('Broadcast "'+name+'" sent to '+seg.count+' recipients','success');
+      return true;
+    });
+  updateBroadcastPreview();
+}
+function updateBroadcastPreview(){
+  var tplId=g('wbTemplate'), segKey=g('wbSegment');
+  var tpl=mockWhatsAppTemplates.find(function(t){return t.id===tplId;});
+  var seg=buildSegments().find(function(s){return s.key===segKey;});
+  var pre=document.getElementById('wbPreview'); if(!pre)return;
+  if(!tpl){pre.innerHTML='';return;}
+  var body=tpl.body;
+  var sample=(seg&&seg.contacts.length)?seg.contacts[0]:{name:'Customer'};
+  var sub={customer_name:sample.name||'Customer',property:'Muktodhara - Plot M-103',unit:'U-104',booking_no:'BKG-112',amount:'৳1,50,00,000',due_date:'2026-07-01',handover_date:'2026-12-15',visit_date:'2026-06-20'};
+  body=body.replace(/\{\{(\w+)\}\}/g,function(_,k){return sub[k]||('{{'+k+'}}');});
+  pre.innerHTML='<div style="font-weight:600;color:#2F80ED;margin-bottom:6px">Preview → '+(seg?seg.label:'')+'</div><div style="color:#555">'+body+'</div>';
+}
+function renderWAHistory(){
+  var sts=['all','Sent','Delivered','Read','Failed'];
+  var counts={};mockWhatsAppLog.forEach(function(l){counts[l.status]=(counts[l.status]||0)+1;});
+  var flt=mockWhatsAppLog.filter(function(l){return _waStatusFilter==='all'||l.status===_waStatusFilter;});
+  return '<div style="margin-bottom:6px;display:flex;gap:6px;flex-wrap:wrap">'+sts.map(function(s){
+    var n=s==='all'?mockWhatsAppLog.length:(counts[s]||0);
+    return '<span onclick="_waStatusFilter=\''+s+'\';renderModule()" style="padding:3px 10px;border-radius:12px;font-size:10px;cursor:pointer;'+(_waStatusFilter===s?'background:#2F80ED;color:#fff':'background:#f2f4f8;color:#555')+'">'+s+' ('+n+')</span>';
+  }).join('')+'</div>'+
+  '<div class="card"><div class="card-header"><h3>🕘 Message History</h3></div><div class="card-body" style="padding:0">'+
+  '<table style="font-size:10px"><thead><tr><th>Time</th><th>Contact</th><th>Phone</th><th>Template</th><th>Status</th></tr></thead><tbody>'+
+  (flt.length?flt.map(function(l){
+    var sc=l.shortcodes||{};
+    var tpl=mockWhatsAppTemplates.find(function(t){return t.id===l.template;});
+    var body=(tpl?tpl.body:'').replace(/\{\{(\w+)\}\}/g,function(_,k){return sc[k]||('{{'+k+'}}');});
+    var color={Sent:'#1565c0',Delivered:'#2e7d32',Read:'#00695c',Failed:'#c62828'}[l.status]||'#555';
+    return '<tr><td style="font-size:9px;color:#888;white-space:nowrap">'+l.time+'</td><td style="font-weight:500">'+l.contact+'</td><td style="font-size:9px;color:#555">'+l.phone+'</td><td style="max-width:280px"><div style="font-weight:600;color:#2F80ED;font-size:9px">'+l.templateName+'</div><div style="font-size:9px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+body+'</div></td><td><span style="color:'+color+';font-weight:600;font-size:10px">'+l.status+'</span></td></tr>';
+  }).join(''):'<tr><td colspan="5" style="text-align:center;color:#999;padding:16px">No messages yet</td></tr>')+
+  '</tbody></table></div></div>';
+}
+// ═══ 5.2 INTERNAL CHAT ═══
+var chatChannel='general';
+var chatUnread={};
+function computeChatUnread(){
+  chatUnread={};
+  mockChatMessages.forEach(function(m){ if(m.unread) chatUnread[m.ch]=(chatUnread[m.ch]||0)+1; });
+}
+function renderChat(el){
+  computeChatUnread();
+  var totalUnread=Object.keys(chatUnread).reduce(function(s,k){return s+chatUnread[k];},0);
+  var chan=mockChatChannels.find(function(x){return x.id===chatChannel;})||mockChatChannels[0];
+  el.innerHTML='<div class="fade-in">'+
+    '<div class="page-title">💬 Internal Chat</div>'+
+    '<div class="page-subtitle">'+mockChatChannels.length+' channels · '+mockChatMessages.length+' messages'+(totalUnread?' · <span style="color:#c62828">'+totalUnread+' unread</span>':'')+' · চ্যাট</div>'+
+    '<div style="display:grid;grid-template-columns:220px 1fr;gap:10px;min-height:520px">'+
+      '<div class="card" style="margin:0"><div class="card-header"><h3>Channels</h3></div><div class="card-body" style="padding:6px">'+
+        mockChatChannels.map(function(c){
+          var last=mockChatMessages.filter(function(m){return m.ch===c.id;}).pop();
+          var un=chatUnread[c.id]||0;
+          return '<div onclick="openChatChannel(\''+c.id+'\')" style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;'+(chatChannel===c.id?'background:#eef3ff;':'')+'">'+
+            '<span style="font-size:17px">'+c.icon+'</span>'+
+            '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600">'+c.name+'</div>'+
+            '<div style="font-size:9px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(last?last.from+': '+last.text:'')+'</div></div>'+
+            (un>0?'<span style="background:#2F80ED;color:#fff;border-radius:10px;padding:1px 7px;font-size:9px;font-weight:600">'+un+'</span>':'')+
+          '</div>';
+        }).join('')+
+      '</div></div>'+
+      '<div class="card" style="margin:0;display:flex;flex-direction:column">'+renderChatThread(chan)+'</div>'+
+    '</div>';
+}
+function renderChatThread(c){
+  var msgs=mockChatMessages.filter(function(m){return m.ch===c.id;});
+  return '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center">'+
+    '<h3>'+c.icon+' '+c.name+' <span style="font-size:9px;color:#888;font-weight:400">· '+c.members+' members</span></h3>'+
+    '<span style="font-size:9px;color:#888">'+c.desc+'</span></div>'+
+    '<div class="card-body" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;max-height:420px" data-msglist="1">'+
+    (msgs.length?msgs.map(function(m){
+      var mine=m.from==='You';
+      var text=String(m.text||'').replace(/(@\w+)/g,'<span style="color:#2F80ED;font-weight:600">$1</span>');
+      return '<div style="display:flex;'+(mine?'justify-content:flex-end':'')+'">'+
+        '<div style="max-width:72%;background:'+(mine?'#2F80ED':'#f2f4f8')+';color:'+(mine?'#fff':'#333')+';border-radius:10px;padding:7px 10px;font-size:11px;line-height:1.45">'+
+        (!mine?'<div style="font-weight:600;font-size:9px;color:#2F80ED;margin-bottom:2px">'+m.from+'</div>':'')+
+        text+
+        '<div style="font-size:8px;opacity:.65;margin-top:3px">'+m.time+'</div></div></div>';
+    }).join(''):'<div style="text-align:center;color:#999;font-size:11px;padding:20px">No messages yet — start the conversation</div>')+
+    '</div>'+
+    '<div style="display:flex;gap:8px;padding:8px;border-top:1px solid #eee;background:#fff;border-radius:0 0 10px 10px">'+
+    '<input class="form-input" id="chatMsgInput" placeholder="Message '+c.name+'… (use @name to mention)" style="flex:1" onkeydown="if(event.key===\'Enter\')sendChatMessage()">'+
+    '<button class="action-btn primary" onclick="sendChatMessage()" style="padding:6px 14px;font-size:11px" data-perm="Internal Chat:Create">➤ Send</button></div>';
+}
+function openChatChannel(id){ chatChannel=id; mockChatMessages.forEach(function(m){ if(m.ch===id) m.unread=false; }); DB.save('chat_messages'); renderModule(); }
+function sendChatMessage(){
+  var inp=document.getElementById('chatMsgInput'); if(!inp)return;
+  var t=inp.value.trim(); if(!t){showToast('Type a message first','error');return;}
+  var now=new Date();
+  var hh=now.getHours()%12||12, mm=String(now.getMinutes()).padStart(2,'0'), ap=now.getHours()>=12?'PM':'AM';
+  mockChatMessages.push({id:'CM-'+Date.now(),ch:chatChannel,from:'You',text:t,time:hh+':'+mm+' '+ap,date:now.toISOString().slice(0,10)});
+  DB.save('chat_messages');
+  inp.value='';
+  renderModule();
+  setTimeout(function(){var l=document.querySelector('[data-msglist="1"]');if(l)l.scrollTop=l.scrollHeight;},30);
+}
 </script>
 </body>
 </html>
