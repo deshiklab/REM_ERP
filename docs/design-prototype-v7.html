@@ -4659,7 +4659,7 @@ function renderLandProposals(){
     <select id="landFStage" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${stageNames.map(s=>'<option value="'+s+'"'+(sf===s?' selected':'')+'>'+stageLabels[s].split(' ').slice(1).join(' ')+'</option>').join('')}</select>
     <select id="landFRisk" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Risk</option><option value="Low"${rf==='Low'?' selected':''}>Low</option><option value="Medium"${rf==='Medium'?' selected':''}>Medium</option><option value="High"${rf==='High'?' selected':''}>High</option></select>
     <div class="spacer"></div>
-    <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px">+ New Proposal</button data-perm="Land Acquisition:Create">
+    <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Land Acquisition:Create">+ New Proposal</button>
   </div>
   <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Property</th><th>Location</th><th>Area</th><th class="num">Value</th><th>Stage</th><th>Status</th><th>Risk</th><th>ROI</th><th>Priority</th><th>Progress</th><th></th></tr></thead><tbody>${
     pL.items.map(function(p){
