@@ -11911,7 +11911,7 @@ function openLeadPanel(leadId,tab){
       '<button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>';
   }else{
     footerHtml='<div class="lead-footer" style="flex-wrap:wrap">' +
-      '<button class="lead-foot-btn success" onclick="convertToCustomer('+l.id+')" style="flex:1;min-width:60px;background:#2e7d32;color:#fff;border-color:#2e7d32">✅ Convert</button>' +
+      '<button class="lead-foot-btn success" onclick="convertLeadToBooking('+l.id+')" style="flex:1;min-width:60px;background:#2e7d32;color:#fff;border-color:#2e7d32">✅ Convert to Booking</button>' +
       '<button class="lead-foot-btn" onclick="markLeadLost('+l.id+')" style="flex:0 0 auto;padding:7px 10px">❌ Lost</button>' +
       '<button class="lead-foot-btn" onclick="showLeadInfo('+l.id+')" style="flex:0 0 auto;padding:7px 10px">ℹ Info</button>' +
       '<button class="lead-foot-btn" onclick="markLeadJunk('+l.id+')" style="flex:0 0 auto;padding:7px 10px;color:#999">🗑 Junk</button>' +
@@ -12087,8 +12087,68 @@ function crudEntityFromLead(id){
   if(ent){crudEntity(ent.id);}
   else{showToast('No customer entity found for this lead. Use Convert first.','error');}
 }
-// Keep convertLeadToBooking for backward compatibility
-function convertLeadToBooking(id){convertToCustomer(id);}
+// ── Phase 3.5 Lead → Booking conversion wizard ─────────────────────
+window._convUnits=[];
+function convUnitChanged(sel){
+  var u=window._convUnits.find(function(x){return x.id===sel.value;});
+  if(u){
+    document.getElementById('f_prop').value=u.proj;
+    document.getElementById('f_price').value=String(u.price);
+  }
+}
+function convertLeadToBooking(id){
+  var l=mockLeads.find(function(x){return x.id===id;});if(!l)return;
+  if(l.status==='Booking'||l.status==='Downpayment'||l.status==='Installments'||l.status==='Possession'||l.status==='Handover'){showToast('Lead already in converted stage: '+l.status,'error');return;}
+  var units=[];
+  (mockProperties||[]).forEach(function(p){
+    (p.units||[]).forEach(function(u){
+      if(u.status==='Available'||u.status==='Reserved'){
+        units.push({id:u.id,number:u.number,proj:p.name,type:u.type||'Flat',size:u.size||'',price:u.price||0});
+      }
+    });
+  });
+  if(!units.length){showToast('No available units to book','error');return;}
+  window._convUnits=units;
+  var priceGuess=parsePriceStr(l.value)||units[0].price||0;
+  window._formRules=[
+    {id:'f_unit',fn:function(v){return unitAvailabilityCheck(v);}},
+    {id:'f_price',fn:function(v){return V.pos(V.num(v),'Price must be greater than 0');}},
+    {id:'f_adv',fn:function(v){if(!String(v).trim())return null;var a=V.num(v);if(a<0)return 'Advance cannot be negative';var pr=V.num(document.getElementById('f_price').value);return (!isNaN(pr)&&a>pr)?'Advance cannot exceed price ('+pr.toLocaleString('en-IN')+')':null;}}
+  ];
+  openModal('Convert Lead to Booking — '+l.name,
+    '<div style="font-size:10px;color:#555;padding:6px 8px;background:#eef3ff;border-radius:6px;margin-bottom:8px">🎯 '+l.name+' · '+l.property+' · '+(l.value||'—')+' · '+(l.territory||'—')+'</div>'+
+    '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:4px;padding:2px 6px;background:#eef3ff;border-radius:4px">🏠 Unit Selection (availability-checked)</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="form-group"><label class="form-label">Unit *</label><select class="form-input" id="f_unit" required onchange="convUnitChanged(this)">'+optList(units,function(u){return u.id;},function(u){return 'Unit '+u.number+' — '+u.proj+' ('+u.type+(u.size?', '+u.size:'')+')';},units[0].id)+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Property</label><input class="form-input" id="f_prop" value="'+units[0].proj+'"/></div></div>'+
+    formRow(inputField('Price (৳) *','f_price',String(priceGuess),'',true),inputField('Advance (৳)','f_adv',''))+
+    formRow(selectField('Payment Terms','f_terms','10% down + 18 monthly',BOOKING_TERMS),inputField('Schedule Start','f_schedStart',new Date().toISOString().slice(0,10)))+
+    '<div style="font-size:8px;color:#999;margin-top:4px">Creates booking + payment schedule · marks unit Booked/Under Payment · lead stage → Booking</div>',
+    function(){
+      var u=window._convUnits.find(function(x){return x.id===g('f_unit');});
+      if(!u)return false;
+      var av=unitAvailabilityCheck(g('f_unit'));
+      if(av){showToast(av,'error');return;}
+      var price=V.num(g('f_price'));
+      if(isNaN(price)||price<=0){showToast('Enter a valid price','error');return;}
+      var adv=V.num(g('f_adv'))||0;
+      var nid=nextId(mockBookings);
+      var bk={id:nid,client:l.name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:u.proj,unit:'Unit '+u.number,price:'৳'+price.toLocaleString('en-IN'),advance:adv>0?'৳'+adv.toLocaleString('en-IN'):'—',status:adv>0?'Confirmed':'Pending Review',type:u.type,terms:g('f_terms'),schedStart:g('f_schedStart')};
+      mockBookings.push(bk);DB.save('bookings');
+      (mockProperties||[]).forEach(function(p){
+        (p.units||[]).forEach(function(un){
+          if(String(un.id)===String(u.id)){un.status=adv>0?'Booked':'Under Payment';un.customer=l.name;un.bookingId=bk.id;}
+        });
+      });DB.save('properties');
+      generateBookingSchedule(nid,price,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10));
+      l.status='Booking';l.nextFollowUp='—';l.linkedEntityId=l.linkedEntityId||nid;
+      if(!l.activities)l.activities=[];
+      l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'📋 Converted to booking '+bk.id+' — '+u.proj+' Unit '+u.number+' (৳'+price.toLocaleString('en-IN')+', '+bk.terms+')'});
+      DB.save('leads');
+      closeLeadPanel();showToast('Booking '+bk.id+' created — unit '+u.number+' '+(adv>0?'Booked':'Under Payment'),'success');renderModule();
+    }
+  );
+}
+
 function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.findIndex(x=>x.id===id);if(i>-1){const _item=JSON.parse(JSON.stringify(mockLeads[i]));mockLeads.splice(i,1);DB.save('leads');closeLeadPanel();renderModule();showToast('Deleted','info',function(){mockLeads.splice(Math.min(i,mockLeads.length),0,_item);DB.save('leads');renderModule();showToast('Restored','info');});}}
 // ═══ LEAD SCORING ═══
 function calcLeadScore(l){
