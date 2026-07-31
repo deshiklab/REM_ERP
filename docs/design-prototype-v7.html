@@ -2114,6 +2114,7 @@ function switchModule(mod,skipSkel) {
       case 'backup_restore': renderBackupRestore(el); break;
       default: renderDashboard(el);
     }
+    try{_moveStatsBelowToolbar();}catch(e){}
     setTimeout(applyPerms,0);
     setTimeout(_animateStats,20);
     setTimeout(function(){try{_wirePostRender();}catch(e){}},60);
@@ -11920,11 +11921,25 @@ function _wireViewsUI(){
   });
 }
 function _wirePostRender(){
+  _moveStatsBelowToolbar();
   _wireRowMenus();
   _wireColResize();
   _wireViewsUI();
   _wireTableScaffold();
   _applyLangPass();
+}
+// Enforce the fixed page anatomy on every page & inner sub-view:
+// page-title → page-subtitle → tabs(toolbar) → stats-row (if any).
+// Only touches a stats-row whose immediate next sibling is a toolbar;
+// pages with no toolbar (dashboard, analytics, reports) keep stats under the subtitle.
+function _moveStatsBelowToolbar(){
+  var root=document.getElementById('mainContent');if(!root)return;
+  root.querySelectorAll('.stats-row').forEach(function(sr){
+    var tb=sr.nextElementSibling;
+    if(tb&&tb.classList&&tb.classList.contains('toolbar')){
+      tb.parentNode.insertBefore(sr,tb.nextSibling);
+    }
+  });
 }
 function _wireTableScaffold(){
   var root=document.getElementById('mainContent');if(!root)return;
