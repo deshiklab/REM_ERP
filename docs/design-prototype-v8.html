@@ -1074,7 +1074,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1, ai_usage:1, reminder_log:1, investors:1, investments:1, loans:1, loan_contracts:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1, ai_usage:1, reminder_log:1, investors:1, investments:1, loans:1, loan_contracts:1, portal_sessions:1, portal_chat:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -6233,13 +6233,14 @@ function renderCustomerPortal(el){
   var delinquent=mockCustomers.filter(function(c){return c.status==='Delinquent'}).length;
   var totalDues=mockCustomers.reduce(function(s,c){return s+c.duesNum},0);
   var totalPV=mockCustomers.reduce(function(s,c){return s+c.propertyValue},0);
-  el.innerHTML='<div class="fade-in"><div class="page-title">Customer Portal</div><div class="page-subtitle">'+total+' customers · Tk'+(totalDues/100000).toFixed(1)+'L total dues · Tk'+(totalPV/100000).toFixed(1)+'L portfolio</div>'+
+  el.innerHTML='<div class="fade-in"><div class="page-title">Customer Portal</div><div class="page-subtitle no-i18n">'+total+' customers · Tk'+(totalDues/100000).toFixed(1)+'L total dues · Tk'+(totalPV/100000).toFixed(1)+'L portfolio · কাস্টমার পোর্টাল</div>'+
     '<div class="toolbar" style="margin-bottom:6px">'+
       '<div class="tabs">'+[
         ['dashboard','📊 Dashboard'],
         ['customers','👥 Customers'],
         ['documents','📁 Documents'],
-        ['tickets','🎫 Support Tickets']
+        ['tickets','🎫 Support Tickets'],
+        ['client','👤 Client Login']
       ].map(function(t){
         return '<div class="tab '+(cpTab===t[0]?'active':'')+'" onclick="cpTab=\x27'+t[0]+'\x27;Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">'+t[1]+'</div>';
       }).join('')+'</div>'+
@@ -6251,7 +6252,8 @@ function renderCustomerPortal(el){
     (cpTab==='dashboard'?renderCustDashboard():
      cpTab==='customers'?renderCustList():
      cpTab==='documents'?renderCustDocs():
-     cpTab==='tickets'?renderCustTickets():'')+
+     cpTab==='tickets'?renderCustTickets():
+     cpTab==='client'?renderClientView():'')+
   '</div>';
 }
 function renderCustDashboard(){
@@ -11342,6 +11344,14 @@ window.mockLoanContracts = DB.init('loan_contracts', [
   {id:'LCT-003',refType:'Investment',refId:'INVT-001',party:'Abdul Matin',title:'Muktodhara Investor Agreement',startDate:'2024-04-01',endDate:'2026-03-31',amount:20000000,status:'Active',signedBy:'MD Hasanul Banna'},
   {id:'LCT-004',refType:'Loan',refId:'LN-005',party:'MARS Construction (Internal)',title:'Internal Fund Transfer Note',startDate:'2024-09-01',endDate:'2025-08-31',amount:10000000,status:'Completed',signedBy:'Rofiqul Islam'},
   {id:'LCT-005',refType:'Investment',refId:'INVT-005',party:'Purbachal Developers Ltd',title:'Jolshiri Phase B Investment Deed',startDate:'2025-05-01',endDate:'2027-04-30',amount:40000000,status:'Active',signedBy:'MD Hasanul Banna'}
+]);
+// ═══ PHASE 6.2 — CUSTOMER PORTAL (store seeds) ═══
+window.mockPortalSessions = DB.init('portal_sessions', []);
+window.mockPortalChat = DB.init('portal_chat', [
+  {id:'PC-001',customerName:'Kamrul Hasan',from:'Customer',text:'Hi! When will the handover be for Jolshiri Apt 9A?',time:'10:12 AM'},
+  {id:'PC-002',customerName:'Kamrul Hasan',from:'Sales',text:'Handover is scheduled Dec 2026 — we\'ll send a formal invite with the snag-list procedure.',time:'10:20 AM'},
+  {id:'PC-003',customerName:'Dr. Rubina Ali',from:'Customer',text:'Can I move my installment date to the 5th of each month?',time:'02:05 PM'},
+  {id:'PC-004',customerName:'Dr. Rubina Ali',from:'Sales',text:'Sure! Nazma will confirm the revised schedule by email today.',time:'02:30 PM'}
 ]);
 var notifIcons = {lead:'🔵',payment:'🟢',approval:'🟡',due:'🔴',task:'📋',add:'🟢',edit:'🔵',delete:'⛔',info:'ℹ️',success:'✅',warning:'⚠️',error:'🚫','default':'🔔'};
 var notifBg = {lead:'#e3f2fd',payment:'#e8f5e9',approval:'#fff8e1',due:'#ffebee',task:'#f3e5f5',add:'#e8f5e9',edit:'#e3f2fd',delete:'#ffebee',info:'#e8eaf6',success:'#e8f5e9',warning:'#fff8e1',error:'#ffebee','default':'#f5f5f5'};
@@ -17560,6 +17570,126 @@ function crudLoanContract(item){
 function lcRefOptions(type){
   var arr=type==='Loan'?mockLoans:mockInvestments;
   return arr.map(function(x){return '<option value="'+x.id+'">'+x.id+'</option>';}).join('');
+}
+// ═══ 6.2 CUSTOMER PORTAL — CLIENT LOGIN SIMULATION (কাস্টমার পোর্টাল) ═══
+function portalSession(){return mockPortalSessions.find(function(s){return s.loggedIn;})||null;}
+function renderClientView(){
+  var s=portalSession();
+  return s?renderClientDashboard(s):renderClientLogin();
+}
+function renderClientLogin(){
+  var custOpts=mockCustomers.map(function(c){return '<option value="'+c.id+'">'+c.name+' — '+c.property+'</option>';}).join('');
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">'+
+    '<div class="card"><div class="card-header"><h3 class="no-i18n">🔐 Client Login (কাস্টমার পোর্টাল)</h3></div>'+
+    '<div class="card-body" style="padding:14px">'+
+    '<div style="font-size:10px;color:#555;margin-bottom:10px">Simulated client portal — pick a customer and verify with their registered email to sign in.</div>'+
+    '<div class="form-group"><label class="form-label">Customer <span style="color:#e53935">*</span></label><select class="form-input" id="plCust" onchange="plPrefillEmail()">'+custOpts+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Email <span style="color:#e53935">*</span></label><input class="form-input" id="plEmail" placeholder="registered email"/></div>'+
+    '<button class="action-btn primary" onclick="portalLogin()" style="width:100%;padding:8px;font-size:11px;margin-top:6px">🔐 Sign in to Portal</button>'+
+    '<div style="font-size:9px;color:#888;margin-top:10px">Demo emails: kamrul.hasan@gmail.com · rubina.ali@yahoo.com · tariq.islam@gmail.com</div>'+
+    '</div></div>'+
+    '<div class="card"><div class="card-header"><h3>🛡 What clients can do</h3></div><div class="card-body" style="padding:12px;font-size:10px;color:#555;line-height:1.9">'+
+    '✅ View own <b>bookings</b> & status<br>✅ Track <b>dues</b> & due dates<br>✅ <b>Payment history</b> & receipts<br>✅ Unit <b>documents</b> vault<br>✅ Raise <b>maintenance requests</b><br>✅ <b>Chat with sales</b> team<br><br><span style="color:#2F80ED">Simulated login for prototype — real auth comes with the backend build.</span>'+
+    '</div></div></div>';
+}
+function plPrefillEmail(){
+  var c=mockCustomers.find(function(x){return x.id===g('plCust');});
+  var e=document.getElementById('plEmail');if(e&&c)e.value=c.email||'';
+}
+function portalLogin(){
+  var cid=g('plCust');
+  var c=mockCustomers.find(function(x){return x.id===cid;});
+  var em=g('plEmail').trim();
+  if(!c)return;
+  if(!em){showToast('Email is required','error');return;}
+  if(String(c.email||'').trim().toLowerCase()!==em.toLowerCase()){
+    var e=document.getElementById('plEmail');
+    e.style.borderColor='#e53935';e.style.background='#fff5f5';
+    showToast('Email does not match '+c.name+'\'s registered email','error');
+    return;
+  }
+  var now=new Date();
+  var s=mockPortalSessions.find(function(x){return x.customerId===c.id&&x.loggedIn;});
+  if(!s){s={id:'PS-'+Date.now(),customerId:c.id,customerName:c.name,email:c.email,loggedIn:true,lastLogin:now.toISOString().slice(0,10)};mockPortalSessions.push(s);}
+  else{s.lastLogin=now.toISOString().slice(0,10);}
+  DB.save('portal_sessions');
+  addNotification('🔐 Client portal login',c.name+' signed in','info');
+  showToast('Welcome back, '+c.name+'!','success');
+  renderModule();
+}
+function portalLogout(){
+  var s=portalSession();if(s)s.loggedIn=false;
+  DB.save('portal_sessions');
+  showToast('Signed out','info');
+  renderModule();
+}
+function renderClientDashboard(s){
+  var bk=mockBookings.filter(function(b){return String(b.client||'').toLowerCase()===String(s.customerName).toLowerCase();});
+  var du=mockDues.filter(function(d){return String(d.customer||'').toLowerCase()===String(s.customerName).toLowerCase();});
+  var pay=mockPayments.filter(function(p){return String(p.client||'').toLowerCase()===String(s.customerName).toLowerCase();});
+  var c=mockCustomers.find(function(x){return x.id===s.customerId;});
+  var docs=c?mockCustomerDocs.filter(function(d){return d.customerId===c.id;}):[];
+  var dueTot=du.reduce(function(a,d){return a+(d.due||0);},0);
+  var paidTot=pay.reduce(function(a,p){return a+(p.amount||0);},0);
+  var chat=mockPortalChat.filter(function(m){return m.customerName===s.customerName;});
+  return '<div class="card" style="margin-bottom:8px"><div class="card-body" style="padding:10px;display:flex;justify-content:space-between;align-items:center">'+
+    '<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:50%;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:15px">👤</div>'+
+    '<div><div style="font-size:12px;font-weight:700">'+s.customerName+'</div><div style="font-size:9px;color:#888">'+s.email+' · signed in '+s.lastLogin+'</div></div></div>'+
+    '<button class="action-btn secondary" onclick="portalLogout()" style="padding:3px 10px;font-size:9px">Sign out</button></div></div>'+
+  '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['My Bookings',bk.length,'#2F80ED'],
+    ['Dues Outstanding','৳'+Math.round(dueTot).toLocaleString('en-IN'),dueTot>0?'#c62828':'#2e7d32'],
+    ['Total Paid','৳'+Math.round(paidTot).toLocaleString('en-IN'),'#2e7d32'],
+    ['Documents',docs.length,'#7b1fa2']
+  ].map(function(x){return '<div class="stat-card"><div class="label">'+x[0]+'</div><div class="value" style="color:'+x[2]+'">'+x[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="card"><div class="card-header"><h3>📝 My Bookings</h3></div><div class="card-body" style="padding:0">'+(bk.length?'<table style="font-size:10px"><thead><tr><th>ID</th><th>Property</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>'+bk.map(function(b){return '<tr><td style="font-weight:600;color:#2F80ED;font-size:9px">'+b.id+'</td><td>'+b.property+'</td><td class="num">'+b.amount+'</td><td><span class="badge-status '+(b.status==='Confirmed'?'badge-sold':'badge-pending')+'">'+b.status+'</span></td></tr>';}).join('')+'</tbody></table>':'<div style="padding:14px;text-align:center;color:#999;font-size:10px">No bookings</div>')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>💰 My Dues</h3></div><div class="card-body" style="padding:0">'+(du.length?'<table style="font-size:10px"><thead><tr><th>Project</th><th class="num">Due</th><th>Overdue</th><th>Status</th></tr></thead><tbody>'+du.map(function(d){return '<tr><td>'+d.project+'</td><td class="num" style="font-weight:600">৳'+d.due.toLocaleString('en-IN')+'</td><td style="font-size:9px;color:'+(d.daysOverdue?'#c62828':'#888')+'">'+(d.daysOverdue?d.daysOverdue+'d':'—')+'</td><td><span class="badge-status '+(d.status==='Critical'?'badge-closed':d.status==='Overdue'?'badge-pending':'badge-sold')+'">'+d.status+'</span></td></tr>';}).join('')+'</tbody></table>':'<div style="padding:14px;text-align:center;color:#999;font-size:10px">No dues — fully up to date 🎉</div>')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>💳 Payment History</h3></div><div class="card-body" style="padding:0">'+(pay.length?'<table style="font-size:10px"><thead><tr><th>Date</th><th class="num">Amount</th><th>Method</th><th>Status</th></tr></thead><tbody>'+pay.map(function(p){return '<tr><td style="font-size:9px;color:#888;white-space:nowrap">'+p.date+'</td><td class="num" style="font-weight:600">৳'+p.amount.toLocaleString('en-IN')+'</td><td style="font-size:9px">'+p.method+'</td><td><span class="badge-status badge-sold">'+p.status+'</span></td></tr>';}).join('')+'</tbody></table>':'<div style="padding:14px;text-align:center;color:#999;font-size:10px">No payments yet</div>')+'</div></div>'+
+    '<div class="card"><div class="card-header"><h3>📁 My Documents</h3></div><div class="card-body" style="padding:8px">'+(docs.length?docs.map(function(d){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 2px;border-bottom:1px solid #f0f0f0;font-size:10px"><span>📄 '+d.docType+'</span><span class="badge-status '+(d.status==='Verified'?'badge-sold':'badge-pending')+'" style="font-size:8px">'+d.status+'</span></div>';}).join(''):'<div style="padding:10px;text-align:center;color:#999;font-size:10px">No documents</div>')+'</div></div>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">'+
+    '<div class="card"><div class="card-header"><h3>🔧 Maintenance Request</h3></div><div class="card-body" style="padding:10px">'+
+    '<div class="form-group"><label class="form-label">Category</label><select class="form-input" id="mtCat">'+['Plumbing','Electrical','Painting','Structural','Other'].map(function(o){return '<option>'+o+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Subject <span style="color:#e53935">*</span></label><input class="form-input" id="mtSub" placeholder="e.g. Bathroom leakage in Apt 9A"/></div>'+
+    '<div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="mtDesc" rows="2" style="min-height:50px"></textarea></div>'+
+    '<button class="action-btn primary" onclick="portalRaiseTicket()" style="padding:4px 12px;font-size:10px">📮 Submit Request</button></div></div>'+
+    '<div class="card" style="display:flex;flex-direction:column"><div class="card-header"><h3>💬 Chat with Sales</h3></div>'+
+    '<div class="card-body" style="flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;max-height:210px" data-pchat="1">'+
+    (chat.length?chat.map(function(m){var mine=m.from==='Customer';return '<div style="display:flex;'+(mine?'justify-content:flex-end':'')+'"><div style="max-width:80%;background:'+(mine?'#2F80ED':'#f2f4f8')+';color:'+(mine?'#fff':'#333')+';border-radius:9px;padding:6px 9px;font-size:10px">'+(mine?'':'<b style="color:#2F80ED">Sales ·</b> ')+m.text+'<div style="font-size:8px;opacity:.65;margin-top:2px">'+m.time+'</div></div></div>';}).join(''):'<div style="text-align:center;color:#999;font-size:10px;padding:10px">Say hi to your sales team 👋</div>')+
+    '</div>'+
+    '<div style="display:flex;gap:6px;padding:6px;border-top:1px solid #eee">'+
+    '<input class="form-input" id="pchatInput" placeholder="Message sales…" style="flex:1;font-size:10px" onkeydown="if(event.key===\'Enter\')portalChatSend()">'+
+    '<button class="action-btn primary" onclick="portalChatSend()" style="padding:4px 10px;font-size:10px">➤</button></div></div>'+
+  '</div>';
+}
+function portalRaiseTicket(){
+  var s=portalSession();if(!s)return;
+  var sub=g('mtSub').trim();
+  if(!sub){showToast('Subject is required','error');return;}
+  mockSupportTickets.unshift({id:'TKT-'+String(mockSupportTickets.length+9).padStart(3,'0'),customerId:s.customerId,customerName:s.customerName,subject:sub,category:g('mtCat'),priority:'Medium',status:'Open',date:new Date().toISOString().slice(0,10),assignedTo:'Nazma Akhter',description:g('mtDesc').trim()});
+  DB.save('supportTickets');
+  addNotification('🔧 Maintenance request',s.customerName+' — '+sub,'task');
+  showToast('Maintenance request submitted ✓','success');
+  renderModule();
+}
+function portalChatSend(){
+  var s=portalSession();if(!s)return;
+  var inp=document.getElementById('pchatInput');if(!inp)return;
+  var t=inp.value.trim();if(!t){showToast('Type a message first','error');return;}
+  var now=new Date();
+  var hh=now.getHours()%12||12, mm=String(now.getMinutes()).padStart(2,'0'), ap=now.getHours()>=12?'PM':'AM';
+  var firstName=(s.customerName||'friend').split(' ')[0];
+  mockPortalChat.push({id:'PC-'+Date.now(),customerName:s.customerName,from:'Customer',text:t,time:hh+':'+mm+' '+ap});
+  DB.save('portal_chat');
+  inp.value='';
+  renderModule();
+  setTimeout(function(){
+    mockPortalChat.push({id:'PC-'+Date.now()+1,customerName:s.customerName,from:'Sales',text:'Thanks '+firstName+'! Our sales team will get back to you shortly.',time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
+    DB.save('portal_chat');
+    renderModule();
+    setTimeout(function(){var l=document.querySelector('[data-pchat="1"]');if(l)l.scrollTop=l.scrollHeight;},30);
+  },700);
 }
 </script>
 </body>
