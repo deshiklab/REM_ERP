@@ -207,8 +207,8 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 | 1.4 | v8-v15 | Module toggles + menu setup |
 | 1.5–1.6 | v8-v16 | Calendar + Announcements |
 | 1.7–1.8 | v8-v17 | Fund transfers + Journal entries |
-| 1.9–1.11 | v8-v18 | HR: check-in/out, leave approval, timesheets |
-| 1.12–1.13 | v8-v19 | Notification templates + bulk exports |
+| 1.9–1.11 | v8-v18 | HR: check-in/out, leave approval, timesheets | ✅ done |
+| 1.12–1.13 | v8-v19 | Notification templates + bulk exports | ✅ done |
 | 2.x | v8-v20..22 | Accounting deep-dive |
 | 3.x | v8-v23..25 | Sales & inventory |
 | 4.x | v8-v26..27 | HR deep-dive |
@@ -223,5 +223,5 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 - [x] **1.5+1.6** Calendar + Announcements modules — SW v8-v16 (`28fac14`)
 - [x] **1.7+1.8** Fund transfers + Journal entries (balanced dr=cr) — SW v8-v17 (`b37ec61`)
 - [x] **1.9–1.11** HR check-in/out · Leave approval workflow · Timesheets — SW v8-v18 (`f0f6554`)
-- [ ] 1.12 Notification templates · 1.13 Bulk exports
+- [x] **1.12–1.13** Notification templates · Bulk PDF/e-Invoice exports — SW v8-v19 (`6f66460`)
 - [ ] Phase 2 (accounting) · Phase 3 (sales/inventory) · Phase 4 (HR) · Phase 5 (comm/AI) · Phase 6 (investment/portal)
