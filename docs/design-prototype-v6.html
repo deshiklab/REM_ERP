@@ -483,6 +483,18 @@
     html.dark .mnav-grp.active{background:var(--hover-bg,#1a2a4a);box-shadow:0 0 0 1px var(--primary,#7ab7ff)}
     html.dark .mnav-item{color:var(--muted,#94a3b8)}
     html.dark .mnav-item.active{background:var(--hover-bg,#1a2a4a);color:var(--primary,#7ab7ff)}
+    /* Tab strip scroll arrows (mobile) */
+    .tab-scroll-wrap{position:relative}
+    .tab-arrow{position:absolute;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.94);border:1px solid #e0e0e0;box-shadow:0 2px 8px rgba(0,0,0,.16);color:#555;font-size:13px;font-weight:700;cursor:pointer;z-index:5;display:none;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;user-select:none}
+    .tab-arrow.left{left:2px}
+    .tab-arrow.right{right:2px}
+    .tab-arrow:active{background:#2F80ED;color:#fff}
+    .tab-arrow.hidden{display:none!important}
+    html.dark .tab-arrow{background:rgba(26,34,52,.92);border-color:#334155;color:#94a3b8}
+    html.dark .tab-arrow:active{background:var(--primary,#7ab7ff);color:#fff}
+    @media(max-width:768px){
+      .tab-arrow{display:flex}
+    }
     .more-dropdown{display:none;position:fixed;top:46px;right:8px;left:8px;z-index:9991;background:#fff;border:1px solid #e0e0e0;border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.2);padding:8px;max-height:72vh;overflow-y:auto;animation:ddIn .18s ease-out}
     .more-dropdown.open{display:block}
     .mm-sep{height:1px;background:#f0f0f0;margin:6px 2px}
@@ -11226,6 +11238,55 @@ function buildMoreMenu(){
     '<div class="mm-mod" onclick="toggleRoleMenu();closeMoreMenu()"><span>👤 Switch Role</span></div>';
   md.innerHTML=html;
 }
+// ═══ TAB SCROLL ARROWS (mobile) ═══
+// Auto-wraps scrollable tab strips (.tabs, .lead-tabs, .qa-tab rows) with ‹ › buttons
+function _wireTabArrows(){
+  var scopes=['#mainContent','#leadSlideOut #leadPanelContent','.drawer-body'];
+  var targets=[];
+  scopes.forEach(function(s){
+    var root=document.querySelector(s);
+    if(!root)return;
+    root.querySelectorAll('.tabs, .lead-tabs').forEach(function(el){targets.push(el);});
+    // containers with multiple .qa-tab chips that overflow
+    root.querySelectorAll('div').forEach(function(d){
+      if(d.querySelectorAll(':scope > .qa-tab').length>=2)targets.push(d);
+    });
+  });
+  targets.forEach(function(el){
+    if(el.dataset.tabArrows||el.closest('.tab-scroll-wrap'))return;
+    if(el.scrollWidth<=el.clientWidth+6)return; // doesn't overflow — no arrows needed
+    var wrap=document.createElement('div');
+    wrap.className='tab-scroll-wrap';
+    el.parentNode.insertBefore(wrap,el);
+    wrap.appendChild(el);
+    var left=document.createElement('div');left.className='tab-arrow left';left.innerHTML='‹';
+    var right=document.createElement('div');right.className='tab-arrow right';right.innerHTML='›';
+    wrap.appendChild(left);wrap.appendChild(right);
+    el.dataset.tabArrows='1';
+    var upd=function(){
+      left.classList.toggle('hidden',el.scrollLeft<=4);
+      right.classList.toggle('hidden',el.scrollLeft+el.clientWidth>=el.scrollWidth-4);
+    };
+    left.onclick=function(){el.scrollBy({left:-150,behavior:'smooth'});};
+    right.onclick=function(){el.scrollBy({left:150,behavior:'smooth'});};
+    el.addEventListener('scroll',upd,{passive:true});
+    window.addEventListener('resize',upd);
+    upd();
+  });
+}
+var _tabObs=null;
+function _initTabArrows(){
+  if(window._tabArrowsDone)return;
+  window._tabArrowsDone=true;
+  _wireTabArrows();
+  _tabObs=new MutationObserver(function(){
+    clearTimeout(window._tabArrowT);
+    window._tabArrowT=setTimeout(_wireTabArrows,150);
+  });
+  _tabObs.observe(document.body,{subtree:true,childList:true});
+  window.addEventListener('resize',function(){clearTimeout(window._tabArrowT);window._tabArrowT=setTimeout(_wireTabArrows,200);});
+}
+_initTabArrows();
 // Show mobile sidebar button only on small screens
 function checkMobile(){
   var nb=document.getElementById('mobileNavBtn');
