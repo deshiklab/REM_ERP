@@ -11605,6 +11605,9 @@ function buildMoreMenu(){
     '<div class="mm-mod" onclick="toggleDarkMode();closeMoreMenu()"><span>'+(mode==='dark'?'☀️':'🌙')+' '+(mode==='dark'?'Light Mode':'Dark Mode')+'</span></div>'+
     '<div class="mm-mod" onclick="closeMoreMenu();openSettingsTab(\'themes\')"><span>🎨 Customize…</span></div>'+
     '<div class="mm-sep"></div>'+
+    '<div class="mm-title" style="margin-top:2px">🌐 Language</div>'+
+    '<div class="mm-mod" onclick="toggleLang();closeMoreMenu()"><span>🔤 '+(LANG==='bn'?'English (EN)':'বাংলা (BN)')+'</span></div>'+
+    '<div class="mm-sep"></div>'+
     '<div class="mm-mod" onclick="toggleNotifications();closeMoreMenu()"><span>🔔 Notifications <span class="mm-badge" style="background:#2F80ED">'+notifCount+'</span></span></div>'+
     '<div class="mm-mod" onclick="toggleRoleMenu();closeMoreMenu()"><span>👤 Switch Role</span></div>';
   md.innerHTML=html;
@@ -11899,7 +11902,6 @@ function toggleViewsMenu(ev,modId){
 }
 function _closeViewsMenu(){var m=document.getElementById('viewsMenu');if(m)m.classList.remove('open');}
 function _wireViewsUI(){
-  if(window.innerWidth<=768)return; // keep mobile toolbars clean — views still load via chips where present
   var root=document.getElementById('mainContent');
   if(!root)return;
   root.querySelectorAll('.toolbar').forEach(function(tb){
