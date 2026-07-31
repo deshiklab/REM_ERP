@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, hr_attendance:1, hr_timesheets:1, leave:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -8692,7 +8692,7 @@ function renderFinanceTransactions(){
     <button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add Transaction</button data-perm="Finance:Create">
   </div>
   <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table data-mod="finance"><thead><tr>${function(){
-    var COLS=[{k:'id',l:'ID'},{k:'date',l:'Date'},{k:'desc',l:'Description'},{k:'category',l:'Category'},{k:'type',l:'Type'},{k:'amount',l:'Amount'},{k:'status',l:'Status'},{k:'trend',l:'Trend'}];
+    var COLS=[{k:'id',l:'ID'},{k:'date',l:'Date'},{k:'desc',l:'Description'},{k:'category',l:'Category'},{k:'account',l:'CoA'},{k:'type',l:'Type'},{k:'amount',l:'Amount'},{k:'status',l:'Status'},{k:'trend',l:'Trend'}];
     _colDefs.finance=COLS;
     COLS=colOrder('finance',COLS).filter(function(c){return colVisible('finance',c.k);});
     return COLS.map(function(c){return '<th'+(c.k==='amount'||c.k==='trend'?' class="num"':'')+'>'+c.l+'</th>';}).join('');
@@ -8703,11 +8703,12 @@ function renderFinanceTransactions(){
       tds.date='<td style="font-size:10px;color:#666">'+t.date+'</td>';
       tds.desc='<td>'+t.desc+'</td>';
       tds.category='<td><span style="padding:1px 5px;border-radius:3px;font-size:9px;background:#f0f4ff;color:#2F80ED">'+(t.category||'\u2014')+'</span></td>';
+      tds.account='<td><span style="font-family:monospace;font-size:9px;background:#f3e5f5;color:#7b1fa2;padding:1px 5px;border-radius:3px" title="'+_txnAccountName(t)+'">'+_txnAccount(t)+'</span></td>';
       tds.type='<td><span class="badge-status '+(t.type==='Inflow'?'badge-active':'badge-sold')+'">'+t.type+'</span></td>';
       tds.amount='<td class="num" style="font-weight:600;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.fmt+'</td>';
       tds.status='<td><span class="badge-status '+(t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved')+'">'+t.status+'</span></td>';
       tds.trend='<td style="width:110px;text-align:right">'+sparkline(clientInflowTrend(t.client||'',i),'#2e7d32')+'</td>';
-      var COLS2=colOrder('finance',[{k:'id',l:'ID'},{k:'date',l:'Date'},{k:'desc',l:'Description'},{k:'category',l:'Category'},{k:'type',l:'Type'},{k:'amount',l:'Amount'},{k:'status',l:'Status'},{k:'trend',l:'Trend'}]).filter(function(c){return colVisible('finance',c.k);});
+      var COLS2=colOrder('finance',[{k:'id',l:'ID'},{k:'date',l:'Date'},{k:'desc',l:'Description'},{k:'category',l:'Category'},{k:'account',l:'CoA'},{k:'type',l:'Type'},{k:'amount',l:'Amount'},{k:'status',l:'Status'},{k:'trend',l:'Trend'}]).filter(function(c){return colVisible('finance',c.k);});
       return '<tr style="cursor:pointer" onclick="openTransaction(\''+_q(t.id)+'\')">'+COLS2.map(function(c){return tds[c.k]||'';}).join('')+'</tr>';
     }).join('')
   }</tbody></table>${_pgHtml('finance',pF.total,pF.page,pF.totalPages,pF.perPage)}</div></div></div>`;
@@ -8954,6 +8955,101 @@ function crudPurchaseInvoice(){
       mockInvoices.push(d);DB.save('invoices');showToast('Purchase invoice created','success');renderModule();
     }
   );
+}
+
+// ── 2.6 CoA → transaction linkage ──
+var _TXNA_ACCT={'Booking':'3-1000 Revenue - Booking','Installment':'3-2000 Revenue - Installments','Handover':'3-1000 Revenue - Booking','Materials':'4-1000 Construction Costs','Labor':'4-1000 Construction Costs','Marketing':'4-2000 Admin Expenses','Admin':'4-2000 Admin Expenses','Legal':'4-2000 Admin Expenses','Professional Fees':'4-2000 Admin Expenses','Utilities':'4-2000 Admin Expenses','Tax':'4-2000 Admin Expenses','Land':'1-3000 Land Inventory','Loan':'2-2000 Accounts Payable'};
+function _txnAccount(t){
+  var key=(t.category||'').trim();
+  var name=_TXNA_ACCT[key]||'4-2000 Admin Expenses';
+  var code=name.split(' ')[0];
+  return code;
+}
+function _txnAccountName(t){
+  var key=(t.category||'').trim();
+  return _TXNA_ACCT[key]||'4-2000 Admin Expenses';
+}
+// ── 2.3 Fiscal Year config ──
+var _fyCfg=(function(){try{var s=localStorage.getItem('rem_fiscal_cfg');if(s)return JSON.parse(s);}catch(e){}return {fyStart:'2026-07-01',fyEnd:'2027-06-30',periods:{'2026-07':true,'2026-08':true,'2026-09':true,'2026-10':true,'2026-11':true,'2026-12':true,'2027-01':true,'2027-02':true,'2027-03':true,'2027-04':true,'2027-05':true,'2027-06':true}};})();
+function _fySave(){localStorage.setItem('rem_fiscal_cfg',JSON.stringify(_fyCfg));}
+function _fyMonths(){
+  var out=[];var d=new Date(_fyCfg.fyStart+'T00:00:00');
+  if(isNaN(d.getTime()))return [];
+  var end=new Date(_fyCfg.fyEnd+'T00:00:00');
+  if(isNaN(end.getTime())||end<=d){return [];}
+  while(d<=end){
+    out.push(d.toISOString().slice(0,7));
+    d.setMonth(d.getMonth()+1);
+  }
+  return out;
+}
+window.mockOpeningBalances = DB.init('opening_balances', (function(){
+  return mockCOA.map(function(a){return {code:a.code,name:a.name,type:a.type,balance:_balNum(a.balance)};});
+})());
+function renderFiscalTab(){
+  var months=_fyMonths();
+  var openCnt=months.filter(function(m){return _fyCfg.periods[m]!==false;}).length;
+  var closedCnt=months.length-openCnt;
+  var ob=mockOpeningBalances;
+  var obTotal=ob.reduce(function(s,r){return s+(r.balance||0);},0);
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Fiscal Year',(_fyCfg.fyStart||'—').slice(0,7)+' → '+(_fyCfg.fyEnd||'—').slice(0,7),'#2F80ED'],
+    ['Periods',months.length,'#1565c0'],
+    ['Open',openCnt,'#2e7d32'],
+    ['Closed',closedCnt,closedCnt>0?'#e65100':'#999'],
+    ['Opening Balances','৳'+fmtNum(obTotal),'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="font-size:12px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
+    '<div class="card"><div class="card-header"><h3>📅 Fiscal Year Definition</h3></div><div class="card-body" style="padding:10px">'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        '<div><label style="font-size:9px;font-weight:600;color:#888;display:block;margin-bottom:3px">START DATE</label><input id="fyStart" type="date" value="'+(_fyCfg.fyStart||'')+'" style="width:100%;padding:5px 8px;font-size:11px;border:1px solid #e0e0e0;border-radius:6px"/></div>'+
+        '<div><label style="font-size:9px;font-weight:600;color:#888;display:block;margin-bottom:3px">END DATE</label><input id="fyEnd" type="date" value="'+(_fyCfg.fyEnd||'')+'" style="width:100%;padding:5px 8px;font-size:11px;border:1px solid #e0e0e0;border-radius:6px"/></div>'+
+      '</div>'+
+      '<button class="action-btn primary" onclick="fySaveDates()" style="padding:4px 10px;font-size:10px">Save Fiscal Year</button>'+
+      '<div style="margin-top:8px;padding:8px 10px;background:#f8f9fa;border-radius:6px;font-size:10px;color:#666">BD standard fiscal year: 1 July – 30 June. Posting to a <b>closed</b> period is blocked.</div>'+
+    '</div></div>'+
+    '<div class="card"><div class="card-header"><h3>🔒 Period Open / Close Lock</h3></div><div class="card-body" style="padding:10px;max-height:240px;overflow-y:auto">'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">'+
+      (months.length?months.map(function(m){
+        var open=_fyCfg.periods[m]!==false;
+        return '<div style="padding:8px;border:1px solid '+(open?'#c8e6c9':'#ffcdd2')+';border-radius:8px;background:'+(open?'#e8f5e9':'#ffebee')+'">'+
+          '<div style="font-size:11px;font-weight:700;color:'+(open?'#2e7d32':'#c62828')+'">'+m+'</div>'+
+          '<div style="font-size:9px;color:#888;margin:3px 0">'+(open?'Open':'Closed')+'</div>'+
+          '<div class="toggle '+(open?'on':'')+'" onclick="fyTogglePeriod(\''+m+'\')" style="transform:scale(0.75);transform-origin:left center"></div>'+
+        '</div>';
+      }).join(''):'<div style="grid-column:span 3;text-align:center;color:#999;font-size:11px;padding:20px">Set a valid fiscal year first</div>')+
+      '</div></div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>💰 Opening Balances (per CoA account)</h3><button class="action-btn secondary" onclick="obSaveAll()" style="padding:3px 8px;font-size:10px">Save Balances</button></div>'+
+  '<div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:260px;overflow-y:auto"><table style="font-size:10px"><thead><tr><th>Code</th><th>Account</th><th>Type</th><th class="num">Opening Balance (৳)</th></tr></thead><tbody>'+
+  ob.map(function(r){
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+r.code+'</td><td style="font-weight:500">'+r.name+'</td><td><span class="badge-status badge-reserved" style="font-size:8px">'+r.type+'</span></td>'+
+      '<td class="num"><input type="number" min="0" step="1000" value="'+(r.balance||0)+'" onchange="obUpdate(\''+r.code+'\',this.value)" style="width:110px;padding:3px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;text-align:right"/></td></tr>';
+  }).join('')+
+  '</tbody></table></div></div></div>';
+}
+function fySaveDates(){
+  var s=document.getElementById('fyStart').value;
+  var e=document.getElementById('fyEnd').value;
+  if(!s||!e){showToast('Both start and end dates are required','error');return;}
+  if(e<=s){showToast('End date must be after start date','error');return;}
+  _fyCfg.fyStart=s;_fyCfg.fyEnd=e;_fySave();
+  showToast('Fiscal year saved: '+s.slice(0,7)+' → '+e.slice(0,7),'success');renderModule();
+}
+function fyTogglePeriod(m){
+  _fyCfg.periods[m]=_fyCfg.periods[m]===false?true:false;_fySave();
+  showToast('Period '+m+' '+( _fyCfg.periods[m]===false?'closed':'opened'),'info');renderModule();
+}
+function obUpdate(code,val){
+  var r=mockOpeningBalances.find(function(x){return x.code===code;});if(!r)return;
+  var v=parseFloat(val)||0;
+  if(v<0){showToast('Opening balance cannot be negative','error');return;}
+  r.balance=v;DB.save('opening_balances');
+}
+function obSaveAll(){
+  DB.save('opening_balances');
+  var total=mockOpeningBalances.reduce(function(s,r){return s+(r.balance||0);},0);
+  showToast('Opening balances saved · Total ৳'+fmtNum(total),'success');renderModule();
 }
 
 function renderFinanceInvoices(){
@@ -10449,7 +10545,7 @@ function applyMenuConfig(){
   }catch(e){}
 }
 function renderSettings(el){
-  const si=[{id:'users',label:'Users & Roles',icon:'👤',desc:'Users, roles & permission matrix'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'templates',label:'Templates',icon:'📄',desc:'Email, invoice & receipt templates'},{id:'themes',label:'Themes & Appearance',icon:'🎨',desc:'Presets, custom builder, font & density'},{id:'modules',label:'Modules',icon:'🧩',desc:'Enable / disable modules'},{id:'menu',label:'Menu Setup',icon:'🗂️',desc:'Show / hide & reorder groups'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
+  const si=[{id:'users',label:'Users & Roles',icon:'👤',desc:'Users, roles & permission matrix'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'fiscal',label:'Fiscal Year',icon:'📅',desc:'FY periods, open/close lock, opening balances'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'templates',label:'Templates',icon:'📄',desc:'Email, invoice & receipt templates'},{id:'themes',label:'Themes & Appearance',icon:'🎨',desc:'Presets, custom builder, font & density'},{id:'modules',label:'Modules',icon:'🧩',desc:'Enable / disable modules'},{id:'menu',label:'Menu Setup',icon:'🗂️',desc:'Show / hide & reorder groups'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
   const sidebar=si.map(s=>'<div class="settings-nav-item'+(settingsTab===s.id?' on':'')+'" onclick="settingsTab=\''+s.id+'\';renderModule()" style="padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;transition:all .15s;background:'+(settingsTab===s.id?'#eef3ff':'transparent')+';'+(settingsTab===s.id?'font-weight:600;color:#2F80ED':'color:#555')+'"><span style="font-size:14px">'+s.icon+'</span><div><div style="font-size:11px;font-weight:'+(settingsTab===s.id?'600':'500')+'">'+s.label+'</div><div style="font-size:9px;color:#888">'+s.desc+'</div></div></div>').join('');
   var mc='';
   if(settingsTab==='users'){
@@ -10461,6 +10557,8 @@ function renderSettings(el){
     mc='<div class="card" style="margin-bottom:10px"><div class="card-header"><h3>Company Information</h3><button class="action-btn primary" onclick="showToast(\'Company profile saved!\',\'success\')" style="padding:3px 7px;font-size:9px">Save Changes</button></div><div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="form-group"><label class="form-label">Company Name</label><input class="form-input" value="Mars Constech Ltd."/></div><div class="form-group"><label class="form-label">Trade License</label><input class="form-input" value="TRADE-2024-xxx"/></div><div class="form-group"><label class="form-label">BIN / TIN</label><input class="form-input" value="BIN-123456789-01"/></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="+880 1711-000000"/></div><div class="form-group" style="grid-column:span 2"><label class="form-label">Address</label><input class="form-input" value="House 12, Road 5, Gulshan-1, Dhaka 1212"/></div><div class="form-group" style="grid-column:span 2"><label class="form-label">Website</label><input class="form-input" value="https://marsconstech.com"/></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div class="card"><div class="card-header"><h3>Brand Colors</h3></div><div class="card-body"><div class="form-group"><label class="form-label">Primary Color</label><div style="display:flex;align-items:center;gap:8px"><input type="color" value="#2F80ED" style="width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;padding:0"/><input class="form-input" value="#2F80ED" style="flex:1;font-family:monospace;font-size:11px"/></div></div><div class="form-group"><label class="form-label">Secondary Color</label><div style="display:flex;align-items:center;gap:8px"><input type="color" value="#27ae60" style="width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;padding:0"/><input class="form-input" value="#27ae60" style="flex:1;font-family:monospace;font-size:11px"/></div></div><div class="form-group"><label class="form-label">Accent Color</label><div style="display:flex;align-items:center;gap:8px"><input type="color" value="#e65100" style="width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;padding:0"/><input class="form-input" value="#e65100" style="flex:1;font-family:monospace;font-size:11px"/></div></div><div style="margin-top:8px;padding:8px 10px;background:#f8f9fa;border-radius:6px;font-size:10px;color:#888">Colors take effect after save. Full theme reskin coming soon.</div></div></div><div class="card"><div class="card-header"><h3>Logo</h3></div><div class="card-body" style="text-align:center"><div style="width:80px;height:80px;border-radius:12px;background:#eef3ff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:28px;color:#2F80ED;border:2px dashed #d0d5dd">🏢</div><button class="action-btn primary" onclick="showToast(\'Logo upload coming soon\',\'info\')" style="padding:4px 10px;font-size:10px;display:inline-flex">Upload Logo</button><button class="action-btn secondary" onclick="showToast(\'Logo removed\',\'info\')" style="padding:4px 10px;font-size:10px;display:inline-flex;margin-left:4px">Remove</button><div style="margin-top:6px;font-size:9px;color:#888">Recommended: 256x256px PNG</div></div></div></div><div class="card"><div class="card-header"><h3>Brand Preview</h3></div><div class="card-body" style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:8px;background:#2F80ED"></div><div style="width:40px;height:40px;border-radius:8px;background:#27ae60"></div><div style="flex:1;padding:10px 14px;border-radius:8px;background:#eef3ff;color:#2F80ED;font-size:12px;font-weight:600">Mars Constech Ltd. — Brand Preview</div><button class="action-btn primary" onclick="showToast(\'Theme applied!\',\'success\')" style="padding:4px 10px;font-size:10px">Apply Theme</button></div></div>';
   }else if(settingsTab==='finance'){
     mc='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div class="card"><div class="card-header"><h3>Chart of Accounts</h3><button class="action-btn primary" onclick="settingsAddAccount()" style="padding:2px 6px;font-size:9px">+ Add</button></div><div class="card-body" style="padding:0;max-height:180px;overflow-y:auto"><table style="font-size:9px"><thead><tr><th>Code</th><th>Name</th><th>Type</th><th class="num">Balance</th></tr></thead><tbody>'+mockCOA.map(function(a){return '<tr><td style="font-family:monospace;font-size:8px">'+a.code+'</td><td style="font-weight:500">'+a.name+'</td><td><span class="badge-status badge-reserved" style="font-size:8px">'+a.type+'</span></td><td class="num" style="font-size:9px">'+a.balance+'</td></tr>';}).join('')+'</tbody></table></div></div><div class="card"><div class="card-header"><h3>Bank Accounts</h3><button class="action-btn primary" onclick="settingsAddBank()" style="padding:2px 6px;font-size:9px">+ Add</button></div><div class="card-body" style="padding:0;max-height:180px;overflow-y:auto"><table style="font-size:9px"><thead><tr><th>Bank</th><th>Account</th><th>Type</th><th class="num">Balance</th></tr></thead><tbody>'+mockBankAccounts.map(function(b){return '<tr><td style="font-weight:500">'+b.name+'</td><td style="font-family:monospace;font-size:8px">'+b.account+'</td><td>'+b.type+'</td><td class="num" style="font-size:9px">'+b.balance+'</td></tr>';}).join('')+'</tbody></table></div></div></div><div class="card"><div class="card-header"><h3>Tax & VAT Configuration</h3></div><div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"><div class="form-group"><label class="form-label">VAT Rate (%)</label><input class="form-input" value="5"/></div><div class="form-group"><label class="form-label">TDS on Contractor (%)</label><input class="form-input" value="10"/></div><div class="form-group"><label class="form-label">AIT on Land (%)</label><input class="form-input" value="3"/></div></div></div><div class="card" style="margin-top:10px"><div class="card-header"><h3>Invoice Template</h3><button class="action-btn primary" onclick="showToast(\'Template editor coming soon\',\'info\')" style="padding:2px 6px;font-size:9px">Edit Template</button></div><div class="card-body" style="display:flex;gap:12px;align-items:center"><div style="width:60px;height:80px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:9px">INV</div><div><div style="font-size:11px;font-weight:600">Standard Invoice</div><div style="font-size:10px;color:#888">Shortcodes: {{company_name}}, {{customer_name}}, {{amount}}, {{date}}</div><div style="margin-top:4px;display:flex;gap:4px"><span class="badge-status badge-active">Default</span><span class="badge-status badge-reserved" style="cursor:pointer" onclick="showToast(\'Invoice preview coming soon\',\'info\')">Preview</span></div></div></div></div>';
+  }else if(settingsTab==='fiscal'){
+    mc=renderFiscalTab();
   }else if(settingsTab==='project_config'){
     mc='<div class="card"><div class="card-header"><h3>Global Defaults</h3></div><div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"><div class="form-group"><label class="form-label">Default Currency</label><select class="form-input"><option selected>BDT (৳)</option><option>USD ($)</option></select></div><div class="form-group"><label class="form-label">Area Unit</label><select class="form-input"><option selected>Katha</option><option>SQFT</option><option>Bigha</option></select></div><div class="form-group"><label class="form-label">Late Fee (%)</label><input class="form-input" value="2 / month"/></div><div class="form-group"><label class="form-label">Grace Period (Days)</label><input class="form-input" value="15"/></div><div class="form-group"><label class="form-label">Default Downpayment %</label><input class="form-input" value="25"/></div><div class="form-group"><label class="form-label">Installments</label><select class="form-input"><option>Quarterly</option><option selected>Monthly</option><option>Half-Yearly</option></select></div></div></div><div class="card" style="margin-top:10px"><div class="card-header"><h3>Master Data Lists</h3></div><div class="card-body">'+Object.entries(mockMasterLists).map(function(e){var k=e[0],v=e[1];return '<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px">'+k+'</div><div style="display:flex;gap:4px;flex-wrap:wrap">'+v.map(function(item){return '<span style="padding:2px 8px;border-radius:10px;font-size:9px;background:#f0f4ff;color:#1565c0;border:1px solid #d0d8e8">'+item+' <span style="cursor:pointer;color:#999;margin-left:2px" onclick="settingsRemoveList(k,item)">×</span></span>';}).join('')+' <span style="padding:2px 8px;border-radius:10px;font-size:9px;border:1px dashed #d0d8e8;color:#999;cursor:pointer" onclick="settingsAddList(k)">+ Add</span></div></div>';}).join('')+'</div></div>';
   }else if(settingsTab==='integrations'){
