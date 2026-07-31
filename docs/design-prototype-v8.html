@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -2294,7 +2294,7 @@ function switchGroup(group) {
   document.getElementById('footerGroup').textContent = grp.label;
   const nav = document.getElementById('topNav');
   // Filter modules by role permissions
-  const visibleMods = grp.mods.filter(function(m){return canAccess(m.id);});
+  const visibleMods = grp.mods.filter(function(m){return canAccess(m.id)&&modEnabled(m.id);});
   nav.innerHTML = visibleMods.map(function(m, i){
     var isFirst=(i===0);
     return '<div class="top-nav-item'+(isFirst?' active':'')+(m.badge?' badge-new':'')+'" onclick="switchModule(\''+m.id+'\')">'+m.label+'</div>';
@@ -2314,6 +2314,7 @@ function openPropertyRef(name) { trackRecent('property', name, {mod:'properties_
 
 function switchModule(mod,skipSkel) {
   closeLeadPanel();
+  if(typeof modEnabled==='function'&&!modEnabled(mod)){showToast('🚫 '+modLabel(mod)+' is disabled by admin','info');return;}
   currentModule = mod;
   if(skipSkel!==true)window._mobOpenPanels={}; // fresh module = fresh dropdown state
   // Snapshot toolbar filter values + focused control before re-render so the
@@ -2398,6 +2399,7 @@ function switchModule(mod,skipSkel) {
     }
     try{_moveStatsBelowToolbar();}catch(e){}
     setTimeout(applyPerms,0);
+    setTimeout(applyMenuConfig,0);
     setTimeout(_animateStats,20);
     setTimeout(function(){try{_wirePostRender();}catch(e){}},60);
   },skipSkel?0:180);
@@ -9560,8 +9562,77 @@ function resetPermissions(){
 function _rolesMatrixHtml(){
   return '<div class="card"><div class="card-header"><h3>🔐 Permission Matrix — Role: '+currentRole+'</h3><button class="action-btn primary" onclick="showToast(\'Permissions saved!\',\'success\')" style="padding:3px 7px;font-size:9px">Save Permissions</button></div><div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:380px;overflow-y:auto"><table style="font-size:10px"><thead><tr style="position:sticky;top:0;background:#fff"><th style="min-width:130px;background:#fff;z-index:1">Module</th>'+PERMISSION_ACTIONS.map(function(a){return '<th style="text-align:center;min-width:55px;background:#f0f4ff;color:#2F80ED;font-size:9px">'+a+'</th>';}).join('')+'</tr></thead><tbody>'+PERMISSION_MODULES.map(function(m,mi){var perms=(MOCK_PERMISSIONS[currentRole]||MOCK_PERMISSIONS['Super Admin'])[mi];return '<tr><td style="font-weight:500;padding:5px 10px">'+m+'</td>'+PERMISSION_ACTIONS.map(function(a,ai){return '<td style="text-align:center;padding:5px"><div onclick="showToast(\'Toggle permission for '+m+': '+a+'\',\'info\')" style="width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:'+(perms[ai]==='✓'?'#2F80ED':'#e0e0e0')+';color:#fff;font-size:10px;font-weight:700;transition:all .15s;user-select:none">'+(perms[ai]==='✓'?'✓':'')+'</div></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div></div></div><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font-size:10px;color:#888">Quick role switch:</span>'+['Super Admin','Sales Agent','Site Engineer','Finance'].map(function(r){return '<div onclick="setRole(\''+r+'\')" style="padding:4px 10px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:500;background:'+(r===currentRole?'#2F80ED':'#f0f0f0')+';color:'+(r===currentRole?'#fff':'#555')+';border:none;transition:all .15s">'+r+'</div>';}).join('')+'</div>';
 }
+// ── Module enable/disable + menu setup (Phase 1.4) ──
+window.mockModuleConfig = DB.init('module_config', {});
+window.mockMenuConfig = DB.init('menu_config', {});
+function modEnabled(id){
+  var cfg=window.mockModuleConfig||{};
+  return cfg[id]===undefined?true:!!cfg[id];
+}
+function modLabel(id){
+  for(var gi=0;gi<GROUP_ORDER.length;gi++){var g=GROUPS[GROUP_ORDER[gi]];for(var mi=0;mi<g.mods.length;mi++){if(g.mods[mi].id===id)return g.mods[mi].label;}}
+  return id;
+}
+function toggleModule(id){
+  var cfg=window.mockModuleConfig||{};
+  cfg[id]=!modEnabled(id);
+  window.mockModuleConfig=cfg;
+  DB.save('module_config');
+  renderModule();
+  showToast((cfg[id]?'✅ Enabled':'🚫 Disabled')+' — '+modLabel(id), cfg[id]?'success':'info');
+}
+function menuGroupVisible(g){
+  var cfg=window.mockMenuConfig||{};
+  return cfg[g]===undefined?true:!!cfg[g];
+}
+function menuGroupOrder(){
+  var cfg=window.mockMenuConfig||{};
+  var ord=cfg.order||[];
+  var base=GROUP_ORDER.slice();
+  ord.forEach(function(g){var i=base.indexOf(g);if(i>=0){base.splice(i,1);}});
+  return ord.concat(base);
+}
+function toggleMenuGroup(g){
+  var cfg=window.mockMenuConfig||{};
+  cfg[g]=!menuGroupVisible(g);
+  window.mockMenuConfig=cfg;
+  DB.save('menu_config');
+  renderModule();
+  showToast((cfg[g]?'✅ Menu shown':'🚫 Menu hidden')+' — '+GROUPS[g].label, cfg[g]?'success':'info');
+}
+function moveMenuGroup(g,dir){
+  var cfg=window.mockMenuConfig||{};
+  var ord=menuGroupOrder();
+  var i=ord.indexOf(g);
+  var j=i+dir;
+  if(i<0||j<0||j>=ord.length)return;
+  ord.splice(i,1);ord.splice(j,0,g);
+  cfg.order=ord;
+  window.mockMenuConfig=cfg;
+  DB.save('menu_config');
+  renderModule();
+  showToast('Menu reordered','info');
+}
+function groupKeyByLabel(l){
+  for(var k in GROUPS){if(GROUPS[k].label===l)return k;}
+  return null;
+}
+function applyMenuConfig(){
+  try{
+    GROUP_ORDER.forEach(function(g){
+      var el=document.getElementById('s_'+g);
+      if(el)el.style.display=menuGroupVisible(g)?'':'none';
+    });
+    // Reorder search dropdown groups to match menu order
+    try{
+      var ord=menuGroupOrder();
+      var lab=ord.map(function(g){return GROUPS[g]?GROUPS[g].label:g;});
+      if(window._sdGroupOrder&&lab.length){window._sdGroupOrder=lab;}
+    }catch(e){}
+  }catch(e){}
+}
 function renderSettings(el){
-  const si=[{id:'users',label:'Users & Roles',icon:'👤',desc:'Users, roles & permission matrix'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'templates',label:'Templates',icon:'📄',desc:'Email, invoice & receipt templates'},{id:'themes',label:'Themes & Appearance',icon:'🎨',desc:'Presets, custom builder, font & density'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
+  const si=[{id:'users',label:'Users & Roles',icon:'👤',desc:'Users, roles & permission matrix'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'templates',label:'Templates',icon:'📄',desc:'Email, invoice & receipt templates'},{id:'themes',label:'Themes & Appearance',icon:'🎨',desc:'Presets, custom builder, font & density'},{id:'modules',label:'Modules',icon:'🧩',desc:'Enable / disable modules'},{id:'menu',label:'Menu Setup',icon:'🗂️',desc:'Show / hide & reorder groups'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
   const sidebar=si.map(s=>'<div class="settings-nav-item'+(settingsTab===s.id?' on':'')+'" onclick="settingsTab=\''+s.id+'\';renderModule()" style="padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;transition:all .15s;background:'+(settingsTab===s.id?'#eef3ff':'transparent')+';'+(settingsTab===s.id?'font-weight:600;color:#2F80ED':'color:#555')+'"><span style="font-size:14px">'+s.icon+'</span><div><div style="font-size:11px;font-weight:'+(settingsTab===s.id?'600':'500')+'">'+s.label+'</div><div style="font-size:9px;color:#888">'+s.desc+'</div></div></div>').join('');
   var mc='';
   if(settingsTab==='users'){
@@ -9747,6 +9818,38 @@ function renderSettings(el){
       '</div>';
   }else if(settingsTab==='activity'){
     mc='<div class="card"><div class="card-header"><h3>Activity Log</h3><div style="display:flex;gap:4px"><input id="searchActLog" placeholder="Search log..." onkeyup="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/><button class="action-btn secondary" onclick="clearSearch()" style="padding:3px 7px;font-size:9px">Clear</button></div></div><div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:350px;overflow-y:auto"><table style="font-size:10px"><thead><tr style="position:sticky;top:0;background:#fff"><th>User</th><th>Action</th><th>Module</th><th>Detail</th><th>IP</th><th>Date/Time</th></tr></thead><tbody>'+(function(){var sq=document.getElementById("searchActLog");var q=sq?sq.value.toLowerCase():"";var fl=!q?mockSettingsActivity:mockSettingsActivity.filter(function(a){return a.user.toLowerCase().indexOf(q)>=0||a.action.toLowerCase().indexOf(q)>=0||a.module.toLowerCase().indexOf(q)>=0||a.detail.toLowerCase().indexOf(q)>=0;});var pAct=_pg('settings_activity',fl);var out="";for(var fi=0;fi<pAct.items.length;fi++){var a=pAct.items[fi];out+="<tr><td style=\"font-weight:500\">"+a.user+"</td><td>"+a.action+"</td><td><span class=\"badge-status badge-reserved\" style=\"font-size:8px\">"+a.module+"</span></td><td style=\"font-size:9px;color:#888;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+a.detail+"</td><td style=\"font-family:monospace;font-size:8px;color:#999\">"+a.ip+"</td><td style=\"font-size:9px;color:#888\">"+a.date+"</td></tr>";}out+=_pgHtml('settings_activity',pAct.total,pAct.page,pAct.totalPages,pAct.perPage);return out;})()+'</tbody></table></div></div></div>';
+  }else if(settingsTab==='modules'){
+    var modRows=GROUP_ORDER.map(function(g){
+      var grp=GROUPS[g];
+      return '<div style="margin-bottom:6px"><div style="font-size:11px;font-weight:700;color:#555;margin:8px 2px 4px">'+grp.icon+' '+grp.label+'</div>'+
+        grp.mods.map(function(m){
+          var on=modEnabled(m.id);
+          return '<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid '+(on?'#c8e6c9':'#e8e8e8')+';border-radius:6px;margin-bottom:3px;background:'+(on?'#f6fef6':'#fafafa')+'">'+
+            '<div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:600;color:'+(on?'#2e7d32':'#999')+'">'+m.label+'</div><div style="font-size:8px;color:#bbb">'+m.id+'</div></div>'+
+            '<div class="toggle '+(on?'on':'')+'" onclick="toggleModule(\''+m.id+'\')"></div>'+
+          '</div>';
+        }).join('')+'</div>';
+    }).join('');
+    var onCnt=0;GROUP_ORDER.forEach(function(g){GROUPS[g].mods.forEach(function(m){if(modEnabled(m.id))onCnt++;});});
+    var totCnt=GROUP_ORDER.reduce(function(s,g){return s+GROUPS[g].mods.length;},0);
+    mc='<div class="stats-row" style="margin-bottom:8px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">'+
+      [['Enabled',onCnt,'#2e7d32'],['Disabled',totCnt-onCnt,'#c62828'],['Total Modules',totCnt,'#2F80ED'],['Groups',GROUP_ORDER.length,'#7b1fa2']].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+      '<div class="card"><div class="card-header"><h3>🧩 Module Manager</h3><div style="font-size:9px;color:#888">Disabled modules are hidden from navigation, search & ⌘K — and cannot be opened</div></div><div class="card-body" style="padding:8px;max-height:520px;overflow-y:auto">'+modRows+'</div></div>';
+  }else if(settingsTab==='menu'){
+    var ord=menuGroupOrder();
+    var grpRows=ord.map(function(g,idx){
+      var grp=GROUPS[g];var vis=menuGroupVisible(g);
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid '+(vis?'#d0d8e8':'#e8e8e8')+';border-radius:6px;margin-bottom:4px;background:'+(vis?'#fff':'#fafafa')+'">'+
+        '<span style="font-size:9px;color:#bbb;width:16px">'+(idx+1)+'</span>'+
+        '<span style="font-size:14px">'+grp.icon+'</span>'+
+        '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:'+(vis?'#222':'#999')+'">'+grp.label+'</div><div style="font-size:8px;color:#bbb">'+grp.mods.length+' modules</div></div>'+
+        '<span style="cursor:pointer;color:#2F80ED;font-size:12px" onclick="moveMenuGroup(\''+g+'\',-1)" title="Move up">▲</span>'+
+        '<span style="cursor:pointer;color:#2F80ED;font-size:12px" onclick="moveMenuGroup(\''+g+'\',1)" title="Move down">▼</span>'+
+        '<div class="toggle '+(vis?'on':'')+'" onclick="toggleMenuGroup(\''+g+'\')"></div>'+
+      '</div>';
+    }).join('');
+    mc='<div class="card"><div class="card-header"><h3>🗂️ Menu Setup</h3><div style="font-size:9px;color:#888">Show/hide sidebar groups & reorder them (sidebar, mobile nav & search follow this order)</div></div><div class="card-body" style="padding:8px;max-height:560px;overflow-y:auto">'+grpRows+'</div></div>'+
+      '<div style="margin-top:6px;padding:8px 10px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:6px;font-size:9px;color:#2e7d32">💡 Hiding a group hides its sidebar icon and removes it from the mobile nav & search — module permissions are unchanged.</div>';
   }
   el.innerHTML='<div class="fade-in settings-wrap" style="display:flex;gap:8px;height:100%;flex:1"><div class="settings-nav" style="width:180px;min-width:180px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:6px;display:flex;flex-direction:column;overflow-y:auto"><div class="settings-nav-title" style="font-size:12px;font-weight:700;color:#222;margin-bottom:6px;padding:0 4px">Settings</div>'+sidebar+'<div class="settings-nav-actions" style="margin-top:auto;padding-top:6px;border-top:1px solid #f0f0f0"><button onclick="showToast(\'All settings saved!\',\'success\')" style="width:100%;padding:5px 0;background:#2F80ED;color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button><button onclick="resetAllAppData()" style="width:100%;padding:4px 0;background:transparent;color:#c62828;border:1px solid #f5c6cb;border-radius:6px;font-size:9px;font-weight:500;cursor:pointer;margin-top:3px">↺ Reset All Data</button></div></div><div class="settings-content" style="flex:1;overflow-y:auto">'+mc+'<div class="content-footer" style="margin-top:8px"><div class="breadcrumb">Settings <span>›</span> '+settingsTab+'</div></div></div></div>';
 }
@@ -9908,6 +10011,7 @@ function doGlobalSearch(){
   var grouped={};
   var total=0;
   _sdDatasetDefs.forEach(function(ds){
+    if(typeof modEnabled==='function'&&!modEnabled(ds.mod))return;
     var arr=window[ds.arr];
     if(!arr)return;
     arr.forEach(function(item){
@@ -9948,6 +10052,7 @@ function doGlobalSearch(){
   var html='';
   var globalIdx=0;
   _sdGroupOrder.forEach(function(grp){
+    if(typeof groupKeyByLabel==='function'){var gk=groupKeyByLabel(grp);if(gk&&!menuGroupVisible(gk))return;}
     if(!grouped[grp]||!grouped[grp].length)return;
     var items=grouped[grp];
     html+='<div class="sd-group-header">'+items[0].icon+' '+grp+'<span>'+items.length+'</span></div>';
@@ -13765,8 +13870,8 @@ function openMobileNav(){
   var p=document.getElementById('mobileNavPanel');
   if(!sh||!p)return;
   var grp=GROUPS[currentGroup]||GROUPS.executive;
-  var mods=grp.mods.filter(function(m){return canAccess(m.id);});
-  var groupsHtml=GROUP_ORDER.map(function(g){
+  var mods=grp.mods.filter(function(m){return canAccess(m.id)&&modEnabled(m.id);});
+  var groupsHtml=menuGroupOrder().filter(function(g){return menuGroupVisible(g);}).map(function(g){
     var gg=GROUPS[g],a=g===currentGroup;
     return '<div class="mnav-grp'+(a?' active':'')+'" onclick="switchMobileNavGroup(\''+g+'\')" title="'+gg.label+'">'+gg.icon+'</div>';
   }).join('');
