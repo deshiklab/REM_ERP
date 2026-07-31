@@ -232,4 +232,6 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 - [x] **3.5** Lead→Booking conversion wizard — SW v8-v25 (`d2ea470`)
 - [x] **4.1** HR Shifts tab (types + weekly roster + overtime) — SW v8-v26 (`6bba3d0`)
 - [x] **4.2** Contracts & Insurance + 30-day expiry reminders — SW v8-v27 (`774cdfb`)
-- [ ] Phase 5 (comm/AI) · Phase 6 (investment/portal)
+- [x] **5.1+5.2** WhatsApp Engine + Internal Chat (new 💬 group) — SW v8-v28 (`163de9a`)
+- [x] **5.3+5.4** AI Copilot + Dues auto-notifications — SW v8-v29 (`ce396ef`)
+- [ ] Phase 6 (investment/portal)
