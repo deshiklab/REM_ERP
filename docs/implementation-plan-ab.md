@@ -227,4 +227,7 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 - [x] **2.1+2.2** Bank reconciliation + Audit statements (SFP/SCI/SCE/SCF) — SW v8-v20 (`c7841ba`)
 - [x] **2.4+2.5** Credit notes + Purchase invoices — SW v8-v21 (`277dc3d`)
 - [x] **2.3+2.6** Fiscal year/periods + CoA→transaction linkage — SW v8-v22 (`8624710`)
-- [ ] Phase 3 (sales/inventory) · Phase 4 (HR) · Phase 5 (comm/AI) · Phase 6 (investment/portal)
+- [x] **3.1+3.3** Stock Goods Receive tab + Customer segmentation groups — SW v8-v23 (`657055e`)
+- [x] **3.2+3.4** CRM Config (territories/targets/stages) + Booking payment schedules — SW v8-v24 (`96ca497`)
+- [x] **3.5** Lead→Booking conversion wizard — SW v8-v25 (`d2ea470`)
+- [ ] Phase 4 (HR) · Phase 5 (comm/AI) · Phase 6 (investment/portal)
