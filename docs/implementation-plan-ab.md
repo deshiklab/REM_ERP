@@ -202,7 +202,7 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 
 | Phase | SW cache | Deliverable |
 |---|---|---|
-| 1.1 | v8-v13 | Currency fix + seedV bumps |
+| 1.1 | v8-v13 | Currency fix + seedV bumps — **✅ DONE `f45121b`** |
 | 1.2–1.3 | v8-v14 | Under Payment + unsold balance |
 | 1.4 | v8-v15 | Module toggles + menu setup |
 | 1.5–1.6 | v8-v16 | Calendar + Announcements |
@@ -214,3 +214,15 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 | 4.x | v8-v26..27 | HR deep-dive |
 | 5.x | v8-v28..31 | Communication & AI group |
 | 6.x | v8-v32..33 | Investment/Loan + portal |
+
+## Progress tracker
+
+- [x] **1.1** Currency consistency — 70 ₹→৳, seedV bumps, SW v8-v13 (`f45121b`)
+- [ ] 1.2 Flats & Units "Under Payment" status
+- [ ] 1.3 Unsold plot/flat balance ledger
+- [ ] 1.4 Settings — module enable/disable + menu setup
+- [ ] 1.5 Calendar · 1.6 Announcements
+- [ ] 1.7 Fund transfers · 1.8 Journal entries
+- [ ] 1.9 HR check-in/out · 1.10 Leave approval · 1.11 Timesheets
+- [ ] 1.12 Notification templates · 1.13 Bulk exports
+- [ ] Phase 2 (accounting) · Phase 3 (sales/inventory) · Phase 4 (HR) · Phase 5 (comm/AI) · Phase 6 (investment/portal)
