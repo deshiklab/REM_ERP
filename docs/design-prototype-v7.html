@@ -475,6 +475,14 @@
       .app-shell.table-view .content{overflow:hidden!important;height:auto!important;flex:1!important;min-height:0!important}
       .app-shell.table-view .content>.tbl-scaffold{height:100%!important}
       .tbl-region .pagination{padding-bottom:2px!important}
+      /* Documents Vault list view: nested card must flex inside the fixed-height
+         table shell exactly like other pages (title/subtitle/toolbar pinned,
+         table region scrolls, pagination pinned below). */
+      .app-shell.table-view .vault-wrap{flex:1!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;overflow:hidden!important}
+      .app-shell.table-view .vault-wrap>div[style]{flex:1!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important;align-items:stretch!important}
+      .app-shell.table-view .vault-wrap .card.tbl-region{flex:1!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+      .app-shell.table-view .vault-wrap .card.tbl-region .card-body{flex:1!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important}
+      .app-shell.table-view .vault-wrap .table-wrap{flex:1!important;min-width:0!important;min-height:0!important}
       /* Mobile: all search + filter controls collapse into a single Filters dropdown */
       .toolbar{position:relative!important}
       .toolbar .mob-filter-btn{flex-shrink:0!important}
@@ -881,7 +889,7 @@
     html.dark .dropzone{background:var(--muted-bg,#1a2a4a)}
     html.dark .doc-meta-row{border-bottom-color:var(--card-border,#ffffff10)}
     @media(max-width:768px){
-      .vault-wrap{flex-direction:column}
+      .vault-wrap{flex-direction:column;align-items:stretch}
       .vault-side{width:100%;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;top:auto}
       .vault-side-title{width:100%;flex:0 0 100%;padding:2px 2px 6px}
       .vault-cat{flex:0 0 auto;white-space:nowrap;margin-bottom:0}
@@ -12921,7 +12929,13 @@ function _wireTableScaffold(){
   for(var i=0;i<tws.length;i++){
     var tw=tws[i];
     var region=tw;
-    while(region.parentElement&&region.parentElement!==wrap)region=region.parentElement;
+    while(region.parentElement&&region.parentElement!==wrap){
+      region=region.parentElement;
+      // stop at the .card that owns this table (vault/list wrappers like
+      // .vault-wrap must NOT become the region — they would inherit
+      // overflow:hidden + flex sizing and clip the table on mobile)
+      if(region.classList&&region.classList.contains('card'))break;
+    }
     if(region&&region!==wrap&&!region.classList.contains('tbl-region'))region.classList.add('tbl-region');
     // move pagination out of the scroll container so it stays pinned above the footer
     var pg=tw.querySelector(':scope > .pagination');
