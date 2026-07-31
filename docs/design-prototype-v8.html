@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, hr_attendance:1, hr_timesheets:1, leave:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:1, hr_attendance:1, hr_timesheets:1, leave:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -8475,6 +8475,16 @@ window.mockJournals = DB.init('journals', [
   {id:'JNL-005',date:'2026-07-22',ref:'Installment collection',desc:'2nd installment Dr. Rubina Ali',lines:[{acc:'1-1000 Cash & Bank',dr:2200000,cr:0},{acc:'3-2000 Revenue - Installments',dr:0,cr:2200000}]},
   {id:'JNL-006',date:'2026-07-28',ref:'TDS contractor deduction',desc:'10% TDS on contractor bill',lines:[{acc:'2-2000 Accounts Payable',dr:120000,cr:0},{acc:'4-1000 Construction Costs',dr:0,cr:120000}]}
 ]);
+window.mockReconItems = DB.init('recon_items', [
+  {id:'REC-9001',date:'2026-07-02',ref:'RCP-9001',desc:'Booking advance - Kamrul Hasan',amount:1800000,status:'Matched',matchedTo:'RCP-8839'},
+  {id:'REC-9002',date:'2026-07-05',ref:'RCP-9002',desc:'Installment - Dr. Rubina Ali',amount:2200000,status:'Uncleared',matchedTo:null},
+  {id:'REC-9003',date:'2026-07-08',ref:'PO-PAY-112',desc:'Cement purchase - Shah Cement',amount:950000,status:'Uncleared',matchedTo:null},
+  {id:'REC-9004',date:'2026-07-12',ref:'RCP-9003',desc:'Plot booking - Tariqul Islam',amount:1150000,status:'Uncleared',matchedTo:null},
+  {id:'REC-9005',date:'2026-07-15',ref:'CHQ-9004',desc:'Contractor bill - Karim Traders',amount:650000,status:'Matched',matchedTo:'EXP-9912'},
+  {id:'REC-9006',date:'2026-07-18',ref:'RCP-9005',desc:'Installment - Nazma Akhter',amount:800000,status:'Uncleared',matchedTo:null},
+  {id:'REC-9007',date:'2026-07-21',ref:'RCP-9006',desc:'Handover fee - Jahanara Begum',amount:2000000,status:'Uncleared',matchedTo:null},
+  {id:'REC-9008',date:'2026-07-24',ref:'PO-PAY-113',desc:'Steel purchase - BSRM',amount:1400000,status:'Uncleared',matchedTo:null}
+]);
 function _balNum(s){return parseInt(String(s||'').replace(/[^0-9]/g,''))||0;}
 function renderFinanceTransfers(){
   var rows=mockTransfers.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
@@ -8608,7 +8618,7 @@ function renderFinance(el){
   el.innerHTML=`<div class="fade-in">
     <div class="page-title">Finance Dashboard</div><div class="page-subtitle">${mockTransactions.length} transactions \u00B7 \u09F3 ${fmtNum(netProfit)} net</div>
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','invoices','payments','bank_accounts','transfers','journals','budgets','tax'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','invoices':'\uD83D\uDCC4 Invoices','payments':'\uD83D\uDCB0 Payments','bank_accounts':'\uD83C\uDFE6 Banks','transfers':'\uD83D\uDD01 Transfers','journals':'\uD83D\uDCD2 Journals','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax'}[t]}</div>`).join('')}</div>
+      <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','invoices','payments','bank_accounts','transfers','journals','budgets','tax','reconcile','statements'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','invoices':'\uD83D\uDCC4 Invoices','payments':'\uD83D\uDCB0 Payments','bank_accounts':'\uD83C\uDFE6 Banks','transfers':'\uD83D\uDD01 Transfers','journals':'\uD83D\uDCD2 Journals','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax','reconcile':'\uD83D\uDD01 Reconcile','statements':'\uD83D\uDCCA Statements'}[t]}</div>`).join('')}</div>
     </div>
     ${finT==='dashboard'?renderFinanceDashboard(grossIncome,grossExpense,netProfit,bankTotal):
       finT==='transactions'?renderFinanceTransactions():
@@ -8620,7 +8630,9 @@ function renderFinance(el){
       finT==='transfers'?renderFinanceTransfers():
       finT==='journals'?renderFinanceJournals():
       finT==='budgets'?renderProjectBudgets():
-      finT==='tax'?renderTaxAdjustments():''}
+      finT==='tax'?renderTaxAdjustments():
+      finT==='reconcile'?renderFinanceReconcile():
+      finT==='statements'?renderFinanceStatements():''}
   </div>`;
   if(finT==='dashboard')setTimeout(renderFinanceCharts,50);
   // Handle cross-module navigation: switch to invoices tab for invoice ref
@@ -8703,6 +8715,160 @@ function renderRecordExpense(){
     }</tbody></table></div></div></div>`;
 }
 
+function renderFinanceReconcile(){
+  var q=(document.getElementById('reconSearch')||{}).value||'';
+  var rows=mockReconItems.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  var matched=rows.filter(function(r){return r.status==='Matched';}).length;
+  var uncleared=rows.filter(function(r){return r.status!=='Matched';}).length;
+  var unclearedAmt=rows.filter(function(r){return r.status!=='Matched';}).reduce(function(s,r){return s+r.amount;},0);
+  if(q)rows=rows.filter(function(r){return r.ref.toLowerCase().includes(q.toLowerCase())||r.desc.toLowerCase().includes(q.toLowerCase());});
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Statement Lines',rows.length,'#2F80ED'],
+    ['Matched',matched,'#2e7d32'],
+    ['Uncleared',uncleared,uncleared>0?'#e65100':'#999'],
+    ['Uncleared Value','৳'+fmtNum(unclearedAmt),unclearedAmt>0?'#c62828':'#999'],
+    ['Match Rate',rows.length?Math.round(matched/rows.length*100)+'%':'—','#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="reconSearch" placeholder="Search ref/desc..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:150px"/>'+
+    '<div class="spacer"></div>'+
+    '<button class="action-btn secondary" onclick="reconAutoMatch()" style="padding:3px 8px;font-size:10px" title="Auto-match by amount">⚡ Auto Match</button>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Date</th><th>Ref</th><th>Description</th><th class="num">Amount</th><th>Status</th><th>Matched To</th><th></th></tr></thead><tbody>'+
+  (rows.length?rows.map(function(r){
+    var sb=r.status==='Matched'?'#e8f5e9;color:#2e7d32':'#fff3e0;color:#e65100';
+    var txn=r.matchedTo?mockTransactions.find(function(t){return t.id===r.matchedTo;}):null;
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+r.id+'</td><td style="font-size:9px;color:#888">'+r.date+'</td><td style="font-weight:500">'+r.ref+'</td><td style="font-size:9px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.desc+'">'+r.desc+'</td><td class="num" style="font-weight:600">৳'+fmtNum(r.amount)+'</td><td><span class="badge-status" style="background:'+sb+'">'+r.status+'</span></td><td style="font-size:9px;font-family:monospace">'+(txn?txn.id+' · '+txn.desc.slice(0,18):'—')+'</td><td style="white-space:nowrap">'+
+      (r.status!=='Matched'?'<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Match" onclick="event.stopPropagation();reconMatch(\''+r.id+'\')">✓</span> ':'<span style="color:#e65100;cursor:pointer;font-size:10px" title="Unmatch" onclick="event.stopPropagation();reconUnmatch(\''+r.id+'\')">↺</span> ')+
+      '</td></tr>';
+  }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;font-size:11px">No statement lines</td></tr>')+
+  '</tbody></table></div></div></div>'+
+  '<div style="margin-top:8px;padding:8px 12px;background:#f8f9fa;border-radius:6px;font-size:10px;color:#666">রিকনসিলিয়েশন — Bank statement vs ERP transactions. Match only lines with equal amounts. Uncleared lines remain for next month.</div>';
+}
+function reconMatch(id){
+  var r=mockReconItems.find(function(x){return x.id===id});if(!r)return;
+  var candidates=mockTransactions.filter(function(t){return Math.abs(t.amount-r.amount)<1&&r.matchedTo!==t.id&&!mockReconItems.some(function(x){return x.matchedTo===t.id;});});
+  if(!candidates.length){showToast('No unmatched transaction with amount ৳'+fmtNum(r.amount),'error');return;}
+  openModal('Match Statement Line — '+r.ref,
+    formRow(selectField('Statement','recon_line',r.id,[r.id+' | '+r.desc],true),selectField('Transaction','recon_txn',candidates[0].id,candidates.map(function(t){return t.id+' | '+t.desc.slice(0,24)+' | ৳'+t.amount;}),true))+
+    '<div style="font-size:9px;color:#888;margin-top:4px">Amount must match: statement ৳'+fmtNum(r.amount)+' vs selected transaction</div>',
+    function(){
+      var sel=document.getElementById('recon_txn').value;
+      var tId=sel.split('|')[0].trim();
+      var txn=mockTransactions.find(function(t){return t.id===tId;});
+      if(!txn){showToast('Select a transaction','error');return;}
+      if(Math.abs(txn.amount-r.amount)>0){showToast('Amount mismatch — cannot match','error');return;}
+      r.matchedTo=txn.id;r.status='Matched';DB.save('recon_items');showToast('Matched '+r.ref+' → '+txn.id,'success');renderModule();
+    }
+  );
+}
+function reconUnmatch(id){
+  var r=mockReconItems.find(function(x){return x.id===id});if(!r)return;
+  r.matchedTo=null;r.status='Uncleared';DB.save('recon_items');showToast('Unmatched — line '+r.ref+' moved to uncleared','info');renderModule();
+}
+function reconAutoMatch(){
+  var n=0;
+  mockReconItems.forEach(function(r){
+    if(r.status==='Matched')return;
+    var t=mockTransactions.find(function(t){return Math.abs(t.amount-r.amount)<1&&!mockReconItems.some(function(x){return x.matchedTo===t.id;});});
+    if(t){r.matchedTo=t.id;r.status='Matched';n++;}
+  });
+  DB.save('recon_items');showToast(n+' lines auto-matched by amount','success');renderModule();
+}
+var stTab='sfp';
+function _coaByType(type){return mockCOA.filter(function(a){return a.type===type;});}
+function _coaTotal(type){var t=0;mockCOA.forEach(function(a){if(a.type===type)t+=_balNum(a.balance);});return t;}
+function _stmtRow(label,amount,opts){
+  opts=opts||{};
+  return '<div style="display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid '+(opts.border||'#f0f0f0')+';font-size:11px'+(opts.bold?';font-weight:700':';color:#333')+'"><span>'+(opts.indent?'&nbsp;&nbsp;&nbsp;&nbsp;':'')+label+'</span><span style="font-weight:'+(opts.strong?'700':'500')+';color:'+(opts.color||'#333')+'">৳'+fmtNum(amount)+'</span></div>';
+}
+function _stmtTotal(label,amount,color){
+  return '<div style="display:flex;justify-content:space-between;padding:7px 10px;background:'+(color||'#eef3ff')+';border-radius:4px;font-size:12px;font-weight:800;color:'+(color==='#e8f5e9'?'#2e7d32':color==='#ffebee'?'#c62828':'#2F80ED')+'"><span>'+label+'</span><span>৳'+fmtNum(amount)+'</span></div>';
+}
+function renderFinanceStatements(){
+  var tabs=['sfp','sci','sce','scf'].map(function(t){
+    var L={'sfp':'📊 SFP (Balance Sheet)','sci':'📈 SCI (P&L)','sce':'🏛 SCE (Equity)','scf':'💵 SCF (Cash Flow)'}[t];
+    return '<div class="tab '+(stTab===t?'active':'')+'" onclick="stTab=\''+t+'\';renderModule()">'+L+'</div>';
+  }).join('');
+  var assets=_coaTotal('Asset'),liabs=_coaTotal('Liability'),income=_coaTotal('Income'),expense=_coaTotal('Expense');
+  var netProfit=income-expense;
+  var equity=assets-liabs;
+  var body='';
+  if(stTab==='sfp'){
+    body='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+      '<div class="card"><div class="card-header"><h3>Assets</h3></div><div class="card-body" style="padding:0">'+
+      _coaByType('Asset').map(function(a){return _stmtRow(a.code+' '+a.name,_balNum(a.balance),{indent:true});}).join('')+
+      _stmtTotal('Total Assets',assets,'#eef3ff')+'</div></div>'+
+      '<div class="card"><div class="card-header"><h3>Liabilities + Equity</h3></div><div class="card-body" style="padding:0">'+
+      _coaByType('Liability').map(function(a){return _stmtRow(a.code+' '+a.name,_balNum(a.balance),{indent:true});}).join('')+
+      _stmtRow('Equity (balancing)',equity,{bold:true,border:'#e0e0e0'})+
+      _stmtTotal('Total Liabilities + Equity',liabs+equity,'#eef3ff')+'</div></div>'+
+      '</div>'+
+      '<div style="margin-top:8px;padding:8px 12px;background:'+(Math.abs(assets-(liabs+equity))<1?'#e8f5e9':'#ffebee')+';border-radius:6px;font-size:11px;font-weight:600;color:'+(Math.abs(assets-(liabs+equity))<1?'#2e7d32':'#c62828')+'">'+(Math.abs(assets-(liabs+equity))<1?'✓ Balanced: Assets = Liabilities + Equity':'⚠ Out of balance by ৳'+fmtNum(Math.abs(assets-(liabs+equity)))+'</span>')+'</div>';
+  }else if(stTab==='sci'){
+    body='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+      '<div class="card"><div class="card-header"><h3>Revenue</h3></div><div class="card-body" style="padding:0">'+
+      _coaByType('Income').map(function(a){return _stmtRow(a.code+' '+a.name,_balNum(a.balance),{indent:true});}).join('')+
+      _stmtTotal('Total Revenue',income,'#e8f5e9')+'</div></div>'+
+      '<div class="card"><div class="card-header"><h3>Expenses</h3></div><div class="card-body" style="padding:0">'+
+      _coaByType('Expense').map(function(a){return _stmtRow(a.code+' '+a.name,_balNum(a.balance),{indent:true});}).join('')+
+      _stmtTotal('Total Expenses',expense,'#ffebee')+'</div></div>'+
+      '</div>'+
+      _stmtTotal('Net Profit / (Loss)',netProfit,netProfit>=0?'#e8f5e9':'#ffebee')+
+      '<div style="margin-top:8px"><button class="action-btn primary" onclick="stmtsPrint(\'SCI\')" style="padding:4px 10px;font-size:10px">🖨 Export PDF</button></div>';
+  }else if(stTab==='sce'){
+    var opening=equity-netProfit;
+    body='<div class="card"><div class="card-header"><h3>Statement of Changes in Equity</h3></div><div class="card-body" style="padding:0">'+
+      _stmtRow('Opening Equity (FY start)',opening,{border:'#e0e0e0'})+
+      _stmtRow('Add: Net Profit for the period',netProfit,{indent:true,color:netProfit>=0?'#2e7d32':'#c62828'})+
+      _stmtRow('Less: Dividends / Withdrawals',0,{indent:true,color:'#c62828'})+
+      _stmtTotal('Closing Equity',equity,'#eef3ff')+'</div></div>'+
+      '<div style="margin-top:8px"><button class="action-btn primary" onclick="stmtsPrint(\'SCE\')" style="padding:4px 10px;font-size:10px">🖨 Export PDF</button></div>';
+  }else{
+    var opIn=mockTransactions.filter(function(t){return t.type==='Inflow'&&['Booking','Installment','Payment'].indexOf(t.category)>=0;}).reduce(function(s,t){return s+t.amount;},0);
+    var opOut=mockTransactions.filter(function(t){return t.type==='Outflow'&&['Materials','Labor','Marketing','Admin'].indexOf(t.category)>=0;}).reduce(function(s,t){return s+t.amount;},0);
+    var invIn=0,invOut=mockTransactions.filter(function(t){return t.type==='Outflow'&&t.category==='Land';}).reduce(function(s,t){return s+t.amount;},0);
+    var finIn=mockTransactions.filter(function(t){return t.type==='Inflow'&&t.category==='Loan';}).reduce(function(s,t){return s+t.amount;},0);
+    var finOut=0;
+    var opNet=opIn-opOut,invNet=invIn-invOut,finNet=finIn-finOut;
+    body='<div class="card"><div class="card-header"><h3>Statement of Cash Flows</h3></div><div class="card-body" style="padding:0">'+
+      '<div style="padding:8px 10px;font-size:10px;font-weight:700;color:#1565c0;background:#e3f2fd;border-radius:4px 4px 0 0">Operating Activities</div>'+
+      _stmtRow('Cash received — bookings & installments',opIn,{indent:true,color:'#2e7d32'})+
+      _stmtRow('Cash paid — materials, labor, admin',opOut,{indent:true,color:'#c62828'})+
+      _stmtTotal('Net cash from operations',opNet,opNet>=0?'#e8f5e9':'#ffebee')+
+      '<div style="padding:8px 10px;font-size:10px;font-weight:700;color:#6a1b9a;background:#f3e5f5;border-radius:4px 4px 0 0;margin-top:8px">Investing Activities</div>'+
+      _stmtRow('Land & project acquisitions',invOut,{indent:true,color:'#c62828'})+
+      _stmtTotal('Net cash used in investing',invNet,invNet>=0?'#e8f5e9':'#ffebee')+
+      '<div style="padding:8px 10px;font-size:10px;font-weight:700;color:#e65100;background:#fff3e0;border-radius:4px 4px 0 0;margin-top:8px">Financing Activities</div>'+
+      _stmtRow('Loan proceeds',finIn,{indent:true,color:'#2e7d32'})+
+      _stmtTotal('Net cash from financing',finNet,finNet>=0?'#e8f5e9':'#ffebee')+
+      _stmtTotal('Net increase in cash',opNet+invNet+finNet,'#eef3ff')+'</div></div>'+
+      '<div style="margin-top:8px"><button class="action-btn primary" onclick="stmtsPrint(\'SCF\')" style="padding:4px 10px;font-size:10px">🖨 Export PDF</button></div>';
+  }
+  return '<div class="fade-in"><div class="page-title">📊 Audit Statements</div><div class="page-subtitle">অডিট রিপোর্ট · live from Chart of Accounts + transactions + journals</div>'+
+    '<div class="toolbar" style="margin-bottom:8px"><div class="tabs">'+tabs+'</div><div class="spacer"></div>'+
+    '<button class="action-btn secondary" onclick="stmtsPrint(\''+stTab.toUpperCase()+'\')" style="padding:3px 8px;font-size:10px">🖨 PDF</button>'+
+    '<button class="action-btn secondary" onclick="stmtsCSV()" style="padding:3px 8px;font-size:10px">📄 CSV</button></div>'+
+    body+'</div>';
+}
+function _stmtBuildPrint(title){
+  var pr=document.getElementById('printArea')||(function(){var x=document.createElement('div');x.id='printArea';document.body.appendChild(x);return x;})();
+  var now=new Date();
+  var card=document.querySelector('.module-container,.fade-in');
+  pr.innerHTML='<div style="text-align:center;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:12px"><div style="font-size:18px;font-weight:700">MARS CONSTRUCTIONS LTD — '+title+'</div><div style="font-size:11px;color:#555;margin-top:3px">Audit Statement · Generated '+now.toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric'})+'</div></div>'+(card?card.innerHTML:'');
+}
+function stmtsPrint(name){
+  _stmtBuildPrint(name);showToast('Print dialog opening…','info');
+  setTimeout(function(){window.print();},150);
+}
+function stmtsCSV(){
+  var lines=[];
+  mockCOA.forEach(function(a){lines.push([a.type,a.code,a.name,a.balance]);});
+  var esc=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';};
+  var csv='Type,Code,Account,Balance\n'+lines.map(function(r){return r.map(esc).join(',');}).join('\n');
+  _repDownload('coa-export.csv','﻿'+csv,'text/csv');
+  showToast('CoA CSV downloaded','success');
+}
 function renderFinanceInvoices(){
   var invs=mockInvoices;
   var totalAmt=invs.reduce(function(s,i){return s+(i.amount||0)},0);
