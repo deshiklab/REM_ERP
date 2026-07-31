@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, hr_attendance:1, hr_timesheets:1, leave:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, hr_attendance:1, hr_timesheets:1, leave:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -1550,7 +1550,11 @@ window.mockInvoices = DB.init('invoices', [
   {id:'INV-005',leadId:12,client:'Mr. Abdul Karim',project:'Jolshiri',unit:'Apt 12B',amount:28000000,status:'Draft',dueDate:'2026-08-01',issuedDate:'2026-07-01',desc:'Proforma invoice for Apt 12B - Jolshiri',items:[{desc:'Apartment Cost (4BHK)',qty:1,rate:24000000},{desc:'Premium Finishes',qty:1,rate:3000000},{desc:'Registration Fee',qty:1,rate:1000000}]},
   {id:'INV-006',leadId:19,client:'Rashida Begum',project:'Skyline',unit:'Apt 12A',amount:38000000,status:'Sent',dueDate:'2026-07-10',issuedDate:'2026-06-10',desc:'Installment invoice for Apt 12A - Skyline Towers',items:[{desc:'5th Installment (4BHK)',qty:1,rate:35000000},{desc:'Interest Adjustment',qty:1,rate:2500000},{desc:'Late Fee Waiver',qty:1,rate:500000}]},
   {id:'INV-007',leadId:19,client:'Rashida Begum',project:'Skyline',unit:'Apt 12A',amount:8000000,status:'Paid',dueDate:'2026-05-01',issuedDate:'2026-04-01',desc:'Downpayment invoice for Apt 12A',items:[{desc:'Booking Advance',qty:1,rate:5000000},{desc:'Agreement Fee',qty:1,rate:2000000},{desc:'Stamp Duty',qty:1,rate:1000000}]},
-  {id:'INV-008',leadId:18,client:'Delwar Hossain',project:'Muktodhara',unit:'Apt 4C',amount:8000000,status:'Overdue',dueDate:'2026-06-01',issuedDate:'2026-05-01',desc:'2nd installment invoice for Apt 4C',items:[{desc:'2nd Installment (3BHK)',qty:1,rate:7000000},{desc:'Maintenance Fee',qty:1,rate:1000000}]}
+  {id:'INV-008',leadId:18,client:'Delwar Hossain',project:'Muktodhara',unit:'Apt 4C',amount:8000000,status:'Overdue',dueDate:'2026-06-01',issuedDate:'2026-05-01',desc:'2nd installment invoice for Apt 4C',items:[{desc:'2nd Installment (3BHK)',qty:1,rate:7000000},{desc:'Maintenance Fee',qty:1,rate:1000000}]},
+  {id:'PINV-001',type:'Purchase',supplier:'Shah Cement Ltd.',poRef:'PO-24-089',client:'Shah Cement Ltd.',project:'Muktodhara',unit:'Cement (1000 Bags)',amount:550000,status:'Unpaid',dueDate:'2026-07-30',issuedDate:'2026-07-10',vat:5,tds:1,desc:'Cement purchase against PO-24-089',items:[{desc:'Cement 1000 Bags',qty:1000,rate:550}]},
+  {id:'PINV-002',type:'Purchase',supplier:'BSRM Steels Ltd.',poRef:'PO-24-088',client:'BSRM Steels Ltd.',project:'Jolshiri',unit:'500W Steel (20 Tons)',amount:1840000,status:'Unpaid',dueDate:'2026-07-28',issuedDate:'2026-07-08',vat:5,tds:1,desc:'Steel purchase against PO-24-088',items:[{desc:'500W Steel 20 Tons',qty:20,rate:92000}]},
+  {id:'PINV-003',type:'Purchase',supplier:'RFL Building Products',poRef:'PO-24-087',client:'RFL Building Products',project:'Muktodhara',unit:'Ceramic Tiles (100 Boxes)',amount:95000,status:'Paid',dueDate:'2026-07-15',issuedDate:'2026-06-28',vat:5,tds:0,desc:'Tiles purchase against PO-24-087',items:[{desc:'Ceramic Tiles 100 Boxes',qty:100,rate:950}]},
+  {id:'PINV-004',type:'Purchase',supplier:'Delta Electricals',poRef:'PO-24-086',client:'Delta Electricals',project:'Jolshiri',unit:'Cable + Switches',amount:165000,status:'Unpaid',dueDate:'2026-07-25',issuedDate:'2026-07-05',vat:5,tds:0,desc:'Electricals against PO-24-086',items:[{desc:'Cable 1000m + Switches',qty:1,rate:165000}]}
 ]);
 // ═══ PROPOSALS & QUOTATIONS ═══
 window.mockProposals = DB.init('proposals', [
@@ -8485,6 +8489,11 @@ window.mockReconItems = DB.init('recon_items', [
   {id:'REC-9007',date:'2026-07-21',ref:'RCP-9006',desc:'Handover fee - Jahanara Begum',amount:2000000,status:'Uncleared',matchedTo:null},
   {id:'REC-9008',date:'2026-07-24',ref:'PO-PAY-113',desc:'Steel purchase - BSRM',amount:1400000,status:'Uncleared',matchedTo:null}
 ]);
+window.mockCreditNotes = DB.init('credit_notes', [
+  {id:'CN-001',invoiceId:'INV-004',reason:'Late fee waiver on balance — goodwill',amount:250000,date:'2026-07-20',status:'Applied'},
+  {id:'CN-002',invoiceId:'INV-006',reason:'Interest adjustment — early payment',amount:500000,date:'2026-07-22',status:'Issued'},
+  {id:'CN-003',invoiceId:'INV-001',reason:'Registration fee refund — partial cancellation',amount:150000,date:'2026-07-25',status:'Draft'}
+]);
 function _balNum(s){return parseInt(String(s||'').replace(/[^0-9]/g,''))||0;}
 function renderFinanceTransfers(){
   var rows=mockTransfers.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
@@ -8618,7 +8627,7 @@ function renderFinance(el){
   el.innerHTML=`<div class="fade-in">
     <div class="page-title">Finance Dashboard</div><div class="page-subtitle">${mockTransactions.length} transactions \u00B7 \u09F3 ${fmtNum(netProfit)} net</div>
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','invoices','payments','bank_accounts','transfers','journals','budgets','tax','reconcile','statements'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','invoices':'\uD83D\uDCC4 Invoices','payments':'\uD83D\uDCB0 Payments','bank_accounts':'\uD83C\uDFE6 Banks','transfers':'\uD83D\uDD01 Transfers','journals':'\uD83D\uDCD2 Journals','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax','reconcile':'\uD83D\uDD01 Reconcile','statements':'\uD83D\uDCCA Statements'}[t]}</div>`).join('')}</div>
+      <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','invoices','payments','bank_accounts','transfers','journals','budgets','tax','reconcile','statements','credit_notes'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','invoices':'\uD83D\uDCC4 Invoices','payments':'\uD83D\uDCB0 Payments','bank_accounts':'\uD83C\uDFE6 Banks','transfers':'\uD83D\uDD01 Transfers','journals':'\uD83D\uDCD2 Journals','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax','reconcile':'\uD83D\uDD01 Reconcile','statements':'\uD83D\uDCCA Statements','credit_notes':'\uD83E\uDDFE Credit Notes'}[t]}</div>`).join('')}</div>
     </div>
     ${finT==='dashboard'?renderFinanceDashboard(grossIncome,grossExpense,netProfit,bankTotal):
       finT==='transactions'?renderFinanceTransactions():
@@ -8632,7 +8641,8 @@ function renderFinance(el){
       finT==='budgets'?renderProjectBudgets():
       finT==='tax'?renderTaxAdjustments():
       finT==='reconcile'?renderFinanceReconcile():
-      finT==='statements'?renderFinanceStatements():''}
+      finT==='statements'?renderFinanceStatements():
+      finT==='credit_notes'?renderFinanceCreditNotes():''}
   </div>`;
   if(finT==='dashboard')setTimeout(renderFinanceCharts,50);
   // Handle cross-module navigation: switch to invoices tab for invoice ref
@@ -8869,22 +8879,117 @@ function stmtsCSV(){
   _repDownload('coa-export.csv','﻿'+csv,'text/csv');
   showToast('CoA CSV downloaded','success');
 }
+function renderFinanceCreditNotes(){
+  var rows=mockCreditNotes.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  var draft=rows.filter(function(c){return c.status==='Draft';}).length;
+  var issued=rows.filter(function(c){return c.status==='Issued';}).length;
+  var applied=rows.filter(function(c){return c.status==='Applied';}).length;
+  var totalVal=rows.reduce(function(s,c){return s+c.amount;},0);
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Credit Notes',rows.length,'#2F80ED'],
+    ['Draft',draft,'#888'],
+    ['Issued',issued,'#e65100'],
+    ['Applied',applied,'#2e7d32'],
+    ['Total Value','৳'+fmtNum(totalVal),'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div>'+
+    '<button class="action-btn primary" onclick="crudCreditNote()" data-perm="Accounts & Finance:Create" style="padding:3px 8px;font-size:10px">+ Issue Credit Note</button></div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Invoice</th><th>Reason</th><th class="num">Amount</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (rows.length?rows.map(function(c){
+    var inv=mockInvoices.find(function(x){return x.id===c.invoiceId;});
+    var sb=c.status==='Applied'?'#e8f5e9;color:#2e7d32':c.status==='Issued'?'#fff3e0;color:#e65100':'#f5f5f5;color:#888';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+c.id+'</td><td style="font-weight:500">'+(inv?inv.id+' · '+inv.client:'—')+'</td><td style="font-size:9px;max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+c.reason+'">'+c.reason+'</td><td class="num" style="font-weight:600">৳'+fmtNum(c.amount)+'</td><td style="font-size:9px;color:#888">'+c.date+'</td><td><span class="badge-status" style="background:'+sb+'">'+c.status+'</span></td><td style="white-space:nowrap">'+
+      (c.status==='Draft'?'<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Issue" onclick="event.stopPropagation();cnSetStatus(\''+c.id+'\',\'Issued\')">✓ Issue</span> ':'')+
+      (c.status==='Issued'?'<span style="color:#1565c0;cursor:pointer;font-size:10px" title="Apply to invoice" onclick="event.stopPropagation();cnSetStatus(\''+c.id+'\',\'Applied\')">✓ Apply</span> ':'')+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudCreditNote(mockCreditNotes.find(function(x){return x.id===\''+c.id+'\'}))">✎</span></td></tr>';
+  }).join(''):'<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;font-size:11px">No credit notes yet</td></tr>')+
+  '</tbody></table></div></div></div>'+
+  '<div style="margin-top:8px;padding:8px 12px;background:#f8f9fa;border-radius:6px;font-size:10px;color:#666">ক্রেডিট নোট — Credit notes against sales invoices. Amount cannot exceed the invoice total. Applied notes reduce the customer balance.</div>';
+}
+function cnSetStatus(id,status){
+  var c=mockCreditNotes.find(function(x){return x.id===id});if(!c)return;
+  c.status=status;DB.save('credit_notes');showToast('Credit note '+status.toLowerCase(),status==='Applied'?'success':'info');renderModule();
+}
+function crudCreditNote(item){
+  var n=!item;
+  var salesInvs=mockInvoices.filter(function(i){return !i.type||i.type==='Sales';});
+  var c=n?{id:'CN-'+String(mockCreditNotes.length+1).padStart(3,'0'),invoiceId:salesInvs.length?salesInvs[0].id:'',reason:'',amount:0,date:new Date().toISOString().slice(0,10),status:'Draft'}:item;
+  window._formRules=[
+    {id:'cnf_amount',fn:function(v){var amt=V.num(v);if(isNaN(amt)||amt<=0)return 'Amount must be positive';var sel=document.getElementById('cnf_inv');var invId=sel?String(sel.value).split('|')[0].trim():'';var inv=mockInvoices.find(function(x){return x.id===invId;});if(inv&&amt>inv.amount)return 'Amount cannot exceed invoice total (৳'+fmtNum(inv.amount)+')';return null;}},
+    {id:'cnf_reason',fn:function(v){return String(v||'').trim()?'':'Reason is required';}}
+  ];
+  openModal(n?'Issue Credit Note':'Edit Credit Note',
+    formRow(selectField('Invoice','cnf_inv',c.invoiceId,salesInvs.map(function(i){return i.id+' | '+i.client;}),true),inputField('Amount (৳)','cnf_amount',String(c.amount||''),'',true))+
+    inputField('Reason','cnf_reason',c.reason,'',true)+
+    formRow(inputField('Date','cnf_date',c.date,'',true),selectField('Status','cnf_status',c.status,['Draft','Issued','Applied'],true)),
+    function(){
+      var sel=document.getElementById('cnf_inv');var invId=sel?sel.value.split('|')[0].trim():'';
+      var amt=parseFloat(document.getElementById('cnf_amount').value);
+      var d={id:c.id,invoiceId:invId,reason:g('cnf_reason'),amount:amt,date:g('cnf_date'),status:g('cnf_status')};
+      if(n){mockCreditNotes.push(d);DB.save('credit_notes');showToast('Credit note created','success');}
+      else{var idx=mockCreditNotes.findIndex(function(x){return x.id===c.id});if(idx>=0){mockCreditNotes[idx]=d;DB.save('credit_notes');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudPurchaseInvoice(){
+  var poOpts=mockPOs.map(function(p){return p.id+' | '+p.vendor+' | ৳'+fmtNum(p.amount);});
+  var supOpts=mockSuppliers.map(function(s){return s.name;});
+  window._formRules=[
+    {id:'pinv_amt',fn:function(v){var a=V.num(v);if(isNaN(a)||a<=0)return 'Amount must be positive';return null;}},
+    {id:'pinv_vat',fn:function(v){if(!String(v).trim())return null;var x=V.num(v);if(isNaN(x)||x<0||x>100)return 'VAT must be 0-100%';return null;}},
+    {id:'pinv_tds',fn:function(v){if(!String(v).trim())return null;var x=V.num(v);if(isNaN(x)||x<0||x>100)return 'TDS must be 0-100%';return null;}}
+  ];
+  openModal('New Purchase Invoice',
+    formRow(selectField('Supplier','pinv_sup',supOpts[0]||'',supOpts,true),selectField('PO Reference','pinv_po',poOpts[0]||'',poOpts,true))+
+    inputField('Items','pinv_items','','',true)+
+    formRow(inputField('Amount (৳)','pinv_amt','','',true),inputField('Due Date','pinv_due',new Date().toISOString().slice(0,10),'',true))+
+    formRow(inputField('VAT %','pinv_vat','5'),inputField('TDS %','pinv_tds','1'))+
+    formRow(selectField('Status','pinv_status','Unpaid',['Unpaid','Paid'],true),inputField('ID','pinv_id','PINV-'+String(mockInvoices.filter(function(i){return i.type==='Purchase';}).length+1).padStart(3,'0'),'',true)),
+    function(){
+      var poSel=document.getElementById('pinv_po');var poRef=poSel?poSel.value.split('|')[0].trim():'';
+      var sup=g('pinv_sup');var vat=parseFloat(document.getElementById('pinv_vat').value)||0;
+      var tds=parseFloat(document.getElementById('pinv_tds').value)||0;
+      var d={id:g('pinv_id'),type:'Purchase',supplier:sup,poRef:poRef,client:sup,project:g('pinv_items'),unit:g('pinv_items'),amount:parseFloat(document.getElementById('pinv_amt').value)||0,status:g('pinv_status'),dueDate:g('pinv_due'),issuedDate:new Date().toISOString().slice(0,10),vat:vat,tds:tds,desc:'Purchase invoice '+poRef,items:[{desc:g('pinv_items'),qty:1,rate:parseFloat(document.getElementById('pinv_amt').value)||0}]};
+      mockInvoices.push(d);DB.save('invoices');showToast('Purchase invoice created','success');renderModule();
+    }
+  );
+}
+
 function renderFinanceInvoices(){
-  var invs=mockInvoices;
+  var tf=(document.getElementById('invType')||{}).value||'';
+  var invs=mockInvoices.filter(function(i){
+    if(tf==='Purchase')return i.type==='Purchase';
+    if(tf==='Sales')return !i.type||i.type==='Sales';
+    return true;
+  });
+  var salesCnt=mockInvoices.filter(function(i){return !i.type||i.type==='Sales';}).length;
+  var purchCnt=mockInvoices.filter(function(i){return i.type==='Purchase';}).length;
   var totalAmt=invs.reduce(function(s,i){return s+(i.amount||0)},0);
+  var paidAmt=invs.filter(function(x){return x.status==='Paid'}).reduce(function(s,i){return s+(i.amount||0)},0);
+  var unpaidAmt=invs.filter(function(x){return x.status!=='Paid'}).reduce(function(s,i){return s+(i.amount||0)},0);
   return '<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr))">'+
     ['Total','Paid','Unpaid'].map(function(s,i){
-      var amt=i===0?totalAmt:i===1?invs.filter(function(x){return x.status==='Paid'}).reduce(function(s,i){return s+(i.amount||0)},0):invs.filter(function(x){return x.status!=='Paid'}).reduce(function(s,i){return s+(i.amount||0)},0);
+      var amt=i===0?totalAmt:i===1?paidAmt:unpaidAmt;
       var cols=['#2F80ED','#2e7d32','#c62828'];
       return '<div class="stat-card"><div class="label">'+s+' Invoices</div><div class="value" style="font-size:14px;color:'+cols[i]+'">\u09F3'+(amt/100000).toFixed(1)+'L</div></div>';
     }).join('')+
-    '<div class="stat-card"><div class="label">Count</div><div class="value" style="font-size:14px;color:#1565c0">'+invs.length+'</div></div>'+
-  '</div><div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>'+
-  invs.map(function(inv){
-    var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[inv.status]||'#888';
-    var stBg={Draft:'#f5f5f5',Sent:'#fff3e0',Paid:'#e8f5e9',Overdue:'#ffebee'}[inv.status]||'#f5f5f5';
-    return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td style="font-weight:600;color:#2F80ED">'+inv.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+inv.client.replace(/'/g,"\\'")+'\')">'+inv.client+'</td><td style="font-weight:600;color:#2e7d32">\u09F3'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')">\uD83D\uDC41</span></td></tr>';
-  }).join('')+
+    '<div class="stat-card"><div class="label">🧾 Sales</div><div class="value" style="font-size:14px;color:#1565c0">'+salesCnt+'</div></div>'+
+    '<div class="stat-card"><div class="label">📦 Purchase</div><div class="value" style="font-size:14px;color:#e65100">'+purchCnt+'</div></div>'+
+  '</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<select id="invType" onchange="_PG={};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option value="Sales"'+(tf==='Sales'?' selected':'')+'>🧾 Sales</option><option value="Purchase"'+(tf==='Purchase'?' selected':'')+'>📦 Purchase</option></select>'+
+    '<div class="spacer"></div>'+
+    '<button class="action-btn primary" onclick="crudPurchaseInvoice()" style="padding:3px 8px;font-size:10px">+ Purchase Invoice</button>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Type</th><th>Invoice</th><th>Party</th><th>Ref</th><th class="num">Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (invs.length?invs.map(function(inv){
+    var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828',Unpaid:'#e65100'}[inv.status]||'#888';
+    var stBg={Draft:'#f5f5f5',Sent:'#fff3e0',Paid:'#e8f5e9',Overdue:'#ffebee',Unpaid:'#fff3e0'}[inv.status]||'#f5f5f5';
+    var isP=inv.type==='Purchase';
+    var vatTds=isP?' · VAT '+inv.vat+'% · TDS '+inv.tds+'%':'';
+    return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td>'+(isP?'<span class="badge-status badge-reserved" style="font-size:8px">📦</span>':'<span class="badge-status" style="background:#e3f2fd;color:#1565c0;font-size:8px">🧾</span>')+'</td><td style="font-weight:600;color:#2F80ED">'+inv.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+String(inv.client||inv.supplier||'').replace(/'/g,"\\'")+'\')">'+(isP?inv.supplier:inv.client)+'</td><td style="font-size:9px">'+(isP?('<span class="badge-status badge-reserved" style="font-size:8px">PO '+inv.poRef+'</span>'+vatTds):'—')+'</td><td style="font-weight:600;color:#2e7d32">\u09F3'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')">\uD83D\uDC41</span></td></tr>';
+  }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;font-size:11px">No invoices match the type filter</td></tr>')+
   '</tbody></table></div></div></div>';
 }
 function renderFinancePayments(){
