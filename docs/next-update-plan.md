@@ -82,3 +82,15 @@ Turn the validated prototype into a real, deployable ERP. Keep the exact same UI
 3. **Framework:** Flask (matches existing dashboard pattern) vs FastAPI vs Django?
 4. **Auth:** simple session login vs JWT with refresh tokens?
 5. **Deployment target:** keep AWS Lightsail + Cloudflare tunnel, or dedicated domain?
+
+---
+## V8 Reorganization Log (master)
+- `87c2dbe` — Sales & CRM / Bookings & Customer split: Dues & Recovery → Bookings & Customer; new **Ticketing & Issue** module (8 seed tickets, full CRUD + detail panel + filters). SW v8-v5.
+- **HEAD — Admin & Operations / Legal & Compliance / Accounts & Finance reorg** (SW v8-v6):
+  - Renamed group `hr_admin` label → **Admin & Operations** (icon 👥).
+  - Renamed group `finance_admin` label → **Accounts & Finance** (icon 💰).
+  - New group **Legal & Compliance** (⚖️, 10th sidebar group): **Compliance** moved out of Engineering & Construction; new **Legal Contracts** module (7 seed contracts: land purchase, NDA, construction, utility, sales agreement, vendor framework, JV — full CRUD + detail + activate flow + expiry tracking).
+  - New sub-module **Financial Approvals** under Accounts & Finance (8 seed requests: expense/vendor/contractor/refund — Pending/Approved/Rejected workflow, approval levels Manager/Director/Board, pending-value stat, full CRUD + detail panel).
+  - Updated everywhere: GROUPS/GROUP_ORDER/GROUPS_LOOKUP, sidebar icons + tooltips, switch cases, search dataset defs + `_sdGroupOrder`, Quick-Add defs + tabs (Accounts & Finance, Legal), PERMISSION_MODULES (33 rows), Bengali dict.
+  - Dynamic module counts (dashboard subtitle + search dropdown) — computed from GROUPS (44 modules).
+  - Fixed `navigateSearch` to land on the exact module (was: group's first module only).
