@@ -1062,7 +1062,7 @@ const GROUPS = {
   finance_admin: { label:'Accounts & Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'approvals',label:'Financial Approvals',badge:true},{id:'boq',label:'BOQ & Cost Control',badge:true}] },
   hr_admin:      { label:'Admin & Operations',icon:'💼',mods:[{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'},{id:'stock',label:'Stock & Procurement'}] },
   legal_compliance:{label:'Legal & Compliance',icon:'⚖️',mods:[{id:'compliance',label:'Compliance',badge:true},{id:'legal_contracts',label:'Legal Contracts',badge:true},{id:'qc',label:'QC & Inspection'}] },
-  collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
+  collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'calendar',label:'Calendar',badge:true},{id:'announcements',label:'Announcements',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
   system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] }
 };
 const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','hr_admin','legal_compliance','collaboration','system'];
@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -2384,6 +2384,8 @@ function switchModule(mod,skipSkel) {
       case 'documents': renderDocuments(el); break;
       case 'knowledge_base': renderKB(el); break;
       case 'tasks': renderTasks(el); break;
+      case 'calendar': renderCalendar(el); break;
+      case 'announcements': renderAnnouncements(el); break;
       case 'workspace': renderWorkspace(el); break;
       case 'bi_reports': renderBIReports(el); break;
       case 'notifications_page': renderNotificationsPage(el); break;
@@ -9344,7 +9346,7 @@ window.mockCOA = DB.init('coa', [
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Project Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -9562,6 +9564,153 @@ function resetPermissions(){
 function _rolesMatrixHtml(){
   return '<div class="card"><div class="card-header"><h3>🔐 Permission Matrix — Role: '+currentRole+'</h3><button class="action-btn primary" onclick="showToast(\'Permissions saved!\',\'success\')" style="padding:3px 7px;font-size:9px">Save Permissions</button></div><div class="card-body" style="padding:0"><div class="table-wrap" style="max-height:380px;overflow-y:auto"><table style="font-size:10px"><thead><tr style="position:sticky;top:0;background:#fff"><th style="min-width:130px;background:#fff;z-index:1">Module</th>'+PERMISSION_ACTIONS.map(function(a){return '<th style="text-align:center;min-width:55px;background:#f0f4ff;color:#2F80ED;font-size:9px">'+a+'</th>';}).join('')+'</tr></thead><tbody>'+PERMISSION_MODULES.map(function(m,mi){var perms=(MOCK_PERMISSIONS[currentRole]||MOCK_PERMISSIONS['Super Admin'])[mi];return '<tr><td style="font-weight:500;padding:5px 10px">'+m+'</td>'+PERMISSION_ACTIONS.map(function(a,ai){return '<td style="text-align:center;padding:5px"><div onclick="showToast(\'Toggle permission for '+m+': '+a+'\',\'info\')" style="width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:'+(perms[ai]==='✓'?'#2F80ED':'#e0e0e0')+';color:#fff;font-size:10px;font-weight:700;transition:all .15s;user-select:none">'+(perms[ai]==='✓'?'✓':'')+'</div></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div></div></div><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font-size:10px;color:#888">Quick role switch:</span>'+['Super Admin','Sales Agent','Site Engineer','Finance'].map(function(r){return '<div onclick="setRole(\''+r+'\')" style="padding:4px 10px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:500;background:'+(r===currentRole?'#2F80ED':'#f0f0f0')+';color:'+(r===currentRole?'#fff':'#555')+';border:none;transition:all .15s">'+r+'</div>';}).join('')+'</div>';
 }
+// ═══ CALENDAR & ANNOUNCEMENTS (Phase 1.5 + 1.6) ═══
+window.mockCalendarEvents = DB.init('calendar_events', [
+  {id:'EVT-001',title:'Jolshiri site visit — Dr. Rubina Ali',type:'Site Visit',date:'2026-07-05',time:'11:00 AM',project:'Jolshiri Abason',assignee:'Rofiqul Islam',status:'Confirmed'},
+  {id:'EVT-002',title:'Installment due — BKG-101',type:'Payment Due',date:'2026-07-10',time:'All Day',project:'Jolshiri Abason',assignee:'Finance',status:'Confirmed'},
+  {id:'EVT-003',title:'Handover walkthrough — Muktodhara Plot 22',type:'Handover',date:'2026-07-12',time:'3:00 PM',project:'Muktodhara Green Park',assignee:'Handover Team',status:'Tentative'},
+  {id:'EVT-004',title:'Slab casting milestone — Tower B',type:'Milestone',date:'2026-07-15',time:'8:00 AM',project:'Skyline Towers',assignee:'Site Engineer',status:'Confirmed'},
+  {id:'EVT-005',title:'Board meeting — monthly review',type:'Meeting',date:'2026-07-18',time:'10:00 AM',project:'Head Office',assignee:'MD Office',status:'Confirmed'},
+  {id:'EVT-006',title:'NRB client presentation — Green Valley',type:'Meeting',date:'2026-07-20',time:'4:30 PM',project:'Green Valley',assignee:'Sales Team',status:'Confirmed'},
+  {id:'EVT-007',title:'Payment reminder follow-up — Laily Akhter',type:'Payment Due',date:'2026-07-22',time:'All Day',project:'Muktodhara Green Park',assignee:'Finance',status:'Confirmed'},
+  {id:'EVT-008',title:'QC inspection — Floor 4 finishes',type:'Site Visit',date:'2026-07-25',time:'10:00 AM',project:'Jolshiri Abason',assignee:'QC Team',status:'Confirmed'},
+  {id:'EVT-009',title:'Land registry meeting — Purbachal',type:'Meeting',date:'2026-07-28',time:'2:00 PM',project:'Project Acquisition',assignee:'Legal',status:'Tentative'},
+  {id:'EVT-010',title:'Tower A handover ceremony',type:'Handover',date:'2026-08-02',time:'11:00 AM',project:'Skyline Towers',assignee:'Management',status:'Confirmed'},
+  {id:'EVT-011',title:'Contractor progress review',type:'Milestone',date:'2026-08-05',time:'9:30 AM',project:'Muktodhara Green Park',assignee:'Project Manager',status:'Confirmed'},
+  {id:'EVT-012',title:'Annual audit — SFP/SCI sign-off',type:'Milestone',date:'2026-08-10',time:'All Day',project:'Finance',assignee:'Finance Lead',status:'Confirmed'}
+]);
+window.mockAnnouncements = DB.init('announcements', [
+  {id:'ANN-001',title:'Eid-ul-Adha holiday schedule',body:'Office will remain closed from Jul 17–21 for Eid-ul-Adha. Site work resumes Jul 22. All dues reminders scheduled during this window will auto-deliver after reopening.',author:'MD Office',date:'2026-07-08',audience:'All Staff',priority:'High',pinned:true,views:42},
+  {id:'ANN-002',title:'New pricing matrix published for Blocks C & D',body:'Updated plot pricing for Blocks C & D is live in Plots & Blocks → Pricing Matrix. Effective from next month bookings.',author:'Sales Head',date:'2026-07-06',audience:'Sales Team',priority:'Normal',pinned:false,views:31},
+  {id:'ANN-003',title:'VAT return filing deadline — Jul 15',body:'All department heads must submit expense reports by Jul 10 for the monthly VAT return. Late submissions will be escalated.',author:'Finance',date:'2026-07-02',audience:'All Staff',priority:'High',pinned:true,views:58},
+  {id:'ANN-004',title:'Safety drill at Jolshiri site — Thursday',body:'Mandatory fire & safety drill for all site staff at 4 PM. Attendance is recorded against the site register.',author:'Site Office',date:'2026-06-28',audience:'Site Staff',priority:'Normal',pinned:false,views:25},
+  {id:'ANN-005',title:'New CRM lead intake guidelines',body:'All leads from the Real Estate Fair must be logged with source "Real Estate Fair" and assigned within 24 hours. See Knowledge Base for the updated playbook.',author:'CRM Admin',date:'2026-06-25',audience:'Sales Team',priority:'Normal',pinned:false,views:19}
+]);
+function renderCalendar(el){
+  var now=window._calNow?new Date(window._calNow):new Date();
+  var ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var monthEvents=mockCalendarEvents.filter(function(e){return (e.date||'').slice(0,7)===ym;});
+  var typeF=window._calType||'';
+  var events=monthEvents.filter(function(e){return !typeF||e.type===typeF;});
+  var first=new Date(now.getFullYear(),now.getMonth(),1);
+  var startDow=(first.getDay()+6)%7;
+  var daysIn=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  var todayStr=new Date().toISOString().slice(0,10);
+  var byDay={};events.forEach(function(e){var d=(e.date||'').slice(0,10);if(!byDay[d])byDay[d]=[];byDay[d].push(e);});
+  var cells='';
+  for(var i=0;i<startDow;i++)cells+='<div class="cal-cell cal-empty" style="min-height:64px"></div>';
+  for(var d=1;d<=daysIn;d++){
+    var ds=ym+'-'+String(d).padStart(2,'0');
+    var evs=byDay[ds]||[];
+    var isToday=ds===todayStr;
+    cells+='<div class="cal-cell" onclick="window._calDay=\''+ds+'\';renderModule()" style="cursor:pointer;min-height:64px;padding:3px;border:1px solid '+(isToday?'#2F80ED':'#f0f0f0')+';border-radius:4px;background:'+(isToday?'#eef3ff':'#fff')+'">'+
+      '<div style="font-size:10px;font-weight:600;color:'+(isToday?'#2F80ED':'#333')+'">'+d+'</div>'+
+      (evs.length?'<div style="margin-top:2px">'+evs.slice(0,3).map(function(e){return '<div style="font-size:7px;padding:1px 3px;border-radius:3px;margin-bottom:1px;background:'+({ 'Site Visit':'#4caf50','Payment Due':'#e53935','Handover':'#7b1fa2','Milestone':'#ff9800','Meeting':'#2196f3'}[e.type]||'#888')+'22;color:'+({ 'Site Visit':'#2e7d32','Payment Due':'#c62828','Handover':'#6a1b9a','Milestone':'#e65100','Meeting':'#1565c0'}[e.type]||'#555')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+e.title+'</div>';}).join('')+(evs.length>3?'<div style="font-size:7px;color:#888">+'+(evs.length-3)+' more</div>':'')+'</div>':'')+
+    '</div>';
+  }
+  var selDay=window._calDay||todayStr;
+  var dayEvents=mockCalendarEvents.filter(function(e){return (e.date||'').slice(0,10)===selDay;});
+  var stats=[['This Month',monthEvents.length,'#2F80ED'],['Site Visits',monthEvents.filter(function(e){return e.type==='Site Visit';}).length,'#4caf50'],['Payments Due',monthEvents.filter(function(e){return e.type==='Payment Due';}).length,'#e53935'],['Meetings',monthEvents.filter(function(e){return e.type==='Meeting';}).length,'#2196f3']];
+  el.innerHTML='<div class="fade-in"><div class="page-title">📅 Calendar</div><div class="page-subtitle">'+monthEvents.length+' events in '+now.toLocaleString('en-US',{month:'long',year:'numeric'})+'</div>'+
+    '<div class="stats-row" style="margin-bottom:8px">'+stats.map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<button class="action-btn secondary" onclick="window._calNow=\''+new Date(now.getFullYear(),now.getMonth()-1,1).toISOString().slice(0,10)+'\';window._calDay=null;renderModule()" style="padding:3px 8px;font-size:10px">‹ Prev</button>'+
+      '<button class="action-btn secondary" onclick="window._calNow=null;window._calDay=null;renderModule()" style="padding:3px 8px;font-size:10px">Today</button>'+
+      '<button class="action-btn secondary" onclick="window._calNow=\''+new Date(now.getFullYear(),now.getMonth()+1,1).toISOString().slice(0,10)+'\';window._calDay=null;renderModule()" style="padding:3px 8px;font-size:10px">Next ›</button>'+
+      '<span style="font-size:11px;font-weight:600;color:#333;margin-left:6px">'+now.toLocaleString('en-US',{month:'long',year:'numeric'})+'</span>'+
+      '<div class="spacer"></div>'+
+      '<select id="calTypeFilter" onchange="window._calType=this.value;renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+['Site Visit','Payment Due','Handover','Milestone','Meeting'].map(function(t){return '<option value="'+t+'"'+(typeF===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+      '<button class="action-btn primary" onclick="crudCalendarEvent()" data-perm="Calendar:Create" style="padding:3px 8px;font-size:10px">+ New Event</button>'+
+    '</div>'+
+    '<div class="card" style="margin-bottom:8px"><div class="card-body" style="padding:8px"><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(function(dw){return '<div style="text-align:center;font-size:8px;font-weight:700;color:#999;padding:2px">'+dw+'</div>';}).join('')+'</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">'+cells+'</div></div></div>'+
+    '<div class="card"><div class="card-header"><h3>🗓 Events — '+selDay+'</h3><div style="font-size:9px;color:#888">'+dayEvents.length+' events</div></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Time</th><th>Title</th><th>Type</th><th>Project</th><th>Assignee</th><th>Status</th><th></th></tr></thead><tbody>'+
+    (dayEvents.length?dayEvents.map(function(e){
+      var tc={'Site Visit':'#4caf50','Payment Due':'#e53935','Handover':'#7b1fa2','Milestone':'#ff9800','Meeting':'#2196f3'}[e.type]||'#888';
+      return '<tr><td style="white-space:nowrap;color:#555">'+e.time+'</td><td style="font-weight:500">'+e.title+'</td><td><span class="badge-status" style="background:'+tc+'22;color:'+tc+'">'+e.type+'</span></td><td style="font-size:10px;color:#555">'+e.project+'</td><td style="font-size:10px">'+e.assignee+'</td><td><span class="badge-status '+(e.status==='Confirmed'?'badge-active':'badge-pending')+'">'+e.status+'</span></td>'+
+      '<td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="crudCalendarEvent(mockCalendarEvents.find(function(x){return x.id===\x27'+e.id+'\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="if(confirm(\x27Delete '+e.id+'?\x27)){var i=mockCalendarEvents.findIndex(function(x){return x.id===\x27'+e.id+'\x27});if(i>=0)mockCalendarEvents.splice(i,1);DB.save(\x27calendar_events\x27);showToast(\x27Deleted\x27,\x27info\x27);renderModule()}">✕</span></td></tr>';
+    }).join(''):'<tr><td colspan="7" style="text-align:center;color:#999;padding:14px">No events on this day</td></tr>')+
+    '</tbody></table></div></div></div>'+
+  '</div>';
+}
+function crudCalendarEvent(item){
+  var n=!item;
+  var e=n?{id:'EVT-'+String(mockCalendarEvents.length+1+100).padStart(4,'0'),date:new Date().toISOString().slice(0,10),time:'10:00 AM',type:'Meeting',project:'',assignee:'',status:'Confirmed',title:''}:item;
+  showModal(n?'New Calendar Event':'Edit Event',
+    '<div style="padding:8px"><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Title *</label><input id="ev_title" value="'+e.title+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Date *</label><input id="ev_date" type="date" value="'+e.date+'" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div>'+
+    '<div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Time</label><input id="ev_time" value="'+e.time+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Type</label><select id="ev_type" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px">'+['Site Visit','Payment Due','Handover','Milestone','Meeting'].map(function(t){return '<option value="'+t+'"'+(e.type===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div>'+
+    '<div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Status</label><select id="ev_status" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px"><option value="Confirmed"'+(e.status==='Confirmed'?' selected':'')+'>Confirmed</option><option value="Tentative"'+(e.status==='Tentative'?' selected':'')+'>Tentative</option></select></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Project</label><input id="ev_project" value="'+e.project+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div>'+
+    '<div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Assignee</label><input id="ev_assignee" value="'+e.assignee+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div></div></div>',
+    [
+      {label:'Cancel',action:'close',secondary:true},
+      {label:n?'Create':'Update',action:function(){
+        var title=document.getElementById('ev_title').value.trim();
+        var date=document.getElementById('ev_date').value;
+        if(!title){showToast('Title is required','error');return;}
+        if(!date){showToast('Date is required','error');return;}
+        var data={id:e.id,title:title,date:date,time:document.getElementById('ev_time').value||'All Day',type:document.getElementById('ev_type').value,status:document.getElementById('ev_status').value,project:document.getElementById('ev_project').value||'—',assignee:document.getElementById('ev_assignee').value||'—'};
+        if(n){mockCalendarEvents.unshift(data);DB.save('calendar_events');showToast('Event created!','success');}
+        else{var idx=mockCalendarEvents.findIndex(function(x){return x.id===e.id});if(idx>=0){mockCalendarEvents[idx]=data;DB.save('calendar_events');showToast('Updated','info');}}
+        closeDrawer();renderModule();
+      }}
+    ]
+  );
+}
+function renderAnnouncements(el){
+  var audF=window._annAud||'';
+  var list=mockAnnouncements.filter(function(a){return !audF||a.audience===audF;});
+  var pinned=list.filter(function(a){return a.pinned;});
+  var normal=list.filter(function(a){return !a.pinned;});
+  el.innerHTML='<div class="fade-in"><div class="page-title">📢 Announcements</div><div class="page-subtitle">'+mockAnnouncements.length+' announcements · internal notices & updates</div>'+
+    '<div class="stats-row" style="margin-bottom:8px">'+[
+      ['Total',mockAnnouncements.length,'#2F80ED'],['Pinned',mockAnnouncements.filter(function(a){return a.pinned;}).length,'#e65100'],
+      ['High Priority',mockAnnouncements.filter(function(a){return a.priority==='High';}).length,'#c62828'],
+      ['Total Views',mockAnnouncements.reduce(function(s,a){return s+(a.views||0);},0),'#1565c0']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<select id="annAudFilter" onchange="window._annAud=this.value;renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Audiences</option>'+['All Staff','Sales Team','Site Staff'].map(function(a){return '<option value="'+a+'"'+(audF===a?' selected':'')+'>'+a+'</option>';}).join('')+'</select>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudAnnouncement()" data-perm="Announcements:Create" style="padding:3px 8px;font-size:10px">+ New Announcement</button>'+
+    '</div>'+
+    (pinned.length?'<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;color:#e65100;margin-bottom:4px">📌 PINNED</div>'+pinned.map(function(a){return annCard(a,true);}).join('')+'</div>':'')+
+    '<div>'+(normal.length?normal.map(function(a){return annCard(a,false);}).join(''):'<div style="text-align:center;color:#999;padding:24px;border:2px dashed #e0e0e0;border-radius:8px;font-size:11px">No announcements</div>')+'</div></div>';
+}
+function annCard(a,pinned){
+  return '<div class="card" style="margin-bottom:8px;border-left:3px solid '+(a.priority==='High'?'#e53935':pinned?'#e65100':'#2F80ED')+'"><div class="card-body" style="padding:10px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:#222">'+(pinned?'📌 ':'')+a.title+'</div>'+
+    '<div style="font-size:9px;color:#888;margin-top:2px">by <b>'+a.author+'</b> · '+a.date+' · '+a.audience+' · 👁 '+(a.views||0)+' views</div></div>'+
+    '<div style="display:flex;gap:4px;align-items:center;flex-shrink:0"><span class="badge-status '+(a.priority==='High'?'badge-sold':'badge-reserved')+'" style="font-size:8px">'+a.priority+'</span>'+
+    '<span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="crudAnnouncement(mockAnnouncements.find(function(x){return x.id===\x27'+a.id+'\x27}))">✎</span>'+
+    '<span style="color:#e53935;cursor:pointer;font-size:11px" onclick="if(confirm(\x27Delete '+a.id+'?\x27)){var i=mockAnnouncements.findIndex(function(x){return x.id===\x27'+a.id+'\x27});if(i>=0)mockAnnouncements.splice(i,1);DB.save(\x27announcements\x27);showToast(\x27Deleted\x27,\x27info\x27);renderModule()}">✕</span></div></div>'+
+    '<div style="font-size:10px;color:#555;margin-top:6px;line-height:1.5">'+a.body+'</div></div></div>';
+}
+function crudAnnouncement(item){
+  var n=!item;
+  var a=n?{id:'ANN-'+String(mockAnnouncements.length+1+100).padStart(4,'0'),title:'',body:'',author:currentRole||'Admin',date:new Date().toISOString().slice(0,10),audience:'All Staff',priority:'Normal',pinned:false,views:0}:item;
+  showModal(n?'New Announcement':'Edit Announcement',
+    '<div style="padding:8px"><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Title *</label><input id="an_title" value="'+a.title+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/>'+
+    '<label style="font-size:11px;font-weight:500;display:block;margin:8px 0 4px">Body *</label><textarea id="an_body" rows="4" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box;font-family:inherit">'+a.body+'</textarea>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Audience</label><select id="an_aud" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px">'+['All Staff','Sales Team','Site Staff'].map(function(x){return '<option value="'+x+'"'+(a.audience===x?' selected':'')+'>'+x+'</option>';}).join('')+'</select></div>'+
+    '<div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Priority</label><select id="an_pri" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px"><option value="Normal"'+(a.priority==='Normal'?' selected':'')+'>Normal</option><option value="High"'+(a.priority==='High'?' selected':'')+'>High</option></select></div></div>'+
+    '<div style="margin-top:8px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="an_pin"'+(a.pinned?' checked':'')+' style="cursor:pointer"/><label for="an_pin" style="font-size:10px;color:#555;cursor:pointer">📌 Pin to top</label></div></div>',
+    [
+      {label:'Cancel',action:'close',secondary:true},
+      {label:n?'Publish':'Update',action:function(){
+        var title=document.getElementById('an_title').value.trim();
+        var body=document.getElementById('an_body').value.trim();
+        if(!title){showToast('Title is required','error');return;}
+        if(!body){showToast('Body is required','error');return;}
+        var data={id:a.id,title:title,body:body,author:a.author,date:new Date().toISOString().slice(0,10),audience:document.getElementById('an_aud').value,priority:document.getElementById('an_pri').value,pinned:document.getElementById('an_pin').checked,views:a.views||0};
+        if(n){mockAnnouncements.unshift(data);DB.save('announcements');showToast('Announcement published!','success');}
+        else{var idx=mockAnnouncements.findIndex(function(x){return x.id===a.id});if(idx>=0){mockAnnouncements[idx]=data;DB.save('announcements');showToast('Updated','info');}}
+        closeDrawer();renderModule();
+      }}
+    ]
+  );
+}
+
 // ── Module enable/disable + menu setup (Phase 1.4) ──
 window.mockModuleConfig = DB.init('module_config', {});
 window.mockMenuConfig = DB.init('menu_config', {});
@@ -9913,6 +10062,8 @@ function closeSearchDropdown(){
 var _sdDatasetDefs=[
   // Group: Executive
   {g:'Executive',arr:'mockTasks',label:'Tasks',icon:'📋',mod:'tasks',fields:['title','project','status']},
+  {g:'Collaboration',arr:'mockCalendarEvents',label:'Calendar Events',icon:'📅',mod:'calendar',fields:['title','type','date','project']},
+  {g:'Collaboration',arr:'mockAnnouncements',label:'Announcements',icon:'📢',mod:'announcements',fields:['title','author','audience']},
   {g:'Executive',arr:'mockBiReports',label:'Reports',icon:'📊',mod:'bi_reports',fields:['name','reportType','status']},
   // Group: Sales & CRM
   {g:'Sales & CRM',arr:'mockLeads',label:'Leads',icon:'🎯',mod:'crm',fields:['name','property','source','phone','email','facingDir','floorPref','flatType','sizeSqFt','paymentPlan']},
@@ -11305,7 +11456,7 @@ function filterLeads(){
     return true;
   });
 }
-const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',bi_reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',contacts:'sales_crm',proposals:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',layout_builder:'land_projects',projects:'land_projects',compliance:'legal_compliance',legal_contracts:'legal_compliance',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',dues_recovery:'bookings_customer',ticketing:'bookings_customer',contractors:'construction',boq:'finance_admin',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'legal_compliance',designs:'construction',stock:'hr_admin',finance:'finance_admin',approvals:'finance_admin',payment_reminders:'bookings_customer',hr:'hr_admin',documents:'hr_admin',knowledge_base:'hr_admin',tasks:'collaboration',workspace:'collaboration',notifications_page:'collaboration',settings:'system'};
+const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',bi_reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',contacts:'sales_crm',proposals:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',layout_builder:'land_projects',projects:'land_projects',compliance:'legal_compliance',legal_contracts:'legal_compliance',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',dues_recovery:'bookings_customer',ticketing:'bookings_customer',contractors:'construction',boq:'finance_admin',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'legal_compliance',designs:'construction',stock:'hr_admin',finance:'finance_admin',approvals:'finance_admin',payment_reminders:'bookings_customer',hr:'hr_admin',documents:'hr_admin',knowledge_base:'hr_admin',tasks:'collaboration',workspace:'collaboration',calendar:'collaboration',announcements:'collaboration',notifications_page:'collaboration',settings:'system'};
 
 // ═══ CRUD ═══
 function openModal(title,body,onSave){
@@ -14587,7 +14738,7 @@ html.dark .inv-preview{background:rgba(15,23,42,.5);border-color:#334155}
 // ── LANGUAGE TOGGLE (EN / বাংলা) ──
 var LANG='en';
 var _BN_DICT={
-'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Project Acquisition':'প্রকল্প অধিগ্রহণ','Flats & Units':'ফ্ল্যাট ও ইউনিট','Plots & Blocks':'প্লট ও ব্লক','Layout & Unit Builder':'লেআউট ও ইউনিট বিল্ডার','Pricing Matrix':'মূল্য ম্যাট্রিক্স','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Attendance':'উপস্থিতি','Leave':'ছুটি','Payroll':'বেতন','Recruitment':'নিয়োগ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
+'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Project Acquisition':'প্রকল্প অধিগ্রহণ','Flats & Units':'ফ্ল্যাট ও ইউনিট','Plots & Blocks':'প্লট ও ব্লক','Layout & Unit Builder':'লেআউট ও ইউনিট বিল্ডার','Pricing Matrix':'মূল্য ম্যাট্রিক্স','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Attendance':'উপস্থিতি','Leave':'ছুটি','Payroll':'বেতন','Recruitment':'নিয়োগ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি','Calendar':'ক্যালেন্ডার','Announcements':'ঘোষণা',
 'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Engineering & Construction':'প্রকৌশল ও নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Finance':'ফাইন্যান্স','Accounts & Finance':'অ্যাকাউন্টস ও ফাইন্যান্স','HR & Admin':'মানবসম্পদ ও প্রশাসন','Admin & Operations':'প্রশাসন ও কার্যক্রম','Legal & Compliance':'আইনি ও সম্মতি','Collaboration':'সহযোগিতা','System':'সিস্টেম',
 'Super Admin':'সুপার অ্যাডমিন','Sales Agent':'সেলস এজেন্ট','Site Engineer':'সাইট ইঞ্জিনিয়ার','Finance':'ফাইন্যান্স','Executive Group':'নির্বাহী গ্রুপ',
 'New Inquiry':'নতুন অনুসন্ধান','Contacted':'যোগাযোগ হয়েছে','Site Visit':'সাইট পরিদর্শন','Negotiation':'আলোচনা','Booking':'বুকিং','Downpayment':'ডাউন পেমেন্ট','Installments':'কিস্তি','Possession':'দখল','Handover':'হস্তান্তর','Lost':'হারানো','Junk':'অপ্রাসঙ্গিক',

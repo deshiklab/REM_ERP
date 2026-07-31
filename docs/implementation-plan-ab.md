@@ -218,9 +218,8 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 ## Progress tracker
 
 - [x] **1.1** Currency consistency — 70 ₹→৳, seedV bumps, SW v8-v13 (`f45121b`)
-- [ ] 1.2 Flats & Units "Under Payment" status
-- [ ] 1.3 Unsold plot/flat balance ledger
-- [ ] 1.4 Settings — module enable/disable + menu setup
+- [x] **1.2+1.3** Under Payment status + Open Inventory ledgers — SW v8-v14 (`3a2ba13`)
+- [x] **1.4** Module enable/disable + Menu Setup — SW v8-v15 (`2181345`)
 - [ ] 1.5 Calendar · 1.6 Announcements
 - [ ] 1.7 Fund transfers · 1.8 Journal entries
 - [ ] 1.9 HR check-in/out · 1.10 Leave approval · 1.11 Timesheets
