@@ -867,6 +867,7 @@
         <div class="icon-btn" onclick="printReport()" title="Print Report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></div>
         <div class="icon-btn" onclick="exportAllTables()" title="Export All as CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
         <div class="icon-btn" id="pwaInstallBtn" onclick="installPWA()" title="Install App" style="display:none;font-size:15px;line-height:1;color:#2F80ED">📲</div>
+        <div class="icon-btn lang-btn" onclick="toggleLang()" id="langBtn" title="বাংলা / English">EN</div>
         <div class="icon-btn" onclick="toggleDarkMode()" id="topThemeBtn" title="Toggle Dark Mode" style="font-size:15px;line-height:1">🌙</div>
         <div class="icon-btn" onclick="toggleThemePalette(event)" title="Theme Palette" style="position:relative;font-size:15px;line-height:1">🎨<div id="themePalette" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:252px;background:var(--card-bg,#fff);border:1px solid var(--card-border,#e0e0e0);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.18);z-index:9999;padding:8px"></div></div>
         <div class="icon-btn" onclick="toggleNotifications()" title="Notifications" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div id="notifBadge">0</div></div>
@@ -886,6 +887,7 @@
         <span style="color:#e0e0e0">|</span>
         <button onclick="toggleFullScreen()" style="padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:10px;color:#555" title="Fullscreen">⛶</button>
         <span style="color:#e0e0e0">|</span>
+        <span onclick="toggleLang()" id="footerLangBtn" style="cursor:pointer;font-size:9px;font-weight:700;color:#555;padding:1px 5px;border:1px solid #d0d8e8;border-radius:4px" title="বাংলা / English">EN</span>
         <span onclick="toggleDarkMode()" id="footerThemeBtn" style="cursor:pointer;font-size:12px;padding:1px 4px;border-radius:3px" title="Toggle Theme">🌙</span>
         <span style="color:#e0e0e0">|</span>
         <span id="footerRoleBtn" onclick="toggleRoleMenu()" style="cursor:pointer;font-size:10px;font-weight:600;color:#2F80ED;padding:1px 6px;border:1px solid #d0d8e8;border-radius:4px" title="Switch Role">SA</span>
@@ -895,7 +897,8 @@
 </div>
 
 <div id="notifPanel" class="slide-out"><div class="backdrop" onclick="toggleNotifications()"></div><div class="panel">
-  <div class="notif-header"><span class="nh-title">Notifications <span class="nh-count"></span></span><button class="notif-clear-btn" onclick="clearAllNotifications()">Clear All</button></div>
+  <div class="notif-header"><span class="nh-title">Notifications <span class="nh-count"></span></span><div style="display:flex;gap:4px"><button class="notif-clear-btn" onclick="markAllNotifRead()">✓ Mark read</button><button class="notif-clear-btn" onclick="clearAllNotifications()">Clear All</button></div></div>
+  <div class="notif-tabs" id="notifTabs"></div>
   <div id="notifList" style="flex:1;overflow-y:auto"></div>
 </div></div>
 
@@ -2957,7 +2960,7 @@ function renderCRM(el){
       <input id="invSearch" placeholder="Search client/invoice..." oninput="_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <div class="tabs" style="margin:0 4px 0 0"><div class="tab ${crmInvTab==='all'?'active':''}" onclick="crmInvTab='all';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">All</div><div class="tab ${crmInvTab==='draft'?'active':''}" onclick="crmInvTab='draft';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Draft</div><div class="tab ${crmInvTab==='sent'?'active':''}" onclick="crmInvTab='sent';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Sent</div><div class="tab ${crmInvTab==='paid'?'active':''}" onclick="crmInvTab='paid';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Paid</div><div class="tab ${crmInvTab==='overdue'?'active':''}" onclick="crmInvTab='overdue';_PG['invoices']={page:1,perPage:_pgPerPage};renderModule()">Overdue</div></div>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudInvoice()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ New Invoice</button>
+      <button class="action-btn secondary" onclick="openInvoiceTemplates()" style="padding:3px 7px;font-size:9px" title="Branded invoice templates" data-perm="CRM & Leads:Edit">🧾 Templates</button><button class="action-btn primary" onclick="crudInvoice()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ New Invoice</button>
       `:crmSubView==='payments'?`
       <input id="paySearch" placeholder="Search client/payment..." oninput="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <select id="payMethod" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Method</option><option value="Bank Transfer">Bank Transfer</option><option value="Cheque">Cheque</option><option value="Cash">Cash</option><option value="Online">Online</option></select>
@@ -3447,40 +3450,74 @@ function crudPayment(item){
 
 
 // ═══ INVOICE & PAYMENT PRINT / DOWNLOAD ═══
-function printInvoice(id){
-  var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
-  var paidAmt=mockPayments.filter(function(p){return p.invoiceId===inv.id}).reduce(function(s,p){return s+(p.amount||0)},0);
+var _invTplCur='classic';
+var _INV_TPL_NAMES={classic:'Classic',modern:'Modern',minimal:'Minimal'};
+var _tplColor=function(t){return t==='modern'?'#0f2540':t==='minimal'?'#111':'#2F80ED';};
+var _invBrand=function(){return {name:'REM Real Estate Management Ltd',addr:'Level 8, 40 Panthapath, Dhaka 1205',phone:'+880 2-9612345',email:'accounts@rembd.com',web:'www.rembd.com'};};
+var _INV_TPL_CSS={
+classic:'.inv-body{font-family:Inter,Arial,sans-serif;color:#222;font-size:11px}.inv-body .ivp{max-width:660px;margin:0 auto}.inv-body .ivh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:2px solid #2F80ED;margin-bottom:16px}.inv-body .iv-name{font-size:16px;font-weight:700;color:#2F80ED}.inv-body .iv-sub{font-size:9px;color:#666;margin-top:2px}.inv-body .iv-title{font-size:22px;font-weight:800;color:#2F80ED;letter-spacing:1px}.inv-body .iv-id{font-size:11px;color:#666;margin-top:2px}.inv-body .iv-badge{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;color:#fff}.inv-body .iv-info{display:flex;gap:14px;margin-bottom:12px}.inv-body .iv-box{flex:1;padding:10px;background:#f8f9fa;border-radius:6px}.inv-body .iv-lbl{font-size:8px;color:#888;letter-spacing:.8px;margin-bottom:3px}.inv-body .iv-val{font-size:12px;font-weight:600}.inv-body .iv-sub2{font-size:10px;color:#666;margin-top:3px}.inv-body .iv-note{font-size:10px;color:#666;background:#f8f9fa;padding:8px 10px;border-radius:4px;margin-bottom:10px}.inv-body table{width:100%;border-collapse:collapse;font-size:10.5px;margin:10px 0}.inv-body th{background:#f0f4ff;padding:6px 8px;text-align:left;font-size:8.5px;text-transform:uppercase;letter-spacing:.5px;color:#555}.inv-body td{padding:5px 8px;border-bottom:1px solid #eee}.inv-body .num{text-align:right}.inv-body .tot td{border-bottom:none;padding-top:7px}.inv-body .grand{font-weight:700;color:#2F80ED}.inv-body .iv-h3{font-size:11px;font-weight:600;margin:14px 0 2px}.inv-body .iv-foot{margin-top:16px;padding-top:10px;border-top:1px solid #ddd;font-size:8.5px;color:#999;text-align:center;line-height:1.7}',
+modern:'.inv-body{font-family:Inter,Arial,sans-serif;color:#1f2937;font-size:11px}.inv-body .ivp{max-width:660px;margin:0 auto}.inv-body .ivh{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#0f2540,#1b3a63);color:#fff;border-radius:10px;padding:18px 20px;margin-bottom:16px}.inv-body .iv-brand{display:flex;align-items:center;gap:10px}.inv-body .iv-logo{width:34px;height:34px;border-radius:8px;background:#d4a017;color:#0f2540;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}.inv-body .iv-name{font-size:15px;font-weight:700;color:#fff}.inv-body .iv-sub{font-size:8.5px;color:#b8c7dd;margin-top:2px}.inv-body .iv-meta{text-align:right}.inv-body .iv-title{font-size:20px;font-weight:800;color:#d4a017;letter-spacing:2px}.inv-body .iv-id{font-size:10px;color:#b8c7dd}.inv-body .iv-badge{display:inline-block;margin-top:4px;padding:2px 9px;border-radius:12px;font-size:9px;font-weight:700;background:rgba(255,255,255,.14);color:#fff}.inv-body .iv-info{display:flex;gap:14px;margin-bottom:12px}.inv-body .iv-box{flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px}.inv-body .iv-lbl{font-size:8px;color:#9ca3af;letter-spacing:.8px;margin-bottom:3px}.inv-body .iv-val{font-size:12px;font-weight:700;color:#0f2540}.inv-body .iv-sub2{font-size:10px;color:#6b7280;margin-top:3px}.inv-body .iv-note{font-size:10px;color:#6b7280;background:#f8fafc;border-left:3px solid #d4a017;padding:8px 10px;margin-bottom:10px}.inv-body table{width:100%;border-collapse:collapse;font-size:10.5px;margin:10px 0}.inv-body th{background:#0f2540;color:#fff;padding:7px 8px;text-align:left;font-size:8.5px;text-transform:uppercase;letter-spacing:.5px}.inv-body td{padding:5px 8px;border-bottom:1px solid #eef0f3}.inv-body tbody tr:nth-child(even){background:#f8fafc}.inv-body .num{text-align:right}.inv-body .tot td{border-bottom:none;padding-top:7px}.inv-body .grand{font-weight:800;color:#d4a017}.inv-body .iv-h3{font-size:11px;font-weight:700;margin:14px 0 2px;color:#0f2540}.inv-body .iv-foot{margin-top:16px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:8.5px;color:#9ca3af;text-align:center;line-height:1.7}',
+minimal:'.inv-body{font-family:Inter,Arial,sans-serif;color:#111;font-size:11px}.inv-body .ivp{max-width:620px;margin:0 auto}.inv-body .ivh{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:12px;border-bottom:3px solid #111;margin-bottom:16px}.inv-body .iv-name{font-size:15px;font-weight:800;color:#111;letter-spacing:.3px}.inv-body .iv-sub{font-size:9px;color:#777;margin-top:2px}.inv-body .iv-meta{text-align:right}.inv-body .iv-title{font-size:19px;font-weight:300;letter-spacing:4px;color:#111}.inv-body .iv-id{font-size:10px;color:#777;margin-top:2px}.inv-body .iv-badge{display:inline-block;margin-top:5px;padding:2px 10px;border:1px solid #111;border-radius:2px;font-size:9px;font-weight:600}.inv-body .iv-info{display:flex;gap:24px;margin-bottom:14px}.inv-body .iv-box{flex:1;padding:2px 0}.inv-body .iv-lbl{font-size:8px;color:#999;letter-spacing:1px;margin-bottom:4px}.inv-body .iv-val{font-size:12px;font-weight:600}.inv-body .iv-sub2{font-size:10px;color:#555;margin-top:2px}.inv-body .iv-note{font-size:10px;color:#555;border-bottom:1px dashed #ccc;padding-bottom:8px;margin-bottom:10px}.inv-body table{width:100%;border-collapse:collapse;font-size:10.5px;margin:10px 0}.inv-body th{padding:6px 0;text-align:left;font-size:8.5px;text-transform:uppercase;letter-spacing:1px;color:#999;border-bottom:1px solid #111}.inv-body td{padding:6px 0;border-bottom:1px solid #eee}.inv-body .num{text-align:right}.inv-body .tot td{border-bottom:none;padding-top:8px}.inv-body .grand{font-weight:700;font-size:12px}.inv-body .iv-h3{font-size:10.5px;font-weight:700;letter-spacing:1px;margin:14px 0 2px;text-transform:uppercase;color:#111}.inv-body .iv-foot{margin-top:18px;padding-top:10px;border-top:1px solid #111;font-size:8.5px;color:#888;text-align:center;letter-spacing:.4px;line-height:1.7}'
+};
+function _invSample(){if(window.mockInvoices&&mockInvoices.length)return mockInvoices[0];return {id:'INV-001',client:'Tariqul Islam',project:'Muktodhara',unit:'5 Katha',amount:15000000,status:'Sent',dueDate:'2026-07-15',issuedDate:'2026-06-15',desc:'Downpayment invoice for 5 Katha plot - Muktodhara',items:[{desc:'Plot Booking Fee',qty:1,rate:5000000},{desc:'Registration & Legal',qty:1,rate:150000},{desc:'Service Charge',qty:1,rate:50000}]};}
+function _invDocBody(inv,tpl){
+  tpl=tpl||'classic';
+  var br=_invBrand();
+  var paidAmt=(window.mockPayments||[]).filter(function(p){return p.invoiceId===inv.id}).reduce(function(s,p){return s+(p.amount||0)},0);
   var dueAmt=Math.max(0,inv.amount-paidAmt);
   var itemsHtml=inv.items.map(function(it,i){return '<tr><td>'+(i+1)+'</td><td>'+it.desc+'</td><td class="num">'+it.qty+'</td><td class="num">Tk '+it.rate.toLocaleString('en-IN')+'</td><td class="num">Tk '+(it.qty*it.rate).toLocaleString('en-IN')+'</td></tr>';}).join('');
-  var payHtml=mockPayments.filter(function(p){return p.invoiceId===inv.id}).map(function(p){return '<tr><td>'+p.id+'</td><td>'+p.date+'</td><td>'+p.method+'</td><td class="num">Tk '+(p.amount).toLocaleString('en-IN')+'</td><td>'+p.status+'</td></tr>';}).join('');
-  var w=window.open('','_blank','width=800,height=700');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice '+inv.id+'</title><style>'+
-    'body{font-family:"Inter",Arial,sans-serif;max-width:700px;margin:30px auto;padding:20px;color:#222}'+
-    '.header{display:flex;justify-content:space-between;align-items:start;padding-bottom:20px;border-bottom:2px solid #2F80ED;margin-bottom:20px}'+
-    '.header .title{font-size:24px;font-weight:700;color:#2F80ED}.header .sub{font-size:11px;color:#666}'+
-    '.info{display:flex;gap:20px;margin-bottom:16px}.info-box{flex:1;padding:10px;background:#f8f9fa;border-radius:6px}'+
-    '.info-box .lbl{font-size:9px;color:#888;text-transform:uppercase;margin-bottom:2px}.info-box .val{font-size:13px;font-weight:600}'+
-    'table{width:100%;border-collapse:collapse;font-size:11px;margin:12px 0}th{background:#f0f4ff;padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase;color:#555}'+
-    'td{padding:5px 8px;border-bottom:1px solid #eee}.num{text-align:right}.total-row td{padding:5px 8px;border-bottom:none}.grand{font-weight:700;font-size:13px;color:#2F80ED}'+
-    '.footer{margin-top:20px;padding-top:12px;border-top:1px solid #ddd;font-size:9px;color:#999;text-align:center}'+
-    '@media print{body{margin:0;padding:15px}.no-print{display:none}}'+
-    '.status-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:'+(inv.status==='Paid'?'#2e7d32':inv.status==='Overdue'?'#c62828':inv.status==='Sent'?'#1565c0':'#888')+'}'+
-    '</style></head><body>'+
-    '<div class="no-print" style="text-align:center;margin-bottom:20px"><button onclick="window.print()" style="padding:8px 20px;background:#2F80ED;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">\U0001F5A8 Print This Invoice</button></div>'+
-    '<div class="header"><div><div class="title">INVOICE</div><div class="sub">'+inv.id+'</div></div><div><span class="status-badge">'+inv.status+'</span></div></div>'+
-    '<div class="info"><div class="info-box"><div class="lbl">Bill To</div><div class="val">'+inv.client+'</div><div style="font-size:10px;color:#666;margin-top:4px">'+inv.project+(inv.unit?' \u00B7 '+inv.unit:'')+'</div></div>'+
-    '<div class="info-box"><div class="lbl">Invoice Details</div><div class="val" style="font-size:11px">Issued: '+inv.issuedDate+'</div><div class="val" style="font-size:11px">Due: '+inv.dueDate+'</div></div></div>'+
-    (inv.desc?'<div style="font-size:11px;color:#666;margin-bottom:10px;padding:8px;background:#f8f9fa;border-radius:4px">'+inv.desc+'</div>':'')+
-    '<table><thead><tr><th>#</th><th>Description</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Total</th></tr></thead><tbody>'+itemsHtml+
-    '<tr><td colspan="4" class="num" style="font-weight:600;padding-top:10px">Subtotal</td><td class="num grand" style="padding-top:10px">Tk '+inv.amount.toLocaleString('en-IN')+'</td></tr>'+
-    (paidAmt?'<tr><td colspan="4" class="num" style="color:#2e7d32">Paid</td><td class="num" style="color:#2e7d32;font-weight:600">Tk '+paidAmt.toLocaleString('en-IN')+'</td></tr>':'')+
-    (dueAmt?'<tr><td colspan="4" class="num" style="color:#c62828;font-weight:600">Due</td><td class="num" style="color:#c62828;font-weight:700;font-size:13px">Tk '+dueAmt.toLocaleString('en-IN')+'</td></tr>':'')+
-    '</tbody></table>'+
-    (payHtml?'<h3 style="font-size:11px;font-weight:600;margin:16px 0 4px">Payments on this Invoice</h3><table><thead><tr><th>ID</th><th>Date</th><th>Method</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>'+payHtml+'</tbody></table>':'')+
-    '<div class="footer">REM ERP \u2014 MARS Construction Ltd. \u00B7 This is a computer-generated invoice.</div>'+
-    '</body></html>');
+  var payHtml=(window.mockPayments||[]).filter(function(p){return p.invoiceId===inv.id}).map(function(p){return '<tr><td>'+p.id+'</td><td>'+p.date+'</td><td>'+p.method+'</td><td class="num">Tk '+(p.amount).toLocaleString('en-IN')+'</td><td>'+p.status+'</td></tr>';}).join('');
+  var stc={Paid:'#2e7d32',Overdue:'#c62828',Sent:'#1565c0'}[inv.status]||'#888';
+  var css=_INV_TPL_CSS[tpl]||_INV_TPL_CSS.classic;
+  var hdr='';
+  if(tpl==='modern'){
+    hdr='<div class="ivh"><div class="iv-brand"><div class="iv-logo">REM</div><div><div class="iv-name">'+br.name+'</div><div class="iv-sub">'+br.addr+' · '+br.phone+' · '+br.web+'</div></div></div><div class="iv-meta"><div class="iv-title">INVOICE</div><div class="iv-id">'+inv.id+'</div><span class="iv-badge">'+inv.status+'</span></div></div>';
+  }else if(tpl==='minimal'){
+    hdr='<div class="ivh"><div class="iv-brand"><div class="iv-name">'+br.name+'</div><div class="iv-sub">'+br.addr+'</div></div><div class="iv-meta"><div class="iv-title">INVOICE</div><div class="iv-id">'+inv.id+'</div><span class="iv-badge">'+inv.status+'</span></div></div>';
+  }else{
+    hdr='<div class="ivh"><div class="iv-brand"><div class="iv-name">'+br.name+'</div><div class="iv-sub">'+br.addr+' · '+br.phone+' · '+br.email+'</div></div><div class="iv-meta"><div class="iv-title">INVOICE</div><div class="iv-id">'+inv.id+'</div><span class="iv-badge" style="background:'+stc+'">'+inv.status+'</span></div></div>';
+  }
+  var info='<div class="iv-info"><div class="iv-box"><div class="iv-lbl">BILL TO</div><div class="iv-val">'+inv.client+'</div><div class="iv-sub2">'+inv.project+(inv.unit?' · '+inv.unit:'')+'</div></div><div class="iv-box"><div class="iv-lbl">INVOICE DETAILS</div><div class="iv-val">Issued: '+inv.issuedDate+'</div><div class="iv-val">Due: '+inv.dueDate+'</div></div></div>';
+  var note=inv.desc?'<div class="iv-note">'+inv.desc+'</div>':'';
+  var items='<table class="iv-t"><thead><tr><th>#</th><th>Description</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Total</th></tr></thead><tbody>'+itemsHtml+
+    '<tr class="tot"><td colspan="4" class="num">Subtotal</td><td class="num grand">Tk '+inv.amount.toLocaleString('en-IN')+'</td></tr>'+
+    (paidAmt?'<tr class="tot"><td colspan="4" class="num" style="color:#2e7d32">Paid</td><td class="num" style="color:#2e7d32;font-weight:600">Tk '+paidAmt.toLocaleString('en-IN')+'</td></tr>':'')+
+    (dueAmt?'<tr class="tot"><td colspan="4" class="num" style="color:#c62828;font-weight:600">Due</td><td class="num" style="color:#c62828;font-weight:700">Tk '+dueAmt.toLocaleString('en-IN')+'</td></tr>':'')+
+    '</tbody></table>';
+  var pays=payHtml?'<h3 class="iv-h3">Payments on this Invoice</h3><table class="iv-t"><thead><tr><th>ID</th><th>Date</th><th>Method</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>'+payHtml+'</tbody></table>':'';
+  var foot='<div class="iv-foot">'+br.name+' · '+br.addr+' · '+br.email+'<br/>Payment by Bank Transfer / Cheque to: REM ERP Account, DBBL 123-456-789 · This is a computer-generated invoice.</div>';
+  return '<style>'+css+'</style><div class="tpl-'+tpl+' inv-body"><div class="ivp">'+hdr+info+note+items+pays+foot+'</div></div>';
+}
+function _invDoc(inv,tpl){
+  tpl=tpl||'classic';
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice '+inv.id+'</title><style>body{margin:0;padding:0;background:#f0f1f3}.print-bar{max-width:660px;margin:18px auto 0;text-align:center}.print-bar button{padding:9px 22px;background:#2F80ED;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}.inv-body .ivp{background:#fff;padding:28px;margin:18px auto;box-shadow:0 2px 16px rgba(0,0,0,.06);border-radius:4px}@media print{.print-bar{display:none}body{background:#fff}.inv-body .ivp{box-shadow:none;margin:0;padding:14px}}</style></head><body><div class="print-bar"><button onclick="window.print()">🖨 Print This Invoice</button></div>'+_invDocBody(inv,tpl)+'</body></html>';
+}
+function printInvoice(id,tpl){
+  var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
+  var w=window.open('','_blank','width=820,height=760');
+  w.document.write(_invDoc(inv,tpl||'classic'));
   w.document.close();
 }
+function selectInvTpl(t){
+  _invTplCur=t;
+  document.querySelectorAll('.inv-tpl-card').forEach(function(c){c.classList.toggle('active',c.getAttribute('data-tpl')===t);});
+  _renderInvPreview(_invSample(),t);
+}
+function _renderInvPreview(inv,tpl){
+  var el=document.getElementById('invPreview');
+  if(el)el.innerHTML=_invDocBody(inv,tpl||'classic');
+}
+function openInvoiceTemplates(){
+  var sample=_invSample();
+  var body='<div style="font-size:10px;color:#888;margin-bottom:6px">Choose a template — live preview below</div>'+
+    '<div class="inv-tpl-grid">'+['classic','modern','minimal'].map(function(t,i){
+      return '<div class="inv-tpl-card'+(i===0?' active':'')+(t==='modern'?' modern':'')+'" data-tpl="'+t+'" onclick="selectInvTpl(\''+t+'\')"><div class="tpl-mini"><div class="mh" style="background:'+_tplColor(t)+'">REM ERP</div><div class="ml"></div></div><div class="tpl-name">'+_INV_TPL_NAMES[t]+'</div></div>';
+    }).join('')+'</div><div class="inv-preview" id="invPreview"></div>';
+  openModal('🧾 Branded Invoice Templates', body, '<button class="drawer-btn secondary" onclick="closeDrawer()">Close</button><button class="drawer-btn primary" onclick="printInvoice(\''+sample.id+'\',_invTplCur||\'classic\')">🖨 Print Preview</button>');
+  _invTplCur='classic';
+  _renderInvPreview(sample,'classic');
+}
+
 function downloadInvoice(id){
   var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
   var paidAmt=mockPayments.filter(function(p){return p.invoiceId===inv.id}).reduce(function(s,p){return s+(p.amount||0)},0);
@@ -7949,27 +7986,61 @@ function updateNotifBadge(){
   badge.textContent=unread;
   badge.style.display=unread>0?'flex':'none';
 }
+var _notifFilter='all';
+var _NOTIF_TYPES=['all','lead','payment','due','task','approval'];
+function _notifLabel(t){return {all:'All',lead:'Lead',payment:'Payment',due:'Due',task:'Task',approval:'Approval'}[t]||t;}
+function setNotifFilter(f){_notifFilter=f;renderNotifications();}
 function renderNotifications(){
   var list=document.getElementById('notifList');
   if(!list)return;
-  var unread=mockNotifications.filter(function(n){return !n.read}).length;
+  var all=mockNotifications;
+  var unread=all.filter(function(n){return !n.read}).length;
   var hdr=document.querySelector('.notif-header .nh-count');
   if(hdr)hdr.textContent='('+unread+' unread)';
-  if(mockNotifications.length===0){
-    list.innerHTML='<div class="notif-empty"><div class="ne-icon">🔔</div>No notifications yet</div>';
+  var tabsEl=document.getElementById('notifTabs');
+  if(tabsEl){
+    tabsEl.innerHTML=_NOTIF_TYPES.map(function(t){
+      var items=t==='all'?all:all.filter(function(n){return n.type===t;});
+      var cnt=items.length;
+      return '<div class="notif-tab'+( _notifFilter===t?' active':'')+'" onclick="setNotifFilter(\''+t+'\')">'+_notifLabel(t)+'<span class="nt-c">'+cnt+'</span></div>';
+    }).join('');
+  }
+  var filtered=_notifFilter==='all'?all:all.filter(function(n){return n.type===_notifFilter;});
+  if(filtered.length===0){
+    list.innerHTML='<div class="notif-empty"><div class="ne-icon">🔔</div>'+(all.length===0?'No notifications yet':'No '+_notifLabel(_notifFilter)+' notifications')+'</div>';
     return;
   }
-  list.innerHTML=mockNotifications.slice(0,50).map(function(n){
+  list.innerHTML=filtered.slice(0,50).map(function(n){
     var ago=timeAgo(n.time);
     var icon=notifIcons[n.type]||notifIcons['default'];
     var bg=notifBg[n.type]||notifBg['default'];
-    return '<div class="notif-item'+(n.read?'':' unread')+'" onclick="markNotifRead(\''+n.id+'\')">'+
+    return '<div class="notif-item'+(n.read?'':' unread')+'" onclick="openNotif(\''+n.id+'\')">'+
       '<div class="ni-icon" style="background:'+bg+'">'+icon+'</div>'+
       '<div class="ni-body"><div class="ni-title">'+n.title+'</div>'+
-      '<div class="ni-sub">'+n.sub+'</div><div class="ni-time">'+ago+'</div></div>'+
+      '<div class="ni-sub">'+n.sub+'</div><div class="ni-time">'+ago+'</div>'+
+      '<div class="ni-nav">Open '+_notifLabel(n.type)+' →</div></div>'+
       (n.read?'':'<div class="ni-dot"></div>')+
       '</div>';
   }).join('');
+  updateNotifBadge();
+}
+function markAllNotifRead(){
+  mockNotifications.forEach(function(n){n.read=true;});
+  DB.save('notifications');renderNotifications();updateNotifBadge();
+  showToast('All notifications marked as read','success');
+}
+function notifNav(n){
+  var map={lead:'crm',payment:'crm',due:'dues_recovery',task:'tasks',approval:'finance'};
+  var mod=map[n.type]||currentModule;
+  toggleNotifications();
+  if(n.type==='payment'){try{crmSubView='payments';}catch(e){}}
+  switchModule(mod);
+  showToast('Opened '+(n.title||'notification'),'info');
+}
+function openNotif(id){
+  var n=mockNotifications.find(function(x){return x.id===id});
+  if(n&&!n.read){n.read=true;DB.save('notifications');renderNotifications();updateNotifBadge();}
+  if(n)notifNav(n);
 }
 function timeAgo(ts){
   var d=Date.now()-ts;
@@ -8055,6 +8126,7 @@ function openQuickAdd(){
   var recBadge=document.getElementById('qaRecentBadge');
   if(_qaRecent.length){recBadge.style.display='inline';recBadge.textContent=_qaRecent.length+' recent';}else recBadge.style.display='none';
   document.querySelectorAll('.qa-tab').forEach(function(t){t.style.background=t.dataset.qaTab==='all'?'#2F80ED':'#f0f0f0';t.style.color=t.dataset.qaTab==='all'?'#fff':'#666'});
+  if(typeof _applyLangPass==='function')_applyLangPass();
 }
 function closeQuickAdd(){
   document.getElementById('quickAddDropdown').classList.remove('active');
@@ -8103,6 +8175,7 @@ document.addEventListener('keydown',function(e){
 function toggleDarkMode(){
   var is=document.documentElement.classList.toggle('dark');
   localStorage.setItem('theme',is?'dark':'light');
+  localStorage.setItem('theme_manual','1');
   var tb=document.getElementById('footerThemeBtn');if(tb)tb.textContent=is?'☀️':'🌙';
   var tt=document.getElementById('topThemeBtn');if(tt)tt.textContent=is?'☀️':'🌙';
   if(settingsTab==='theme'||settingsTab==='themes')renderModule();
@@ -8126,6 +8199,8 @@ function setDefaultTheme(){var t=localStorage.getItem('rem_theme')||'default';va
 function initTheme(){
   var theme=localStorage.getItem('rem_theme')||'default';
   var mode=localStorage.getItem('theme')||'light';
+  var manual=localStorage.getItem('theme_manual')==='1';
+  if(!manual&&window.matchMedia){try{if(matchMedia('(prefers-color-scheme: dark)').matches)mode='dark';}catch(e){}}
   var tb=document.getElementById('footerThemeBtn');if(tb)tb.textContent=mode==='dark'?'☀️':'🌙';
   var tt=document.getElementById('topThemeBtn');if(tt)tt.textContent=mode==='dark'?'☀️':'🌙';
   if(theme==='custom'){try{var cv=JSON.parse(localStorage.getItem('rem_custom_theme')||'null');if(cv)buildCustomStyle(cv);}catch(e){}}
@@ -8136,6 +8211,19 @@ function initTheme(){
   var fs=localStorage.getItem('rem_fontsize');
   if(fs)document.documentElement.style.fontSize=(fs==='s'?'13px':fs==='l'?'15px':'14px');
   if(localStorage.getItem('rem_compact')==='1')document.documentElement.classList.add('compact-mode');
+  // Follow system light/dark until the user picks a theme manually
+  if(!manual&&window.matchMedia){
+    try{
+      var mq=matchMedia('(prefers-color-scheme: dark)');
+      var onSys=function(e){
+        if(localStorage.getItem('theme_manual')==='1')return;
+        localStorage.setItem('theme',e.matches?'dark':'light');
+        initTheme();
+      };
+      if(mq.addEventListener)mq.addEventListener('change',onSys);
+      else if(mq.addListener)mq.addListener(onSys);
+    }catch(e){}
+  }
 }
 // ═══ THEME & VISUALS UPGRADE ═══
 function openSettingsTab(tab){settingsTab=tab||'themes';switchModule('settings',true);}
@@ -8246,6 +8334,7 @@ function settingsAddList(k){var v=prompt('Add new item to '+k+':');if(v&&v.trim(
 function settingsRemoveList(k,i){if(!confirm('Remove "'+i+'" from '+k+'?'))return;if(mockMasterLists[k]){mockMasterLists[k]=mockMasterLists[k].filter(function(x){return x!==i});DB.save('master_lists');renderModule()}}
 function clearSearch(){var el=document.getElementById('searchActLog');if(el){el.value=''}renderModule();}
 initTheme();
+if(typeof setLang==='function')setLang(localStorage.getItem('rem_lang')||'en');
 var savedRole=localStorage.getItem('rem_role');
 if(savedRole&&['Super Admin','Sales Agent','Site Engineer','Finance'].indexOf(savedRole)>=0){
   currentRole=savedRole;
@@ -8872,6 +8961,7 @@ function openModal(title,body,onSave){
   var d=document.getElementById('appDrawer');
   document.getElementById('drawerTitle').textContent=title;
   document.getElementById('drawerBody').innerHTML=body;
+  if(typeof _applyLangPass==='function')_applyLangPass();
   if(typeof onSave==='string'){
     document.getElementById('drawerFooter').innerHTML=onSave;
     window._drawerOnSave=null;
@@ -11274,6 +11364,7 @@ function openMobileNav(){
     '<div class="mnav-list">'+(modsHtml||'<div class="mnav-empty">No modules accessible</div>')+'</div>';
   sh.classList.add('active');
   _navOpen=true;
+  if(typeof _applyLangPass==='function')_applyLangPass();
 }
 function closeMobileNav(){
   var sh=document.getElementById('mobileNavSheet');
@@ -11660,6 +11751,7 @@ function _wirePostRender(){
   _wireColResize();
   _wireViewsUI();
   _wireTableScaffold();
+  _applyLangPass();
 }
 function _wireTableScaffold(){
   var root=document.getElementById('mainContent');if(!root)return;
@@ -11811,12 +11903,107 @@ html.dark .rt-item .rt-ico{background:rgba(30,41,59,.6)}
 .rt-head{padding:4px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#999;display:flex;justify-content:space-between;align-items:center}
 .rt-clear{color:#2F80ED;cursor:pointer;font-weight:600;text-transform:none;letter-spacing:0;font-size:9px}
 .rt-empty{padding:22px 12px;text-align:center;color:#999;font-size:11px}
+/* ── LANGUAGE TOGGLE (EN / বাংলা) ── */
+.lang-btn{width:auto;min-width:34px;padding:0 6px;font-size:10px;font-weight:700;border:1px solid #e0e0e0;border-radius:6px;background:#fff;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s}
+.lang-btn:hover{border-color:#2F80ED;color:#2F80ED}
+html.dark .lang-btn{background:rgba(30,41,59,.6);border-color:#334155;color:#cbd5e1}
+html.lang-bn body,html.lang-bn .app-shell{font-family:'Noto Sans Bengali','Hind Siliguri','Inter',sans-serif}
+/* ── NOTIFICATIONS CENTER ── */
+.notif-tabs{display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid #e8e8e8;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.notif-tabs::-webkit-scrollbar{display:none}
+.notif-tab{padding:3px 8px;font-size:9px;font-weight:600;border-radius:12px;border:1px solid #e0e0e0;background:#fff;color:#666;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;transition:all .12s;flex-shrink:0}
+.notif-tab:hover{border-color:#2F80ED;color:#2F80ED}
+.notif-tab.active{background:#2F80ED;border-color:#2F80ED;color:#fff}
+.notif-tab .nt-c{background:#f0f4ff;color:#2F80ED;border-radius:8px;padding:0 4px;font-size:8px;min-width:14px;text-align:center;line-height:1.5}
+.notif-tab.active .nt-c{background:rgba(255,255,255,.25);color:#fff}
+html.dark .notif-tab{background:rgba(30,41,59,.6);border-color:#334155;color:#cbd5e1}
+html.dark .notif-tab .nt-c{background:rgba(59,130,246,.2);color:#60a5fa}
+.notif-item .ni-nav{font-size:8px;color:#2F80ED;margin-top:2px;font-weight:600;display:none}
+.notif-item:hover .ni-nav{display:block}
+/* ── INVOICE TEMPLATES ── */
+.inv-tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.inv-tpl-card{border:2px solid #e8e8e8;border-radius:10px;padding:8px;cursor:pointer;text-align:center;transition:all .15s;background:#fff}
+.inv-tpl-card:hover{border-color:#2F80ED}
+.inv-tpl-card.active{border-color:#2F80ED;background:#f0f4ff}
+.inv-tpl-card .tpl-name{font-size:10px;font-weight:600;color:#333;margin-top:4px}
+.inv-tpl-card .tpl-mini{height:74px;border-radius:6px;border:1px solid #eee;display:flex;flex-direction:column;overflow:hidden;background:#fff}
+.inv-tpl-card .tpl-mini .mh{height:16px;display:flex;align-items:center;padding:0 5px;font-size:6px;font-weight:700;color:#fff;letter-spacing:.5px}
+.inv-tpl-card .tpl-mini .ml{flex:1;background:repeating-linear-gradient(#fafafa,#fafafa 8px,#fff 8px,#fff 9px);border-top:1px solid #f0f0f0}
+.inv-tpl-card.modern .tpl-mini .mh{height:22px;align-items:flex-start;padding-top:4px}
+.inv-preview{background:#f5f6f8;border:1px solid #e8e8e8;border-radius:10px;padding:12px;overflow:auto;max-height:430px}
+.inv-preview .inv-pg{background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.08);border-radius:6px;padding:20px;max-width:520px;margin:0 auto;font-family:'Inter',Arial,sans-serif;color:#222;font-size:11px}
+html.dark .inv-tpl-card{background:rgba(30,41,59,.5);border-color:#334155}
+html.dark .inv-tpl-card .tpl-name{color:#e2e8f0}
+html.dark .inv-preview{background:rgba(15,23,42,.5);border-color:#334155}
+@media(max-width:768px){.inv-tpl-grid{grid-template-columns:1fr 1fr 1fr;gap:5px}.inv-tpl-card .tpl-mini{height:56px}}
 `;
   var st=document.createElement('style');
   st.id='navUpgradeCss';
   st.textContent=css;
   document.head.appendChild(st);
 })();
+// ── LANGUAGE TOGGLE (EN / বাংলা) ──
+var LANG='en';
+var _BN_DICT={
+'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Property & Unit Inventory':'সম্পত্তি ও ইউনিট ইনভেন্টরি','Plots & Layout':'প্লট ও লেআউট','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Data Vault':'ডেটা ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
+'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Land & Projects':'জমি ও প্রকল্প','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Collaboration':'সহযোগিতা','System':'সিস্টেম',
+'Super Admin':'সুপার অ্যাডমিন','Sales Agent':'সেলস এজেন্ট','Site Engineer':'সাইট ইঞ্জিনিয়ার','Finance':'ফাইন্যান্স','Executive Group':'নির্বাহী গ্রুপ',
+'New Inquiry':'নতুন অনুসন্ধান','Contacted':'যোগাযোগ হয়েছে','Site Visit':'সাইট পরিদর্শন','Negotiation':'আলোচনা','Booking':'বুকিং','Downpayment':'ডাউন পেমেন্ট','Installments':'কিস্তি','Possession':'দখল','Handover':'হস্তান্তর','Lost':'হারানো','Junk':'অপ্রাসঙ্গিক',
+'Confirmed':'নিশ্চিত','Pending Review':'বিবেচনাধীন','Overdue':'অতীত','Paid':'পরিশোধিত','Sent':'প্রেরিত','Draft':'খসড়া','Active':'সক্রিয়','Inactive':'নিষ্ক্রিয়','Open':'খোলা','In Progress':'চলমান','Resolved':'সমাধান','Escalated':'উচ্চতর স্তরে','Critical':'জরুরি','High':'উচ্চ','Medium':'মাঝারি','Low':'নিম্ন','Hot':'গরম','Warm':'উষ্ণ','Cold':'ঠান্ডা','New':'নতুন','Available':'উপলব্ধ','Sold':'বিক্রিত','Reserved':'সংরক্ষিত','Cleared':'ক্লিয়ার্ড','Pending':'অপেক্ষমাণ','Published':'প্রকাশিত','Unassigned':'বণ্টিত হয়নি','Assigned':'বণ্টিত','Booked':'বুকড','Completed':'সম্পন্ন','Cancelled':'বাতিল','Rejected':'প্রত্যাখ্যাত','Approved':'অনুমোদিত','Waiting':'অপেক্ষমাণ','Delivered':'বিতরণ করা হয়েছে',
+'Name':'নাম','Phone':'ফোন','Property':'সম্পত্তি','Source':'উৎস','Value':'মূল্য','Score':'স্কোর','Priority':'অগ্রাধিকার','Owner':'মালিক','Status':'স্থিতি','Stage':'পর্যায়','Type':'ধরন','City':'শহর','Amount':'পরিমাণ','Date':'তারিখ','Total':'মোট','Actions':'অ্যাকশন','Email':'ইমেইল','Client':'ক্লায়েন্ট','Project':'প্রকল্প','Invoice':'চালান','Payment':'পেমেন্ট','Method':'পদ্ধতি','Balance':'ব্যালেন্স','Due Date':'নির্দিষ্ট তারিখ','Next F/U':'পরবর্তী ফলো-আপ','Referred':'রেফার','Region':'অঞ্চল','Tier':'স্তর','Deals Closed':'সম্পন্ন চুক্তি','Commission':'কমিশন','Unit':'ইউনিট','Plot':'প্লট','Rate':'হার','Qty':'পরিমাণ','Subtotal':'উপমোট','Tax':'কর','Grand Total':'সর্বমোট','Reference':'রেফারেন্স','Notes':'নোট','Description':'বিবরণ','Category':'বিভাগ','Location':'অবস্থান','Area':'এলাকা','Size':'আকার','Price':'দাম','Cost':'খরচ','Budget':'বাজেট','Progress':'অগ্রগতি','Remarks':'মন্তব্য','Label':'লেবেল','Key':'কী','Options':'বিকল্প','Select':'নির্বাচন','All':'সব','None':'কিছুই নয়',
+'Search':'অনুসন্ধান','Filter':'ফিল্টার','Clear':'মুছুন','Apply':'প্রয়োগ','Reset':'রিসেট','Export':'রপ্তানি','Import':'আমদানি','Print':'প্রিন্ট','Save':'সংরক্ষণ','Cancel':'বাতিল','Close':'বন্ধ','Edit':'সম্পাদনা','Delete':'মুছুন','View':'দেখুন','Views':'ভিউ','Saved Views':'সংরক্ষিত ভিউ','Details':'বিস্তারিত','Download':'ডাউনলোড','Upload':'আপলোড','Add':'যোগ করুন','Add Lead':'নতুন লিড','Add Broker':'নতুন ব্রোকার','New Invoice':'নতুন চালান','Add Customer':'নতুন গ্রাহক','New Customer':'নতুন গ্রাহক','Record Payment':'পেমেন্ট রেকর্ড','New Booking':'নতুন বুকিং','New Lead':'নতুন লিড','New Task':'নতুন কাজ','New Transaction':'নতুন লেনদেন','New Employee':'নতুন কর্মচারী','Advance':'অগ্রিম','Assign':'বরাদ্দ','Delete All':'সব মুছুন','View All':'সব দেখুন','See All':'সব দেখুন','Show':'দেখান','Hide':'লুকান','More':'আরও','Back':'পেছনে','Next':'পরবর্তী','Previous':'পূর্ববর্তী','First':'প্রথম','Last':'শেষ','Today':'আজ','Yesterday':'গতকাল','Week':'সপ্তাহ','Month':'মাস','Year':'বছর','Records':'রেকর্ড','records':'রেকর্ড','Page':'পৃষ্ঠা','pages':'পৃষ্ঠা','page':'পৃষ্ঠা','Results':'ফলাফল','Loading':'লোড হচ্ছে','No data':'কোনো ডেটা নেই','No records found':'কোনো রেকর্ড পাওয়া যায়নি','No notifications yet':'এখনো কোনো বিজ্ঞপ্তি নেই',
+'Revenue':'আয়','Expense':'ব্যয়','Profit':'লাভ','Loss':'ক্ষতি','Active Bookings':'সক্রিয় বুকিং','Hot Leads':'হট লিড','Available Plots':'উপলব্ধ প্লট','Sold Plots':'বিক্রিত প্লট','Reserved Plots':'সংরক্ষিত প্লট','Total Revenue':'মোট আয়','Total Expense':'মোট ব্যয়','Net Profit':'নিট লাভ','This Month':'এই মাস','This Week':'এই সপ্তাহ',
+'Just now':'এইমাত্র','m ago':'মি. আগে','h ago':'ঘণ্টা আগে','d ago':'দিন আগে','ago':'আগে',
+'Mark read':'পঠিত চিহ্নিত','Clear All':'সব মুছুন','unread':'অপঠিত','Lead':'লিড','Due':'বকেয়া','Task':'কাজ','Approval':'অনুমোদন','Lead Status Changed':'লিডের স্থিতি পরিবর্তিত','Payment Received':'পেমেন্ট গৃহীত','Requires Approval':'অনুমোদন প্রয়োজন','Installment Due Tomorrow':'আগামীকাল কিস্তি বকেয়া','Task Overdue':'কাজ অতীত',
+'Users':'ব্যবহারকারী','Roles':'ভূমিকা','Theme':'থিম','General':'সাধারণ','Billing':'বিলিং','Security':'নিরাপত্তা','Company':'কোম্পানি','Localization':'স্থানীয়করণ','Notifications Settings':'বিজ্ঞপ্তি সেটিংস','System':'সিস্টেম','Data':'ডেটা','Backups':'ব্যাকআপ','Activity':'কার্যকলাপ','Permissions':'অনুমতি','Audit':'অডিট',
+'Search anything...':'যেকোনো কিছু খুঁজুন...','Search name/phone/property...':'নাম/ফোন/সম্পত্তি খুঁজুন...','Search client/invoice...':'ক্লায়েন্ট/চালান খুঁজুন...','Search leads, projects, contacts...':'লিড, প্রকল্প, যোগাযোগ খুঁজুন...','Search broker name/phone/region...':'ব্রোকারের নাম/ফোন/অঞ্চল খুঁজুন...'
+};
+var _BN_RT={};Object.keys(_BN_DICT).forEach(function(k){_BN_RT[_BN_DICT[k]]=k;});
+function _t(s){return LANG==='bn'?(_BN_DICT[s]||s):s;}
+function _bnRegex(){
+  var keys=LANG==='bn'?Object.keys(_BN_DICT):Object.keys(_BN_RT);
+  var map=LANG==='bn'?_BN_DICT:_BN_RT;
+  keys.sort(function(a,b){return b.length-a.length;});
+  var esc=keys.map(function(k){return k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');});
+  return {re:new RegExp(esc.join('|'),'g'),map:map};
+}
+function _applyLangPass(){
+  try{
+    var _r=_bnRegex();
+    var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      var p=n.parentElement;if(!p)return NodeFilter.FILTER_REJECT;
+      var t=p.tagName;if(t==='SCRIPT'||t==='STYLE'||t==='INPUT'||t==='TEXTAREA'||t==='SELECT')return NodeFilter.FILTER_REJECT;
+      if(p.closest&&p.closest('.no-i18n'))return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }});
+    while(walker.nextNode()){
+      var nd=walker.currentNode;var txt=nd.nodeValue;
+      if(!txt||!/\w/.test(txt))continue;
+      var nt=txt.replace(_r.re,function(m){return _r.map[m]||m;});
+      if(nt!==txt)nd.nodeValue=nt;
+    }
+    document.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(function(el){
+      var p=el.getAttribute('placeholder');if(p)el.setAttribute('placeholder',p.replace(_r.re,function(m){return _r.map[m]||m;}));
+    });
+  }catch(e){}
+}
+function updateLangButtons(){
+  var b=document.getElementById('langBtn');if(b)b.textContent=LANG==='bn'?'বাং':'EN';
+  var fb=document.getElementById('footerLangBtn');if(fb)fb.textContent=LANG==='bn'?'বাং':'EN';
+}
+function setLang(l){
+  LANG=l||'en';try{localStorage.setItem('rem_lang',LANG);}catch(e){}
+  document.documentElement.classList.toggle('lang-bn',LANG==='bn');
+  document.documentElement.lang=LANG==='bn'?'bn':'en';
+  document.querySelectorAll('#sidebarNav .sidebar-item').forEach(function(el){
+    var gid=(el.id||'').replace('s_','');
+    if(GROUPS[gid])el.setAttribute('data-tip',_t(GROUPS[gid].label));
+  });
+  updateLangButtons();
+  _applyLangPass();
+}
+function toggleLang(){setLang(LANG==='bn'?'en':'bn');showToast(LANG==='bn'?'বাংলা ভাষা চালু হয়েছে':'English enabled','success');}
+
 // ── FEATURE A: Command Palette (Ctrl+K / ⌘K) ──
 var _cpMatches=[]; window._cpMatches=_cpMatches;
 var _cpHL=-1, _cpBuilt=false;
@@ -11878,6 +12065,7 @@ function openCommandPalette(){
   if(ov.classList.contains('active')){document.getElementById('cpInput').focus();return;}
   closeSearchDropdown();
   _cpSearch('');
+  if(typeof _applyLangPass==='function')_applyLangPass();
   ov.classList.add('active');
   setTimeout(function(){document.getElementById('cpInput').focus();},30);
 }
