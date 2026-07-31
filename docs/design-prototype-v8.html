@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -1099,23 +1099,23 @@ const DB = {
 };
 
 window.mockLeads = DB.init('leads', [
-  {id:1,name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Bikroy.com',value:'৳1.5 Cr',lastContact:'2h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 3:00 PM',paymentStatus:'Up to Date',facingDir:'South',floorPref:'Any',flatType:'Plot',sizeSqFt:'1800 sqft',paymentPlan:'Construction Link',brokerId:null,
+  {id:1,name:'Tariqul Islam',territory:'Dhaka North',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Bikroy.com',value:'৳1.5 Cr',lastContact:'2h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 3:00 PM',paymentStatus:'Up to Date',facingDir:'South',floorPref:'Any',flatType:'Plot',sizeSqFt:'1800 sqft',paymentPlan:'Construction Link',brokerId:null,
    installments:[{date:'Oct 01, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Nov 01, 2024',amount:'৳5,00,000',status:'Due'}],
    documents:[{name:'NID_Front.jpg',type:'ID Document'},{name:'Application_Form.pdf',type:'Application'}],
    activities:[{type:'Call',user:'Iftekhar',date:'Today, 10:30 AM',text:'Discussed plot location and pricing.'},{type:'Note',user:'System',date:'Yesterday, 4:00 PM',text:'Lead created via Bikroy.com campaign.'}]},
-  {id:2,name:'Dr. Rubina Ali',phone:'+1 415 555 0198',email:'rubina@example.com',property:'Jolshiri - Apt 4B',status:'Installments',priority:'Medium',type:'NRB',source:'Referral',value:'৳2.2 Cr',lastContact:'1d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Tomorrow, 11:00 AM',paymentStatus:'Pending',facingDir:'East',floorPref:'Mid-level',flatType:'3BHK',sizeSqFt:'1350 sqft',paymentPlan:'Construction Link',brokerId:null,
+  {id:2,name:'Dr. Rubina Ali',territory:'Dhaka South',phone:'+1 415 555 0198',email:'rubina@example.com',property:'Jolshiri - Apt 4B',status:'Installments',priority:'Medium',type:'NRB',source:'Referral',value:'৳2.2 Cr',lastContact:'1d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Tomorrow, 11:00 AM',paymentStatus:'Pending',facingDir:'East',floorPref:'Mid-level',flatType:'3BHK',sizeSqFt:'1350 sqft',paymentPlan:'Construction Link',brokerId:null,
    installments:[{date:'Oct 15, 2024',amount:'৳2,00,000',status:'Paid'},{date:'Nov 15, 2024',amount:'৳2,00,000',status:'Due'},{date:'Dec 15, 2024',amount:'৳2,00,000',status:'Upcoming'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'Downpayment_Receipt.pdf',type:'Receipt'}],activities:[{type:'Meeting',user:'Hasanul Banna',date:'Yesterday, 2:00 PM',text:'Site visit scheduled for Saturday. Client confirmed.'},{type:'Call',user:'Sales Team',date:'3 days ago',text:'Client confirmed downpayment schedule.'}]},
-  {id:3,name:'Ahasan Habib',phone:'+880 1819 111111',email:'ahasan@example.com',property:'Muktodhara - 3 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Walk-in',value:'৳95 Lac',lastContact:'3h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 5:00 PM',paymentStatus:'Overdue',facingDir:'West',floorPref:'Any',flatType:'Plot',sizeSqFt:'1080 sqft',paymentPlan:'Bank Loan',brokerId:null,
+  {id:3,name:'Ahasan Habib',territory:'Purbachal',phone:'+880 1819 111111',email:'ahasan@example.com',property:'Muktodhara - 3 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Walk-in',value:'৳95 Lac',lastContact:'3h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 5:00 PM',paymentStatus:'Overdue',facingDir:'West',floorPref:'Any',flatType:'Plot',sizeSqFt:'1080 sqft',paymentPlan:'Bank Loan',brokerId:null,
    installments:[{date:'Sep 10, 2024',amount:'৳1,00,000',status:'Overdue'}],documents:[{name:'Trade_License.pdf',type:'Business Doc'}],activities:[{type:'Call',user:'Sales Team',date:'Today, 9:00 AM',text:'Negotiated price down to 92 Lac. Client thinking.'}]},
-  {id:4,name:'Kamrul Hasan',phone:'+880 1912 222222',email:'kamrul@example.com',property:'Jolshiri - Apt 9A',status:'Booking',priority:'Low',type:'Local',source:'PropertyBarta',value:'৳1.8 Cr',lastContact:'5d ago',owner:'Sales Team A',nextFollowUp:'—',paymentStatus:'Up to Date',facingDir:'South',floorPref:'Top',flatType:'3BHK',sizeSqFt:'1500 sqft',paymentPlan:'Construction Link',brokerId:null,
+  {id:4,name:'Kamrul Hasan',territory:'Dhaka North',phone:'+880 1912 222222',email:'kamrul@example.com',property:'Jolshiri - Apt 9A',status:'Booking',priority:'Low',type:'Local',source:'PropertyBarta',value:'৳1.8 Cr',lastContact:'5d ago',owner:'Sales Team A',nextFollowUp:'—',paymentStatus:'Up to Date',facingDir:'South',floorPref:'Top',flatType:'3BHK',sizeSqFt:'1500 sqft',paymentPlan:'Construction Link',brokerId:null,
    installments:[{date:'Sep 20, 2024',amount:'৳10,00,000',status:'Paid'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'NID_Copy.pdf',type:'ID Document'}],activities:[{type:'Note',user:'System',date:'Sep 20, 2024',text:'Booking confirmed. Unit 9A allocated.'}]},
-  {id:5,name:'Syed Rahman',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'Contacted',priority:'High',type:'NRB',source:'Broker',value:'৳1.5 Cr',lastContact:'10m ago',owner:'Unassigned',nextFollowUp:'Tomorrow, 9:00 AM',paymentStatus:'Pending',facingDir:'North',floorPref:'Any',flatType:'Plot',sizeSqFt:'1800 sqft',paymentPlan:'Full Payment',brokerId:'BRK-001',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'Today, 12:00 PM',text:'Initial contact made via broker BRK-001. Client interested in 5 katha south-facing plot.'}]},
-  {id:6,name:'Fatima Begum',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'NRB Direct',value:'৳85 Lac',lastContact:'2d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Overdue — 3 days ago',paymentStatus:'Up to Date',facingDir:'East',floorPref:'Any',flatType:'Plot',sizeSqFt:'1080 sqft',paymentPlan:'Construction Link',brokerId:null,installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]},
-  {id:7,name:'Shamim Reza',phone:'+880 1700 111111',email:'shamim@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Bikroy.com',value:'৳1.5 Cr',lastContact:'30m ago',owner:'Unassigned',nextFollowUp:'Today, 4:30 PM',paymentStatus:'—',facingDir:'South',floorPref:'Any',flatType:'Plot',sizeSqFt:'1800 sqft',paymentPlan:'Construction Link',brokerId:null,installments:[],documents:[],activities:[{type:'Note',user:'System',date:'Today, 12:30 PM',text:'Lead captured from Bikroy.com listing inquiry.'}]},
-  {id:8,name:'Mrs. Jahanara Begum',phone:'+880 1712 333333',email:'jahanara@example.com',property:'Jolshiri - Apt 3C',status:'Downpayment',priority:'Medium',type:'Local',source:'Referral',value:'৳2.0 Cr',lastContact:'1d ago',owner:'Hasanul Banna',nextFollowUp:'Today, 10:00 AM',paymentStatus:'Pending',facingDir:'West',floorPref:'Ground',flatType:'2BHK',sizeSqFt:'1100 sqft',paymentPlan:'Construction Link',brokerId:null,
+  {id:5,name:'Syed Rahman',territory:'Sylhet',phone:'+971 50 123 4567',email:'syed@example.com',property:'Muktodhara - 5 Katha',status:'Contacted',priority:'High',type:'NRB',source:'Broker',value:'৳1.5 Cr',lastContact:'10m ago',owner:'Unassigned',nextFollowUp:'Tomorrow, 9:00 AM',paymentStatus:'Pending',facingDir:'North',floorPref:'Any',flatType:'Plot',sizeSqFt:'1800 sqft',paymentPlan:'Full Payment',brokerId:'BRK-001',installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'Today, 12:00 PM',text:'Initial contact made via broker BRK-001. Client interested in 5 katha south-facing plot.'}]},
+  {id:6,name:'Fatima Begum',territory:'Dhaka South',phone:'+880 1711 543210',email:'fatima@example.com',property:'Jolshiri - 3 Katha',status:'Site Visit',priority:'Medium',type:'Local',source:'NRB Direct',value:'৳85 Lac',lastContact:'2d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Overdue — 3 days ago',paymentStatus:'Up to Date',facingDir:'East',floorPref:'Any',flatType:'Plot',sizeSqFt:'1080 sqft',paymentPlan:'Construction Link',brokerId:null,installments:[],documents:[],activities:[{type:'Call',user:'Sales Team',date:'2 days ago',text:'Client referred by Dr. Rubina Ali. Interested in 3 katha plot.'}]},
+  {id:7,name:'Shamim Reza',territory:'Dhaka North',phone:'+880 1700 111111',email:'shamim@example.com',property:'Muktodhara - 5 Katha',status:'New Inquiry',priority:'High',type:'Local',source:'Bikroy.com',value:'৳1.5 Cr',lastContact:'30m ago',owner:'Unassigned',nextFollowUp:'Today, 4:30 PM',paymentStatus:'—',facingDir:'South',floorPref:'Any',flatType:'Plot',sizeSqFt:'1800 sqft',paymentPlan:'Construction Link',brokerId:null,installments:[],documents:[],activities:[{type:'Note',user:'System',date:'Today, 12:30 PM',text:'Lead captured from Bikroy.com listing inquiry.'}]},
+  {id:8,name:'Mrs. Jahanara Begum',territory:'Dhaka South',phone:'+880 1712 333333',email:'jahanara@example.com',property:'Jolshiri - Apt 3C',status:'Downpayment',priority:'Medium',type:'Local',source:'Referral',value:'৳2.0 Cr',lastContact:'1d ago',owner:'Hasanul Banna',nextFollowUp:'Today, 10:00 AM',paymentStatus:'Pending',facingDir:'West',floorPref:'Ground',flatType:'2BHK',sizeSqFt:'1100 sqft',paymentPlan:'Construction Link',brokerId:null,
    installments:[{date:'Nov 01, 2024',amount:'৳8,00,000',status:'Paid'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'Payment_Plan.pdf',type:'Document'}],activities:[{type:'Meeting',user:'Hasanul Banna',date:'2 days ago',text:'Downpayment of 8 Lac received. Unit 3C reserved.'}]},
-  {id:9,name:'Md. Taher Uddin',phone:'+880 1713 444444',email:'taher@example.com',property:'Muktodhara - Plot 17',status:'Contacted',priority:'Low',type:'Local',source:'Cold Call',value:'৳42 Lac',lastContact:'4d ago',owner:'Sales Team A',nextFollowUp:'Next week',paymentStatus:'—',facingDir:'North',floorPref:'Any',flatType:'Plot',sizeSqFt:'900 sqft',paymentPlan:'Bank Loan',brokerId:null,installments:[],documents:[],activities:[{type:'Call',user:'Sales Team A',date:'4 days ago',text:'Cold call. Left voicemail. Follow up next week.'}]},
-  {id:10,name:'Engr. Salahuddin',phone:'+880 1714 555555',email:'salahuddin@example.com',property:'Muktodhara - Plot 22',status:'Negotiation',priority:'Medium',type:'Local',source:'Real Estate Fair',value:'৳55 Lac',lastContact:'1d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Today, 2:00 PM',paymentStatus:'—',facingDir:'South',floorPref:'Any',flatType:'Plot',sizeSqFt:'1200 sqft',paymentPlan:'Construction Link',brokerId:null,installments:[],documents:[{name:'Business_Card.jpg',type:'Document'}],activities:[{type:'Meeting',user:'Iftekhar Ahmad',date:'Yesterday, 11:00 AM',text:'Client met at Real Estate Fair. Discussed payment plan for Plot 22.'}]},
+  {id:9,name:'Md. Taher Uddin',territory:'Purbachal',phone:'+880 1713 444444',email:'taher@example.com',property:'Muktodhara - Plot 17',status:'Contacted',priority:'Low',type:'Local',source:'Cold Call',value:'৳42 Lac',lastContact:'4d ago',owner:'Sales Team A',nextFollowUp:'Next week',paymentStatus:'—',facingDir:'North',floorPref:'Any',flatType:'Plot',sizeSqFt:'900 sqft',paymentPlan:'Bank Loan',brokerId:null,installments:[],documents:[],activities:[{type:'Call',user:'Sales Team A',date:'4 days ago',text:'Cold call. Left voicemail. Follow up next week.'}]},
+  {id:10,name:'Engr. Salahuddin',territory:'Dhaka North',phone:'+880 1714 555555',email:'salahuddin@example.com',property:'Muktodhara - Plot 22',status:'Negotiation',priority:'Medium',type:'Local',source:'Real Estate Fair',value:'৳55 Lac',lastContact:'1d ago',owner:'Iftekhar Ahmad',nextFollowUp:'Today, 2:00 PM',paymentStatus:'—',facingDir:'South',floorPref:'Any',flatType:'Plot',sizeSqFt:'1200 sqft',paymentPlan:'Construction Link',brokerId:null,installments:[],documents:[{name:'Business_Card.jpg',type:'Document'}],activities:[{type:'Meeting',user:'Iftekhar Ahmad',date:'Yesterday, 11:00 AM',text:'Client met at Real Estate Fair. Discussed payment plan for Plot 22.'}]},
   {id:11,name:'Nazma Akhter',phone:'+880 1715 666666',email:'nazma@example.com',property:'Jolshiri - Apt 7A',status:'Site Visit',priority:'Medium',type:'Local',source:'PropertyBarta',value:'৳1.6 Cr',lastContact:'3d ago',owner:'Sales Team A',nextFollowUp:'Tomorrow, 10:00 AM',paymentStatus:'—',facingDir:'East',floorPref:'Mid-level',flatType:'3BHK',sizeSqFt:'1400 sqft',paymentPlan:'Construction Link',brokerId:null,installments:[],documents:[],activities:[{type:'Call',user:'Sales Team A',date:'3 days ago',text:'Lead from PropertyBarta listing. Referred by Kamrul Hasan. Interested in 3BR apartment.'}]},
   {id:12,name:'Mr. Abdul Karim',phone:'+971 55 777 8888',email:'karim@example.com',property:'Jolshiri - Apt 12B',status:'Installments',priority:'High',type:'NRB',source:'Broker',value:'৳2.8 Cr',lastContact:'5h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 2:00 PM',paymentStatus:'Up to Date',facingDir:'South',floorPref:'Top',flatType:'4BHK',sizeSqFt:'2000 sqft',paymentPlan:'Construction Link',brokerId:'BRK-002',
    installments:[{date:'Oct 05, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Nov 05, 2024',amount:'৳5,00,000',status:'Paid'},{date:'Dec 05, 2024',amount:'৳5,00,000',status:'Upcoming'}],documents:[{name:'Booking_Agreement.pdf',type:'Agreement'},{name:'Passport_Copy.pdf',type:'ID Document'}],activities:[{type:'Payment',user:'System',date:'Nov 05, 2024',text:'2nd installment of 5 Lac received.'},{type:'Call',user:'Hasanul Banna',date:'1 week ago',text:'Client confirmed 3rd installment schedule. Referred by broker BRK-002.'}]},
@@ -1364,17 +1364,17 @@ window.mockPlotPricing = DB.init('plot_pricing', {
   premiums: [ { key:'base', label:'Base Rate' }, { key:'corner', label:'Corner Premium' }, { key:'road', label:'Road-Facing Premium' } ]
 });
 window.mockBookings = DB.init('bookings', [
-  {id:'BKG-101',client:'Kamrul Hasan',date:'Sep 20, 2024',property:'Jolshiri Abason',unit:'Apt 9A',price:'৳1.8 Cr',advance:'৳10,00,000',status:'Confirmed',type:'Flat'},
+  {id:'BKG-101',client:'Kamrul Hasan',date:'Sep 20, 2024',property:'Jolshiri Abason',unit:'Apt 9A',price:'৳1.8 Cr',advance:'৳10,00,000',status:'Confirmed',type:'Flat',terms:'20% down + 12 quarterly',schedStart:'2024-10-01'},
   {id:'BKG-102',client:'Dr. Rubina Ali',date:'Oct 15, 2024',property:'Jolshiri Abason',unit:'Apt 4B',price:'৳2.2 Cr',advance:'৳2,00,000',status:'Pending Review',type:'Flat'},
-  {id:'BKG-103',client:'Tariqul Islam',date:'Nov 1, 2024',property:'Muktodhara',unit:'Plot M-103',price:'৳46.0L',advance:'৳11,50,000',status:'Confirmed',type:'Plot'},
+  {id:'BKG-103',client:'Tariqul Islam',date:'Nov 1, 2024',property:'Muktodhara',unit:'Plot M-103',price:'৳46.0L',advance:'৳11,50,000',status:'Confirmed',type:'Plot',terms:'Full Payment',schedStart:'2024-11-15'},
   {id:'BKG-104',client:'Fatima Begum',date:'Nov 5, 2024',property:'Green Valley',unit:'Plot G-22',price:'৳32.0L',advance:'৳8,00,000',status:'Pending Review',type:'Plot'}
 ,
-  {id:'BKG-105',client:'Shahidul Islam',date:'Jun 10, 2026',property:'Muktodhara Green Park',unit:'Plot 15',price:'৳1.8 Cr',advance:'৳5,00,000',status:'Confirmed',type:'Plot'},
+  {id:'BKG-105',client:'Shahidul Islam',date:'Jun 10, 2026',property:'Muktodhara Green Park',unit:'Plot 15',price:'৳1.8 Cr',advance:'৳5,00,000',status:'Confirmed',type:'Plot',terms:'10% down + 18 monthly',schedStart:'2026-03-15'},
   {id:'BKG-106',client:'Mizanur Rahman',date:'Jun 08, 2026',property:'Jolshiri Abason',unit:'3 Katha',price:'৳2.0 Cr',advance:'৳6,00,000',status:'Pending Review',type:'Plot'},
-  {id:'BKG-107',client:'Delwar Hossain',date:'Jun 05, 2026',property:'Muktodhara Green Park',unit:'Apt 4C',price:'৳1.6 Cr',advance:'৳8,00,000',status:'Confirmed',type:'Flat'},
+  {id:'BKG-107',client:'Delwar Hossain',date:'Jun 05, 2026',property:'Muktodhara Green Park',unit:'Apt 4C',price:'৳1.6 Cr',advance:'৳8,00,000',status:'Confirmed',type:'Flat',terms:'30% down + 24 monthly',schedStart:'2026-01-10'},
   {id:'BKG-108',client:'Laily Akhter',date:'Jun 03, 2026',property:'Muktodhara Green Park',unit:'3 Katha',price:'৳95 Lac',advance:'৳4,75,000',status:'Confirmed',type:'Plot'},
   {id:'BKG-109',client:'Nadia Akhter',date:'May 28, 2026',property:'Jolshiri Abason',unit:'5 Katha',price:'৳3.2 Cr',advance:'৳10,00,000',status:'Pending Review',type:'Plot'},
-  {id:'BKG-110',client:'Kazi Nizam',date:'May 25, 2026',property:'Skyline Towers',unit:'Penthouse',price:'৳7.5 Cr',advance:'৳25,00,000',status:'Pending Review',type:'Flat'}
+  {id:'BKG-110',client:'Kazi Nizam',date:'May 25, 2026',property:'Skyline Towers',unit:'Penthouse',price:'৳7.5 Cr',advance:'৳25,00,000',status:'Pending Review',type:'Flat',terms:'50% down + 6 monthly',schedStart:'2026-05-01'}
 ]);
 window.mockInventory = DB.init('inventory', [
   {id:1,site:'Muktodhara',item:'BSRM Steel 500W',category:'Construction Material',qty:45,unit:'Tons',price:410000,value:18450000,status:'Adequate',reorder:20,lastReceived:'Oct 23, 2024',supplier:'BSRM Steels Ltd.'},
@@ -1410,6 +1410,40 @@ window.mockStockReceipts = DB.init('stock_receipts', [
   {id:3,grn:'GRN-2403',poRef:'PO-24-087',item:'Ceramic Tiles (2x2)',qty:60,unit:'Boxes',date:'2024-10-21',inspection:'Pass',receivedBy:'Ms. Shirin'},
   {id:4,grn:'GRN-2404',poRef:'PO-24-086',item:'Electrical Cable (6mm)',qty:400,unit:'Meters',date:'2024-10-19',inspection:'Fail',receivedBy:'Rajib Ghosh'},
   {id:5,grn:'GRN-2405',poRef:'PO-24-085',item:'Sylhet Sand',qty:3000,unit:'CFT',date:'2024-10-16',inspection:'Pass',receivedBy:'Md. Alam'}
+]);
+window.mockSalesConfig = DB.init('sales_config', {
+  territories: [
+    {id:'TER-01',name:'Dhaka North',region:'Dhaka'},
+    {id:'TER-02',name:'Dhaka South',region:'Dhaka'},
+    {id:'TER-03',name:'Purbachal',region:'Dhaka'},
+    {id:'TER-04',name:'Chattogram',region:'Chattogram'},
+    {id:'TER-05',name:'Sylhet',region:'Sylhet'}
+  ],
+  targets: [
+    {id:'TGT-01',salesperson:'Hasanul Banna',month:'2026-07',target:30000000},
+    {id:'TGT-02',salesperson:'Iftekhar Ahmad',month:'2026-07',target:25000000},
+    {id:'TGT-03',salesperson:'Sales Team A',month:'2026-07',target:20000000},
+    {id:'TGT-04',salesperson:'Hasanul Banna',month:'2026-08',target:35000000},
+    {id:'TGT-05',salesperson:'Iftekhar Ahmad',month:'2026-08',target:30000000}
+  ],
+  stages: [
+    {name:'New Inquiry',color:'#1565c0'},{name:'Contacted',color:'#e65100'},{name:'Site Visit',color:'#c62828'},
+    {name:'Negotiation',color:'#7b1fa2'},{name:'Booking',color:'#2e7d32'},{name:'Downpayment',color:'#00838f'},
+    {name:'Installments',color:'#f9a825'},{name:'Possession',color:'#00695c'},{name:'Handover',color:'#33691e'}
+  ]
+});
+function mkInst(startISO,count,amount,paidCount,dueCount,stepMonths){
+  var out=[],s=new Date(startISO),st=stepMonths||1;
+  for(var i=0;i<count;i++){var d=new Date(s);d.setMonth(s.getMonth()+i*st);
+    out.push({no:i+1,date:d.toISOString().slice(0,10),amount:amount,status:i<paidCount?'Paid':(i<paidCount+dueCount?'Due':'Upcoming')});}
+  return out;
+}
+window.mockBookingSchedules = DB.init('booking_schedules', [
+  {id:1,bookingId:'BKG-101',terms:'20% down + 12 quarterly',total:18000000,down:3600000,installments:[{no:1,date:'2024-10-01',amount:3600000,status:'Paid'}].concat(mkInst('2025-01-01',12,1200000,6,3,3))},
+  {id:2,bookingId:'BKG-103',terms:'Full Payment',total:4600000,down:4600000,installments:[{no:1,date:'2024-11-15',amount:4600000,status:'Paid'}]},
+  {id:3,bookingId:'BKG-105',terms:'10% down + 18 monthly',total:18000000,down:1800000,installments:[{no:1,date:'2026-03-15',amount:1800000,status:'Paid'}].concat(mkInst('2026-04-15',18,900000,1,2))},
+  {id:4,bookingId:'BKG-107',terms:'30% down + 24 monthly',total:16000000,down:4800000,installments:[{no:1,date:'2026-01-10',amount:4800000,status:'Paid'}].concat(mkInst('2026-02-10',24,466667,5,2))},
+  {id:5,bookingId:'BKG-110',terms:'50% down + 6 monthly',total:75000000,down:37500000,installments:[{no:1,date:'2026-05-01',amount:37500000,status:'Paid'}].concat(mkInst('2026-06-01',6,6250000,0,1))}
 ]);
 window.mockSuppliers = DB.init('suppliers', [
   {id:'SUP-001',name:'Shah Cement Ltd.',contact:'Mr. Kabir Hossain',phone:'+880 1700 111111',email:'kabir@shahcement.com',address:'555 Tejgaon I/A, Dhaka',type:'Material',items:'Cement, Sand, Bricks',rating:4.5,status:'Active',lastOrder:'Oct 25, 2024',totalOrders:28},
@@ -3352,7 +3386,7 @@ function renderCRM(el){
       return '<div class="stat-card" style="padding:5px 6px"><div class="label" style="font-size:8px">'+s+'</div><div class="value" style="font-size:13px;color:'+{NIC:'#1565c0',CT:'#e65100',SV:'#c62828',NG:'#7b1fa2',BK:'#2e7d32',DP:'#00838f',IN:'#f9a825',PS:'#00695c',HO:'#33691e'}[{NIC:'NIC',CT:'CT',SV:'SV',NG:'NG',BK:'BK',DP:'DP',IN:'IN',PS:'PS',HO:'HO'}[s.slice(0,2)]||'NIC']+'">'+c+'</div></div>';
     }).join('')}</div>`:''}
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">📋 Kanban</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div><div class="tab ${crmSubView==='reports'?'active':''}" onclick="crmSubView='reports';renderModule()">Reports</div><div class="tab ${crmSubView==='activities'?'active':''}" onclick="crmSubView='activities';renderModule()">Activities</div></div>
+      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">📋 Kanban</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div><div class="tab ${crmSubView==='reports'?'active':''}" onclick="crmSubView='reports';renderModule()">Reports</div><div class="tab ${crmSubView==='activities'?'active':''}" onclick="crmSubView='activities';renderModule()">Activities</div><div class="tab ${crmSubView==='config'?'active':''}" onclick="crmSubView='config';renderModule()">⚙ Config</div></div>
       ${crmSubView==='leads'||crmSubView==='pipeline'?`
       <input id="crmSearch" placeholder="Search name/phone/property..." oninput="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${LEAD_STAGES.map(function(s){return '<option value="'+s+'"'+(f.sf===s?' selected':'')+'>'+s+'</option>'}).join('')}<option value="Lost"${f.sf==='Lost'?' selected':''}>Lost</option><option value="Junk"${f.sf==='Junk'?' selected':''}>Junk</option></select>
@@ -3361,6 +3395,7 @@ function renderCRM(el){
       <select id="crmFValRange" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Value</option><option value="low"${f.vf==='low'?' selected':''}>Below 1Cr</option><option value="mid"${f.vf==='mid'?' selected':''}>1-5 Cr</option><option value="high"${f.vf==='high'?' selected':''}>5Cr+</option></select>
       <select id="crmFScore" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Score</option><option value="hot"${f.scf==='hot'?' selected':''}>🔥 Hot</option><option value="warm"${f.scf==='warm'?' selected':''}>⭐ Warm</option><option value="cold"${f.scf==='cold'?' selected':''}>💤 Cold</option></select>
       <select id="crmFOwner" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Owner</option><option value="_unassigned"${f.of==='_unassigned'?' selected':''}>🚫 Unassigned</option>${owners.map(function(o){return '<option value="'+o+'"'+(f.of===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
+      <select id="crmFTerr" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Territory</option>${terrNames().map(function(o){return '<option value="'+o+'"'+(f.tf2===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
       <select id="crmFSource" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Source</option>${LEAD_SOURCES.map(function(o){return '<option value="'+o+'"'+(f.srcf===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
       <select id="crmFFlatType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Flat Type</option><option value="Plot"${f.ff==='Plot'?' selected':''}>Plot</option><option value="2BHK"${f.ff==='2BHK'?' selected':''}>2BHK</option><option value="3BHK"${f.ff==='3BHK'?' selected':''}>3BHK</option><option value="4BHK"${f.ff==='4BHK'?' selected':''}>4BHK</option></select>
       <select id="crmFFacing" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Facing</option><option value="South"${f.fdf==='South'?' selected':''}>South</option><option value="East"${f.fdf==='East'?' selected':''}>East</option><option value="West"${f.fdf==='West'?' selected':''}>West</option><option value="North"${f.fdf==='North'?' selected':''}>North</option></select>
@@ -3394,13 +3429,13 @@ function renderCRM(el){
       <button class="action-btn primary" onclick="crudPayment()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ Record Payment</button>
       `:''}
     </div>
-    ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):crmSubView==='complaints'?renderComplaints(pcomp):crmSubView==='invoices'?renderInvoices(filtered):crmSubView==='payments'?renderPayments():crmSubView==='reports'?renderCRMReports():crmSubView==='activities'?renderCRMActivities():''}
+    ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):crmSubView==='complaints'?renderComplaints(pcomp):crmSubView==='invoices'?renderInvoices(filtered):crmSubView==='payments'?renderPayments():crmSubView==='reports'?renderCRMReports():crmSubView==='activities'?renderCRMActivities():crmSubView==='config'?renderSalesConfig():''}
   </div>`;
 }
 
 function renderCRMList(filtered,pcrm){
   // 2A: column definitions for the Leads table
-  var COLS=[{k:'sel',l:''},{k:'name',l:'Name'},{k:'phone',l:'Phone'},{k:'property',l:'Property'},{k:'source',l:'Source'},{k:'value',l:'Value'},{k:'score',l:'Score'},{k:'priority',l:'Priority'},{k:'owner',l:'Owner'},{k:'fu',l:'Next F/U'},{k:'stage',l:'Stage'},{k:'actions',l:''}];
+  var COLS=[{k:'sel',l:''},{k:'name',l:'Name'},{k:'phone',l:'Phone'},{k:'property',l:'Property'},{k:'source',l:'Source'},{k:'value',l:'Value'},{k:'score',l:'Score'},{k:'priority',l:'Priority'},{k:'owner',l:'Owner'},{k:'terr',l:'Territory'},{k:'fu',l:'Next F/U'},{k:'stage',l:'Stage'},{k:'actions',l:''}];
   _colDefs.crm=COLS;
   COLS=colOrder('crm',COLS).filter(function(c){return colVisible('crm',c.k);});
   var COLSEL='<th style="width:24px;padding:4px 2px 4px 4px"><input type="checkbox" onchange="toggleBulkAll()" '+(Object.keys(_bulkSel).length===filtered.length&&filtered.length>0?'checked':'')+' style="accent-color:#2F80ED"/></th>';
@@ -3425,6 +3460,7 @@ function renderCRMList(filtered,pcrm){
       tds.score='<td><span style="display:inline-flex;align-items:center;gap:2px;padding:1px 5px;border-radius:8px;font-size:8px;font-weight:600;background:'+leadScoreColor(sc)+'22;color:'+leadScoreColor(sc)+';border:1px solid '+leadScoreColor(sc)+'55">'+sc+'</span></td>';
       tds.priority='<td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+leadBadgeColor(l.priority)+'">'+l.priority+'</span></td>';
       tds.owner='<td style="font-size:10px;color:#555">'+(l.owner||'\u2014')+'</td>';
+      tds.terr='<td style="font-size:9px;color:#555">'+(l.territory||'\u2014')+'</td>';
       tds.fu='<td style="font-size:9px;font-weight:500;color:'+leadFupColor(l.nextFollowUp)+'">'+(l.nextFollowUp||'\u2014')+'</td>';
       tds.stage='<td><select onchange="event.stopPropagation();inlineSetLeadStatus('+l.id+',this.value)" onclick="event.stopPropagation()" style="padding:1px 3px;font-size:8px;border:1px solid #e0e0e0;border-radius:3px;cursor:pointer;max-width:100px;background:'+scc+';color:'+stc+';font-weight:600;outline:none">'+['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'].map(function(s){return '<option value="'+s+'"'+(l.status===s?' selected':'')+'>'+s+'</option>'}).join('')+'</select></td>';
       tds.actions='<td style="white-space:nowrap">'+
@@ -12228,7 +12264,8 @@ function getSmartFilters(){
   var fdf=(document.getElementById('crmFFacing')||{}).value||'';
   var ppf=(document.getElementById('crmFPlan')||{}).value||'';
   var cf=(document.getElementById('crmFCity')||{}).value||'';
-  return {sq:sq,sf:sf,pf:pf,tf:tf,vf:vf,of:of,scf:scf,srcf:srcf,ff:ff,fdf:fdf,ppf:ppf,cf:cf};
+  var tf2=(document.getElementById('crmFTerr')||{}).value||'';
+  return {sq:sq,sf:sf,pf:pf,tf:tf,vf:vf,of:of,scf:scf,srcf:srcf,ff:ff,fdf:fdf,ppf:ppf,cf:cf,tf2:tf2};
 }
 function filterLeads(){
   var f=getSmartFilters();
@@ -12243,6 +12280,7 @@ function filterLeads(){
     if(f.fdf&&l.facingDir!==f.fdf)return false;
     if(f.ppf&&l.paymentPlan!==f.ppf)return false;
     if(f.cf&&(l.city||'')!==f.cf)return false;
+    if(f.tf2&&(l.territory||'')!==f.tf2)return false;
     if(f.vf){var val=parseInt(String(l.value).replace(/[^\d]/g,''))||0;if(f.vf==='low'&&val>=10000000)return false;if(f.vf==='mid'&&(val<10000000||val>50000000))return false;if(f.vf==='high'&&val<=50000000)return false;}
     if(f.scf){var sc=calcLeadScore(l);if(f.scf==='hot'&&sc<80)return false;if(f.scf==='warm'&&(sc<60||sc>=80))return false;if(f.scf==='cold'&&sc>=60)return false;}
     return true;
@@ -12426,7 +12464,7 @@ function crudLead(item){
     {id:'f_lsize',fn:function(v){if(!String(v).trim())return null;return V.pos(V.num(v),'Size must be a positive number');}}
   ];
   openModal(n?'New Lead':'Edit Lead',
-    dupMsg+'<div style="max-height:55vh;overflow-y:auto;padding-right:4px"><div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:6px;padding:2px 6px;background:#eef3ff;border-radius:4px">&#128203; Contact Info</div>'+formRow(inputField('Name *','f_lname',l.name,'',true),inputField('Phone *','f_lphone',l.phone,'',true))+formRow(inputField('Email','f_lemail',l.email),inputField('Position','f_lpos',l.position||''))+formRow(inputField('Website','f_lweb',l.website||''),inputField('Company','f_lcomp',l.company||''))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#128205; Address</div>'+inputField('Address','f_laddr',l.address||'')+formRow(inputField('City','f_lcity',l.city||''),inputField('State','f_lstate',l.state||''))+formRow(selectField('Country','f_lcountry',l.country||'Bangladesh',['Bangladesh','India','USA','UK','UAE','Saudi Arabia','Malaysia','Singapore','Canada','Australia','Other']),inputField('Zip','f_lzip',l.zip||''))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#127974; Property Interest</div>'+formRow(inputField('Property','f_lprop',l.property,'',true),selectField('Flat Type','f_lflat',l.flatType,['','Plot','2BHK','3BHK','4BHK','Studio','Commercial']))+formRow(selectField('Facing','f_lfacing',l.facingDir,['','South','East','West','North']),selectField('Floor Pref','f_lfloor',l.floorPref,['','Any','Ground','Mid-level','Top']))+formRow(inputField('Size (sqft)','f_lsize',l.sizeSqFt),inputField('Value','f_lval',l.value))+formRow(selectField('Payment Plan','f_lplan',l.paymentPlan,['','Construction Link','Bank Loan','Full Payment','3-Year Installment','5-Year Installment']),selectField('Stage','f_lstatus',l.status,LEAD_STAGES))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#9881; Settings</div>'+formRow(selectField('Source','f_lsource',l.source,sources),selectField('Priority','f_lpri',l.priority,['High','Medium','Low']))+formRow(selectField('Type','f_ltype',l.type,['Local','NRB']),selectField('WhatsApp','f_lwapp',l.whatsappEnabled||'Enable',['Enable','Disable']))+formRow(inputField('Next Follow-up','f_lfup',l.nextFollowUp),inputField('Date Contacted','f_ldc',l.dateContacted))+'<div style="font-size:9px;font-weight:600;color:#555;margin-top:4px;margin-bottom:2px">Tags</div>'+tagOpts+inputField('Notes','f_lnotes',l.desc||'')+'</div>',
+    dupMsg+'<div style="max-height:55vh;overflow-y:auto;padding-right:4px"><div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:6px;padding:2px 6px;background:#eef3ff;border-radius:4px">&#128203; Contact Info</div>'+formRow(inputField('Name *','f_lname',l.name,'',true),inputField('Phone *','f_lphone',l.phone,'',true))+formRow(inputField('Email','f_lemail',l.email),inputField('Position','f_lpos',l.position||''))+formRow(inputField('Website','f_lweb',l.website||''),inputField('Company','f_lcomp',l.company||''))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#128205; Address</div>'+inputField('Address','f_laddr',l.address||'')+formRow(inputField('City','f_lcity',l.city||''),inputField('State','f_lstate',l.state||''))+formRow(selectField('Country','f_lcountry',l.country||'Bangladesh',['Bangladesh','India','USA','UK','UAE','Saudi Arabia','Malaysia','Singapore','Canada','Australia','Other']),inputField('Zip','f_lzip',l.zip||''))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#127974; Property Interest</div>'+formRow(inputField('Property','f_lprop',l.property,'',true),selectField('Flat Type','f_lflat',l.flatType,['','Plot','2BHK','3BHK','4BHK','Studio','Commercial']))+formRow(selectField('Facing','f_lfacing',l.facingDir,['','South','East','West','North']),selectField('Floor Pref','f_lfloor',l.floorPref,['','Any','Ground','Mid-level','Top']))+formRow(inputField('Size (sqft)','f_lsize',l.sizeSqFt),inputField('Value','f_lval',l.value))+formRow(selectField('Payment Plan','f_lplan',l.paymentPlan,['','Construction Link','Bank Loan','Full Payment','3-Year Installment','5-Year Installment']),selectField('Stage','f_lstatus',l.status,LEAD_STAGES))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">&#9881; Settings</div>'+formRow(selectField('Source','f_lsource',l.source,sources),selectField('Priority','f_lpri',l.priority,['High','Medium','Low']))+formRow(selectField('Territory','f_lterr',l.territory||'',terrNames()),selectField('Type','f_ltype',l.type,['Local','NRB']))+formRow(selectField('WhatsApp','f_lwapp',l.whatsappEnabled||'Enable',['Enable','Disable']),inputField('Next Follow-up','f_lfup',l.nextFollowUp))+inputField('Date Contacted','f_ldc',l.dateContacted)+'<div style="font-size:9px;font-weight:600;color:#555;margin-top:4px;margin-bottom:2px">Tags</div>'+tagOpts+inputField('Notes','f_lnotes',l.desc||'')+'</div>',
     function(){
       var tagVal = '';
       var tagSelect = document.getElementById('f_ltags');
@@ -12441,7 +12479,7 @@ function crudLead(item){
         else tagVal = tagCustom.value.trim();
       }
       if(!tagVal && tagSelect && !tagSelect.multiple){ tagVal = tagSelect.value; }
-      var d={id:l.id,name:g('f_lname'),phone:g('f_lphone'),email:g('f_lemail'),property:g('f_lprop'),status:g('f_lstatus'),priority:g('f_lpri'),type:g('f_ltype'),source:g('f_lsource'),value:g('f_lval'),lastContact:'Just now',owner:l.owner||'Unassigned',nextFollowUp:g('f_lfup'),paymentStatus:'Pending',facingDir:g('f_lfacing'),floorPref:g('f_lfloor'),flatType:g('f_lflat'),sizeSqFt:g('f_lsize'),paymentPlan:g('f_lplan'),brokerId:null,installments:l.installments||[],documents:l.documents||[],activities:l.activities||[],position:g('f_lpos')||'',website:g('f_lweb')||'',company:g('f_lcomp')||'',address:g('f_laddr')||'',city:g('f_lcity')||'',state:g('f_lstate')||'',country:g('f_lcountry')||'Bangladesh',zip:g('f_lzip')||'',lang:'English',desc:g('f_lnotes')||'',tags:tagVal||(g('f_ltags')||''),dateContacted:g('f_ldc')||new Date().toISOString().slice(0,10),whatsappEnabled:g('f_lwapp')||'Enable',linkedEntityId:null};
+      var d={id:l.id,name:g('f_lname'),phone:g('f_lphone'),email:g('f_lemail'),property:g('f_lprop'),status:g('f_lstatus'),priority:g('f_lpri'),type:g('f_ltype'),source:g('f_lsource'),value:g('f_lval'),lastContact:'Just now',owner:l.owner||'Unassigned',nextFollowUp:g('f_lfup'),paymentStatus:'Pending',facingDir:g('f_lfacing'),floorPref:g('f_lfloor'),flatType:g('f_lflat'),sizeSqFt:g('f_lsize'),paymentPlan:g('f_lplan'),brokerId:null,installments:l.installments||[],documents:l.documents||[],activities:l.activities||[],position:g('f_lpos')||'',website:g('f_lweb')||'',company:g('f_lcomp')||'',address:g('f_laddr')||'',city:g('f_lcity')||'',state:g('f_lstate')||'',country:g('f_lcountry')||'Bangladesh',zip:g('f_lzip')||'',lang:'English',desc:g('f_lnotes')||'',tags:tagVal||(g('f_ltags')||''),dateContacted:g('f_ldc')||new Date().toISOString().slice(0,10),whatsappEnabled:g('f_lwapp')||'Enable',territory:g('f_lterr')||'',linkedEntityId:null};
       if(!canSetLeadStage(l, d.status)) { showToast('Cannot move backward from '+l.status+' stage','error'); return; }
       n?addItem(mockLeads,d,'leads'):updateItem(mockLeads,l.id,d,'leads');
     }
@@ -12459,7 +12497,7 @@ function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),clie
     {id:'f_adv',fn:function(v){if(!String(v).trim())return null;var a=V.num(v);if(a<0)return 'Advance cannot be negative';var pr=V.num(document.getElementById('f_price').value);return (!isNaN(pr)&&a>pr)?'Advance cannot exceed price ('+pr.toLocaleString('en-IN')+')':null;}},
     {id:'f_unit',fn:function(v){return unitAvailabilityCheck(v,n?null:b.id);}}
   ];
-  openModal(n?'New Booking':'Edit Booking',formRow(inputField('Client','f_client',b.client,'',true),inputField('Property','f_prop',b.property,'',true))+formRow(inputField('Unit','f_unit',b.unit),inputField('Price','f_price',b.price,'',true))+formRow(inputField('Advance','f_adv',b.advance),selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed'])),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
+  openModal(n?'New Booking':'Edit Booking',formRow(inputField('Client','f_client',b.client,'',true),inputField('Property','f_prop',b.property,'',true))+formRow(inputField('Unit','f_unit',b.unit),inputField('Price','f_price',b.price,'',true))+formRow(inputField('Advance','f_adv',b.advance),selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']))+formRow(selectField('Payment Terms','f_terms',b.terms||'',BOOKING_TERMS),inputField('Schedule Start','f_schedStart',b.schedStart||'')),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status'),terms:g('f_terms'),schedStart:g('f_schedStart')};var nid;if(n){nid=nextId(mockBookings);addItem(mockBookings,Object.assign({id:nid,type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings');}else{nid=b.id;updateItem(mockBookings,b.id,d,'bookings');}var pr=parsePriceStr(g('f_price'));if(pr>0&&g('f_terms')){var old=bookingScheduleFor(nid);if(old)mockBookingSchedules=mockBookingSchedules.filter(function(x){return String(x.bookingId)!==String(nid);});generateBookingSchedule(nid,pr,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10));}else if(!bookingScheduleFor(nid)){showToast('No schedule — set terms & numeric price','info');}})}
 function crudEmployee(item){
   var n=!item;
   var depts=['Construction','Sales','Finance','Management','HR','IT'];
@@ -12625,10 +12663,134 @@ function openBooking(id){
   showDetailPanel('Booking: '+b.id,
     detailStatRow([['Client',b.client],['Property',b.property],['Unit',b.unit],['Date',b.date],['Type',b.type],['Status',b.status]])+
     '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Summary</h3>'+detailStatRow([['Total Price',b.price],['Advance Paid',b.advance],['Due',b.price+' - '+b.advance]])+'</div>'+
-    '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Schedule</h3><div style="padding:10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center;color:#999;font-size:11px">Schedule details will appear here after downpayment.</div></div>',
+    '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Schedule (পেমেন্ট শিডিউল)</h3><div style="padding:10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+renderBookingScheduleHTML(bookingScheduleFor(b.id))+'</div></div>',
     '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudBooking(mockBookings.find(function(x){return x.id===\''+b.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn success">📄 Receipt</button></div>'
   );
 }
+// ── Phase 3.2 CRM Config ───────────────────────────────────────────
+var BOOKING_TERMS=['Full Payment','10% down + 18 monthly','20% down + 12 quarterly','30% down + 24 monthly','50% down + 6 monthly'];
+function terrNames(){return (mockSalesConfig&&mockSalesConfig.territories?mockSalesConfig.territories.map(function(t){return t.name;}):[]);}
+function renderSalesConfig(){
+  var ter=mockSalesConfig.territories||[];
+  var tgt=mockSalesConfig.targets||[];
+  var stg=mockSalesConfig.stages||[];
+  var jul=tgt.filter(function(t){return t.month==='2026-07';}).reduce(function(s,t){return s+t.target;},0);
+  return `<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">${[
+    ['Territories',ter.length,'#1565c0'],
+    ['Sales Targets',tgt.length,'#2e7d32'],
+    ['Pipeline Stages',stg.length,'#7b1fa2'],
+    ['Jul 2026 Target','৳'+(jul/100000).toFixed(1)+'L','#e65100']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+    <div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>📍 Sales Territories</h3><button class="action-btn primary" onclick="crudTerritory()" style="padding:2px 8px;font-size:9px" data-perm="CRM & Leads:Create">+ Territory</button></div><div class="card-body" style="padding:8px 10px">
+      ${ter.length?ter.map(function(t){
+        var lc=mockLeads.filter(function(l){return l.territory===t.name;}).length;
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0"><div><span style="font-size:10px;font-weight:600">'+t.name+'</span> <span style="font-size:8px;color:#888">· '+t.region+'</span></div><div style="display:flex;align-items:center;gap:6px"><span class="badge-status badge-active" style="font-size:8px">'+lc+' leads</span><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudTerritory(mockSalesConfig.territories.find(function(x){return x.id===\''+t.id+'\'}))">✎</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteTerritory(\''+t.id+'\')">✕</span></div></div>';
+      }).join(''):'<div style="color:#999;font-size:10px;text-align:center;padding:12px">No territories yet</div>'}
+    </div></div>
+    <div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>🎯 Monthly Sales Targets</h3><button class="action-btn primary" onclick="crudTarget()" style="padding:2px 8px;font-size:9px" data-perm="CRM & Leads:Create">+ Target</button></div><div class="card-body" style="padding:8px 10px">
+      <table style="width:100%;font-size:9px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px;color:#888">Salesperson</th><th style="text-align:left;padding:4px;color:#888">Month</th><th style="text-align:right;padding:4px;color:#888">Target</th><th></th></tr></thead><tbody>${tgt.length?tgt.map(function(t){
+        return '<tr style="border-bottom:1px solid #f5f5f5"><td style="padding:4px;font-weight:500">'+t.salesperson+'</td><td style="padding:4px;color:#555">'+t.month+'</td><td style="padding:4px;text-align:right;font-weight:600">৳'+(t.target/100000).toFixed(1)+'L</td><td style="padding:4px;text-align:right;white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudTarget(mockSalesConfig.targets.find(function(x){return x.id===\''+t.id+'\'}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteTarget(\''+t.id+'\')">✕</span></td></tr>';
+      }).join(''):'<tr><td colspan="4" style="text-align:center;color:#999;padding:12px;font-size:10px">No targets yet</td></tr>'}</tbody></table>
+    </div></div>
+  </div>
+  <div class="card"><div class="card-header"><h3>🔄 Pipeline Stage Config</h3></div><div class="card-body" style="padding:8px 10px">
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${stg.map(function(s){
+      var c=mockLeads.filter(function(l){return l.status===s.name;}).length;
+      return '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:12px;font-size:9px;font-weight:600;background:'+s.color+'18;color:'+s.color+';border:1px solid '+s.color+'44"><span style="width:7px;height:7px;border-radius:50%;background:'+s.color+'"></span>'+s.name+' · '+c+'<span style="cursor:pointer;color:#888;font-size:9px" onclick="crudStage(\''+s.name+'\')" title="Edit color">✎</span></span>';
+    }).join('')}</div>
+    <div style="margin-top:8px;font-size:8px;color:#999">বিক্রয় কনফিগ — stage colors drive the lead pipeline, kanban and stats.</div>
+  </div></div>`;
+}
+function crudTerritory(item){
+  var n=!item;
+  var t=n?{id:'TER-0'+(mockSalesConfig.territories.length+1),name:'',region:'Dhaka'}:item;
+  window._formRules=[
+    {id:'f_tname',fn:function(v){if(!String(v).trim())return 'Territory name is required';if(mockSalesConfig.territories.some(function(x){return x.name===String(v).trim()&&(!item||x.id!==item.id);}))return 'Territory name already exists';return null;}}
+  ];
+  openModal(n?'New Territory':'Edit Territory',formRow(inputField('Name *','f_tname',t.name,'',true),inputField('Region','f_tregion',t.region||'Dhaka')),function(){
+    var d={name:g('f_tname').trim(),region:g('f_tregion')||'Dhaka'};
+    if(n)mockSalesConfig.territories.push(Object.assign({id:t.id},d));
+    else Object.assign(t,d);
+    DB.save('sales_config');showToast('Territory saved');renderModule();
+  });
+}
+function deleteTerritory(id){if(!confirm('Delete territory?'))return;mockSalesConfig.territories=mockSalesConfig.territories.filter(function(t){return t.id!==id;});DB.save('sales_config');showToast('Deleted');renderModule();}
+function crudTarget(item){
+  var n=!item;
+  var t=n?{id:'TGT-0'+(mockSalesConfig.targets.length+1),salesperson:'Hasanul Banna',month:'2026-07',target:0}:item;
+  var sps=['Hasanul Banna','Iftekhar Ahmad','Sales Team A','Sales Team B'];
+  window._formRules=[
+    {id:'f_tsp',fn:function(v){return V.req(v,'Salesperson is required');}},
+    {id:'f_tamt',fn:function(v){return V.pos(V.num(v),'Target must be greater than 0');}}
+  ];
+  openModal(n?'New Target':'Edit Target',formRow(selectField('Salesperson *','f_tsp',t.salesperson,sps,true),inputField('Month (YYYY-MM)','f_tmonth',t.month,'',true))+inputField('Target Amount (৳) *','f_tamt',n?'':String(t.target),'',true),function(){
+    var d={salesperson:g('f_tsp'),month:g('f_tmonth'),target:parseInt(g('f_tamt'))||0};
+    if(n)mockSalesConfig.targets.push(Object.assign({id:t.id},d));
+    else Object.assign(t,d);
+    DB.save('sales_config');showToast('Target saved');renderModule();
+  });
+}
+function deleteTarget(id){if(!confirm('Delete target?'))return;mockSalesConfig.targets=mockSalesConfig.targets.filter(function(t){return t.id!==id;});DB.save('sales_config');showToast('Deleted');renderModule();}
+function crudStage(name){
+  var st=mockSalesConfig.stages.find(function(x){return x.name===name;});if(!st)return;
+  var colors=['#1565c0','#e65100','#c62828','#7b1fa2','#2e7d32','#00838f','#f9a825','#00695c','#33691e','#d81b60','#4527a0','#4e342e'];
+  openModal('Stage Color — '+name,selectField('Color','f_scolor',st.color,colors,true),function(){
+    st.color=g('f_scolor');DB.save('sales_config');showToast('Stage color updated');renderModule();
+  });
+}
+// ── Phase 3.4 Booking payment schedules ────────────────────────────
+function parsePriceStr(s){
+  s=String(s||'').replace(/[৳₹,\s]/g,'');
+  if(!s)return 0;
+  var m=s.match(/([\d.]+)\s*(cr|crore|lac|lakh|l)?/i);
+  if(!m)return parseInt(s)||0;
+  var n=parseFloat(m[1]);
+  var unit=(m[2]||'').toLowerCase();
+  if(unit==='cr'||unit==='crore')return Math.round(n*10000000);
+  if(unit==='lac'||unit==='lakh'||unit==='l')return Math.round(n*100000);
+  return Math.round(n);
+}
+function bookingScheduleFor(bid){return mockBookingSchedules.find(function(x){return String(x.bookingId)===String(bid);})||null;}
+function renderBookingScheduleHTML(s){
+  if(!s)return '<div style="text-align:center;color:#999;font-size:10px;padding:6px">No schedule yet — edit the booking to set payment terms.</div>';
+  var today=new Date().toISOString().slice(0,10);
+  var paid=s.installments.filter(function(i){return i.status==='Paid';});
+  var paidAmt=paid.reduce(function(a,i){return a+i.amount;},0);
+  var pct=s.total?Math.round(paidAmt/s.total*100):0;
+  var rows=s.installments.map(function(i){
+    var over=i.status!=='Paid'&&i.date<today;
+    var st=i.status==='Paid'?'Paid':over?'Overdue':i.status;
+    var stc=st==='Paid'?'#2e7d32':over?'#c62828':'#e65100';
+    return '<tr><td style="padding:3px;font-size:9px;color:#888">'+i.no+'</td><td style="padding:3px;font-size:9px;color:'+(over?'#c62828':'#555')+'">'+i.date+(over?' ⚠':'')+'</td><td style="padding:3px;font-size:9px;text-align:right;font-weight:600">৳'+i.amount.toLocaleString('en-IN')+'</td><td style="padding:3px;text-align:left"><span class="badge-status '+(st==='Paid'?'badge-active':over?'badge-sold':'badge-pending')+'" style="font-size:8px">'+st+'</span></td></tr>';
+  }).join('');
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:10px;font-weight:600;color:#2F80ED">'+s.terms+'</span><span style="font-size:9px;color:#555">'+paid.length+'/'+s.installments.length+' paid · ৳'+paidAmt.toLocaleString('en-IN')+' of ৳'+s.total.toLocaleString('en-IN')+'</span></div>'+
+  '<div style="height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:#2e7d32;border-radius:3px;transition:width .3s"></div></div>'+
+  '<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:3px;color:#888;font-size:8px">#</th><th style="text-align:left;padding:3px;color:#888;font-size:8px">Due Date</th><th style="text-align:right;padding:3px;color:#888;font-size:8px">Amount</th><th style="text-align:left;padding:3px;color:#888;font-size:8px">Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+function generateBookingSchedule(bookingId, priceNum, terms, startISO){
+  priceNum=parseInt(priceNum)||0;
+  if(!priceNum||!terms)return null;
+  var s=startISO?new Date(startISO):new Date();
+  var inst=[];
+  var downPct=0,parts=0,step=1;
+  if(terms==='Full Payment'){parts=1;}
+  else if(terms==='10% down + 18 monthly'){downPct=10;parts=18;step=1;}
+  else if(terms==='20% down + 12 quarterly'){downPct=20;parts=12;step=3;}
+  else if(terms==='30% down + 24 monthly'){downPct=30;parts=24;step=1;}
+  else if(terms==='50% down + 6 monthly'){downPct=50;parts=6;step=1;}
+  else{parts=12;step=1;}
+  function addAt(off,amount,status){var d=new Date(s);d.setMonth(d.getMonth()+off);inst.push({no:inst.length+1,date:d.toISOString().slice(0,10),amount:amount,status:status||'Upcoming'});}
+  var down=Math.round(priceNum*downPct/100);
+  if(downPct>0)addAt(0,down,'Due');
+  var rem=priceNum-down;
+  if(parts>1){var base=Math.floor(rem/parts);for(var i=0;i<parts-1;i++){addAt(step*(i+1),base);}addAt(step*parts,rem-base*(parts-1));}
+  else if(parts===1&&downPct===0){addAt(0,priceNum,'Due');}
+  var sched={id:nextId(mockBookingSchedules),bookingId:bookingId,terms:terms,total:priceNum,down:down,installments:inst};
+  mockBookingSchedules.push(sched);DB.save('booking_schedules');
+  return sched;
+}
+
 function openTransaction(id){
   const t=mockTransactions.find(function(x){return x.id===id});if(!t)return;
   showDetailPanel('Transaction: '+t.id,
