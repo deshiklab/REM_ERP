@@ -8983,9 +8983,6 @@ function _fyMonths(){
   }
   return out;
 }
-window.mockOpeningBalances = DB.init('opening_balances', (function(){
-  return mockCOA.map(function(a){return {code:a.code,name:a.name,type:a.type,balance:_balNum(a.balance)};});
-})());
 function renderFiscalTab(){
   var months=_fyMonths();
   var openCnt=months.filter(function(m){return _fyCfg.periods[m]!==false;}).length;
@@ -10107,6 +10104,10 @@ window.mockCOA = DB.init('coa', [
   {code:'4-1020',name:'MARKETING EXPENSE',type:'Expense',balance:'৳2,10,00,000'},
   {code:'4-1030',name:'ADMIN & OVERHEAD',type:'Expense',balance:'৳1,80,00,000'}
 ]);
+window.mockOpeningBalances = DB.init('opening_balances', (function(){
+  return mockCOA.map(function(a){return {code:a.code,name:a.name,type:a.type,balance:_balNum(a.balance)};});
+})());
+
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Project Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
