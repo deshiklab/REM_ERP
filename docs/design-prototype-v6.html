@@ -295,11 +295,15 @@
     .tbl-region>.card>.card-body,.tbl-region .card-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
     .tbl-region .table-wrap{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain}
     .tbl-region .table-wrap thead th{position:sticky;top:0;z-index:2;box-shadow:0 1px 0 #e0e0e0}
-    .tbl-region .table-wrap .pagination{position:sticky;bottom:0;z-index:3;background:#fafbfc;border-top:1px solid #e0e0e0}
+    .tbl-region>.pagination,.tbl-region .card-body>.pagination,.tbl-region .table-wrap .pagination{flex-shrink:0;margin:0;background:#fafbfc;border-top:1px solid #e0e0e0}
+    .tbl-region .table-wrap .pagination{position:sticky;bottom:0;z-index:3}
+    /* stats-row collapses away when the table scrolls */
+    .tbl-scaffold>.stats-row{max-height:300px;opacity:1;overflow:hidden;transition:max-height .22s ease,opacity .22s ease,margin .22s ease,padding .22s ease}
+    .tbl-scaffold.stats-collapsed>.stats-row{max-height:0!important;opacity:0!important;margin:0!important;padding:0!important}
     .tbl-region table.has-row-menu th:last-child,.tbl-region table.has-row-menu .row-more-cell{position:sticky;right:0;background:#fff;z-index:4;box-shadow:-4px 0 8px rgba(0,0,0,.06)}
     .tbl-region table.has-row-menu thead th:last-child{z-index:6}
     html.dark .tbl-region .table-wrap thead th{box-shadow:0 1px 0 rgba(255,255,255,.08)}
-    html.dark .tbl-region .table-wrap .pagination{background:var(--card-bg,#0e1626);border-top-color:rgba(255,255,255,.08);backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%)}
+    html.dark .tbl-region .pagination{background:var(--card-bg,#0e1626);border-top-color:rgba(255,255,255,.08);backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%)}
     html.dark .tbl-region table.has-row-menu th:last-child,html.dark .tbl-region table.has-row-menu .row-more-cell{background:var(--card-bg,#0e1626)!important}
     col.hidden{visibility:collapse}
     th.hidden{display:none}
@@ -440,11 +444,11 @@
       html.dark .settings-nav-item{color:#cbd5e1!important}
       html.dark .settings-nav-item.on{background:rgba(59,130,246,.15)!important;color:#7ab7ff!important}
       /* Table scaffold on mobile: shell fixed, title/toolbar/pagination pinned, table body scrolls */
-      .app-shell.table-view{height:100vh!important;min-height:0!important;padding-bottom:29px!important;overflow:hidden!important}
+      .app-shell.table-view{height:100vh!important;min-height:0!important;padding-bottom:69px!important;overflow:hidden!important}
       .app-shell.table-view .main-area{flex:1!important;height:auto!important;min-height:0!important}
       .app-shell.table-view .content{overflow:hidden!important;height:auto!important;flex:1!important;min-height:0!important}
       .app-shell.table-view .content>.tbl-scaffold{height:100%!important}
-      .tbl-region .table-wrap .pagination{padding-bottom:2px!important}
+      .tbl-region .pagination{padding-bottom:2px!important}
     }
     @media(max-width:480px){
       .stats-row{grid-template-columns:repeat(2,1fr)!important}
@@ -785,7 +789,8 @@
       .content.table-view .tbl-scaffold{height:auto!important;display:block!important}
       .content.table-view .tbl-region,.content.table-view .tbl-region .card,.content.table-view .tbl-region .card-body{overflow:visible!important;flex:none!important;display:block!important;min-height:0!important}
       .content.table-view .table-wrap{overflow:visible!important;position:static!important}
-      .content.table-view .table-wrap thead th,.content.table-view .table-wrap .pagination,.content.table-view table.has-row-menu th:last-child,.content.table-view table.has-row-menu .row-more-cell{position:static!important;box-shadow:none!important}
+      .content.table-view .tbl-scaffold>.stats-row{max-height:none!important;opacity:1!important}
+      .content.table-view .table-wrap thead th,.content.table-view .pagination,.content.table-view table.has-row-menu th:last-child,.content.table-view table.has-row-menu .row-more-cell{position:static!important;box-shadow:none!important}
     }
   </style>
 </head>
@@ -11666,11 +11671,26 @@ function _wireTableScaffold(){
   var shell=document.querySelector('.app-shell');if(shell)shell.classList.toggle('table-view',active);
   if(!active)return;
   wrap.classList.add('tbl-scaffold');
+  wrap.classList.remove('stats-collapsed');
   var tws=wrap.querySelectorAll('.table-wrap');
   for(var i=0;i<tws.length;i++){
-    var region=tws[i];
+    var tw=tws[i];
+    var region=tw;
     while(region.parentElement&&region.parentElement!==wrap)region=region.parentElement;
     if(region&&region!==wrap&&!region.classList.contains('tbl-region'))region.classList.add('tbl-region');
+    // move pagination out of the scroll container so it stays pinned above the footer
+    var pg=tw.querySelector(':scope > .pagination');
+    if(pg&&pg.parentElement===tw){
+      var holder=tw.parentElement;
+      if(holder&&holder!==tw)holder.appendChild(pg);
+    }
+    // collapse the stats-row while the table is scrolled (only when scrolling is meaningful)
+    tw.addEventListener('scroll',function(){
+      var st=wrap.querySelector(':scope > .stats-row');
+      var room=(this.scrollHeight-this.clientHeight)||0;
+      var statsH=st?st.offsetHeight+16:0;
+      wrap.classList.toggle('stats-collapsed',this.scrollTop>4&&room>statsH);
+    });
   }
 }
 // rebind the shared MutationObserver to run all post-render wires
