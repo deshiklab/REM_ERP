@@ -1062,7 +1062,7 @@ const GROUPS = {
   land_projects: { label:'Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Project Acquisition',badge:false},{id:'properties_units', label:'Flats & Units', badge:true},{id:'plots',label:'Plots & Blocks'},{id:'layout_builder',label:'Layout & Unit Builder',badge:true},{id:'projects',label:'Projects'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'},{id:'dues_recovery',label:'Dues & Recovery'},{id:'ticketing',label:'Ticketing & Issue',badge:true}] },
   construction:  { label:'Engineering & Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'designs',label:'Design Mgmt'}] },
-  finance_admin: { label:'Accounts & Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'approvals',label:'Financial Approvals',badge:true},{id:'boq',label:'BOQ & Cost Control',badge:true}] },
+  finance_admin: { label:'Accounts & Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'approvals',label:'Financial Approvals',badge:true},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'investment_loans',label:'Investment & Loans'}] },
   hr_admin:      { label:'Admin & Operations',icon:'💼',mods:[{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'},{id:'stock',label:'Stock & Procurement'}] },
   legal_compliance:{label:'Legal & Compliance',icon:'⚖️',mods:[{id:'compliance',label:'Compliance',badge:true},{id:'legal_contracts',label:'Legal Contracts',badge:true},{id:'qc',label:'QC & Inspection'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'calendar',label:'Calendar',badge:true},{id:'announcements',label:'Announcements',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
@@ -1074,7 +1074,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1, ai_usage:1, reminder_log:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1, ai_usage:1, reminder_log:1, investors:1, investments:1, loans:1, loan_contracts:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -2483,6 +2483,7 @@ function switchModule(mod,skipSkel) {
       case 'whatsapp': renderWhatsApp(el); break;
       case 'chat': renderChat(el); break;
       case 'ai_assistant': renderAiAssistant(el); break;
+      case 'investment_loans': renderInvestmentLoans(el); break;
       case 'csv_import': renderCsvImport(el); break;
       case 'permissions': renderPermissions(el); break;
       case 'settings': renderSettings(el); break;
@@ -10193,7 +10194,7 @@ window.mockOpeningBalances = DB.init('opening_balances', (function(){
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Project Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements','WhatsApp Engine','Internal Chat','AI Copilot'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements','WhatsApp Engine','Internal Chat','AI Copilot','Investment & Loans'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -10963,7 +10964,10 @@ var _sdDatasetDefs=[
   {g:'Communication & AI',arr:'mockWhatsAppTemplates',label:'WhatsApp Templates',icon:'📱',mod:'whatsapp',fields:['name','event','body']},
   {g:'Communication & AI',arr:'mockWhatsAppLog',label:'WhatsApp Log',icon:'📤',mod:'whatsapp',fields:['contact','templateName','status']},
   {g:'Communication & AI',arr:'mockChatMessages',label:'Chat Messages',icon:'💬',mod:'chat',fields:['from','text']},
-  {g:'Communication & AI',arr:'mockAiUsage',label:'AI Queries',icon:'🤖',mod:'ai_assistant',fields:['query','intent','target']}
+  {g:'Communication & AI',arr:'mockAiUsage',label:'AI Queries',icon:'🤖',mod:'ai_assistant',fields:['query','intent','target']},
+  {g:'Accounts & Finance',arr:'mockInvestors',label:'Investors',icon:'👤',mod:'investment_loans',fields:['name','type','phone','email']},
+  {g:'Accounts & Finance',arr:'mockInvestments',label:'Investments',icon:'📈',mod:'investment_loans',fields:['investorName','project','amount']},
+  {g:'Accounts & Finance',arr:'mockLoans',label:'Loans',icon:'🏦',mod:'investment_loans',fields:['lender','type','principal']}
 ];
 var _sdGroupOrder=['Executive','Sales & CRM','Projects','Bookings & Customer','Engineering & Construction','Accounts & Finance','Admin & Operations','Legal & Compliance','Collaboration','Communication & AI'];
 var _sdModuleCount=Object.keys(GROUPS).reduce(function(s,g){return s+GROUPS[g].mods.length},0);
@@ -11307,6 +11311,37 @@ window.mockReminderLog = DB.init('reminder_log', [
   {id:'RL-003',date:'2026-06-11',contact:'Shafiqul Alam',channel:'WhatsApp',template:'WT-002',stage:'D1 · Soft Reminder',status:'Sent',color:'#1565c0'},
   {id:'RL-004',date:'2026-06-11',contact:'Tariqul Islam',channel:'Email',template:'NT-002',stage:'D2 · 7d Follow-up',status:'Sent',color:'#2e7d32'},
   {id:'RL-005',date:'2026-06-12',contact:'Fatima Begum',channel:'WhatsApp',template:'WT-002',stage:'D1 · Soft Reminder',status:'Sent',color:'#1565c0'}
+]);
+// ═══ PHASE 6.1 — INVESTMENT & LOANS (store seeds) ═══
+window.mockInvestors = DB.init('investors', [
+  {id:'INV-001',name:'Abdul Matin',type:'Individual',joinDate:'2024-03-15',totalInvested:20000000,status:'Active',phone:'01711-555101',email:'abdul.matin@gmail.com'},
+  {id:'INV-002',name:'Salma Khatun',type:'NRB (USA)',joinDate:'2024-06-01',totalInvested:15000000,status:'Active',phone:'+1 415 555 0199',email:'salma.k@example.com'},
+  {id:'INV-003',name:'Green Delta Holdings',type:'Company',joinDate:'2024-09-10',totalInvested:50000000,status:'Active',phone:'+880 1700 777889',email:'invest@greendelta.com'},
+  {id:'INV-004',name:'Md. Rafiqul Alam',type:'Individual',joinDate:'2025-01-20',totalInvested:10000000,status:'Active',phone:'01812-334455',email:'rafiqul.alam@live.com'},
+  {id:'INV-005',name:'Purbachal Developers Ltd',type:'Company',joinDate:'2025-04-05',totalInvested:40000000,status:'Active',phone:'01777-221100',email:'finance@purbachaldeve.com'},
+  {id:'INV-006',name:'Nusrat Jahan',type:'NRB (UAE)',joinDate:'2025-08-12',totalInvested:10000000,status:'Active',phone:'+971 55 123 4567',email:'nusrat.jahan@example.com'}
+]);
+window.mockInvestments = DB.init('investments', [
+  {id:'INVT-001',investorId:'INV-001',investorName:'Abdul Matin',project:'Muktodhara',amount:20000000,rate:15,startDate:'2024-04-01',tenureMonths:24,schedule:'Monthly',status:'Active'},
+  {id:'INVT-002',investorId:'INV-002',investorName:'Salma Khatun',project:'Jolshiri',amount:15000000,rate:12,startDate:'2024-07-01',tenureMonths:36,schedule:'Quarterly',status:'Active'},
+  {id:'INVT-003',investorId:'INV-003',investorName:'Green Delta Holdings',project:'Purbachal Phase 1',amount:50000000,rate:18,startDate:'2024-10-01',tenureMonths:24,schedule:'Monthly',status:'Active'},
+  {id:'INVT-004',investorId:'INV-004',investorName:'Md. Rafiqul Alam',project:'Muktodhara Green Park',amount:10000000,rate:10,startDate:'2025-02-01',tenureMonths:18,schedule:'Quarterly',status:'Active'},
+  {id:'INVT-005',investorId:'INV-005',investorName:'Purbachal Developers Ltd',project:'Jolshiri',amount:40000000,rate:16,startDate:'2025-05-01',tenureMonths:24,schedule:'Monthly',status:'Active'},
+  {id:'INVT-006',investorId:'INV-006',investorName:'Nusrat Jahan',project:'Green Valley',amount:10000000,rate:13,startDate:'2025-09-01',tenureMonths:12,schedule:'Monthly',status:'Active'}
+]);
+window.mockLoans = DB.init('loans', [
+  {id:'LN-001',type:'External',lender:'Islami Bank BD',principal:50000000,rate:11,tenureMonths:60,emi:1291667,startDate:'2024-01-15',outstanding:38000000,status:'Active'},
+  {id:'LN-002',type:'External',lender:'City Bank',principal:30000000,rate:12,tenureMonths:48,emi:925000,startDate:'2024-06-01',outstanding:21000000,status:'Active'},
+  {id:'LN-003',type:'Internal',lender:'Corporate Fund',principal:15000000,rate:9,tenureMonths:24,emi:737500,startDate:'2025-01-10',outstanding:9000000,status:'Active'},
+  {id:'LN-004',type:'External',lender:'IDLC Finance',principal:25000000,rate:13.5,tenureMonths:36,emi:975694,startDate:'2025-05-20',outstanding:19000000,status:'Active'},
+  {id:'LN-005',type:'Internal',lender:'Retained Earnings',principal:10000000,rate:8,tenureMonths:12,emi:900000,startDate:'2024-09-01',outstanding:0,status:'Closed'}
+]);
+window.mockLoanContracts = DB.init('loan_contracts', [
+  {id:'LCT-001',refType:'Investment',refId:'INVT-003',party:'Green Delta Holdings',title:'Green Delta Investment Agreement',startDate:'2024-10-01',endDate:'2026-09-30',amount:50000000,status:'Active',signedBy:'MD Hasanul Banna'},
+  {id:'LCT-002',refType:'Loan',refId:'LN-001',party:'Islami Bank BD',title:'Term Loan Facility — Islami Bank',startDate:'2024-01-15',endDate:'2029-01-14',amount:50000000,status:'Active',signedBy:'Rofiqul Islam'},
+  {id:'LCT-003',refType:'Investment',refId:'INVT-001',party:'Abdul Matin',title:'Muktodhara Investor Agreement',startDate:'2024-04-01',endDate:'2026-03-31',amount:20000000,status:'Active',signedBy:'MD Hasanul Banna'},
+  {id:'LCT-004',refType:'Loan',refId:'LN-005',party:'MARS Construction (Internal)',title:'Internal Fund Transfer Note',startDate:'2024-09-01',endDate:'2025-08-31',amount:10000000,status:'Completed',signedBy:'Rofiqul Islam'},
+  {id:'LCT-005',refType:'Investment',refId:'INVT-005',party:'Purbachal Developers Ltd',title:'Jolshiri Phase B Investment Deed',startDate:'2025-05-01',endDate:'2027-04-30',amount:40000000,status:'Active',signedBy:'MD Hasanul Banna'}
 ]);
 var notifIcons = {lead:'🔵',payment:'🟢',approval:'🟡',due:'🔴',task:'📋',add:'🟢',edit:'🔵',delete:'⛔',info:'ℹ️',success:'✅',warning:'⚠️',error:'🚫','default':'🔔'};
 var notifBg = {lead:'#e3f2fd',payment:'#e8f5e9',approval:'#fff8e1',due:'#ffebee',task:'#f3e5f5',add:'#e8f5e9',edit:'#e3f2fd',delete:'#ffebee',info:'#e8eaf6',success:'#e8f5e9',warning:'#fff8e1',error:'#ffebee','default':'#f5f5f5'};
@@ -17251,6 +17286,280 @@ function runAutoReminders(){
   addNotification('⚡ Auto-reminders sent',elig.length+' dues accounts notified via escalation ladder','due');
   showToast('⚡ '+elig.length+' auto-reminders sent','success');
   renderModule();
+}
+// ═══ 6.1 INVESTMENT, LOAN & CONTRACT MANAGEMENT (বিনিয়োগ ও ঋণ) ═══
+var invTab='dashboard';
+var _accrualMonths=0;
+function invMonthsElapsed(startDate){
+  try{
+    var s=new Date(startDate), now=new Date();
+    return Math.max(0,Math.floor((now-s)/(1000*60*60*24*30.44)));
+  }catch(e){return 0;}
+}
+function invAccrued(amt,rate,startDate){return amt*rate/100*(invMonthsElapsed(startDate)+_accrualMonths)/12;}
+function invLoanTotalPayable(p,r,t){return p + p*r/100*t/12;}
+function invCalcEmi(p,r,t){var tp=invLoanTotalPayable(p,r,t);return t?Math.round(tp/t):0;}
+function fmtTk(n){return '৳'+(n/10000000).toFixed(2)+' Cr';}
+function renderInvestmentLoans(el){
+  var totInv=mockInvestments.reduce(function(s,x){return s+(x.amount||0);},0);
+  var totAccrued=mockInvestments.filter(function(x){return x.status==='Active';}).reduce(function(s,x){return s+invAccrued(x.amount,x.rate,x.startDate);},0);
+  var activeLoans=mockLoans.filter(function(x){return x.status==='Active';});
+  var totPrincipal=activeLoans.reduce(function(s,x){return s+(x.principal||0);},0);
+  var totEmi=activeLoans.reduce(function(s,x){return s+(x.emi||0);},0);
+  el.innerHTML='<div class="fade-in">'+
+    '<div class="page-title">💰 Investment & Loans</div>'+
+    '<div class="page-subtitle no-i18n">'+mockInvestors.length+' investors · '+mockInvestments.length+' investments · '+mockLoans.length+' loans · বিনিয়োগ ও ঋণ</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[['dashboard','📊 Dashboard'],['investors','👥 Investors'],['investments','📈 Investments'],['loans','🏦 Loans'],['contracts','📜 Contracts']].map(function(t){return '<div class="tab '+(invTab===t[0]?'active':'')+'" onclick="invTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudInvestor()" data-perm="Investment & Loans:Create" style="padding:3px 8px;font-size:10px;display:'+(invTab==='investors'?'':'none')+'">+ Investor</button>'+
+      '<button class="action-btn primary" onclick="crudInvestment()" data-perm="Investment & Loans:Create" style="padding:3px 8px;font-size:10px;display:'+(invTab==='investments'?'':'none')+'">+ Investment</button>'+
+      '<button class="action-btn primary" onclick="crudLoan()" data-perm="Investment & Loans:Create" style="padding:3px 8px;font-size:10px;display:'+(invTab==='loans'?'':'none')+'">+ Loan</button>'+
+      '<button class="action-btn primary" onclick="crudLoanContract()" data-perm="Investment & Loans:Create" style="padding:3px 8px;font-size:10px;display:'+(invTab==='contracts'?'':'none')+'">+ Contract</button>'+
+    '</div>'+
+    (invTab==='dashboard'?renderInvDashboard(totInv,totAccrued,totPrincipal,totEmi):
+     invTab==='investors'?renderInvInvestors():
+     invTab==='investments'?renderInvInvestments():
+     invTab==='loans'?renderInvLoans():renderInvContracts())+
+  '</div>';
+}
+function renderInvDashboard(totInv,totAccrued,totPrincipal,totEmi){
+  var top=mockInvestors.slice().sort(function(a,b){return b.totalInvested-a.totalInvested;}).slice(0,4);
+  var activeInv=mockInvestments.filter(function(x){return x.status==='Active';}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Total Invested',fmtTk(totInv),'#2e7d32'],
+    ['Accrued Interest',fmtTk(totAccrued),'#7b1fa2'],
+    ['Loan Principal',fmtTk(totPrincipal),'#1565c0'],
+    ['Monthly EMI','৳'+Math.round(totEmi).toLocaleString('en-IN'),'#c62828']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>📈 Funding Mix</h3></div><div class="card-body" style="padding:10px">'+
+      '<div style="display:flex;height:18px;border-radius:6px;overflow:hidden;margin-bottom:8px">'+
+      '<div style="width:'+Math.round(totInv/(totInv+totPrincipal)*100)+'%;background:#2e7d32"></div>'+
+      '<div style="width:'+Math.round(totPrincipal/(totInv+totPrincipal)*100)+'%;background:#1565c0"></div></div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:10px;color:#555"><span><span style="color:#2e7d32">■</span> Investments '+fmtTk(totInv)+'</span><span><span style="color:#1565c0">■</span> Loans '+fmtTk(totPrincipal)+'</span></div>'+
+      '<div style="margin-top:8px;font-size:9px;color:#888">'+activeInv+' active investments · '+mockLoans.filter(function(x){return x.status==='Active';}).length+' active loans</div>'+
+    '</div></div>'+
+    '<div class="card"><div class="card-header"><h3>🏆 Top Investors</h3></div><div class="card-body" style="padding:8px">'+
+    top.map(function(v){
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+v.name+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+Math.round(v.totalInvested/top[0].totalInvested*100)+'%;background:#2F80ED;border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:60px;text-align:right">'+fmtTk(v.totalInvested)+'</div></div>';
+    }).join('')+'</div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>⚡ Interest Accrual</h3><button class="action-btn primary" onclick="runAccrual()" style="padding:2px 8px;font-size:9px">⚡ Accrue +1 Month</button></div>'+
+  '<div class="card-body" style="padding:8px;font-size:10px;color:#555">Accrued so far: <b style="color:#7b1fa2">'+fmtTk(totAccrued)+'</b>'+
+  (_accrualMonths?' · <b>+'+_accrualMonths+' simulated month(s)</b>':'')+
+  ' — interest accrues monthly on active investments at their contracted rate (validated 0–25%).</div></div>';
+}
+function runAccrual(){_accrualMonths++;addNotification('⚡ Interest accrual run','Simulated +1 month on all active investments','payment');showToast('Accrual advanced +1 month','success');renderModule();}
+function renderInvInvestors(){
+  var total=mockInvestors.reduce(function(s,x){return s+(x.totalInvested||0);},0);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Investors',mockInvestors.length,'#2F80ED'],
+    ['Active',mockInvestors.filter(function(x){return x.status==='Active';}).length,'#2e7d32'],
+    ['Companies',mockInvestors.filter(function(x){return x.type==='Company';}).length,'#7b1fa2'],
+    ['NRB',mockInvestors.filter(function(x){return String(x.type).indexOf('NRB')>=0;}).length,'#1565c0'],
+    ['Committed',fmtTk(total),'#2e7d32']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>👥 Investors</h3><button class="action-btn primary" onclick="crudInvestor()" style="padding:2px 8px;font-size:9px" data-perm="Investment & Loans:Create">+ Add Investor</button></div>'+
+  '<div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Joined</th><th class="num">Invested</th><th>Status</th><th></th></tr></thead><tbody>'+
+  mockInvestors.map(function(v){
+    return '<tr><td style="font-weight:600;color:#2F80ED;font-size:9px">'+v.id+'</td><td style="font-weight:500">'+v.name+'</td><td style="font-size:9px">'+v.type+'</td><td style="font-size:9px;color:#888">'+v.joinDate+'</td><td class="num" style="font-weight:600">'+fmtTk(v.totalInvested)+'</td><td><span class="badge-status '+(v.status==='Active'?'badge-sold':'badge-closed')+'">'+v.status+'</span></td>'+
+    '<td><span style="cursor:pointer;font-size:11px;color:#2F80ED" onclick="crudInvestor(mockInvestors.find(function(x){return x.id===\''+v.id+'\';}))">✏️</span> <span style="cursor:pointer;font-size:11px;color:#c62828" onclick="delInvestor(\''+v.id+'\')">🗑</span></td></tr>';
+  }).join('')+'</tbody></table></div></div>';
+}
+function delInvestor(id){mockInvestors=mockInvestors.filter(function(x){return x.id!==id;});DB.save('investors');showToast('Investor '+id+' deleted','success');renderModule();}
+function crudInvestor(item){
+  var n=!item;
+  var b=n?{id:'INV-0'+(mockInvestors.length+1),name:'',type:'Individual',joinDate:'',totalInvested:0,status:'Active',phone:'',email:''}:item;
+  openModal((n?'+ New ':'✏️ Edit ')+'Investor',
+    '<div class="form-group"><label class="form-label">Name <span style="color:#e53935">*</span></label><input class="form-input" id="ivName" value="'+(b.name||'')+'"/></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Type</label><select class="form-input" id="ivType">'+['Individual','Company','NRB (USA)','NRB (UAE)','NRB (UK)'].map(function(o){return '<option '+(b.type===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Join Date <span style="color:#e53935">*</span></label><input class="form-input" id="ivJoin" type="date" value="'+(b.joinDate||'')+'" required/></div></div>'+
+    '<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="ivPhone" value="'+(b.phone||'')+'"/></div>'+
+    '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="ivEmail" value="'+(b.email||'')+'"/></div>'+
+    '<div class="form-group"><label class="form-label">Status</label><select class="form-input" id="ivStatus">'+['Active','Inactive'].map(function(o){return '<option '+(b.status===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div>',
+    function(){
+      window._formRules=[
+        {id:'ivName',fn:function(v){return V.req(v,'Name is required');}},
+        {id:'ivJoin',fn:function(v){return V.req(v,'Join date is required');}}
+      ];
+      if(V.run(window._formRules))return false;
+      b.name=g('ivName').trim();b.type=g('ivType');b.joinDate=g('ivJoin');b.phone=g('ivPhone').trim();b.email=g('ivEmail').trim();b.status=g('ivStatus');
+      if(n)mockInvestors.push(b);
+      DB.save('investors');
+      showToast(n?'Investor added':'Investor updated','success');
+      return true;
+    });
+}
+function renderInvInvestments(){
+  var total=mockInvestments.reduce(function(s,x){return s+(x.amount||0);},0);
+  var accr=mockInvestments.filter(function(x){return x.status==='Active';}).reduce(function(s,x){return s+invAccrued(x.amount,x.rate,x.startDate);},0);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Investments',mockInvestments.length,'#2F80ED'],
+    ['Active',mockInvestments.filter(function(x){return x.status==='Active';}).length,'#2e7d32'],
+    ['Total Amount',fmtTk(total),'#2e7d32'],
+    ['Accrued',fmtTk(accr),'#7b1fa2'],
+    ['Avg Rate',Math.round(mockInvestments.reduce(function(s,x){return s+(x.rate||0);},0)/mockInvestments.length)+'%','#1565c0']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>📈 Investment Portfolio</h3><button class="action-btn primary" onclick="crudInvestment()" style="padding:2px 8px;font-size:9px" data-perm="Investment & Loans:Create">+ Add Investment</button></div>'+
+  '<div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>ID</th><th>Investor</th><th>Project</th><th class="num">Amount</th><th class="num">Rate</th><th>Tenure</th><th>Schedule</th><th class="num">Accrued</th><th>Status</th><th></th></tr></thead><tbody>'+
+  mockInvestments.map(function(v){
+    var accr=invAccrued(v.amount,v.rate,v.startDate);
+    return '<tr><td style="font-weight:600;color:#2F80ED;font-size:9px">'+v.id+'</td><td style="font-weight:500">'+v.investorName+'</td><td style="font-size:9px">'+v.project+'</td><td class="num" style="font-weight:600">'+fmtTk(v.amount)+'</td><td class="num" style="color:'+(v.rate>18?'#c62828':'#555')+'">'+v.rate+'%</td><td style="font-size:9px">'+v.tenureMonths+'m</td><td style="font-size:9px">'+v.schedule+'</td><td class="num" style="color:#7b1fa2">'+fmtTk(accr)+'</td><td><span class="badge-status '+(v.status==='Active'?'badge-sold':'badge-closed')+'">'+v.status+'</span></td>'+
+    '<td><span style="cursor:pointer;font-size:11px;color:#2F80ED" onclick="crudInvestment(mockInvestments.find(function(x){return x.id===\''+v.id+'\';}))">✏️</span> <span style="cursor:pointer;font-size:11px;color:#c62828" onclick="delInvestment(\''+v.id+'\')">🗑</span></td></tr>';
+  }).join('')+'</tbody></table></div></div>';
+}
+function delInvestment(id){mockInvestments=mockInvestments.filter(function(x){return x.id!==id;});DB.save('investments');showToast('Investment '+id+' deleted','success');renderModule();}
+function crudInvestment(item){
+  var n=!item;
+  var b=n?{id:'INVT-0'+(mockInvestments.length+1),investorId:'',investorName:'',project:'',amount:'',rate:'',startDate:'',tenureMonths:'',schedule:'Monthly',status:'Active'}:item;
+  var invOps=mockInvestors.map(function(x){return '<option value="'+x.id+'"'+(b.investorId===x.id?' selected':'')+'>'+x.name+'</option>';}).join('');
+  openModal((n?'+ New ':'✏️ Edit ')+'Investment',
+    '<div class="form-group"><label class="form-label">Investor <span style="color:#e53935">*</span></label><select class="form-input" id="itInv" onchange="window._itInvName=this.options[this.selectedIndex].text">'+invOps+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Project</label><input class="form-input" id="itProject" value="'+(b.project||'')+'"/></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Amount (৳) <span style="color:#e53935">*</span></label><input class="form-input" id="itAmount" type="number" min="1" value="'+(b.amount||'')+'" placeholder="e.g. 10000000" required/></div>'+
+    '<div class="form-group"><label class="form-label">Rate % (0–25) <span style="color:#e53935">*</span></label><input class="form-input" id="itRate" type="number" min="0" max="25" step="0.5" value="'+(b.rate||'')+'" required/></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Start Date <span style="color:#e53935">*</span></label><input class="form-input" id="itStart" type="date" value="'+(b.startDate||'')+'" required/></div>'+
+    '<div class="form-group"><label class="form-label">Tenure (months) <span style="color:#e53935">*</span></label><input class="form-input" id="itTenure" type="number" min="1" value="'+(b.tenureMonths||'')+'" required/></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Schedule</label><select class="form-input" id="itSched">'+['Monthly','Quarterly','Semi-annual'].map(function(o){return '<option '+(b.schedule===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Status</label><select class="form-input" id="itStatus">'+['Active','Matured','Closed'].map(function(o){return '<option '+(b.status===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div></div>',
+    function(){
+      var amt=V.num(g('itAmount')), rate=V.num(g('itRate')), ten=V.num(g('itTenure'));
+      window._formRules=[
+        {id:'itAmount',fn:function(v){return V.pos(V.num(v),'Amount must be greater than 0');}},
+        {id:'itRate',fn:function(v){var n=V.num(v);return (!isNaN(n)&&n>=0&&n<=25)?null:'Rate must be between 0 and 25%';}},
+        {id:'itTenure',fn:function(v){return V.pos(V.num(v),'Tenure must be greater than 0');}}
+      ];
+      if(V.run(window._formRules))return false;
+      var inv=mockInvestors.find(function(x){return x.id===g('itInv');});
+      b.investorId=g('itInv');b.investorName=inv?inv.name:(window._itInvName||'');b.project=g('itProject').trim();b.amount=amt;b.rate=rate;b.startDate=g('itStart');b.tenureMonths=ten;b.schedule=g('itSched');b.status=g('itStatus');
+      if(n)mockInvestments.push(b);
+      if(inv&&n)inv.totalInvested=(inv.totalInvested||0)+amt;
+      if(inv&&!n){/* keep investor total stable on edit */ }
+      DB.save('investments');DB.save('investors');
+      showToast(n?'Investment added':'Investment updated','success');
+      return true;
+    });
+}
+function renderInvLoans(){
+  var active=mockLoans.filter(function(x){return x.status==='Active';});
+  var totP=active.reduce(function(s,x){return s+(x.principal||0);},0);
+  var totOut=active.reduce(function(s,x){return s+(x.outstanding||0);},0);
+  var totEmi=active.reduce(function(s,x){return s+(x.emi||0);},0);
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Loans',mockLoans.length,'#2F80ED'],
+    ['Active',active.length,'#2e7d32'],
+    ['Principal',fmtTk(totP),'#1565c0'],
+    ['Outstanding',fmtTk(totOut),'#c62828'],
+    ['Monthly EMI','৳'+Math.round(totEmi).toLocaleString('en-IN'),'#e65100']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>🏦 Loan Portfolio</h3><button class="action-btn primary" onclick="crudLoan()" style="padding:2px 8px;font-size:9px" data-perm="Investment & Loans:Create">+ Add Loan</button></div>'+
+  '<div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>ID</th><th>Type</th><th>Lender</th><th class="num">Principal</th><th class="num">Rate</th><th>Tenure</th><th class="num">EMI</th><th class="num">Outstanding</th><th>Status</th><th></th></tr></thead><tbody>'+
+  mockLoans.map(function(v){
+    return '<tr><td style="font-weight:600;color:#2F80ED;font-size:9px">'+v.id+'</td><td><span class="badge-status '+(v.type==='Internal'?'badge-pending':'badge-sold')+'">'+v.type+'</span></td><td style="font-weight:500">'+v.lender+'</td><td class="num" style="font-weight:600">'+fmtTk(v.principal)+'</td><td class="num" style="color:'+(v.rate>13?'#c62828':'#555')+'">'+v.rate+'%</td><td style="font-size:9px">'+v.tenureMonths+'m</td><td class="num">৳'+Math.round(v.emi).toLocaleString('en-IN')+'</td><td class="num" style="color:'+(v.outstanding>0?'#c62828':'#2e7d32')+'">'+fmtTk(v.outstanding)+'</td><td><span class="badge-status '+(v.status==='Active'?'badge-sold':'badge-closed')+'">'+v.status+'</span></td>'+
+    '<td><span style="cursor:pointer;font-size:11px;color:#2F80ED" onclick="crudLoan(mockLoans.find(function(x){return x.id===\''+v.id+'\';}))">✏️</span> <span style="cursor:pointer;font-size:11px;color:#c62828" onclick="delLoan(\''+v.id+'\')">🗑</span></td></tr>';
+  }).join('')+'</tbody></table></div></div>';
+}
+function delLoan(id){mockLoans=mockLoans.filter(function(x){return x.id!==id;});DB.save('loans');showToast('Loan '+id+' deleted','success');renderModule();}
+function crudLoan(item){
+  var n=!item;
+  var b=n?{id:'LN-0'+(mockLoans.length+1),type:'External',lender:'',principal:'',rate:'',tenureMonths:'',emi:0,startDate:'',outstanding:'',status:'Active'}:item;
+  openModal((n?'+ New ':'✏️ Edit ')+'Loan',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Type</label><select class="form-input" id="lnType" onchange="lnCalcEmiPreview()">'+['External','Internal'].map(function(o){return '<option '+(b.type===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Lender <span style="color:#e53935">*</span></label><input class="form-input" id="lnLender" value="'+(b.lender||'')+'" placeholder="Bank / Fund name"/></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Principal (৳) <span style="color:#e53935">*</span></label><input class="form-input" id="lnPrincipal" type="number" min="1" value="'+(b.principal||'')+'" oninput="lnCalcEmiPreview()" required/></div>'+
+    '<div class="form-group"><label class="form-label">Rate % (0–25) <span style="color:#e53935">*</span></label><input class="form-input" id="lnRate" type="number" min="0" max="25" step="0.5" value="'+(b.rate||'')+'" oninput="lnCalcEmiPreview()" required/></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Tenure (months) <span style="color:#e53935">*</span></label><input class="form-input" id="lnTenure" type="number" min="1" value="'+(b.tenureMonths||'')+'" oninput="lnCalcEmiPreview()" required/></div>'+
+    '<div class="form-group"><label class="form-label">Start Date <span style="color:#e53935">*</span></label><input class="form-input" id="lnStart" type="date" value="'+(b.startDate||'')+'" required/></div></div>'+
+    '<div class="form-group"><label class="form-label">EMI (auto-calculated, editable) <span style="color:#e53935">*</span></label><input class="form-input" id="lnEmi" type="number" min="1" value="'+(b.emi||'')+'" required/><div id="lnEmiHint" style="font-size:9px;color:#888;margin-top:3px"></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Outstanding (৳)</label><input class="form-input" id="lnOut" type="number" min="0" value="'+(b.outstanding||'')+'"/></div>'+
+    '<div class="form-group"><label class="form-label">Status</label><select class="form-input" id="lnStatus">'+['Active','Closed'].map(function(o){return '<option '+(b.status===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div></div>',
+    function(){
+      var p=V.num(g('lnPrincipal')), r=V.num(g('lnRate')), t=V.num(g('lnTenure')), e=V.num(g('lnEmi'));
+      window._formRules=[
+        {id:'lnLender',fn:function(v){return V.req(v,'Lender is required');}},
+        {id:'lnPrincipal',fn:function(v){return V.pos(V.num(v),'Principal must be greater than 0');}},
+        {id:'lnRate',fn:function(v){var n=V.num(v);return (!isNaN(n)&&n>=0&&n<=25)?null:'Rate must be between 0 and 25%';}},
+        {id:'lnTenure',fn:function(v){return V.pos(V.num(v),'Tenure must be greater than 0');}},
+        {id:'lnEmi',fn:function(v){var n=V.num(v);if(isNaN(n)||n<=0)return 'EMI must be greater than 0';var total=invLoanTotalPayable(p,r,t);return (n*t<=total+t)?null:'EMI × tenure must not exceed principal + interest (৳'+Math.round(total).toLocaleString('en-IN')+')';}}
+      ];
+      if(V.run(window._formRules))return false;
+      b.type=g('lnType');b.lender=g('lnLender').trim();b.principal=p;b.rate=r;b.tenureMonths=t;b.emi=e;b.startDate=g('lnStart');b.outstanding=V.num(g('lnOut'))||0;b.status=g('lnStatus');
+      if(n)mockLoans.push(b);
+      DB.save('loans');
+      showToast(n?'Loan added':'Loan updated','success');
+      return true;
+    });
+  lnCalcEmiPreview();
+}
+function lnCalcEmiPreview(){
+  var p=V.num(g('lnPrincipal')), r=V.num(g('lnRate')), t=V.num(g('lnTenure'));
+  if(!isNaN(p)&&!isNaN(r)&&!isNaN(t)&&p>0&&t>0){
+    var e=invCalcEmi(p,r,t);
+    var el=document.getElementById('lnEmi');if(el&&!document.activeElement||(el&&el===document.activeElement)){/* keep user edit */}
+    var f=document.getElementById('lnEmi');if(f&&document.activeElement!==f)f.value=e;
+    var h=document.getElementById('lnEmiHint');if(h)h.innerHTML='Flat rate: ৳'+e.toLocaleString('en-IN')+'/mo · total payable ৳'+Math.round(invLoanTotalPayable(p,r,t)).toLocaleString('en-IN');
+  }
+}
+function renderInvContracts(){
+  var active=mockLoanContracts.filter(function(x){return x.status==='Active';}).length;
+  return '<div class="stats-row" style="margin-bottom:6px">'+[
+    ['Contracts',mockLoanContracts.length,'#2F80ED'],
+    ['Active',active,'#2e7d32'],
+    ['Investment-linked',mockLoanContracts.filter(function(x){return x.refType==='Investment';}).length,'#7b1fa2'],
+    ['Loan-linked',mockLoanContracts.filter(function(x){return x.refType==='Loan';}).length,'#1565c0']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>📜 Contract Registry</h3><button class="action-btn primary" onclick="crudLoanContract()" style="padding:2px 8px;font-size:9px" data-perm="Investment & Loans:Create">+ Add Contract</button></div>'+
+  '<div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>ID</th><th>Ref</th><th>Party</th><th>Title</th><th>Period</th><th class="num">Amount</th><th>Status</th><th>Signed By</th><th></th></tr></thead><tbody>'+
+  mockLoanContracts.map(function(v){
+    return '<tr><td style="font-weight:600;color:#2F80ED;font-size:9px">'+v.id+'</td><td><span class="badge-status '+(v.refType==='Investment'?'badge-sold':'badge-pending')+'" style="font-size:8px">'+v.refType+'</span> <span style="font-size:8px;color:#888">'+v.refId+'</span></td><td style="font-weight:500">'+v.party+'</td><td style="font-size:9px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+v.title+'">'+v.title+'</td><td style="font-size:9px;color:#888;white-space:nowrap">'+v.startDate+' → '+v.endDate+'</td><td class="num" style="font-weight:600">'+fmtTk(v.amount)+'</td><td><span class="badge-status '+(v.status==='Active'?'badge-sold':'badge-closed')+'">'+v.status+'</span></td><td style="font-size:9px;color:#555">'+v.signedBy+'</td>'+
+    '<td><span style="cursor:pointer;font-size:11px;color:#2F80ED" onclick="crudLoanContract(mockLoanContracts.find(function(x){return x.id===\''+v.id+'\';}))">✏️</span> <span style="cursor:pointer;font-size:11px;color:#c62828" onclick="delLoanContract(\''+v.id+'\')">🗑</span></td></tr>';
+  }).join('')+'</tbody></table></div></div>';
+}
+function delLoanContract(id){mockLoanContracts=mockLoanContracts.filter(function(x){return x.id!==id;});DB.save('loan_contracts');showToast('Contract '+id+' deleted','success');renderModule();}
+function crudLoanContract(item){
+  var n=!item;
+  var b=n?{id:'LCT-0'+(mockLoanContracts.length+1),refType:'Investment',refId:'',party:'',title:'',startDate:'',endDate:'',amount:'',status:'Active',signedBy:''}:item;
+  var refOps=(b.refType==='Loan'?mockLoans:mockInvestments).map(function(x){return '<option value="'+x.id+'"'+(b.refId===x.id?' selected':'')+'>'+x.id+'</option>';}).join('');
+  openModal((n?'+ New ':'✏️ Edit ')+'Contract',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Ref Type</label><select class="form-input" id="lcType" onchange="document.getElementById(\'lcRef\').innerHTML=lcRefOptions(this.value)">'+['Investment','Loan'].map(function(o){return '<option '+(b.refType===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label class="form-label">Reference</label><select class="form-input" id="lcRef">'+refOps+'</select></div></div>'+
+    '<div class="form-group"><label class="form-label">Party <span style="color:#e53935">*</span></label><input class="form-input" id="lcParty" value="'+(b.party||'')+'"/></div>'+
+    '<div class="form-group"><label class="form-label">Title <span style="color:#e53935">*</span></label><input class="form-input" id="lcTitle" value="'+(b.title||'')+'"/></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Start <span style="color:#e53935">*</span></label><input class="form-input" id="lcStart" type="date" value="'+(b.startDate||'')+'" required/></div>'+
+    '<div class="form-group"><label class="form-label">End <span style="color:#e53935">*</span></label><input class="form-input" id="lcEnd" type="date" value="'+(b.endDate||'')+'" required/></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+    '<div class="form-group"><label class="form-label">Amount (৳) <span style="color:#e53935">*</span></label><input class="form-input" id="lcAmount" type="number" min="1" value="'+(b.amount||'')+'" required/></div>'+
+    '<div class="form-group"><label class="form-label">Status</label><select class="form-input" id="lcStatus">'+['Active','Completed','Terminated'].map(function(o){return '<option '+(b.status===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select></div></div>'+
+    '<div class="form-group"><label class="form-label">Signed By</label><input class="form-input" id="lcSigned" value="'+(b.signedBy||'')+'"/></div>',
+    function(){
+      window._formRules=[
+        {id:'lcParty',fn:function(v){return V.req(v,'Party is required');}},
+        {id:'lcTitle',fn:function(v){return V.req(v,'Title is required');}},
+        {id:'lcAmount',fn:function(v){return V.pos(V.num(v),'Amount must be greater than 0');}},
+        {id:'lcEnd',fn:function(v){var s=g('lcStart');if(!s||!v)return null;return new Date(v)>=new Date(s)?null:'End date must be after start date';}}
+      ];
+      if(V.run(window._formRules))return false;
+      b.refType=g('lcType');b.refId=g('lcRef');b.party=g('lcParty').trim();b.title=g('lcTitle').trim();b.startDate=g('lcStart');b.endDate=g('lcEnd');b.amount=V.num(g('lcAmount'));b.status=g('lcStatus');b.signedBy=g('lcSigned').trim();
+      if(n)mockLoanContracts.push(b);
+      DB.save('loan_contracts');
+      showToast(n?'Contract added':'Contract updated','success');
+      return true;
+    });
+}
+function lcRefOptions(type){
+  var arr=type==='Loan'?mockLoans:mockInvestments;
+  return arr.map(function(x){return '<option value="'+x.id+'">'+x.id+'</option>';}).join('');
 }
 </script>
 </body>
