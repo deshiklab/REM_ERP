@@ -94,3 +94,14 @@ Turn the validated prototype into a real, deployable ERP. Keep the exact same UI
   - Updated everywhere: GROUPS/GROUP_ORDER/GROUPS_LOOKUP, sidebar icons + tooltips, switch cases, search dataset defs + `_sdGroupOrder`, Quick-Add defs + tabs (Accounts & Finance, Legal), PERMISSION_MODULES (33 rows), Bengali dict.
   - Dynamic module counts (dashboard subtitle + search dropdown) — computed from GROUPS (44 modules).
   - Fixed `navigateSearch` to land on the exact module (was: group's first module only).
+
+- **HEAD — Module reshuffle + icon fix** (SW v8-v7):
+  - Moved **QC & Inspection** → Legal & Compliance (Compliance, Legal Contracts, QC & Inspection).
+  - Moved **Stock & Procurement** → Admin & Operations (HR, Documents Vault, Knowledge Base, Stock & Procurement).
+  - Moved **Projects** → Land & Projects (Land Acquisition, Property & Units, Plots & Layout, Projects).
+  - Moved **BOQ & Cost Control** → Accounts & Finance (Finance, Payment Heatmap, Financial Approvals, BOQ & Cost Control).
+  - **Payment Reminders** is now a **tab of Bookings & Customer › Dues & Recovery** (🔔 Payment Reminders tab; embedded renderer with styled host). `payment_reminders` navigation redirects to Dues › reminders tab. Removed from Accounts & Finance group nav.
+  - **Icons changed:** Sales & CRM 👥→🎯 (target), Admin & Operations 👥→💼 (briefcase) — sidebar SVGs + group emoji icons updated.
+  - Engineering & Construction now 5 modules (Contractors, Variation Orders, Equipment, Labor Mgmt, Design Mgmt).
+  - QA tabs now match actual item groups (Engineering & Construction, Admin & Operations, Docs tabs fixed/added); QA items moved with their modules.
+  - GROUPS_LOOKUP + search dataset groups updated for all moved modules. Module count now 43.
