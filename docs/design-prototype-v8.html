@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -1747,6 +1747,28 @@ window.mockEmployees = DB.init('employees', [
   {id:11,name:'Morshed Alam',designation:'Legal Officer',dept:'Management',phone:'01810556677',email:'morshed@mars.com',joinDate:'2022-05-30',salary:68000,status:'active'},
   {id:12,name:'Shahnaz Parvin',designation:'Marketing Executive',dept:'Sales',phone:'01710667788',email:'shahnaz@mars.com',joinDate:'2024-03-10',salary:48000,status:'on-leave'}
 ]);
+window.mockHRShifts = DB.init('hr_shifts', {
+  types: [
+    {id:'SFT-01',name:'General',start:'09:00',end:'18:00',overtime:true},
+    {id:'SFT-02',name:'Morning',start:'07:00',end:'15:00',overtime:false},
+    {id:'SFT-03',name:'Evening',start:'15:00',end:'23:00',overtime:false},
+    {id:'SFT-04',name:'Site 7–4',start:'07:00',end:'16:00',overtime:true}
+  ],
+  roster: [
+    {id:1,employeeId:1,shiftId:'SFT-04',week:'W24 · Jun 8–14',overtime:true},
+    {id:2,employeeId:2,shiftId:'SFT-01',week:'W24 · Jun 8–14',overtime:false},
+    {id:3,employeeId:3,shiftId:'SFT-01',week:'W24 · Jun 8–14',overtime:false},
+    {id:4,employeeId:4,shiftId:'SFT-01',week:'W24 · Jun 8–14',overtime:false},
+    {id:5,employeeId:5,shiftId:'SFT-04',week:'W24 · Jun 8–14',overtime:true},
+    {id:6,employeeId:6,shiftId:'SFT-01',week:'W24 · Jun 8–14',overtime:false},
+    {id:7,employeeId:7,shiftId:'SFT-01',week:'W24 · Jun 8–14',overtime:false},
+    {id:8,employeeId:8,shiftId:'SFT-01',week:'W24 · Jun 8–14',overtime:false},
+    {id:9,employeeId:9,shiftId:'SFT-02',week:'W24 · Jun 8–14',overtime:false},
+    {id:10,employeeId:10,shiftId:'SFT-04',week:'W24 · Jun 8–14',overtime:true},
+    {id:11,employeeId:11,shiftId:'SFT-01',week:'W24 · Jun 8–14',overtime:false},
+    {id:12,employeeId:12,shiftId:'SFT-03',week:'W24 · Jun 8–14',overtime:false}
+  ]
+});
 
 // ═══ HR DATA — ATTENDANCE / LEAVE / PAYROLL / RECRUITMENT ═══
 window.mockHRAttendance = DB.init('hr_attendance', (function(){
@@ -9406,7 +9428,7 @@ function renderHR(el){
   el.innerHTML='<div class="fade-in">'+
     '<div class="page-title">👥 Human Resources</div><div class="page-subtitle">'+total+' employees · '+active+' active · '+onLeave+' on leave · '+openJobs+' open positions</div>'+
     '<div class="toolbar" style="margin-bottom:6px">'+
-      '<div class="tabs">'+[['dashboard','📊 Dashboard'],['employees','👥 Employees'],['attendance','📅 Attendance'],['leave','🏖 Leave'],['timesheets','⏱ Timesheets'],['payroll','💰 Payroll'],['recruitment','📢 Recruitment']].map(function(t){return '<div class="tab '+(hrTab===t[0]?'active':'')+'" onclick="hrTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
+      '<div class="tabs">'+[['dashboard','📊 Dashboard'],['employees','👥 Employees'],['attendance','📅 Attendance'],['leave','🏖 Leave'],['timesheets','⏱ Timesheets'],['shifts','🕒 Shifts'],['payroll','💰 Payroll'],['recruitment','📢 Recruitment']].map(function(t){return '<div class="tab '+(hrTab===t[0]?'active':'')+'" onclick="hrTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
       '<div class="spacer"></div>'+
       '<button class="action-btn primary" onclick="crudEmployee()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='employees'?'':'none')+'">+ Add Employee</button>'+
       '<button class="action-btn primary" onclick="crudLeave()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='leave'?'':'none')+'">+ New Request</button>'+
@@ -9419,6 +9441,7 @@ function renderHR(el){
      hrTab==='attendance'?renderHRAttendance():
      hrTab==='leave'?renderHRLeave():
      hrTab==='timesheets'?renderHRTimesheets():
+     hrTab==='shifts'?renderHRShifts():
      hrTab==='payroll'?renderHRPayroll():
      hrTab==='recruitment'?renderHRRecruitment():'')+
   '</div>';
@@ -12954,6 +12977,81 @@ function openPO(id){
     '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudPO(mockPOs.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">\u270E Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
+// ── Phase 4.1 HR Shifts ────────────────────────────────────────────
+function shiftHours(s){
+  var a=(s.start||'').split(':'),b=(s.end||'').split(':');
+  var h=(parseInt(b[0])||0)-(parseInt(a[0])||0)+((parseInt(b[1]||'0')||0)-(parseInt(a[1]||'0')||0))/60;
+  return h>0?h:h+24;
+}
+function renderHRShifts(){
+  var types=mockHRShifts.types||[];
+  var roster=mockHRShifts.roster||[];
+  var ot=roster.filter(function(r){return r.overtime;}).length;
+  var empIds=[];roster.forEach(function(r){if(empIds.indexOf(r.employeeId)<0)empIds.push(r.employeeId);});
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Shift Types',types.length,'#2F80ED'],
+    ['Roster Assignments',roster.length,'#2e7d32'],
+    ['Overtime This Week',ot,'#e65100'],
+    ['Employees Rostered',empIds.length,'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:10px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>🕒 Shift Types (শিফট)</h3><button class="action-btn primary" onclick="crudShiftType()" style="padding:2px 8px;font-size:9px" data-perm="HR:Create">+ Add Shift</button></div><div class="card-body" style="padding:8px 10px">'+
+      (types.length?types.map(function(s){
+        var h=shiftHours(s);
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0"><div><span style="font-size:10px;font-weight:600">'+s.name+'</span> <span style="font-size:8px;color:#888">· '+s.start+' – '+s.end+' ('+h+'h)</span></div><div style="display:flex;align-items:center;gap:6px">'+(s.overtime?'<span class="badge-status badge-pending" style="font-size:8px">OT</span>':'')+'<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudShiftType(mockHRShifts.types.find(function(x){return x.id===\''+s.id+'\'}))">✎</span><span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteShiftType(\''+s.id+'\')">✕</span></div></div>';
+      }).join(''):'<div style="color:#999;font-size:10px;text-align:center;padding:12px">No shift types yet</div>')+
+    '</div></div>'+
+    '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>📅 Weekly Roster</h3><button class="action-btn primary" onclick="crudRoster()" style="padding:2px 8px;font-size:9px" data-perm="HR:Create">+ Assign</button></div><div class="card-body" style="padding:8px 10px">'+
+      '<table style="width:100%;font-size:9px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px;color:#888">Employee</th><th style="text-align:left;padding:4px;color:#888">Shift</th><th style="text-align:left;padding:4px;color:#888">Week</th><th></th></tr></thead><tbody>'+
+      (roster.length?roster.map(function(r){
+        var emp=mockEmployees.find(function(x){return x.id===r.employeeId;});
+        var sh=types.find(function(x){return x.id===r.shiftId;});
+        return '<tr style="border-bottom:1px solid #f5f5f5"><td style="padding:4px;font-weight:500">'+(emp?emp.name:'?')+'</td><td style="padding:4px">'+(sh?sh.name+' ('+sh.start+'–'+sh.end+')':'?')+(r.overtime?' <span class="badge-status badge-pending" style="font-size:7px">OT</span>':'')+'</td><td style="padding:4px;color:#555">'+r.week+'</td><td style="padding:4px;text-align:right;white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudRoster(mockHRShifts.roster.find(function(x){return x.id==='+r.id+'}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="deleteRoster('+r.id+')">✕</span></td></tr>';
+      }).join(''):'<tr><td colspan="4" style="text-align:center;color:#999;padding:12px;font-size:10px">No roster assignments yet</td></tr>')+
+      '</tbody></table>'+
+    '</div></div>'+
+  '</div>';
+}
+function crudShiftType(item){
+  var n=!item;
+  var s=n?{id:'SFT-0'+(mockHRShifts.types.length+1),name:'',start:'09:00',end:'18:00',overtime:false}:item;
+  window._formRules=[
+    {id:'f_sname',fn:function(v){return V.req(v,'Shift name is required');}},
+    {id:'f_send',fn:function(v){var a=String(g('f_sstart')||''),b=String(v||'');if(a&&b&&b<=a)return 'End time must be after start time';return null;}}
+  ];
+  openModal(n?'New Shift':'Edit Shift',
+    formRow(inputField('Name *','f_sname',s.name,'',true),selectField('Overtime','f_sot',s.overtime?'Yes':'No',['No','Yes']))+
+    formRow(inputField('Start (HH:MM)','f_sstart',s.start,'',true),inputField('End (HH:MM)','f_send',s.end,'',true)),
+    function(){
+      var d={name:g('f_sname').trim(),start:g('f_sstart'),end:g('f_send'),overtime:g('f_sot')==='Yes'};
+      if(n)mockHRShifts.types.push(Object.assign({id:s.id},d));
+      else Object.assign(s,d);
+      DB.save('hr_shifts');showToast('Shift saved');renderModule();
+    }
+  );
+}
+function deleteShiftType(id){if(!confirm('Delete shift type?'))return;mockHRShifts.types=mockHRShifts.types.filter(function(s){return s.id!==id;});DB.save('hr_shifts');showToast('Deleted');renderModule();}
+function crudRoster(item){
+  var n=!item;
+  var r=n?{id:nextId(mockHRShifts.roster),employeeId:mockEmployees[0]?mockEmployees[0].id:null,shiftId:(mockHRShifts.types[0]||{}).id||null,week:'W25 · Jun 15–21',overtime:false}:item;
+  window._formRules=[
+    {id:'f_remp',fn:function(v){return V.req(v,'Select an employee');}},
+    {id:'f_rsh',fn:function(v){return V.req(v,'Select a shift');}}
+  ];
+  openModal(n?'Assign Shift':'Edit Roster',
+    formRow(selectField('Employee *','f_remp',n?'':String(r.employeeId),mockEmployees.map(function(e){return e.id+' | '+e.name;}),true),selectField('Shift *','f_rsh',n?'':r.shiftId,mockHRShifts.types.map(function(s){return s.id+' | '+s.name;}),true))+
+    formRow(inputField('Week','f_rweek',r.week||'W25 · Jun 15–21'),selectField('Overtime','f_rot',r.overtime?'Yes':'No',['No','Yes'])),
+    function(){
+      var empId=parseInt(String(g('f_remp')).split('|')[0].trim())||0;
+      var d={employeeId:empId,shiftId:String(g('f_rsh')).split('|')[0].trim(),week:g('f_rweek')||'W25 · Jun 15–21',overtime:g('f_rot')==='Yes'};
+      if(n)mockHRShifts.roster.push(Object.assign({id:nextId(mockHRShifts.roster)},d));
+      else Object.assign(r,d);
+      DB.save('hr_shifts');showToast('Roster saved');renderModule();
+    }
+  );
+}
+function deleteRoster(id){if(!confirm('Remove roster assignment?'))return;mockHRShifts.roster=mockHRShifts.roster.filter(function(r){return r.id!==id;});DB.save('hr_shifts');showToast('Deleted');renderModule();}
+
 function openEmployee(id){
   const e=mockEmployees.find(function(x){return x.id===id});if(!e)return;
   var attCount=mockHRAttendance.filter(function(a){return a.employeeId===id&&a.status!=='Weekend'});
