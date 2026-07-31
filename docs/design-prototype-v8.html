@@ -1067,14 +1067,14 @@ const GROUPS = {
   legal_compliance:{label:'Legal & Compliance',icon:'⚖️',mods:[{id:'compliance',label:'Compliance',badge:true},{id:'legal_contracts',label:'Legal Contracts',badge:true},{id:'qc',label:'QC & Inspection'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'calendar',label:'Calendar',badge:true},{id:'announcements',label:'Announcements',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
   system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] },
-  communication: { label:'Communication & AI', icon:'💬', mods:[{id:'whatsapp',label:'WhatsApp Engine'},{id:'chat',label:'Internal Chat'}] }
+  communication: { label:'Communication & AI', icon:'💬', mods:[{id:'whatsapp',label:'WhatsApp Engine'},{id:'chat',label:'Internal Chat'},{id:'ai_assistant',label:'AI Copilot'}] }
 };
 const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','hr_admin','legal_compliance','collaboration','system','communication'];
 
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1, ai_usage:1, reminder_log:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -2482,6 +2482,7 @@ function switchModule(mod,skipSkel) {
       case 'activity_log': renderActivityLog(el); break;
       case 'whatsapp': renderWhatsApp(el); break;
       case 'chat': renderChat(el); break;
+      case 'ai_assistant': renderAiAssistant(el); break;
       case 'csv_import': renderCsvImport(el); break;
       case 'permissions': renderPermissions(el); break;
       case 'settings': renderSettings(el); break;
@@ -4289,9 +4290,9 @@ function renderDues(el){
     ${duesTab==='dashboard'?renderDuesDashboard(totalDue,totalPaid,totalLateFee,critical,overdue,upcoming):
       duesTab==='all_dues'?renderDuesList():
       duesTab==='promises'?renderDuesPromises():
-      duesTab==='reminders'?'<div id="duesRemindersHost"></div>':''}
+      duesTab==='reminders'?'<div id="duesRemindersHost"></div><div id="duesAutoHost"></div>':''}
   </div>`;
-  if(duesTab==='reminders'){var _drh=document.getElementById('duesRemindersHost');if(_drh)renderPaymentReminders(_drh);}
+  if(duesTab==='reminders'){var _drh=document.getElementById('duesRemindersHost');if(_drh)renderPaymentReminders(_drh);var _dah=document.getElementById('duesAutoHost');if(_dah)renderDuesAutoNotifs(_dah);}
 }
 
 function renderDuesDashboard(tDue,tPaid,tLF,crit,over,upc){
@@ -10192,7 +10193,7 @@ window.mockOpeningBalances = DB.init('opening_balances', (function(){
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Project Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements','WhatsApp Engine','Internal Chat'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements','WhatsApp Engine','Internal Chat','AI Copilot'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -10961,7 +10962,8 @@ var _sdDatasetDefs=[
   // Group: Communication & AI
   {g:'Communication & AI',arr:'mockWhatsAppTemplates',label:'WhatsApp Templates',icon:'📱',mod:'whatsapp',fields:['name','event','body']},
   {g:'Communication & AI',arr:'mockWhatsAppLog',label:'WhatsApp Log',icon:'📤',mod:'whatsapp',fields:['contact','templateName','status']},
-  {g:'Communication & AI',arr:'mockChatMessages',label:'Chat Messages',icon:'💬',mod:'chat',fields:['from','text']}
+  {g:'Communication & AI',arr:'mockChatMessages',label:'Chat Messages',icon:'💬',mod:'chat',fields:['from','text']},
+  {g:'Communication & AI',arr:'mockAiUsage',label:'AI Queries',icon:'🤖',mod:'ai_assistant',fields:['query','intent','target']}
 ];
 var _sdGroupOrder=['Executive','Sales & CRM','Projects','Bookings & Customer','Engineering & Construction','Accounts & Finance','Admin & Operations','Legal & Compliance','Collaboration','Communication & AI'];
 var _sdModuleCount=Object.keys(GROUPS).reduce(function(s,g){return s+GROUPS[g].mods.length},0);
@@ -11290,6 +11292,21 @@ window.mockChatMessages = DB.init('chat_messages', [
   {id:'CM-18',ch:'general',from:'Sultana Razia',role:'HR Manager',text:'Happy birthday to Shamim Reza! 🎂 Team lunch at 1:30 PM.',time:'12:30 PM',date:'2026-06-12'},
   {id:'CM-19',ch:'site',from:'Rofiqul Islam',role:'Procurement',text:'BSRM steel delivery complete — 10 tons received, stock now 55 tons.',time:'01:10 PM',date:'2026-06-12',unread:true},
   {id:'CM-20',ch:'general',from:'Hasanul Banna',role:'Sales Lead',text:'Team, thank you for a strong quarter! Sales targets exceeded by 12%. 🚀',time:'01:30 PM',date:'2026-06-12'}
+]);
+// ═══ PHASE 5 — store seeds (ai_usage + reminder_log) ═══
+window.mockAiUsage = DB.init('ai_usage', [
+  {id:'AU-001',query:'Open Bookings',intent:'navigate',ts:'09:12 AM',date:'2026-06-12',target:'bookings'},
+  {id:'AU-002',query:'Summarize dues',intent:'summary',ts:'09:20 AM',date:'2026-06-12',target:''},
+  {id:'AU-003',query:'KB: handover procedure',intent:'kb',ts:'10:05 AM',date:'2026-06-12',target:'Property Handover Procedure — End-to-End Guide'},
+  {id:'AU-004',query:'Create Lead',intent:'create',ts:'11:30 AM',date:'2026-06-12',target:'crm'},
+  {id:'AU-005',query:'Open Finance',intent:'navigate',ts:'02:15 PM',date:'2026-06-12',target:'finance'}
+]);
+window.mockReminderLog = DB.init('reminder_log', [
+  {id:'RL-001',date:'2026-06-09',contact:'Engr. Salahuddin',channel:'SMS + Email',template:'NT-005',stage:'D3 · 14d Warning',status:'Sent',color:'#e65100'},
+  {id:'RL-002',date:'2026-06-10',contact:'Md. Nazrul Islam',channel:'SMS + Email + WhatsApp',template:'NT-005',stage:'LGL · Legal Referral',status:'Sent',color:'#4a148c'},
+  {id:'RL-003',date:'2026-06-11',contact:'Shafiqul Alam',channel:'WhatsApp',template:'WT-002',stage:'D1 · Soft Reminder',status:'Sent',color:'#1565c0'},
+  {id:'RL-004',date:'2026-06-11',contact:'Tariqul Islam',channel:'Email',template:'NT-002',stage:'D2 · 7d Follow-up',status:'Sent',color:'#2e7d32'},
+  {id:'RL-005',date:'2026-06-12',contact:'Fatima Begum',channel:'WhatsApp',template:'WT-002',stage:'D1 · Soft Reminder',status:'Sent',color:'#1565c0'}
 ]);
 var notifIcons = {lead:'🔵',payment:'🟢',approval:'🟡',due:'🔴',task:'📋',add:'🟢',edit:'🔵',delete:'⛔',info:'ℹ️',success:'✅',warning:'⚠️',error:'🚫','default':'🔔'};
 var notifBg = {lead:'#e3f2fd',payment:'#e8f5e9',approval:'#fff8e1',due:'#ffebee',task:'#f3e5f5',add:'#e8f5e9',edit:'#e3f2fd',delete:'#ffebee',info:'#e8eaf6',success:'#e8f5e9',warning:'#fff8e1',error:'#ffebee','default':'#f5f5f5'};
@@ -17061,6 +17078,179 @@ function sendChatMessage(){
   inp.value='';
   renderModule();
   setTimeout(function(){var l=document.querySelector('[data-msglist="1"]');if(l)l.scrollTop=l.scrollHeight;},30);
+}
+// ═══ 5.3 AI COPILOT (এআই সহকারী) ═══
+function renderAiAssistant(el){
+  var today=new Date().toISOString().slice(0,10);
+  var todayQ=mockAiUsage.filter(function(u){return u.date===today;}).length;
+  var intents={};mockAiUsage.forEach(function(u){intents[u.intent]=(intents[u.intent]||0)+1;});
+  var top=Object.keys(intents).sort(function(a,b){return intents[b]-intents[a];})[0]||'—';
+  el.innerHTML='<div class="fade-in">'+
+    '<div class="page-title">🤖 AI Copilot</div>'+
+    '<div class="page-subtitle">'+mockAiUsage.length+' queries logged · '+todayQ+' today · এআই সহকারী</div>'+
+    '<div class="stats-row" style="margin-bottom:6px">'+[
+      ['Total Queries',mockAiUsage.length,'#2F80ED'],
+      ['Queries Today',todayQ,'#2e7d32'],
+      ['Top Intent',top,'#7b1fa2'],
+      ['KB Hits',intents['kb']||0,'#1565c0']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div class="card"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3>🧠 Usage Analytics</h3><button class="action-btn primary" onclick="aiToggle()" style="padding:2px 8px;font-size:9px">Open Copilot</button></div>'+
+    '<div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Date</th><th>Query</th><th>Intent</th><th>Target</th></tr></thead><tbody>'+
+    (mockAiUsage.length?mockAiUsage.slice(0,15).map(function(u){
+      var c={navigate:'#1565c0',create:'#2e7d32',summary:'#7b1fa2',kb:'#e65100',other:'#888'}[u.intent]||'#888';
+      return '<tr><td style="font-size:9px;color:#888;white-space:nowrap">'+u.date+' '+u.ts+'</td><td style="font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+u.query+'</td><td><span style="color:'+c+';font-weight:600;font-size:9px">'+u.intent+'</span></td><td style="font-size:9px;color:#555">'+u.target+'</td></tr>';
+    }).join(''):'<tr><td colspan="4" style="text-align:center;color:#999;padding:16px">No queries yet — open the copilot 🤖 (bottom-right bubble)</td></tr>')+
+    '</tbody></table></div></div>';
+}
+function aiInit(){
+  if(document.getElementById('aiFab'))return;
+  var d=document.createElement('div');
+  d.id='aiFab';
+  d.style.cssText='position:fixed;bottom:70px;right:16px;width:46px;height:46px;border-radius:50%;background:#2F80ED;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:900;box-shadow:0 6px 20px rgba(47,128,237,.4)';
+  d.innerHTML='🤖';
+  d.title='AI Copilot (এআই সহকারী)';
+  d.onclick=aiToggle;
+  document.body.appendChild(d);
+  var p=document.createElement('div');
+  p.id='aiPanel';
+  p.style.cssText='position:fixed;bottom:124px;right:16px;width:320px;max-width:calc(100vw - 32px);height:440px;background:#fff;border:1px solid #e0e0e0;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.22);z-index:901;display:none;flex-direction:column;overflow:hidden';
+  p.innerHTML='<div style="padding:10px 12px;background:#2F80ED;color:#fff;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center">🤖 AI Copilot <span style="cursor:pointer;font-size:14px" onclick="aiToggle()">✕</span></div>'+
+    '<div id="aiMsgs" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:11px"></div>'+
+    '<div style="padding:6px 8px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid #eee">'+['Open Bookings','Create Lead','Summary','KB: leave'].map(function(c){return '<span onclick="aiQuick(\''+c+'\')" style="padding:3px 9px;border:1px solid #d0d8e8;border-radius:12px;font-size:9px;color:#2F80ED;cursor:pointer">'+c+'</span>';}).join('')+'</div>'+
+    '<div style="display:flex;gap:6px;padding:8px;border-top:1px solid #eee">'+
+    '<input id="aiInput" class="form-input" placeholder="Ask the copilot…" style="flex:1;font-size:11px" onkeydown="if(event.key===\'Enter\')aiSend()">'+
+    '<button onclick="aiSend()" style="background:#2F80ED;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">➤</button></div>';
+  document.body.appendChild(p);
+  aiMsg('bot','👋 Hi! I\'m the REM ERP copilot. Try: <b>"Open Bookings"</b>, <b>"Create Lead"</b>, <b>"Summarize dues"</b>, <b>"KB: handover"</b>.');
+}
+function aiToggle(){aiInit();var pp=document.getElementById('aiPanel');pp.style.display=pp.style.display==='none'?'flex':'none';if(pp.style.display==='flex')setTimeout(function(){var i=document.getElementById('aiInput');if(i)i.focus();},50);}
+function aiMsg(who,txt){
+  var box=document.getElementById('aiMsgs');if(!box)return;
+  var div=document.createElement('div');
+  div.style.cssText='max-width:85%;padding:7px 10px;border-radius:10px;font-size:11px;line-height:1.5;align-self:'+(who==='bot'?'flex-start;background:#f2f4f8;color:#333':'flex-end;background:#2F80ED;color:#fff');
+  div.innerHTML=txt;
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+}
+function aiSend(){
+  var inp=document.getElementById('aiInput');if(!inp)return;
+  var q=inp.value.trim();if(!q)return;
+  inp.value='';
+  aiMsg('user',q.replace(/</g,'&lt;'));
+  var reply=aiHandle(q);
+  setTimeout(function(){aiMsg('bot',reply);},250);
+}
+function aiQuick(c){var inp=document.getElementById('aiInput');if(!inp)return;inp.value=c;aiSend();}
+function aiLog(intent,q,target){
+  var now=new Date();
+  var hh=now.getHours()%12||12, mm=String(now.getMinutes()).padStart(2,'0'), ap=now.getHours()>=12?'PM':'AM';
+  mockAiUsage.unshift({id:'AU-'+Date.now(),query:q,intent:intent,ts:hh+':'+mm+' '+ap,date:now.toISOString().slice(0,10),target:target||''});
+  if(mockAiUsage.length>200)mockAiUsage.pop();
+  DB.save('ai_usage');
+}
+function parseMoneyStr(v){
+  if(typeof v==='number')return v;
+  if(!v)return 0;
+  var s=String(v).replace(/[৳,\s]/g,'').toLowerCase();
+  var m=/^([\d.]+)\s*(cr|lac|lakh|k)?$/.exec(s);
+  if(!m)return 0;
+  var n=parseFloat(m[1]);
+  if(m[2]==='cr')n*=10000000;
+  else if(m[2]==='lac'||m[2]==='lakh')n*=100000;
+  else if(m[2]==='k')n*=1000;
+  return isNaN(n)?0:n;
+}
+function aiHandle(q){
+  var l=q.toLowerCase();
+  var navMap={booking:'bookings',lead:'crm',customer:'customers',dues:'dues_recovery',finance:'finance',whatsapp:'whatsapp',chat:'chat',hr:'hr',stock:'stock',project:'projects',setting:'settings',dashboard:'dashboard',report:'reports',calendar:'calendar'};
+  var m=/^(?:open|go to|navigate to|show)\s+(.+)$/.exec(l);
+  if(m){
+    var k=Object.keys(navMap).find(function(key){return m[1].includes(key);});
+    if(k){aiLog('navigate',q,navMap[k]);switchModule(navMap[k]);return 'Opening <b>'+modLabel(navMap[k])+'</b>…';}
+    return 'I couldn\'t find that module. Try: Open Bookings, Open Finance, Open Chat, Open Dues.';
+  }
+  var c=/^(?:create|new|add)\s+(.+)$/.exec(l);
+  if(c){
+    var ent=c[1];
+    if(ent.includes('lead')){aiLog('create',q,'crm');setTimeout(function(){crudLead();},120);return 'Opening <b>New Lead</b> form…';}
+    if(ent.includes('customer')||ent.includes('contact')){aiLog('create',q,'customers');setTimeout(function(){crudCustomer();},120);return 'Opening <b>New Customer</b> form…';}
+    if(ent.includes('booking')){aiLog('create',q,'bookings');setTimeout(function(){crudBooking();},120);return 'Opening <b>New Booking</b> form…';}
+    if(ent.includes('template')){aiLog('create',q,'whatsapp');setTimeout(function(){crudWATemplate();},120);return 'Opening <b>New WhatsApp Template</b> form…';}
+    return 'I can create: Lead, Customer, Booking, WhatsApp Template. Try "Create Lead".';
+  }
+  if(l.includes('summary')||l.includes('summarize')||l.includes('stats')||l.includes('overview')){
+    var booked=mockBookings.filter(function(b){return b.status!=='Cancelled';});
+    var totVal=booked.reduce(function(s,b){return s+parseMoneyStr(b.price);},0);
+    var due=mockDues.reduce(function(s,d){return s+(d.due||0);},0);
+    var crit=mockDues.filter(function(d){return d.status==='Critical';}).length;
+    aiLog('summary',q,'');
+    return '<b>📊 REM ERP Snapshot</b><br>• '+booked.length+' active bookings (৳'+(totVal/10000000).toFixed(2)+' Cr)<br>• ৳'+(due/10000000).toFixed(2)+' Cr outstanding dues ('+crit+' critical)<br>• '+mockProjects.length+' projects · '+mockEmployees.length+' employees · '+mockLeads.length+' leads';
+  }
+  if(l.startsWith('kb')||l.includes('article')||l.includes('how to')||l.includes('guide')){
+    var kw=l.replace(/^(kb:?\s*|tell me about|help|how to|guide|article|what is)\s*/,'').replace(/[^a-z0-9 ]/g,'').trim();
+    var words=kw.split(/\s+/).filter(Boolean);
+    var arts=(window.mockKnowledgeBase||[]).filter(function(a){
+      var hay=(a.title+' '+a.category+' '+(a.tags||[]).join(' ')).toLowerCase();
+      return words.some(function(w){return hay.includes(w);});
+    }).slice(0,3);
+    if(!arts.length)arts=(window.mockKnowledgeBase||[]).slice(0,2);
+    aiLog('kb',q,arts[0]?arts[0].title:'');
+    return '<b>📚 KB suggestions</b><br>'+arts.map(function(a,i){return (i+1)+'. <b>'+a.title+'</b> <span style="color:#888">('+a.category+')</span>';}).join('<br>')+'<br><span style="color:#2F80ED;cursor:pointer" onclick="switchModule(\'knowledge_base\')">Open Knowledge Base →</span>';
+  }
+  aiLog('other',q,'');
+  return 'I can: <b>Open</b> any module, <b>Create</b> leads/customers/bookings, give a <b>summary</b>, or search <b>KB</b> articles. Try "Open Finance" or "Summarize dues".';
+}
+// ═══ 5.4 DUES & RECOVERY — AUTOMATED NOTIFICATIONS (ডিউস নোটিফিকেশন) ═══
+function duesLadder(days){
+  if(days<7)return {stage:'D1',label:'Soft Reminder',color:'#1565c0'};
+  if(days<14)return {stage:'D2',label:'7d Follow-up',color:'#2e7d32'};
+  if(days<30)return {stage:'D3',label:'14d Warning',color:'#e65100'};
+  if(days<60)return {stage:'D4',label:'30d Final',color:'#c62828'};
+  return {stage:'LGL',label:'Legal Referral',color:'#4a148c'};
+}
+function duesEligible(){
+  return (window.mockDues||[]).filter(function(d){return d.status==='Critical'||d.status==='Overdue'||d.status==='Due Today';}).map(function(d){
+    return {d:d,lad:duesLadder(d.daysOverdue||0)};
+  });
+}
+function renderDuesAutoNotifs(el){
+  if(!el)return;
+  var elig=duesEligible();
+  el.innerHTML=
+  '<div class="card" style="margin-top:10px"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center"><h3 class="no-i18n">⚡ Automated Dues Notifications (ডিউস নোটিফিকেশন)</h3>'+
+    '<button class="action-btn primary" onclick="runAutoReminders()" style="padding:3px 10px;font-size:10px" data-perm="Dues & Recovery:Create">⚡ Run Auto-Reminders</button></div>'+
+    '<div class="card-body" style="padding:10px">'+
+    '<div style="font-size:10px;color:#555;margin-bottom:8px">Escalation ladder: <b style="color:#1565c0">D1 Soft (&lt;7d)</b> → <b style="color:#2e7d32">D2 7d</b> → <b style="color:#e65100">D3 14d</b> → <b style="color:#c62828">D4 30d</b> → <b style="color:#4a148c">Legal</b>. Auto-sends SMS/Email/WhatsApp from notification & WhatsApp templates.</div>'+
+    '<table style="font-size:10px;width:100%"><thead><tr><th>Customer</th><th>Phone</th><th class="num">Due</th><th>Overdue</th><th>Stage</th><th>Channel</th></tr></thead><tbody>'+
+    (elig.length?elig.map(function(e){
+      var d=e.d,lad=e.lad;
+      var ch=d.daysOverdue>=14?'SMS + Email':d.daysOverdue>=7?'Email':'WhatsApp';
+      return '<tr><td style="font-weight:500">'+d.customer+'</td><td style="font-size:9px;color:#555">'+d.phone+'</td><td class="num" style="font-weight:600">৳'+d.due.toLocaleString('en-IN')+'</td><td style="font-weight:600;color:'+(d.daysOverdue>=30?'#c62828':d.daysOverdue>=14?'#e65100':'#555')+'">'+d.daysOverdue+'d</td>'+
+      '<td><span style="padding:1px 8px;border-radius:10px;font-size:9px;font-weight:600;background:'+lad.color+'22;color:'+lad.color+'">'+lad.stage+' · '+lad.label+'</span></td>'+
+      '<td style="font-size:9px;color:#555">'+ch+'</td></tr>';
+    }).join(''):'<tr><td colspan="6" style="text-align:center;color:#999;padding:14px">No overdue accounts — all dues up to date ✅</td></tr>')+
+    '</tbody></table></div></div>'+
+    '<div class="card" style="margin-top:10px"><div class="card-header"><h3>🕘 Reminder Send Log</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Date</th><th>Contact</th><th>Channel</th><th>Template</th><th>Stage</th><th>Status</th></tr></thead><tbody>'+
+    (mockReminderLog.length?mockReminderLog.slice(0,12).map(function(r){
+      return '<tr><td style="font-size:9px;color:#888;white-space:nowrap">'+r.date+'</td><td style="font-weight:500">'+r.contact+'</td><td style="font-size:9px">'+r.channel+'</td><td style="font-size:9px;color:#2F80ED">'+r.template+'</td><td><span style="font-size:9px;font-weight:600;color:'+r.color+'">'+r.stage+'</span></td><td><span style="color:'+(r.status==='Sent'?'#2e7d32':'#c62828')+';font-weight:600;font-size:9px">'+r.status+'</span></td></tr>';
+    }).join(''):'<tr><td colspan="6" style="text-align:center;color:#999;padding:14px">No reminders sent yet</td></tr>')+
+    '</tbody></table></div></div>';
+}
+function runAutoReminders(){
+  var elig=duesEligible();
+  if(!elig.length){showToast('No overdue accounts to remind','info');return;}
+  var now=new Date();
+  var ts=now.toISOString().slice(0,10);
+  elig.forEach(function(e){
+    var d=e.d,lad=e.lad;
+    var ch=lad.stage==='D1'?'WhatsApp':lad.stage==='D2'?'Email':(lad.stage==='D3'||lad.stage==='D4')?'SMS + Email':'SMS + Email + WhatsApp';
+    var tpl=lad.stage==='D1'?'WT-002':lad.stage==='D2'?'NT-002':'NT-005';
+    mockReminderLog.unshift({id:'RL-'+Date.now()+Math.random().toString(36).slice(2,5),date:ts,contact:d.customer,channel:ch,template:tpl,stage:lad.stage+' · '+lad.label,status:'Sent',color:lad.color});
+  });
+  DB.save('reminder_log');
+  addNotification('⚡ Auto-reminders sent',elig.length+' dues accounts notified via escalation ladder','due');
+  showToast('⚡ '+elig.length+' auto-reminders sent','success');
+  renderModule();
 }
 </script>
 </body>
