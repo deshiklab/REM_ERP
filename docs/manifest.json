@@ -1,8 +1,8 @@
 {
   "name": "REM ERP — Real Estate Management",
   "short_name": "REM ERP",
-  "description": "Real Estate Management ERP — properties, sales, finance, construction and more. Prototype v7.",
-  "start_url": "./design-prototype-v7.html",
+  "description": "Real Estate Management ERP — properties, sales, finance, construction and more. Prototype v8.",
+  "start_url": "./design-prototype-v8.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -14,8 +14,8 @@
     { "src": "pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Dashboard", "url": "./design-prototype-v7.html#dashboard", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] },
-    { "name": "CRM & Leads", "url": "./design-prototype-v7.html#crm", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Reports", "url": "./design-prototype-v7.html#reports", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Dashboard", "url": "./design-prototype-v8.html#dashboard", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] },
+    { "name": "CRM & Leads", "url": "./design-prototype-v8.html#crm", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Reports", "url": "./design-prototype-v8.html#reports", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] }
   ]
 }
