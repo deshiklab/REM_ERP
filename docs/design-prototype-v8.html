@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:1, hr_attendance:1, hr_timesheets:1, leave:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, hr_attendance:1, hr_timesheets:1, leave:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -8091,7 +8091,7 @@ function ntChanIcon(c){return c==='Email'?'✉️':c==='SMS'?'📱':'💬';}
 function renderNotifTemplates(){
   var rows=mockNotifTemplates.map(function(t){
     return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+t.id+'</td><td style="font-weight:500">'+t.name+'</td><td>'+ntChanIcon(t.channel)+' '+t.channel+'</td><td style="font-size:9px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+(t.subject||'')+'">'+(t.subject||'—')+'</td><td style="font-size:9px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+t.body+'">'+t.body+'</td><td><span class="badge-status '+(t.active?'badge-active':'badge-closed')+'" style="cursor:pointer" onclick="ntToggleActive(\''+t.id+'\')">'+(t.active?'Active':'Inactive')+'</span></td><td style="white-space:nowrap">'+
-      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" title="Test send" onclick="event.stopPropagation();ntTestSend(\''+t.id+'\')">▶</span> '+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" title="Test send" onclick="event.stopPropagation();ntTestSend(\''+t.id+'\')">▶ Test</span> '+
       '<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Preview" onclick="event.stopPropagation();ntPreview(\''+t.id+'\')">👁</span> '+
       '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudNotifTemplate(mockNotifTemplates.find(function(x){return x.id===\''+t.id+'\'}))">✎</span> '+
       '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\'Delete template?\')){var idx=mockNotifTemplates.findIndex(function(x){return x.id===\''+t.id+'\'});if(idx>=0)mockNotifTemplates.splice(idx,1);DB.save(\'notif_templates\');renderModule();showToast(\'Deleted\',\'info\')}">✕</span></td></tr>';
@@ -8476,11 +8476,11 @@ window.mockJournals = DB.init('journals', [
   {id:'JNL-006',date:'2026-07-28',ref:'TDS contractor deduction',desc:'10% TDS on contractor bill',lines:[{acc:'2-2000 Accounts Payable',dr:120000,cr:0},{acc:'4-1000 Construction Costs',dr:0,cr:120000}]}
 ]);
 window.mockReconItems = DB.init('recon_items', [
-  {id:'REC-9001',date:'2026-07-02',ref:'RCP-9001',desc:'Booking advance - Kamrul Hasan',amount:1800000,status:'Matched',matchedTo:'RCP-8839'},
+  {id:'REC-9001',date:'2026-07-02',ref:'RCP-9001',desc:'Booking advance - Kamrul Hasan',amount:500000,status:'Matched',matchedTo:'RCP-8839'},
   {id:'REC-9002',date:'2026-07-05',ref:'RCP-9002',desc:'Installment - Dr. Rubina Ali',amount:2200000,status:'Uncleared',matchedTo:null},
   {id:'REC-9003',date:'2026-07-08',ref:'PO-PAY-112',desc:'Cement purchase - Shah Cement',amount:950000,status:'Uncleared',matchedTo:null},
   {id:'REC-9004',date:'2026-07-12',ref:'RCP-9003',desc:'Plot booking - Tariqul Islam',amount:1150000,status:'Uncleared',matchedTo:null},
-  {id:'REC-9005',date:'2026-07-15',ref:'CHQ-9004',desc:'Contractor bill - Karim Traders',amount:650000,status:'Matched',matchedTo:'EXP-9912'},
+  {id:'REC-9005',date:'2026-07-15',ref:'CHQ-9004',desc:'Contractor bill - Karim Traders',amount:345000,status:'Matched',matchedTo:'EXP-9912'},
   {id:'REC-9006',date:'2026-07-18',ref:'RCP-9005',desc:'Installment - Nazma Akhter',amount:800000,status:'Uncleared',matchedTo:null},
   {id:'REC-9007',date:'2026-07-21',ref:'RCP-9006',desc:'Handover fee - Jahanara Begum',amount:2000000,status:'Uncleared',matchedTo:null},
   {id:'REC-9008',date:'2026-07-24',ref:'PO-PAY-113',desc:'Steel purchase - BSRM',amount:1400000,status:'Uncleared',matchedTo:null}
@@ -8739,7 +8739,7 @@ function renderFinanceReconcile(){
     var sb=r.status==='Matched'?'#e8f5e9;color:#2e7d32':'#fff3e0;color:#e65100';
     var txn=r.matchedTo?mockTransactions.find(function(t){return t.id===r.matchedTo;}):null;
     return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+r.id+'</td><td style="font-size:9px;color:#888">'+r.date+'</td><td style="font-weight:500">'+r.ref+'</td><td style="font-size:9px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.desc+'">'+r.desc+'</td><td class="num" style="font-weight:600">৳'+fmtNum(r.amount)+'</td><td><span class="badge-status" style="background:'+sb+'">'+r.status+'</span></td><td style="font-size:9px;font-family:monospace">'+(txn?txn.id+' · '+txn.desc.slice(0,18):'—')+'</td><td style="white-space:nowrap">'+
-      (r.status!=='Matched'?'<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Match" onclick="event.stopPropagation();reconMatch(\''+r.id+'\')">✓</span> ':'<span style="color:#e65100;cursor:pointer;font-size:10px" title="Unmatch" onclick="event.stopPropagation();reconUnmatch(\''+r.id+'\')">↺</span> ')+
+      (r.status!=='Matched'?'<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Match" onclick="event.stopPropagation();reconMatch(\''+r.id+'\')">✓ Match</span> ':'<span style="color:#e65100;cursor:pointer;font-size:10px" title="Unmatch" onclick="event.stopPropagation();reconUnmatch(\''+r.id+'\')">↺ Unmatch</span> ')+
       '</td></tr>';
   }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;font-size:11px">No statement lines</td></tr>')+
   '</tbody></table></div></div></div>'+
