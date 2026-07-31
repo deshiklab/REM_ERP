@@ -1,7 +1,7 @@
-/* REM ERP v6 — Service Worker */
-const CACHE = 'rem-erp-v6-v12';
+/* REM ERP v7 — Service Worker */
+const CACHE = 'rem-erp-v7-v13';
 const CORE = [
-  './design-prototype-v6.html',
+  './design-prototype-v7.html',
   './manifest.json',
   './pwa/icon-192.png',
   './pwa/icon-512.png',
@@ -38,23 +38,22 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put(req, clone));
         }
         return res;
-      }).catch(() =>
-        caches.match(req).then((m) => m || caches.match('./design-prototype-v6.html'))
-      )
+      }).catch(() => caches.match(req).then((m) => m || caches.match('./design-prototype-v7.html')))
     );
     return;
   }
 
-  // Assets: cache-first, then network + fill cache
+  // Static assets: STALE-WHILE-REVALIDATE
   e.respondWith(
-    caches.match(req).then((cached) =>
-      cached || fetch(req).then((res) => {
+    caches.match(req).then((cached) => {
+      const fetchPromise = fetch(req).then((res) => {
         if (res && res.ok) {
           const clone = res.clone();
           caches.open(CACHE).then((c) => c.put(req, clone));
         }
         return res;
-      })
-    )
+      }).catch(() => cached);
+      return cached || fetchPromise;
+    })
   );
 });
