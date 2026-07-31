@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -1403,6 +1403,13 @@ window.mockPOs = DB.init('pos', [
   {id:'PO-24-087',date:'Oct 20, 2024',vendor:'RFL Building Products',site:'Muktodhara',items:'Ceramic Tiles (100 Boxes)',amount:95000,fmt:'৳95,000',dueDate:'Nov 15, 2024',status:'Approved',category:'Finishes',approvedBy:'Iftekhar Ahmad'},
   {id:'PO-24-086',date:'Oct 18, 2024',vendor:'Delta Electricals',site:'Jolshiri',items:'Cable (1000m) + Switches',amount:165000,fmt:'৳1,65,000',dueDate:'Oct 30, 2024',status:'Delivered',category:'Electrical',approvedBy:'MD Hasanul Banna'},
   {id:'PO-24-085',date:'Oct 15, 2024',vendor:'Local Sand Suppliers',site:'Muktodhara',items:'Sylhet Sand (3000 CFT)',amount:180000,fmt:'৳1,80,000',dueDate:'Oct 25, 2024',status:'Delivered',category:'Material',approvedBy:'Iftekhar Ahmad'}
+]);
+window.mockStockReceipts = DB.init('stock_receipts', [
+  {id:1,grn:'GRN-2401',poRef:'PO-24-089',item:'Shah Cement',qty:400,unit:'Bags',date:'2024-10-26',inspection:'Pass',receivedBy:'Md. Alam'},
+  {id:2,grn:'GRN-2402',poRef:'PO-24-088',item:'BSRM Steel 500W',qty:10,unit:'Tons',date:'2024-10-24',inspection:'Pass',receivedBy:'Engr. Faruk'},
+  {id:3,grn:'GRN-2403',poRef:'PO-24-087',item:'Ceramic Tiles (2x2)',qty:60,unit:'Boxes',date:'2024-10-21',inspection:'Pass',receivedBy:'Ms. Shirin'},
+  {id:4,grn:'GRN-2404',poRef:'PO-24-086',item:'Electrical Cable (6mm)',qty:400,unit:'Meters',date:'2024-10-19',inspection:'Fail',receivedBy:'Rajib Ghosh'},
+  {id:5,grn:'GRN-2405',poRef:'PO-24-085',item:'Sylhet Sand',qty:3000,unit:'CFT',date:'2024-10-16',inspection:'Pass',receivedBy:'Md. Alam'}
 ]);
 window.mockSuppliers = DB.init('suppliers', [
   {id:'SUP-001',name:'Shah Cement Ltd.',contact:'Mr. Kabir Hossain',phone:'+880 1700 111111',email:'kabir@shahcement.com',address:'555 Tejgaon I/A, Dhaka',type:'Material',items:'Cement, Sand, Bricks',rating:4.5,status:'Active',lastOrder:'Oct 25, 2024',totalOrders:28},
@@ -1786,28 +1793,28 @@ window.mockUsers = DB.init('users', [
 ]);
 window.mockEntities = DB.init('entities', [
   // ═══ INDIVIDUALS ═══
-  {id:'ENT-001',type:'individual',name:'Kamrul Hasan',phone:'01711-234567',email:'kamrul.hasan@gmail.com',nid:'1234567890',dob:'1985-03-15',occupation:'Businessman',roles:['customer'],address:'House 12, Road 5, Banani, Dhaka',nationality:'Bangladeshi',source:'Website',priority:'Hot',notes:'Interested in Jolshiri apartment',totalProperties:1,totalValue:4500000,properties:['Jolshiri - Apt 9A'],createdAt:'2024-08-01',createdBy:'Iftekhar Ahmad',tags:['VIP','NRB']},
-  {id:'ENT-002',type:'individual',name:'Dr. Rubina Ali',phone:'+1 415 555 0198',email:'rubina@example.com',nid:'US-PASS-12345',dob:'1978-11-20',occupation:'Consultant Physician',roles:['customer'],address:'San Francisco, CA, USA',nationality:'Bangladeshi (NRB)',source:'Referral',priority:'Hot',notes:'NRB buyer. Booked Jolshiri Apt 4B. Needs regular progress updates.',totalProperties:1,totalValue:5500000,properties:['Jolshiri - Apt 4B'],createdAt:'2024-09-01',createdBy:'Iftekhar Ahmad',tags:['NRB','Medical']},
-  {id:'ENT-003',type:'individual',name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',nid:'9876543210',dob:'1982-06-10',occupation:'Real Estate Developer',roles:['customer','broker'],address:'House 12, Road 5, Banani, Dhaka',nationality:'Bangladeshi',source:'Bikroy.com',priority:'Hot',notes:'Interested in 5 katha plot at Muktodhara. Prefers south-facing.',totalProperties:1,totalValue:8000000,properties:['Muktodhara - Plot M-103'],createdAt:'2024-08-15',createdBy:'Hasanul Banna',tags:['VIP','Repeat']},
-  {id:'ENT-004',type:'individual',name:'Fatima Begum',phone:'01755-678901',email:'fatima.begum@gmail.com',nid:'1112233445',dob:'1990-02-14',occupation:'Banker',roles:['customer'],address:'Gulshan, Dhaka',nationality:'Bangladeshi',source:'Referral',priority:'Normal',notes:'Need 2BR apartment, budget 2-2.5 Cr',totalProperties:1,totalValue:5000000,properties:['Jolshiri - Apt 7C'],createdAt:'2024-10-01',createdBy:'Sales Team A',tags:[]},
-  {id:'ENT-005',type:'individual',name:'Engr. Salahuddin',phone:'01744-567890',email:'salahuddin@live.com',nid:'5544332211',dob:'1975-08-30',occupation:'Civil Engineer',roles:['customer','supplier'],address:'Uttara, Dhaka',nationality:'Bangladeshi',source:'Real Estate Fair',priority:'Normal',notes:'Engineering consultant for Muktodhara project',totalProperties:1,totalValue:3500000,properties:['Muktodhara - Plot 22'],createdAt:'2024-06-01',createdBy:'Hasanul Banna',tags:['Engineer']},
-  {id:'ENT-006',type:'individual',name:'Mrs. Jahanara Begum',phone:'01766-789012',email:'jahanara@hotmail.com',nid:'9988776655',dob:'1968-12-05',occupation:'Home Maker',roles:['customer'],address:'Dhanmondi, Dhaka',nationality:'Bangladeshi',source:'Referral',priority:'Normal',notes:'Fully paid customer. Handover completed.',totalProperties:2,totalValue:7800000,properties:['Jolshiri - Apt 3C','Muktodhara - Plot 8'],createdAt:'2024-03-01',createdBy:'Hasanul Banna',tags:['Repeat']},
-  {id:'ENT-007',type:'individual',name:'Md. Nazrul Islam',phone:'01777-890123',email:'nazrul.islam@gmail.com',nid:'1122334455',dob:'1979-04-22',occupation:'Government Officer',roles:['customer'],address:'Segunbagicha, Dhaka',nationality:'Bangladeshi',source:'Facebook',priority:'Low',notes:'Delinquent payment history',totalProperties:1,totalValue:6000000,properties:['Muktodhara - Unit 201'],createdAt:'2024-07-01',createdBy:'Sales Team A',tags:['Delinquent']},
-  {id:'ENT-008',type:'individual',name:'Shamima Akhter',phone:'01788-901234',email:'shamima.akhter@yahoo.com',nid:'6677889900',dob:'1988-09-18',occupation:'Teacher',roles:['customer'],address:'Mirpur, Dhaka',nationality:'Bangladeshi',source:'Website',priority:'Normal',notes:'On track with payments. Good customer.',totalProperties:1,totalValue:4200000,properties:['Muktodhara - Unit 305'],createdAt:'2024-08-15',createdBy:'Sales Team B',tags:[]},
-  {id:'ENT-009',type:'individual',name:'Abdur Rahim',phone:'01799-012345',email:'abdur.rahim@live.com',nid:'4433221100',dob:'1983-11-08',occupation:'Businessman',roles:['customer'],address:'Khilgaon, Dhaka',nationality:'Bangladeshi',source:'Walk-in',priority:'Normal',notes:'Looking for large plot for development project',totalProperties:1,totalValue:3800000,properties:['Jolshiri - Apt 5A'],createdAt:'2024-09-20',createdBy:'Iftekhar Ahmad',tags:[]},
-  {id:'ENT-010',type:'individual',name:'Nurjahan Begum',phone:'01800-123456',email:'nurjahan@gmail.com',nid:'5566778899',dob:'1972-07-25',occupation:'Lawyer',roles:['customer'],address:'Banani, Dhaka',nationality:'Bangladeshi',source:'Facebook',priority:'Normal',notes:'Fully paid. Handover completed.',totalProperties:1,totalValue:3200000,properties:['Muktodhara - Plot 15'],createdAt:'2024-05-01',createdBy:'Hasanul Banna',tags:[]},
+  {id:'ENT-001',type:'individual',name:'Kamrul Hasan',phone:'01711-234567',email:'kamrul.hasan@gmail.com',nid:'1234567890',dob:'1985-03-15',occupation:'Businessman',roles:['customer'],address:'House 12, Road 5, Banani, Dhaka',nationality:'Bangladeshi',source:'Website',priority:'Hot',notes:'Interested in Jolshiri apartment',totalProperties:1,totalValue:4500000,properties:['Jolshiri - Apt 9A'],createdAt:'2024-08-01',createdBy:'Iftekhar Ahmad',group:'Owner',tags:['VIP','NRB']},
+  {id:'ENT-002',type:'individual',name:'Dr. Rubina Ali',phone:'+1 415 555 0198',email:'rubina@example.com',nid:'US-PASS-12345',dob:'1978-11-20',occupation:'Consultant Physician',roles:['customer'],address:'San Francisco, CA, USA',nationality:'Bangladeshi (NRB)',source:'Referral',priority:'Hot',notes:'NRB buyer. Booked Jolshiri Apt 4B. Needs regular progress updates.',totalProperties:1,totalValue:5500000,properties:['Jolshiri - Apt 4B'],createdAt:'2024-09-01',createdBy:'Iftekhar Ahmad',group:'NRB',tags:['NRB','Medical']},
+  {id:'ENT-003',type:'individual',name:'Tariqul Islam',phone:'+880 1711 000000',email:'tariqul@example.com',nid:'9876543210',dob:'1982-06-10',occupation:'Real Estate Developer',roles:['customer','broker'],address:'House 12, Road 5, Banani, Dhaka',nationality:'Bangladeshi',source:'Bikroy.com',priority:'Hot',notes:'Interested in 5 katha plot at Muktodhara. Prefers south-facing.',totalProperties:1,totalValue:8000000,properties:['Muktodhara - Plot M-103'],createdAt:'2024-08-15',createdBy:'Hasanul Banna',group:'Broker',tags:['VIP','Repeat']},
+  {id:'ENT-004',type:'individual',name:'Fatima Begum',phone:'01755-678901',email:'fatima.begum@gmail.com',nid:'1112233445',dob:'1990-02-14',occupation:'Banker',roles:['customer'],address:'Gulshan, Dhaka',nationality:'Bangladeshi',source:'Referral',priority:'Normal',notes:'Need 2BR apartment, budget 2-2.5 Cr',totalProperties:1,group:'Prospect',totalValue:5000000,properties:['Jolshiri - Apt 7C'],createdAt:'2024-10-01',createdBy:'Sales Team A',tags:[]},
+  {id:'ENT-005',type:'individual',name:'Engr. Salahuddin',phone:'01744-567890',email:'salahuddin@live.com',nid:'5544332211',dob:'1975-08-30',occupation:'Civil Engineer',roles:['customer','supplier'],address:'Uttara, Dhaka',nationality:'Bangladeshi',source:'Real Estate Fair',priority:'Normal',notes:'Engineering consultant for Muktodhara project',totalProperties:1,totalValue:3500000,properties:['Muktodhara - Plot 22'],createdAt:'2024-06-01',createdBy:'Hasanul Banna',group:'Owner',tags:['Engineer']},
+  {id:'ENT-006',type:'individual',name:'Mrs. Jahanara Begum',phone:'01766-789012',email:'jahanara@hotmail.com',nid:'9988776655',dob:'1968-12-05',occupation:'Home Maker',roles:['customer'],address:'Dhanmondi, Dhaka',nationality:'Bangladeshi',source:'Referral',priority:'Normal',notes:'Fully paid customer. Handover completed.',totalProperties:2,totalValue:7800000,properties:['Jolshiri - Apt 3C','Muktodhara - Plot 8'],createdAt:'2024-03-01',createdBy:'Hasanul Banna',group:'Owner',tags:['Repeat']},
+  {id:'ENT-007',type:'individual',name:'Md. Nazrul Islam',phone:'01777-890123',email:'nazrul.islam@gmail.com',nid:'1122334455',dob:'1979-04-22',occupation:'Government Officer',roles:['customer'],address:'Segunbagicha, Dhaka',nationality:'Bangladeshi',source:'Facebook',priority:'Low',notes:'Delinquent payment history',totalProperties:1,totalValue:6000000,properties:['Muktodhara - Unit 201'],createdAt:'2024-07-01',createdBy:'Sales Team A',group:'Owner',tags:['Delinquent']},
+  {id:'ENT-008',type:'individual',name:'Shamima Akhter',phone:'01788-901234',email:'shamima.akhter@yahoo.com',nid:'6677889900',dob:'1988-09-18',occupation:'Teacher',roles:['customer'],address:'Mirpur, Dhaka',nationality:'Bangladeshi',source:'Website',priority:'Normal',notes:'On track with payments. Good customer.',totalProperties:1,group:'Owner',totalValue:4200000,properties:['Muktodhara - Unit 305'],createdAt:'2024-08-15',createdBy:'Sales Team B',tags:[]},
+  {id:'ENT-009',type:'individual',name:'Abdur Rahim',phone:'01799-012345',email:'abdur.rahim@live.com',nid:'4433221100',dob:'1983-11-08',occupation:'Businessman',roles:['customer'],address:'Khilgaon, Dhaka',nationality:'Bangladeshi',source:'Walk-in',priority:'Normal',notes:'Looking for large plot for development project',totalProperties:1,group:'Prospect',totalValue:3800000,properties:['Jolshiri - Apt 5A'],createdAt:'2024-09-20',createdBy:'Iftekhar Ahmad',tags:[]},
+  {id:'ENT-010',type:'individual',name:'Nurjahan Begum',phone:'01800-123456',email:'nurjahan@gmail.com',nid:'5566778899',dob:'1972-07-25',occupation:'Lawyer',roles:['customer'],address:'Banani, Dhaka',nationality:'Bangladeshi',source:'Facebook',priority:'Normal',notes:'Fully paid. Handover completed.',totalProperties:1,group:'Owner',totalValue:3200000,properties:['Muktodhara - Plot 15'],createdAt:'2024-05-01',createdBy:'Hasanul Banna',tags:[]},
   // ═══ COMPANIES ═══
-  {id:'ENT-011',type:'company',companyName:'Pinnacle Real Estate',phone:'+44-20-7946-0202',email:'info@pinnacle-re.com',vatNumber:'UK-VAT-123',tradeLicense:'TL-2024-001',website:'https://pinnacle-realestate.co.uk',contactPerson:'John Smith',roles:['customer','broker'],address:'55 Baker Street, London, UK',industry:'Real Estate',priority:'Normal',notes:'Institutional buyer for multiple units. Brokering deals in Purbachal.',totalProperties:2,totalValue:15000000,properties:['Jolshiri - Commercial Unit 1','Jolshiri - Commercial Unit 2'],createdAt:'2024-06-01',createdBy:'MD Hasanul Banna',tags:['Institutional']},
+  {id:'ENT-011',type:'company',companyName:'Pinnacle Real Estate',phone:'+44-20-7946-0202',email:'info@pinnacle-re.com',vatNumber:'UK-VAT-123',tradeLicense:'TL-2024-001',website:'https://pinnacle-realestate.co.uk',contactPerson:'John Smith',roles:['customer','broker'],address:'55 Baker Street, London, UK',industry:'Real Estate',priority:'Normal',notes:'Institutional buyer for multiple units. Brokering deals in Purbachal.',totalProperties:2,totalValue:15000000,properties:['Jolshiri - Commercial Unit 1','Jolshiri - Commercial Unit 2'],createdAt:'2024-06-01',createdBy:'MD Hasanul Banna',group:'Investor',tags:['Institutional']},
   {id:'ENT-012',type:'company',companyName:'Shah Cement Industries',phone:'+880 1700 002333',email:'sales@shahcement.com',vatNumber:'VAT-BD-4455',tradeLicense:'TL-2023-002',website:'https://shahcement.com',contactPerson:'Rafiqul Islam',roles:['supplier'],address:'Chattogram EPZ',industry:'Cement Manufacturing',priority:'Normal',notes:'Primary cement supplier for Muktodhara project. Credit terms: 30 days.',totalProperties:0,totalValue:0,properties:[],createdAt:'2024-01-15',createdBy:'MD Hasanul Banna',tags:['Supplier']},
   {id:'ENT-013',type:'company',companyName:'M/S Rahman Enterprise',phone:'+880 1711 004555',email:'contact@rahmanent.com',vatNumber:'VAT-BD-3322',tradeLicense:'TL-2022-015',website:'',contactPerson:'Abdur Rahman',roles:['supplier'],address:'89 East Rajabazar, Farmgate, Dhaka',industry:'Construction',priority:'Normal',notes:'Earthwork and foundation contractor. Good rates for bulk excavation.',totalProperties:0,totalValue:0,properties:[],createdAt:'2024-02-01',createdBy:'MD Hasanul Banna',tags:['Contractor']},
-  {id:'ENT-014',type:'company',companyName:'Bashundhara Group',phone:'+880 1622 005678',email:'broker@bashundhara.com',vatNumber:'VAT-BD-9988',tradeLicense:'TL-2024-010',website:'https://bashundhara.com',contactPerson:'Hasan Mahmud',roles:['broker'],address:'Bashundhara R/A, Dhaka',industry:'Real Estate Development',priority:'High',notes:'Land broker for Purbachal sector deals. Has leads on 10 bigha plot.',totalProperties:0,totalValue:0,properties:[],createdAt:'2024-03-01',createdBy:'MD Hasanul Banna',tags:['Broker','Land']},
-  {id:'ENT-015',type:'company',companyName:'Tech Solutions Ltd.',phone:'+880 1919 343434',email:'info@techsolutions.com',vatNumber:'VAT-BD-7766',tradeLicense:'TL-2023-008',website:'https://techsolutions.com',contactPerson:'Mizanur Rahman',roles:['customer'],address:'Uttara Sector 7, Dhaka',industry:'IT Services',priority:'Normal',notes:'Corporate client looking for office space and employee housing',totalProperties:1,totalValue:8500000,properties:['Jolshiri - Commercial Suite 3'],createdAt:'2024-04-01',createdBy:'Iftekhar Ahmad',tags:['Corporate']},
-  {id:'ENT-016',type:'company',companyName:'Green Delta Insurance',phone:'+880 1700 777888',email:'corporate@greendelta.com',vatNumber:'VAT-BD-5544',tradeLicense:'TL-2021-003',website:'https://greendelta.com',contactPerson:'Md. Shahid Uddin',roles:['customer','supplier'],address:'Motijheel, Dhaka',industry:'Insurance',priority:'Normal',notes:'Insurance partner for project insurance and customer financing',totalProperties:1,totalValue:3500000,properties:['Muktodhara - Commercial Plot C2'],createdAt:'2024-05-01',createdBy:'MD Hasanul Banna',tags:['Corporate','Partner']},
+  {id:'ENT-014',type:'company',companyName:'Bashundhara Group',phone:'+880 1622 005678',email:'broker@bashundhara.com',vatNumber:'VAT-BD-9988',tradeLicense:'TL-2024-010',website:'https://bashundhara.com',contactPerson:'Hasan Mahmud',roles:['broker'],address:'Bashundhara R/A, Dhaka',industry:'Real Estate Development',priority:'High',notes:'Land broker for Purbachal sector deals. Has leads on 10 bigha plot.',totalProperties:0,totalValue:0,properties:[],createdAt:'2024-03-01',createdBy:'MD Hasanul Banna',group:'Broker',tags:['Broker','Land']},
+  {id:'ENT-015',type:'company',companyName:'Tech Solutions Ltd.',phone:'+880 1919 343434',email:'info@techsolutions.com',vatNumber:'VAT-BD-7766',tradeLicense:'TL-2023-008',website:'https://techsolutions.com',contactPerson:'Mizanur Rahman',roles:['customer'],address:'Uttara Sector 7, Dhaka',industry:'IT Services',priority:'Normal',notes:'Corporate client looking for office space and employee housing',totalProperties:1,totalValue:8500000,properties:['Jolshiri - Commercial Suite 3'],createdAt:'2024-04-01',createdBy:'Iftekhar Ahmad',group:'Investor',tags:['Corporate']},
+  {id:'ENT-016',type:'company',companyName:'Green Delta Insurance',phone:'+880 1700 777888',email:'corporate@greendelta.com',vatNumber:'VAT-BD-5544',tradeLicense:'TL-2021-003',website:'https://greendelta.com',contactPerson:'Md. Shahid Uddin',roles:['customer','supplier'],address:'Motijheel, Dhaka',industry:'Insurance',priority:'Normal',notes:'Insurance partner for project insurance and customer financing',totalProperties:1,totalValue:3500000,properties:['Muktodhara - Commercial Plot C2'],createdAt:'2024-05-01',createdBy:'MD Hasanul Banna',group:'Investor',tags:['Corporate','Partner']},
   // ═══ JOINT ENTITIES ═══
-  {id:'ENT-017',type:'joint',name:'Hasan & Rahman (Joint)',members:[{name:'Kamrul Hasan',phone:'01711-234567',nid:'1234567890',relation:'Brother'},{name:'Abdur Rahman',phone:'01722-111111',nid:'9876543210',relation:'Brother'}],phone:'01711-234567',email:'joint.hr@gmail.com',roles:['customer'],address:'Dhanmondi, Dhaka',priority:'Hot',notes:'Two brothers jointly purchasing Jolshiri penthouse',totalProperties:1,totalValue:8500000,properties:['Jolshiri - Penthouse 14A'],createdAt:'2024-10-01',createdBy:'Iftekhar Ahmad',tags:['Joint','VIP']},
-  {id:'ENT-018',type:'joint',name:'Rahim & Fatema (Co-owners)',members:[{name:'Abdur Rahim',phone:'01799-012345',nid:'4433221100',relation:'Husband'},{name:'Fatema Begum',phone:'01755-678901',nid:'1112233445',relation:'Wife'}],phone:'01799-012345',email:'rahim_fatema@gmail.com',roles:['customer'],address:'Khilgaon, Dhaka',priority:'Normal',notes:'Husband-wife jointly purchasing Muktodhara plot',totalProperties:1,totalValue:2800000,properties:['Muktodhara - Plot 28'],createdAt:'2024-11-01',createdBy:'Sales Team A',tags:['Joint']},
+  {id:'ENT-017',type:'joint',name:'Hasan & Rahman (Joint)',members:[{name:'Kamrul Hasan',phone:'01711-234567',nid:'1234567890',relation:'Brother'},{name:'Abdur Rahman',phone:'01722-111111',nid:'9876543210',relation:'Brother'}],phone:'01711-234567',email:'joint.hr@gmail.com',roles:['customer'],address:'Dhanmondi, Dhaka',priority:'Hot',notes:'Two brothers jointly purchasing Jolshiri penthouse',totalProperties:1,totalValue:8500000,properties:['Jolshiri - Penthouse 14A'],createdAt:'2024-10-01',createdBy:'Iftekhar Ahmad',group:'Owner',tags:['Joint','VIP']},
+  {id:'ENT-018',type:'joint',name:'Rahim & Fatema (Co-owners)',members:[{name:'Abdur Rahim',phone:'01799-012345',nid:'4433221100',relation:'Husband'},{name:'Fatema Begum',phone:'01755-678901',nid:'1112233445',relation:'Wife'}],phone:'01799-012345',email:'rahim_fatema@gmail.com',roles:['customer'],address:'Khilgaon, Dhaka',priority:'Normal',notes:'Husband-wife jointly purchasing Muktodhara plot',totalProperties:1,totalValue:2800000,properties:['Muktodhara - Plot 28'],createdAt:'2024-11-01',createdBy:'Sales Team A',group:'Owner',tags:['Joint']},
   // ═══ EMPLOYEES ═══
-  {id:'ENT-019',type:'individual',name:'MD Hasanul Banna',phone:'+880 1711 009888',email:'banna@marsconstech.com',nid:'2233445566',dob:'1980-01-15',occupation:'Project Director',roles:['employee','customer'],address:'Head Office, Dhaka',nationality:'Bangladeshi',source:'Internal',priority:'Normal',notes:'Project director for all Mars projects. Also purchased a plot.',totalProperties:1,totalValue:2500000,properties:['Muktodhara - Staff Plot 1'],createdAt:'2024-01-01',createdBy:'System',tags:['Staff','Management']},
+  {id:'ENT-019',type:'individual',name:'MD Hasanul Banna',phone:'+880 1711 009888',email:'banna@marsconstech.com',nid:'2233445566',dob:'1980-01-15',occupation:'Project Director',roles:['employee','customer'],address:'Head Office, Dhaka',nationality:'Bangladeshi',source:'Internal',priority:'Normal',notes:'Project director for all Mars projects. Also purchased a plot.',totalProperties:1,totalValue:2500000,properties:['Muktodhara - Staff Plot 1'],createdAt:'2024-01-01',createdBy:'System',group:'Owner',tags:['Staff','Management']},
   {id:'ENT-020',type:'individual',name:'Iftekhar Ahmad',phone:'+880 1711 007666',email:'iftekhar@marsconstech.com',nid:'3344556677',dob:'1987-06-20',occupation:'Sales Manager',roles:['employee'],address:'Head Office, Dhaka',nationality:'Bangladeshi',source:'Internal',priority:'Normal',notes:'Senior sales lead handling CRM and bookings.',totalProperties:0,totalValue:0,properties:[],createdAt:'2024-01-01',createdBy:'System',tags:['Staff','Sales']},
 ]);;
 window.mockDocuments = DB.init('documents', [
@@ -3003,7 +3010,8 @@ function renderCustomers(el){
     if(q&&!(e.name||'').toLowerCase().includes(q.toLowerCase())&&!(e.companyName||'').toLowerCase().includes(q.toLowerCase())&&!e.phone.includes(q))return false;
     if(ft&&e.type!==ft)return false;
     if(fr&&e.roles.indexOf(fr)<0)return false;
-    if(fg&&(!e.tags||e.tags.indexOf(fg)<0))return false;
+    if(fg&&e.group!==fg&&(!e.tags||e.tags.indexOf(fg)<0))return false;
+    if(window.custGrpChip&&e.group!==window.custGrpChip)return false;
     if(fri&&e.priority!==fri)return false;
     return true;
   });
@@ -3031,11 +3039,16 @@ function renderCustomers(el){
       '<div class="stat-card"><div class="label">🔄 Repeat Buyers</div><div class="value" style="color:#2e7d32">'+repeatCust+'</div></div>'+
       '<div class="stat-card"><div class="label">Total Properties</div><div class="value" style="color:#00838f">'+totalProps+'</div></div>'+
     '</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">'+CUST_GROUPS.map(function(gr){
+      var c=mockEntities.filter(function(e){return e.group===gr;}).length;
+      var on=window.custGrpChip===gr;
+      return '<span style="cursor:pointer;padding:2px 9px;border-radius:10px;font-size:9px;font-weight:600;border:1px solid '+(on?'#2F80ED':'#d0d8e8')+';background:'+(on?'#2F80ED':'#fff')+';color:'+(on?'#fff':'#555')+'" onclick="setCustGrpChip(\''+gr+'\')">'+gr+' · '+c+'</span>';
+    }).join('')+'</div>'+
     '<div class="toolbar" style="margin-bottom:6px">'+
       '<input id="custSearch" placeholder="Search name/company/phone..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/>'+
       '<select id="custFType" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option><option value="individual">Individual</option><option value="company">Company</option><option value="joint">Joint</option></select>'+
       '<select id="custFRole" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Roles</option><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="broker">Broker</option><option value="employee">Employee</option></select>'+
-      '<select id="custFGroup" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Groups</option><option value="VIP">VIP</option><option value="NRB">NRB</option><option value="Corporate">Corporate</option><option value="Repeat">Repeat Buyer</option><option value="Institutional">Institutional</option><option value="Partner">Partner</option><option value="Staff">Staff</option></select>'+
+      '<select id="custFGroup" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Groups</option>'+CUST_GROUPS.map(function(gr){return '<option value="'+gr+'"'+(g('custFGroup')===gr?' selected':'')+'>'+gr+'</option>';}).join('')+'</select>'+
       '<select id="custFStatus" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option value="Hot">Hot</option><option value="Normal">Normal</option><option value="Low">Low</option><option value="High">High</option></select>'+
       '<div class="spacer"></div>'+
       bulkBar('customers')+
@@ -3060,7 +3073,7 @@ function renderCustomers(el){
       tds.name='<td class="cell-edit" style="font-weight:500;font-size:11px" title="Click to edit" onclick="event.stopPropagation();inlineEdit(this,\'mockEntities\',\''+_q(e.id)+'\',\'name\')">'+displayName+'</td>';
       tds.type='<td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td>';
       tds.roles='<td style="font-size:8px">'+roleBadges+'</td>';
-      tds.group='<td class="cell-edit" style="font-size:9px;max-width:110px;overflow:hidden;text-overflow:ellipsis" title="Click to edit tags" onclick="event.stopPropagation();inlineEdit(this,\'mockEntities\',\''+_q(e.id)+'\',\'tags\',{transform:\'tags\'})">'+(e.tags&&e.tags.length?e.tags.join(', '):'—')+'</td>';
+      tds.group='<td class="cell-edit" style="font-size:9px;max-width:130px;overflow:hidden;text-overflow:ellipsis" title="Click to edit tags" onclick="event.stopPropagation();inlineEdit(this,\'mockEntities\',\''+_q(e.id)+'\',\'tags\',{transform:\'tags\'})">'+custGroupBadge(e.group)+(e.tags&&e.tags.length?e.tags.join(', '):'—')+'</td>';
       tds.phone='<td class="cell-edit" style="font-size:10px;color:#555" title="Click to edit" onclick="event.stopPropagation();inlineEdit(this,\'mockEntities\',\''+_q(e.id)+'\',\'phone\')">'+e.phone+'</td>';
       tds.properties='<td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td>';
       tds.value='<td style="font-size:10px;font-weight:600;color:#2e7d32">'+(e.totalValue?'৳'+(e.totalValue/100000).toFixed(1)+'L':'—')+'</td>';
@@ -9224,10 +9237,11 @@ function renderStock(el){
   const pI=_pg('inv',mockInventory);
   const pPO=_pg('po',mockPOs);
   const pS=_pg('sup',mockSuppliers);
+  const pR=_pg('recv',mockStockReceipts);
 
   el.innerHTML=`<div class="fade-in"><div class="page-title">Stock & Procurement</div><div class="page-subtitle">${mockInventory.length} items · \u09F3 ${invTotal.toLocaleString('en-IN')} total value · ${activeSupp} active suppliers</div>
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs"><div class="tab ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';_PG={};renderModule()">Inventory</div><div class="tab ${stockTab==='po'?'active':''}" onclick="stockTab='po';_PG={};renderModule()">Purchase Orders</div><div class="tab ${stockTab==='suppliers'?'active':''}" onclick="stockTab='suppliers';_PG={};renderModule()">Suppliers</div></div>
+      <div class="tabs"><div class="tab ${stockTab==='inventory'?'active':''}" onclick="stockTab='inventory';_PG={};renderModule()">Inventory</div><div class="tab ${stockTab==='po'?'active':''}" onclick="stockTab='po';_PG={};renderModule()">Purchase Orders</div><div class="tab ${stockTab==='suppliers'?'active':''}" onclick="stockTab='suppliers';_PG={};renderModule()">Suppliers</div><div class="tab ${stockTab==='receive'?'active':''}" onclick="stockTab='receive';_PG={};renderModule()">Goods Receive</div></div>
       ${stockTab==='inventory'?`<select id="invCatFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Categories</option>${['Construction Material','Plumbing','Electrical','Finishes','Safety','Admin'].map(c=>'<option value="'+c+'"'+(g('invCatFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>
         <select id="invSiteFilter" onchange="_PG['inv']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Sites</option>${['Muktodhara','Jolshiri','Corporate'].map(c=>'<option value="'+c+'"'+(g('invSiteFilter')===c?' selected':'')+'>'+c+'</option>').join('')}</select>`:''}
       <div class="spacer"></div>
@@ -9235,7 +9249,8 @@ function renderStock(el){
     </div>
     ${stockTab==='inventory'?renderStockInv(pI):
       stockTab==='po'?renderStockPO(pPO):
-      stockTab==='suppliers'?renderStockSuppliers(pS):''}
+      stockTab==='suppliers'?renderStockSuppliers(pS):
+      stockTab==='receive'?renderStockReceive(pR):''}
   </div>`;
 }
 
@@ -12622,6 +12637,86 @@ function openTransaction(id){
     '<div class="lead-footer"><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
+// ── Phase 3.1 helpers ──────────────────────────────────────────────
+function optList(arr, valFn, labFn, cur){
+  return arr.map(function(o){var v=valFn(o);return '<option value="'+v+'"'+(String(cur)===String(v)?' selected':'')+'>'+labFn(o)+'</option>';}).join('');
+}
+function poRemaining(poId){
+  var po=mockPOs.find(function(x){return String(x.id)===String(poId);});if(!po)return null;
+  var m=String(po.items||'').match(/\((\d+)/);var tot=m?parseInt(m[1],10):null;
+  if(tot===null)return null;
+  var got=mockStockReceipts.filter(function(r){return String(r.poRef)===String(poId);}).reduce(function(s,r){return s+(parseInt(r.qty)||0);},0);
+  return Math.max(0,tot-got);
+}
+function renderStockReceive(pR){
+  var pass=mockStockReceipts.filter(function(r){return r.inspection==='Pass';}).length;
+  var fail=mockStockReceipts.filter(function(r){return r.inspection==='Fail';}).length;
+  var pend=mockPOs.filter(function(p){return p.status==='Approved';}).length;
+  var deliv=mockPOs.filter(function(p){return p.status==='Delivered';}).length;
+  return `<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">${[
+    ['Total Receipts',mockStockReceipts.length,'#1565c0'],
+    ['QC Passed',pass,'#2e7d32'],
+    ['QC Failed',fail,'#c62828'],
+    ['POs Approved',pend,'#e65100'],
+    ['POs Delivered',deliv,'#00838f']
+  ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table data-mod="stock" style="font-size:10px"><thead><tr><th>GRN</th><th>PO Ref</th><th>Item</th><th class="num">Qty</th><th>Date</th><th>Inspection</th><th>Received By</th></tr></thead><tbody>${pR.items.length?pR.items.map(function(r){
+    var it=mockInventory.find(function(x){return String(x.id)===String(r.itemId);});
+    return '<tr style="cursor:pointer" onclick="openStockReceipt('+r.id+')"><td style="font-weight:500;font-family:monospace;font-size:9px">'+r.grn+'</td><td style="font-size:9px;color:#2F80ED;font-weight:500">'+r.poRef+'</td><td style="font-weight:500;font-size:10px">'+r.item+'</td><td class="num" style="font-weight:600">'+r.qty+' '+r.unit+'</td><td style="font-size:9px;color:#888">'+r.date+'</td><td><span class="badge-status '+(r.inspection==='Pass'?'badge-active':'badge-sold')+'" style="font-size:8px">'+(r.inspection==='Pass'?'✓ Pass':'✕ Fail')+'</span></td><td style="font-size:9px;color:#555">'+r.receivedBy+'</td></tr>';
+  }).join(''):'<tr><td colspan="7">'+emptyState('📦','No goods received yet','Receive stock against an approved purchase order to log it here.','+ Receive Goods','crudStockReceipt()')+'</td></tr>'}</tbody></table>${_pgHtml('recv',pR.total,pR.page,pR.totalPages,pR.perPage)}</div></div></div>`;
+}
+function crudStockReceipt(item){
+  var n=!item;
+  var r=n?{id:nextId(mockStockReceipts),grn:'',poRef:'',item:'',qty:0,unit:'',date:new Date().toISOString().slice(0,10),inspection:'Pass',receivedBy:''}:item;
+  var poOpts=mockPOs.filter(function(p){return p.status==='Approved'||p.status==='Delivered';});
+  var invOpts=mockInventory;
+  window._formRules=[
+    {id:'f_po',fn:function(v){return V.req(v,'Select a purchase order');}},
+    {id:'f_item',fn:function(v){return V.req(v,'Select an item');}},
+    {id:'f_rqty',fn:function(v){var q=V.num(v);if(q<=0)return 'Quantity must be greater than 0';var po=String(g('f_po')||'').split('|')[0].trim();var rem=poRemaining(po);if(rem!==null&&q>rem)return 'Quantity exceeds PO remaining ('+rem+')';return null;}}
+  ];
+  openModal(n?'Receive Goods (মালামাল রিসিভ)':'Edit Receipt',
+    formRow(selectField('Purchase Order *','f_po',n?'':r.poRef,poOpts.map(function(p){return p.id+' | '+p.vendor;}),true),selectField('Item *','f_item',n?'':String(r.itemId||''),invOpts.map(function(i){return i.id+' | '+i.item;}),true))+
+    formRow(inputField('Quantity *','f_rqty',n?'':String(r.qty||''),'',true)+'<input type="hidden" id="f_runit" value=""/>',selectField('Inspection','f_insp',r.inspection,['Pass','Fail']))+
+    formRow(inputField('Date','f_date',r.date||new Date().toISOString().slice(0,10)),inputField('Received By','f_rby',r.receivedBy||'')),
+    function(){
+      var poId=String(g('f_po')).split('|')[0].trim();
+      var itId=parseInt(g('f_item'))||0;
+      var it=mockInventory.find(function(x){return x.id===itId;});
+      var q=parseInt(g('f_rqty'))||0;
+      var d={grn:r.grn||'GRN-'+(2600+r.id),poRef:poId,item:it?it.item:g('f_item'),itemId:it?it.id:null,qty:q,unit:it?it.unit:'',date:g('f_date')||new Date().toISOString().slice(0,10),inspection:g('f_insp'),receivedBy:g('f_rby')||'—'};
+      if(n)mockStockReceipts.push(Object.assign({id:nextId(mockStockReceipts)},d));
+      else Object.assign(r,d);
+      DB.save('stock_receipts');
+      if(d.inspection==='Pass'&&it){
+        it.qty=(it.qty||0)+q;
+        it.value=it.qty*it.price;
+        it.status=it.qty<=it.reorder*0.3?'Critical':it.qty<=it.reorder?'Warning':'Adequate';
+        it.lastReceived=d.date;
+        DB.save('inventory');
+        showToast('Stock balance updated');
+      }
+      showToast('Goods received — '+d.grn);renderModule();
+    }
+  );
+}
+function openStockReceipt(id){
+  var r=mockStockReceipts.find(function(x){return x.id===id;});if(!r)return;
+  showDetailPanel('Goods Receipt: '+r.grn,
+    detailStatRow([['GRN',r.grn],['PO Ref',r.poRef],['Item',r.item],['Quantity',r.qty+' '+r.unit],['Date',r.date],['Inspection',r.inspection],['Received By',r.receivedBy]]),
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudStockReceipt(mockStockReceipts.find(function(x){return x.id==='+r.id+'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
+  );
+}
+// ── Phase 3.3 helpers ──────────────────────────────────────────────
+window.custGrpChip=window.custGrpChip||'';
+function setCustGrpChip(gr){window.custGrpChip=(window.custGrpChip===gr)?'':gr;renderModule();}
+var CUST_GROUPS=['NRB','Investor','Owner','Prospect','Broker'];
+function custGroupBadge(gr){
+  if(!gr)return '';
+  var c={'NRB':'#7b1fa2','Investor':'#00838f','Owner':'#2e7d32','Prospect':'#e65100','Broker':'#1565c0'}[gr]||'#888';
+  return '<span style="display:inline-block;padding:1px 6px;border-radius:8px;font-size:8px;font-weight:600;color:#fff;background:'+c+';margin-right:3px">'+gr+'</span>';
+}
+
 function openStockItem(id){
   const i=mockInventory.find(function(x){return x.id===id});if(!i)return;
   showDetailPanel(i.item,
