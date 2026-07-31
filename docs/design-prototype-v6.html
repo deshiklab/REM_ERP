@@ -8158,6 +8158,7 @@ function renderQuickAdd(q){
   });
   html+='</div>';
   grid.innerHTML=html;
+  if(typeof _applyLangPass==='function')_applyLangPass();
 }
 function filterQuickAdd(v){
   document.querySelectorAll('.qa-tab').forEach(function(t){t.style.background=t.dataset.qaTab==='all'?'#2F80ED':'#f0f0f0';t.style.color=t.dataset.qaTab==='all'?'#fff':'#666'});
@@ -11956,16 +11957,35 @@ var _BN_DICT={
 'Just now':'এইমাত্র','m ago':'মি. আগে','h ago':'ঘণ্টা আগে','d ago':'দিন আগে','ago':'আগে',
 'Mark read':'পঠিত চিহ্নিত','Clear All':'সব মুছুন','unread':'অপঠিত','Lead':'লিড','Due':'বকেয়া','Task':'কাজ','Approval':'অনুমোদন','Lead Status Changed':'লিডের স্থিতি পরিবর্তিত','Payment Received':'পেমেন্ট গৃহীত','Requires Approval':'অনুমোদন প্রয়োজন','Installment Due Tomorrow':'আগামীকাল কিস্তি বকেয়া','Task Overdue':'কাজ অতীত',
 'Users':'ব্যবহারকারী','Roles':'ভূমিকা','Theme':'থিম','General':'সাধারণ','Billing':'বিলিং','Security':'নিরাপত্তা','Company':'কোম্পানি','Localization':'স্থানীয়করণ','Notifications Settings':'বিজ্ঞপ্তি সেটিংস','System':'সিস্টেম','Data':'ডেটা','Backups':'ব্যাকআপ','Activity':'কার্যকলাপ','Permissions':'অনুমতি','Audit':'অডিট',
-'Search anything...':'যেকোনো কিছু খুঁজুন...','Search name/phone/property...':'নাম/ফোন/সম্পত্তি খুঁজুন...','Search client/invoice...':'ক্লায়েন্ট/চালান খুঁজুন...','Search leads, projects, contacts...':'লিড, প্রকল্প, যোগাযোগ খুঁজুন...','Search broker name/phone/region...':'ব্রোকারের নাম/ফোন/অঞ্চল খুঁজুন...'
+'Search anything...':'যেকোনো কিছু খুঁজুন...','Search name/phone/property...':'নাম/ফোন/সম্পত্তি খুঁজুন...','Search client/invoice...':'ক্লায়েন্ট/চালান খুঁজুন...','Search leads, projects, contacts...':'লিড, প্রকল্প, যোগাযোগ খুঁজুন...','Search broker name/phone/region...':'ব্রোকারের নাম/ফোন/অঞ্চল খুঁজুন...',
+'My':'আমার','Role':'ভূমিকা','Modules':'মডিউল','Module':'মডিউল','module':'মডিউল','pending':'মুলতুবি','active':'সক্রিয়','Planning':'পরিকল্পনা','Referral':'রেফারেল','Recent':'সাম্প্রতিক','recent':'সাম্প্রতিক','Recent Items':'সাম্প্রতিক আইটেম','Item':'আইটেম','Items':'আইটেম','items':'আইটেম','No recent items yet':'এখনো কোনো সাম্প্রতিক আইটেম নেই','Items you open appear here':'আপনি যে আইটেম খুলবেন সেগুলো এখানে দেখাবে',
+'Sales':'বিক্রয়','Land':'জমি','Customer':'গ্রাহক','Docs':'নথি','Contact':'যোগাযোগ','Campaign':'ক্যাম্পেইন','Dues Payment':'বকেয়া পেমেন্ট','Proposal':'প্রস্তাব','Audit':'অডিট','Certificate':'সার্টিফিকেট','Stock Item':'স্টক আইটেম','Supplier':'সরবরাহকারী','Purchase Order':'ক্রয় আদেশ','Tax Entry':'কর এন্ট্রি','Contractor':'কন্ট্রাক্টর','Work Order':'কাজের আদেশ','BOQ Item':'BOQ আইটেম','Maintenance':'রক্ষণাবেক্ষণ','Worker':'শ্রমিক','Attendance':'উপস্থিতি','Payroll':'বেতন','QC Inspection':'QC পরিদর্শন','QC Checklist':'QC চেকলিস্ট','QC Report':'QC রিপোর্ট','Design':'ডিজাইন','Snag':'ত্রুটি','Ticket':'টিকিট','Customer Doc':'গ্রাহক নথি','After-Sale':'বিক্রয়োত্তর','KB Article':'KB নিবন্ধ',
+'New prospect':'নতুন সম্ভাব্য','New reservation':'নতুন রিজার্ভেশন','Add person':'ব্যক্তি যোগ','Marketing push':'মার্কেটিং প্রচারণা','Receive payment':'পেমেন্ট গ্রহণ','Land proposal':'জমি প্রস্তাব','New development':'নতুন উন্নয়ন','Regulatory item':'নিয়ন্ত্রক আইটেম','Schedule audit':'অডিট সময়সূচি','Add certificate':'সার্টিফিকেট যোগ','Money in/out':'টাকা ইন/আউট','Inventory':'ইনভেন্টরি','Vendor':'বিক্রেতা','Procurement':'ক্রয়','HR record':'HR রেকর্ড','Log expense':'ব্যয় লগ','Tax record':'কর রেকর্ড','Scope of work':'কাজের পরিধি','Cost estimate':'খরচ অনুমান','Machinery':'যন্ত্রপাতি','Service log':'সেবা লগ','Labor record':'শ্রম রেকর্ড','Daily log':'দৈনিক লগ','Pay entry':'বেতন এন্ট্রি','Quality check':'মান যাচাই','Checklist':'চেকলিস্ট','Report':'রিপোর্ট','Drawing/plan':'নকশা/পরিকল্পনা','Contractor pay':'কন্ট্রাক্টর পেমেন্ট','Portal user':'পোর্টাল ব্যবহারকারী','Unit handover':'ইউনিট হস্তান্তর','Issue report':'সমস্যা রিপোর্ট','Support':'সাপোর্ট','Document':'নথি','Post-service':'বিক্রয়োত্তর সেবা','Knowledge base':'নলেজ বেস',
+'Search module... (type or Alt+N to open)':'মডিউল খুঁজুন... (টাইপ করুন বা Alt+N চাপুন)','Search anything (Ctrl+K)':'যেকোনো কিছু খুঁজুন (Ctrl+K)','Search (Ctrl+K)':'অনুসন্ধান (Ctrl+K)','Keyboard Shortcuts (?)':'কীবোর্ড শর্টকাট (?)','Quick Add':'দ্রুত যোগ','Print Report':'রিপোর্ট প্রিন্ট','Export All as CSV':'সব CSV রপ্তানি','Install App':'অ্যাপ ইনস্টল','Toggle Dark Mode':'ডার্ক মোড টগল','Theme Palette':'থিম প্যালেট','Switch Role':'ভূমিকা পরিবর্তন','Switch group':'গ্রুপ পরিবর্তন','Switch module':'মডিউল পরিবর্তন','Fullscreen':'ফুলস্ক্রিন','Toggle Theme':'থিম টগল',
+'Sales Pipeline':'বিক্রয় পাইপলাইন','Payment Collection':'পেমেন্ট সংগ্রহ','Occupancy':'অধিকার','Expense Breakdown':'ব্যয় বিশ্লেষণ','Lead Conversion Trend':'লিড রূপান্তর প্রবণতা','Revenue vs Expense':'আয় বনাম ব্যয়','All Time':'সব সময়','Last 30 Days':'শেষ ৩০ দিন','Last 90 Days':'শেষ ৯০ দিন','Year To Date':'চলতি বছর','Up to Date':'আপ টু ডেট','Auto':'স্বয়ংক্রিয়','Manual':'ম্যানুয়াল',
+'Tasks':'কাজসমূহ','Leads':'লিডসমূহ','Payments':'পেমেন্টসমূহ','Invoices':'চালানসমূহ','Clients':'ক্লায়েন্টসমূহ','Employees':'কর্মচারীসমূহ','Transactions':'লেনদেনসমূহ','Units':'ইউনিটসমূহ','Plots':'প্লটসমূহ'
 };
-var _BN_RT={};Object.keys(_BN_DICT).forEach(function(k){_BN_RT[_BN_DICT[k]]=k;});
+var _BN_RT={};Object.keys(_BN_DICT).forEach(function(k){if(_BN_RT[_BN_DICT[k]]===undefined)_BN_RT[_BN_DICT[k]]=k;});
 function _t(s){return LANG==='bn'?(_BN_DICT[s]||s):s;}
 function _bnRegex(){
-  var keys=LANG==='bn'?Object.keys(_BN_DICT):Object.keys(_BN_RT);
-  var map=LANG==='bn'?_BN_DICT:_BN_RT;
+  var bn=LANG==='bn';
+  var src=bn?_BN_DICT:_BN_RT;
+  var keys=Object.keys(src);
   keys.sort(function(a,b){return b.length-a.length;});
   var esc=keys.map(function(k){return k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');});
-  return {re:new RegExp(esc.join('|'),'g'),map:map};
+  if(bn){
+    keys.forEach(function(k){
+      if(!/s$/i.test(k)&&k.length>2&&/^[A-Za-z][A-Za-z ]*$/.test(k)){
+        esc.push(k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:s)?');
+      }
+    });
+    esc.sort(function(a,b){return b.length-a.length;});
+  }
+  return {re:new RegExp(esc.join('|'),'g'),map:src,resolve:function(m){
+    if(src[m]!==undefined)return src[m];
+    if(/s$/i.test(m)&&src[m.slice(0,-1)]!==undefined)return src[m.slice(0,-1)];
+    return m;
+  }};
 }
 function _applyLangPass(){
   try{
@@ -11978,12 +11998,15 @@ function _applyLangPass(){
     }});
     while(walker.nextNode()){
       var nd=walker.currentNode;var txt=nd.nodeValue;
-      if(!txt||!/\w/.test(txt))continue;
-      var nt=txt.replace(_r.re,function(m){return _r.map[m]||m;});
+      if(!txt||!/[\w\u0980-\u09FF]/.test(txt))continue;
+      var nt=txt.replace(_r.re,function(m){return _r.resolve(m);});
       if(nt!==txt)nd.nodeValue=nt;
     }
     document.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(function(el){
-      var p=el.getAttribute('placeholder');if(p)el.setAttribute('placeholder',p.replace(_r.re,function(m){return _r.map[m]||m;}));
+      var p=el.getAttribute('placeholder');if(p)el.setAttribute('placeholder',p.replace(_r.re,function(m){return _r.resolve(m);}));
+    });
+    document.querySelectorAll('[title]').forEach(function(el){
+      var t=el.getAttribute('title');if(t&&!/^বাংলা/.test(t)){var nt=t.replace(_r.re,function(m){return _r.resolve(m);});if(nt!==t)el.setAttribute('title',nt);}
     });
   }catch(e){}
 }
