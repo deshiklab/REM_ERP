@@ -882,14 +882,19 @@
     html.dark .doc-meta-row{border-bottom-color:var(--card-border,#ffffff10)}
     @media(max-width:768px){
       .vault-wrap{flex-direction:column}
-      .vault-side{width:100%;position:static;display:flex;flex-wrap:wrap;gap:4px}
-      .vault-side-title{width:100%}
-      .vault-cat{margin-bottom:0}
+      .vault-side{width:100%;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;top:auto}
+      .vault-side-title{width:100%;flex:0 0 100%;padding:2px 2px 6px}
+      .vault-cat{flex:0 0 auto;white-space:nowrap;margin-bottom:0}
       .doc-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-      .doc-viewer{height:90vh;border-radius:12px}
-      .doc-viewer-body{flex-direction:column}
-      .doc-meta{width:100%;border-left:none;border-top:1px solid #f0f0f0}
-      .doc-preview{max-height:45vh}
+      .doc-viewer-overlay{padding:8px;align-items:center}
+      .doc-viewer{height:92vh;max-height:92vh;border-radius:12px}
+      .doc-viewer-head span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .doc-viewer-body{flex-direction:column;min-height:0}
+      .doc-meta{width:100%;border-left:none;border-top:1px solid #f0f0f0;flex:1;min-height:0}
+      .doc-preview{max-height:42vh;min-height:150px;flex:none}
+      .doc-card{min-height:0}
+      .doc-card-foot{font-size:8px}
+      .doc-card-actions{font-size:10px;gap:5px}
     }
   </style>
 </head>
@@ -7313,7 +7318,7 @@ function renderDocuments(el){
       '<div class="toolbar" style="margin-bottom:6px">'+
         '<input id="docSearch" placeholder="Search documents..." oninput="_PG.documents={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:150px"/>'+
         '<select id="docFType" onchange="_PG.documents={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+docTypes.map(function(t){return '<option value="'+t+'"'+(ft===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
-        '<select onchange="window._docSort=this.value;renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px">'+
+        '<select id="docSort" onchange="window._docSort=this.value;renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px">'+
           '<option value="date_desc"'+(sort==='date_desc'?' selected':'')+'>Newest</option>'+
           '<option value="date_asc"'+(sort==='date_asc'?' selected':'')+'>Oldest</option>'+
           '<option value="title"'+(sort==='title'?' selected':'')+'>Title A–Z</option>'+
