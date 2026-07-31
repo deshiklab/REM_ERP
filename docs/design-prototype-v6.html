@@ -406,6 +406,18 @@
       #quickAddDropdown .panel{max-width:100vw!important;width:100vw!important;height:100%!important;border-radius:0!important;animation:slideUp .25s ease-out!important}
       #quickAddDropdown .backdrop{background:rgba(0,0,0,.5)!important;flex:0!important;height:0!important}
       #qaGrid{max-height:calc(100vh - 160px)!important}
+      .row-more{display:inline-flex!important;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;border:1px solid #e0e0e0;background:#fff;color:#555;font-size:14px;font-weight:700;cursor:pointer;line-height:1;padding:0;margin:0;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+      .row-more:active{background:#eef3ff;color:#2F80ED}
+      .row-more-cell{position:relative;text-align:right}
+      .row-menu{position:fixed;z-index:9996;background:#fff;border:1px solid #e0e0e0;border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.2);padding:4px;display:none;flex-direction:column;gap:2px;min-width:168px;max-width:78vw}
+      .row-menu.open{display:flex}
+      .row-menu .rm-item{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important;padding:8px 12px!important;font-size:12px!important;font-weight:500!important;border-radius:6px!important;border:none!important;background:transparent!important;color:#333!important;text-align:left!important;cursor:pointer!important;white-space:nowrap!important;margin:0!important;line-height:1.3!important;box-shadow:none!important;text-decoration:none!important}
+      .row-menu .rm-item:active{background:#f0f4ff!important}
+      html.dark .row-more{background:rgba(26,34,52,.92);border-color:#334155;color:#94a3b8}
+      html.dark .row-more:active{background:rgba(59,130,246,.15);color:#7ab7ff}
+      html.dark .row-menu{background:rgba(23,31,48,.98);border-color:#334155;box-shadow:0 10px 28px rgba(0,0,0,.5)}
+      html.dark .row-menu .rm-item{color:#e2e8f0!important}
+      html.dark .row-menu .rm-item:active{background:rgba(59,130,246,.12)!important}
     }
     @media(max-width:480px){
       .stats-row{grid-template-columns:repeat(2,1fr)!important}
@@ -11289,6 +11301,88 @@ function _initTabArrows(){
   window.addEventListener('resize',function(){clearTimeout(window._tabArrowT);window._tabArrowT=setTimeout(_wireTabArrows,200);});
 }
 _initTabArrows();
+// ═══ MOBILE ROW ACTION MENUS (⋮) ═══
+// Collapses table row action buttons into a per-row ⋮ dropdown (mobile only)
+var _ROW_GLYPH_LABELS={'\u270E':'Edit','\u2715':'Delete','\u25B6':'Advance','\uD83D\uDCCB':'Booking','✎':'Edit','✕':'Delete','✓':'Mark Paid','⚠':'Overdue','🖨':'Print','📥':'Download'};
+function _closeRowMenus(){
+  document.querySelectorAll('.row-menu.open').forEach(function(m){m.classList.remove('open');});
+}
+function _wireRowMenus(){
+  _closeRowMenus();
+  if(!window.matchMedia('(max-width:768px)').matches)return;
+  var scopes=['#mainContent','#leadSlideOut #leadPanelContent','.drawer-body'];
+  scopes.forEach(function(s){
+    var root=document.querySelector(s);
+    if(!root)return;
+    root.querySelectorAll('table').forEach(function(tbl){
+      tbl.querySelectorAll('tr').forEach(function(tr){
+        if(!tr.querySelector('td'))return;
+        var tds=tr.querySelectorAll('td');
+        var last=tds[tds.length-1];
+        if(!last||last.classList.contains('row-more-cell'))return;
+        var items=[];
+        last.querySelectorAll('button, span[onclick]').forEach(function(n){
+          if(getComputedStyle(n).display==='none')return;
+          items.push(n);
+        });
+        if(!items.length)return;
+        last.classList.add('row-more-cell');
+        last.style.textAlign='right';
+        last.style.whiteSpace='nowrap';
+        var btn=document.createElement('button');
+        btn.type='button';
+        btn.className='row-more';
+        btn.innerHTML='⋮';
+        var menu=document.createElement('div');
+        menu.className='row-menu';
+        items.forEach(function(n){
+          var c=n.cloneNode(true);
+          c.classList.add('rm-item');
+          var txt=(c.textContent||'').replace(/\s+/g,' ').trim();
+          if(txt.length<=2){var lab=_ROW_GLYPH_LABELS[txt];if(lab)c.textContent=txt+' '+lab;}
+          menu.appendChild(c);
+        });
+        last.innerHTML='';
+        last.appendChild(btn);
+        last.appendChild(menu);
+        btn.onclick=function(e){
+          e.stopPropagation();e.preventDefault();
+          _closeRowMenus();
+          menu.classList.add('open');
+          var r=btn.getBoundingClientRect();
+          var h=menu.offsetHeight;
+          var mw=menu.offsetWidth;
+          var left=Math.min(Math.max(8,r.right-mw-4),window.innerWidth-mw-8);
+          if(left<8)left=8;
+          var top=r.bottom+4;
+          if(top+h>window.innerHeight-8)top=Math.max(8,r.top-h-4);
+          menu.style.left=left+'px';
+          menu.style.top=top+'px';
+        };
+        // capture: close menu first, then the item's inline onclick still runs
+        menu.addEventListener('click',function(){_closeRowMenus();},true);
+      });
+    });
+  });
+}
+var _rowMenuObs=null;
+function _initRowMenus(){
+  if(window._rowMenusDone)return;
+  window._rowMenusDone=true;
+  _wireRowMenus();
+  _rowMenuObs=new MutationObserver(function(){
+    clearTimeout(window._rowMenuT);
+    window._rowMenuT=setTimeout(_wireRowMenus,150);
+  });
+  _rowMenuObs.observe(document.body,{subtree:true,childList:true});
+  document.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('.row-more-cell'))return;
+    _closeRowMenus();
+  });
+  window.addEventListener('scroll',function(){_closeRowMenus();},{capture:true,passive:true});
+  window.addEventListener('resize',function(){_closeRowMenus();});
+}
+_initRowMenus();
 // Show mobile sidebar button only on small screens
 function checkMobile(){
   var nb=document.getElementById('mobileNavBtn');
