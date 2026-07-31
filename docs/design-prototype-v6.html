@@ -343,13 +343,7 @@
       .sidebar-bottom{display:none!important}
       .main-area{flex:none!important;height:auto!important}
       .top-nav{display:none!important}
-      .top-nav.mobile-open{display:flex!important;position:fixed;top:40px;left:0;right:0;z-index:9989;background:#fff;flex-direction:column;align-items:stretch;gap:2px;padding:8px 8px 10px;border-bottom:1px solid #e8e8e8;box-shadow:0 10px 28px rgba(0,0,0,.14);overflow-x:visible;overflow-y:auto;max-height:62vh;animation:ddIn .18s ease-out}
-      .top-nav.mobile-open .top-nav-item{display:flex!important;align-items:center;padding:11px 14px!important;font-size:13px!important;font-weight:500!important;border-radius:9px!important;margin-right:0!important;white-space:normal!important;flex-shrink:0!important}
-      .top-nav.mobile-open .top-nav-item.active{background:#eef3ff!important;color:#2F80ED!important;font-weight:600!important}
-      .top-nav.mobile-open .top-nav-item.badge-new::after{margin-left:auto!important}
-      html.dark .top-nav.mobile-open{background:var(--card-bg,#1a2234);border-bottom-color:var(--glass-edge,#ffffff10)}
-      html.dark .top-nav.mobile-open .top-nav-item.active{background:var(--hover-bg,#1a2a4a);color:var(--primary,#7ab7ff)}
-      #mobileSideBtn{display:flex!important;flex-shrink:0!important}
+      #mobileNavBtn{display:flex!important;flex-shrink:0!important}
       .top-actions .icon-btn{display:none!important}
       #moreBtn{display:flex!important}
       .top-actions{flex:1!important;min-width:0!important;justify-content:flex-end!important;gap:4px!important}
@@ -467,6 +461,28 @@
     /* More (⋯) menu — mobile top-actions grouping */
     #moreBtn{font-size:16px;font-weight:700;letter-spacing:1px}
     #moreBtn.on{background:#eef3ff;color:#2F80ED}
+    /* Mobile module menu — pill button + bottom sheet */
+    #mobileNavBtn{display:none;align-items:center;gap:5px;padding:5px 12px;border-radius:14px;background:#eef3ff;color:#2F80ED;font-size:11px;font-weight:600;cursor:pointer;max-width:150px;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+    #mobileNavBtn .mn-label{overflow:hidden;text-overflow:ellipsis}
+    html.dark #mobileNavBtn{background:var(--hover-bg,#1a2a4a);color:var(--primary,#7ab7ff)}
+    .mnav-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px;font-size:14px;font-weight:700;color:#333;border-bottom:1px solid #f0f0f0;flex-shrink:0}
+    .mnav-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#999;font-size:14px}
+    .mnav-close:hover{background:#f0f0f0;color:#333}
+    .mnav-groups{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid #f0f0f0;overflow-x:auto;flex-shrink:0}
+    .mnav-grp{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:17px;cursor:pointer;background:#f5f5f5;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+    .mnav-grp.active{background:#eef3ff;box-shadow:0 0 0 1px #2F80ED}
+    .mnav-list{overflow-y:auto;max-height:52vh;padding:6px}
+    .mnav-item{display:flex;align-items:center;gap:8px;padding:12px 12px;border-radius:10px;font-size:13px;font-weight:500;color:#444;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .mnav-item.active{background:#eef3ff;color:#2F80ED;font-weight:600}
+    .mnav-check{margin-left:auto;color:#2F80ED;font-weight:700}
+    .mnav-empty{text-align:center;color:#999;font-size:12px;padding:24px}
+    html.dark .mnav-head{color:var(--fg,#e0e0e0);border-bottom-color:var(--glass-edge,#ffffff10)}
+    html.dark .mnav-close:hover{background:var(--hover-bg,#1a2a4a);color:var(--fg)}
+    html.dark .mnav-groups{border-bottom-color:var(--glass-edge,#ffffff10)}
+    html.dark .mnav-grp{background:rgba(255,255,255,.05)}
+    html.dark .mnav-grp.active{background:var(--hover-bg,#1a2a4a);box-shadow:0 0 0 1px var(--primary,#7ab7ff)}
+    html.dark .mnav-item{color:var(--muted,#94a3b8)}
+    html.dark .mnav-item.active{background:var(--hover-bg,#1a2a4a);color:var(--primary,#7ab7ff)}
     .more-dropdown{display:none;position:fixed;top:46px;right:8px;left:8px;z-index:9991;background:#fff;border:1px solid #e0e0e0;border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.2);padding:8px;max-height:72vh;overflow-y:auto;animation:ddIn .18s ease-out}
     .more-dropdown.open{display:block}
     .mm-sep{height:1px;background:#f0f0f0;margin:6px 2px}
@@ -717,7 +733,7 @@
     <div class="top-bar">
       <div class="top-nav" id="topNav"></div>
       <div class="top-actions" style="position:relative">
-        <div id="mobileSideBtn" onclick="toggleMobileSidebar()" style="display:none;width:26px;height:26px;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#666;font-size:16px" class="mobile-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+        <div id="mobileNavBtn" onclick="openMobileNav()" title="Modules"><span class="mn-label" id="mobileNavBtnLabel">Dashboard</span><span style="font-size:8px">▾</span></div>
         <div id="searchWrap">
           <div id="searchBar" tabindex="-1" onclick="openCommandPalette()" title="Search anything (Ctrl+K)" style="cursor:pointer">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -750,6 +766,7 @@
       </div>
     </div>
     <div id="moreDropdown" class="more-dropdown"></div>
+    <div id="mobileNavSheet" class="slide-out"><div class="backdrop" onclick="closeMobileNav()"></div><div class="panel" id="mobileNavPanel"></div></div>
     <div class="content" id="mainContent"></div>
     <div class="app-footer" style="height:28px;min-height:28px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 12px;font-size:10px;color:#888;justify-content:space-between;position:sticky;bottom:0;z-index:20">
       <div class="breadcrumb"><span class="crumb-part crumb-root" onclick="openCommandPalette()" title="Search (Ctrl+K)">REM ERP</span> <span class="crumb-sep">›</span> <span id="footerGroup" class="crumb-part" onclick="showGroupPicker(event)" title="Switch group">Executive</span> <span class="crumb-sep">›</span> <span id="footerModName" class="crumb-part" onclick="showModulePicker(event)" title="Switch module">Dashboard</span></div>
@@ -1898,6 +1915,7 @@ function switchModule(mod,skipSkel) {
   // Footer
   const names = {}; grp.mods.forEach(m => { names[m.id] = m.label; });
   document.getElementById('footerModName').textContent = names[mod] || mod;
+  var _mnbl=document.getElementById('mobileNavBtnLabel'); if(_mnbl)_mnbl.textContent=names[mod]||mod;
   // Fast redirect cases — run synchronously BEFORE any skeleton logic
   if(mod==='invoices_view'){crmSubView='invoices';crmInvTab='all';switchModule('crm');return;}
   if(mod==='payments_view'){crmSubView='payments';switchModule('crm');return;}
@@ -11112,38 +11130,39 @@ function renderCsvImport(el) {
   render();
 }
 
-var _mobileMenuOpen=false;
-var _HAM_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
-var _X_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-// Hamburger ⇄ top-nav: on mobile, toggles the module tabs as a dropdown panel
-function toggleMobileSidebar(){
-  var tn=document.getElementById('topNav');
-  if(!tn)return;
-  if(tn.classList.contains('mobile-open'))closeMobileMenu();
-  else openMobileMenu();
+var _navOpen=false;
+// Mobile module menu: pill button opens a bottom-sheet with groups + current group's modules
+function openMobileNav(){
+  var sh=document.getElementById('mobileNavSheet');
+  var p=document.getElementById('mobileNavPanel');
+  if(!sh||!p)return;
+  var grp=GROUPS[currentGroup]||GROUPS.executive;
+  var mods=grp.mods.filter(function(m){return canAccess(m.id);});
+  var groupsHtml=GROUP_ORDER.map(function(g){
+    var gg=GROUPS[g],a=g===currentGroup;
+    return '<div class="mnav-grp'+(a?' active':'')+'" onclick="switchMobileNavGroup(\''+g+'\')" title="'+gg.label+'">'+gg.icon+'</div>';
+  }).join('');
+  var modsHtml=mods.map(function(m){
+    var a=m.id===currentModule;
+    return '<div class="mnav-item'+(a?' active':'')+'" onclick="switchModule(\''+m.id+'\');closeMobileNav()"><span>'+m.label+'</span>'+(m.badge?'<span class="mm-badge">NEW</span>':'')+(a?'<span class="mnav-check">✓</span>':'')+'</div>';
+  }).join('');
+  p.innerHTML='<div class="mnav-head"><span>'+grp.icon+' '+grp.label+'</span><span class="mnav-close" onclick="closeMobileNav()">✕</span></div>'+
+    '<div class="mnav-groups">'+groupsHtml+'</div>'+
+    '<div class="mnav-list">'+(modsHtml||'<div class="mnav-empty">No modules accessible</div>')+'</div>';
+  sh.classList.add('active');
+  _navOpen=true;
 }
-function openMobileMenu(){
-  var tn=document.getElementById('topNav');
-  if(!tn)return;
-  tn.classList.add('mobile-open');
-  _mobileMenuOpen=true;
-  var btn=document.getElementById('mobileSideBtn');if(btn)btn.innerHTML=_X_ICON;
+function closeMobileNav(){
+  var sh=document.getElementById('mobileNavSheet');
+  if(sh)sh.classList.remove('active');
+  _navOpen=false;
 }
-function closeMobileMenu(){
-  var tn=document.getElementById('topNav');
-  if(tn)tn.classList.remove('mobile-open');
-  _mobileMenuOpen=false;
-  var btn=document.getElementById('mobileSideBtn');if(btn)btn.innerHTML=_HAM_ICON;
+function switchMobileNavGroup(g){
+  switchGroup(g);
+  openMobileNav();
 }
-// Close mobile menu: outside tap, module picked, group switched, or more menu opened
+// Close more menu on outside tap
 document.addEventListener('click',function(e){
-  if(_mobileMenuOpen){
-    var tn=document.getElementById('topNav');
-    var btn=document.getElementById('mobileSideBtn');
-    if(tn&&tn.contains(e.target)){closeMobileMenu();return;}
-    if(btn&&btn.contains(e.target))return;
-    closeMobileMenu();
-  }
   if(_moreOpen){
     var md=document.getElementById('moreDropdown');
     var mb=document.getElementById('moreBtn');
@@ -11156,7 +11175,7 @@ document.addEventListener('click',function(e){
 var _moreOpen=false;
 function toggleMoreMenu(ev){
   if(ev&&ev.stopPropagation)ev.stopPropagation();
-  if(_mobileMenuOpen)closeMobileMenu();
+  if(_navOpen)closeMobileNav();
   if(_moreOpen){closeMoreMenu();return;}
   buildMoreMenu();
   var md=document.getElementById('moreDropdown');
@@ -11209,10 +11228,9 @@ function buildMoreMenu(){
 }
 // Show mobile sidebar button only on small screens
 function checkMobile(){
-  var btn=document.getElementById('mobileSideBtn');
-  if(!btn)return;
-  btn.style.display=window.innerWidth<=768?'flex':'none';
-  if(window.innerWidth>768){if(_mobileMenuOpen)closeMobileMenu();if(_moreOpen)closeMoreMenu();}
+  var nb=document.getElementById('mobileNavBtn');
+  if(nb)nb.style.display=window.innerWidth<=768?'flex':'none';
+  if(window.innerWidth>768){if(_navOpen)closeMobileNav();if(_moreOpen)closeMoreMenu();}
 }
 switchGroup('executive');
 checkMobile();
