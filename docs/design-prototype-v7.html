@@ -475,6 +475,15 @@
       .app-shell.table-view .content{overflow:hidden!important;height:auto!important;flex:1!important;min-height:0!important}
       .app-shell.table-view .content>.tbl-scaffold{height:100%!important}
       .tbl-region .pagination{padding-bottom:2px!important}
+      /* Mobile: all search + filter controls collapse into a single Filters dropdown */
+      .toolbar{position:relative!important}
+      .toolbar .mob-filter-btn{flex-shrink:0!important}
+      .mob-filter-panel{position:absolute!important;top:calc(100% + 3px)!important;left:0!important;right:0!important;z-index:80!important;background:#fff!important;border:1px solid #e0e0e0!important;border-radius:8px!important;box-shadow:0 8px 24px rgba(0,0,0,.15)!important;padding:8px!important;display:none!important;max-height:55vh!important;overflow-y:auto!important}
+      .mob-filter-panel.open{display:block!important}
+      .mob-filter-panel input[id],.mob-filter-panel select[id]{display:block!important;width:100%!important;max-width:100%!important;flex:none!important;margin:0 0 6px!important;padding:7px 8px!important;font-size:11px!important;border:1px solid #e0e0e0!important;border-radius:6px!important;background:#fff!important;color:#333!important;box-sizing:border-box!important;outline:none!important}
+      .mob-filter-panel input[id]:focus,.mob-filter-panel select[id]:focus{border-color:#2F80ED!important}
+      html.dark .mob-filter-panel{background:#1e293b!important;border-color:#334155!important;box-shadow:0 8px 24px rgba(0,0,0,.5)!important}
+      html.dark .mob-filter-panel input[id],html.dark .mob-filter-panel select[id]{background:#0f172a!important;border-color:#334155!important;color:#e2e8f0!important}
     }
     @media(max-width:480px){
       .stats-row{grid-template-columns:repeat(2,1fr)!important}
@@ -2051,6 +2060,19 @@ function openPropertyRef(name) { trackRecent('property', name, {mod:'properties_
 function switchModule(mod,skipSkel) {
   closeLeadPanel();
   currentModule = mod;
+  if(skipSkel!==true)window._mobOpenPanels={}; // fresh module = fresh dropdown state
+  // Snapshot toolbar filter values + focused control before re-render so the
+  // mobile Filters dropdown keeps values/focus across renders.
+  window._mobSnapshot=null;
+  try{
+    var _mc=document.getElementById('mainContent');
+    if(_mc){
+      var _vals={};
+      _mc.querySelectorAll('.toolbar input[id],.toolbar select[id]').forEach(function(el){_vals[el.id]=el.value;});
+      var _act=document.activeElement;
+      window._mobSnapshot={vals:_vals,focusId:(_act&&_act.id&&_mc.contains(_act)?_act.id:null)};
+    }
+  }catch(e){}
   // Update top bar active
   document.querySelectorAll('#topNav .top-nav-item').forEach(e => e.classList.remove('active'));
   const items = document.querySelectorAll('#topNav .top-nav-item');
@@ -11922,12 +11944,98 @@ function _wireViewsUI(){
 }
 function _wirePostRender(){
   _moveStatsBelowToolbar();
+  _wireMobileFilters();
   _wireRowMenus();
   _wireColResize();
   _wireViewsUI();
   _wireTableScaffold();
   _applyLangPass();
 }
+// Mobile: collapse every toolbar's search + filter controls into a single
+// "Filters" dropdown. Desktop is untouched (controls stay inline).
+function _wireMobileFilters(){
+  var root=document.getElementById('mainContent');if(!root)return;
+  if(window.innerWidth>768){
+    root.querySelectorAll('.mob-filter-panel,.mob-filter-btn').forEach(function(n){n.parentNode&&n.parentNode.removeChild(n);});
+    return;
+  }
+  // restore filter values + focus captured in switchModule before the re-render
+  var snap=window._mobSnapshot||null;
+  if(snap&&snap.vals){
+    Object.keys(snap.vals).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el&&(el.tagName==='INPUT'||el.tagName==='SELECT'))el.value=snap.vals[id]||'';
+    });
+  }
+  root.querySelectorAll('.toolbar').forEach(function(tb){
+    if(tb.getAttribute('data-mob-filter'))return;
+    var ctrls=[];
+    Array.prototype.forEach.call(tb.children,function(el){
+      if((el.tagName==='INPUT'||el.tagName==='SELECT')&&el.id)ctrls.push(el);
+    });
+    if(!ctrls.length)return;
+    tb.setAttribute('data-mob-filter','1');
+    var tIdx=Array.prototype.indexOf.call(root.querySelectorAll('.toolbar'),tb);
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.className='action-btn secondary mob-filter-btn';
+    btn.textContent='⚙ Filters';
+    btn.style.cssText='padding:3px 8px;font-size:9px;flex-shrink:0';
+    // place the button before the spacer so action buttons stay right-aligned
+    var spacer=tb.querySelector('.spacer');
+    if(spacer&&spacer.parentNode===tb)tb.insertBefore(btn,spacer);
+    else tb.appendChild(btn);
+    var panel=document.createElement('div');
+    panel.className='mob-filter-panel';
+    ctrls.forEach(function(el){panel.appendChild(el);});
+    tb.appendChild(panel);
+    if(window._mobOpenPanels&&window._mobOpenPanels[tIdx])panel.classList.add('open');
+    btn.onclick=function(e){
+      e.stopPropagation();
+      var open=panel.classList.toggle('open');
+      if(!window._mobOpenPanels)window._mobOpenPanels={};
+      window._mobOpenPanels[tIdx]=open;
+      if(open){
+        var f=panel.querySelector('input[id]');
+        if(f){setTimeout(function(){f.focus();},30);}
+      }
+    };
+  });
+  // restore focus after re-render so typing in the dropdown keeps working
+  if(snap&&snap.focusId){
+    var fEl=document.getElementById(snap.focusId);
+    if(fEl&&fEl.tagName==='INPUT'){
+      fEl.focus();
+      try{fEl.setSelectionRange(fEl.value.length,fEl.value.length);}catch(e){}
+    }
+  }
+  window._mobSnapshot=null;
+  // re-open panels that were open before the re-render
+  root.querySelectorAll('.toolbar').forEach(function(tb){
+    if(tb.querySelector('.mob-filter-panel')){
+      var tIdx=Array.prototype.indexOf.call(root.querySelectorAll('.toolbar'),tb);
+      if(window._mobOpenPanels&&window._mobOpenPanels[tIdx]){
+        tb.querySelector('.mob-filter-panel').classList.add('open');
+      }
+    }
+  });
+}
+// Close the mobile filter dropdown on outside click
+document.addEventListener('click',function(e){
+  if(window.innerWidth>768)return;
+  var p=e.target.closest?e.target.closest('.mob-filter-panel,.mob-filter-btn'):null;
+  if(!p){
+    document.querySelectorAll('.mob-filter-panel.open').forEach(function(pn){
+      pn.classList.remove('open');
+      var tb=pn.parentNode;
+      if(tb){
+        var root=document.getElementById('mainContent');
+        var tIdx=root?Array.prototype.indexOf.call(root.querySelectorAll('.toolbar'),tb):-1;
+        if(tIdx>=0&&window._mobOpenPanels)window._mobOpenPanels[tIdx]=false;
+      }
+    });
+  }
+});
 // Enforce the fixed page anatomy on every page & inner sub-view:
 // page-title → page-subtitle → tabs(toolbar) → stats-row (if any).
 // Only touches a stats-row whose immediate next sibling is a toolbar;
@@ -11969,7 +12077,8 @@ function _wireTableScaffold(){
       var st=wrap.querySelector(':scope > .stats-row');
       var room=(this.scrollHeight-this.clientHeight)||0;
       var statsH=st?st.offsetHeight+16:0;
-      wrap.classList.toggle('stats-collapsed',this.scrollTop>4&&room>statsH);
+      var mobile=window.innerWidth<=768;
+      wrap.classList.toggle('stats-collapsed',this.scrollTop>4&&(room>statsH||mobile));
     });
   }
   // kanban boards: pin toolbar + collapse stats-row on vertical scroll of the columns
@@ -11980,7 +12089,8 @@ function _wireTableScaffold(){
       var st=wrap.querySelector(':scope > .stats-row');
       var room=(this.scrollHeight-this.clientHeight)||0;
       var statsH=st?st.offsetHeight+16:0;
-      wrap.classList.toggle('stats-collapsed',this.scrollTop>4&&room>statsH);
+      var mobile=window.innerWidth<=768;
+      wrap.classList.toggle('stats-collapsed',this.scrollTop>4&&(room>statsH||mobile));
     };
     wrap.querySelectorAll('.kb-body').forEach(function(b){b.addEventListener('scroll',kbScroll,{passive:true});});
   }
