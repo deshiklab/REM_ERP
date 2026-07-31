@@ -342,8 +342,8 @@
       .s-grp-sep{width:1px!important;height:20px!important;margin:0 3px!important;flex-shrink:0!important}
       .sidebar-bottom{display:none!important}
       .main-area{flex:none!important;height:auto!important}
+      .top-nav{display:none!important}
       .top-bar{height:40px!important;min-height:40px!important;padding:0 8px!important;gap:8px!important;position:sticky!important;top:0!important;z-index:50!important}
-      .top-nav{overflow-x:auto!important;gap:2px!important;-webkit-overflow-scrolling:touch!important}
       .top-nav-item{padding:4px 8px!important;font-size:10px!important;white-space:nowrap!important;flex-shrink:0!important}
       .top-nav-item.badge-new::after{font-size:7px!important;padding:0 3px!important}
       .top-actions .icon-btn{width:26px!important;height:26px!important;flex-shrink:0!important}
@@ -429,6 +429,27 @@
     html.dark .peek-item:active{background:var(--hover-bg,#1a2a4a);color:var(--primary,#7ab7ff)}
     /* PWA install button pulse */
     @keyframes pwaPulse{0%,100%{box-shadow:0 0 0 0 rgba(47,128,237,.35)}50%{box-shadow:0 0 0 6px rgba(47,128,237,0)}}
+    /* Mobile module dropdown (replaces top-nav on small screens) */
+    .mobile-mod-dropdown{display:none;position:fixed;top:46px;right:8px;left:8px;z-index:9990;background:#fff;border:1px solid #e0e0e0;border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.2);padding:8px;max-height:68vh;overflow-y:auto;animation:ddIn .18s ease-out}
+    .mobile-mod-dropdown.open{display:block}
+    @keyframes ddIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    .mm-title{font-size:11px;font-weight:700;color:#333;padding:4px 6px 8px;border-bottom:1px solid #f0f0f0;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .mm-groups{display:flex;gap:4px;flex-wrap:wrap;padding:0 2px 8px;border-bottom:1px solid #f0f0f0;margin-bottom:6px}
+    .mm-grp{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:16px;cursor:pointer;background:#f5f5f5;border:1px solid transparent;-webkit-tap-highlight-color:transparent}
+    .mm-grp.active{background:#eef3ff;border-color:#2F80ED;box-shadow:0 0 0 1px #2F80ED}
+    .mm-mods{display:flex;flex-direction:column;gap:2px}
+    .mm-mod{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;font-size:12px;font-weight:500;color:#444;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+    .mm-mod:active{background:#f0f4ff}
+    .mm-mod.active{background:#eef3ff;color:#2F80ED;font-weight:600}
+    .mm-badge{background:#ff5252;color:#fff;font-size:7px;font-weight:700;padding:1px 5px;border-radius:7px;margin-left:auto}
+    .mm-check{color:#2F80ED;font-weight:700;margin-left:auto;font-size:11px}
+    html.dark .mobile-mod-dropdown{background:var(--card-bg,#1a2234);border-color:var(--card-border,#334155)}
+    html.dark .mm-title{color:var(--fg,#e0e0e0);border-bottom-color:var(--glass-edge,#ffffff10)}
+    html.dark .mm-groups{border-bottom-color:var(--glass-edge,#ffffff10)}
+    html.dark .mm-grp{background:rgba(255,255,255,.05)}
+    html.dark .mm-grp.active{background:var(--hover-bg,#1a2a4a);border-color:var(--primary,#7ab7ff)}
+    html.dark .mm-mod{color:var(--muted,#94a3b8)}
+    html.dark .mm-mod.active{background:var(--hover-bg,#1a2a4a);color:var(--primary,#7ab7ff)}
     .drawer-handle{display:none;width:36px;height:4px;border-radius:2px;background:#d1d5db;margin:10px auto 6px;flex-shrink:0}
     .drawer-header{display:flex;justify-content:space-between;align-items:center;padding:4px 16px 10px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
     .drawer-header h3{font-size:14px;font-weight:700;color:#333;margin:0}
@@ -705,6 +726,7 @@
         <div class="user-avatar" onclick="toggleRoleMenu()" title="Switch Role">SA</div>
       </div>
     </div>
+    <div id="mobileModDropdown" class="mobile-mod-dropdown"></div>
     <div class="content" id="mainContent"></div>
     <div class="app-footer" style="height:28px;min-height:28px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 12px;font-size:10px;color:#888;justify-content:space-between;position:sticky;bottom:0;z-index:20">
       <div class="breadcrumb"><span class="crumb-part crumb-root" onclick="openCommandPalette()" title="Search (Ctrl+K)">REM ERP</span> <span class="crumb-sep">›</span> <span id="footerGroup" class="crumb-part" onclick="showGroupPicker(event)" title="Switch group">Executive</span> <span class="crumb-sep">›</span> <span id="footerModName" class="crumb-part" onclick="showModulePicker(event)" title="Switch module">Dashboard</span></div>
@@ -11067,27 +11089,60 @@ function renderCsvImport(el) {
   render();
 }
 
+var _mobileMenuOpen=false;
+var _HAM_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+var _X_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 function toggleMobileSidebar(){
-  var sb=document.querySelector('#sidebar');
-  if(!sb)return;
-  if(sb.style.display==='none'||sb.style.display===''){
-    sb.style.display='flex';sb.style.position='fixed';sb.style.top='0';sb.style.left='0';sb.style.width='100%';sb.style.height='100%';sb.style.zIndex='9999';sb.style.background='#fff';sb.style.flexDirection='column';sb.style.padding='20px';sb.style.overflow='auto';
-    document.getElementById('mobileSideBtn').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-    // Show logo on mobile fullscreen
-    var logo=sb.querySelector('.sidebar-logo');if(logo)logo.style.display='flex';
-    var btm=sb.querySelector('.sidebar-bottom');if(btm)btm.style.display='flex';
-  }else{
-    sb.style.display='';sb.style.position='';sb.style.top='';sb.style.left='';sb.style.width='';sb.style.height='';sb.style.zIndex='';sb.style.background='';sb.style.flexDirection='';sb.style.padding='';sb.style.overflow='';
-    document.getElementById('mobileSideBtn').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
-    var logo=sb.querySelector('.sidebar-logo');if(logo)logo.style.display='';
-    var btm=sb.querySelector('.sidebar-bottom');if(btm)btm.style.display='';
-  }
+  if(_mobileMenuOpen) closeMobileMenu();
+  else openMobileMenu();
 }
+function openMobileMenu(){
+  var dd=document.getElementById('mobileModDropdown');
+  if(!dd)return;
+  var grp=GROUPS[currentGroup]||GROUPS.executive;
+  var mods=grp.mods.filter(function(m){return canAccess(m.id);});
+  var groupsHtml=GROUP_ORDER.map(function(g){
+    var gg=GROUPS[g],active=g===currentGroup;
+    return '<div class="mm-grp'+(active?' active':'')+'" onclick="switchMobileGroup(\''+g+'\')" title="'+gg.label+'">'+gg.icon+'</div>';
+  }).join('');
+  var modsHtml=mods.map(function(m){
+    var active=m.id===currentModule;
+    return '<div class="mm-mod'+(active?' active':'')+'" onclick="switchModule(\''+m.id+'\');closeMobileMenu()">'+
+      '<span>'+(m.badge?'<span class="mm-badge">NEW</span>':'')+m.label+'</span>'+
+      (active?'<span class="mm-check">✓</span>':'')+'</div>';
+  }).join('');
+  dd.innerHTML='<div class="mm-title">'+grp.icon+' '+grp.label+'</div>'+
+    '<div class="mm-groups">'+groupsHtml+'</div>'+
+    '<div class="mm-mods">'+modsHtml+'</div>';
+  dd.classList.add('open');
+  _mobileMenuOpen=true;
+  var btn=document.getElementById('mobileSideBtn');if(btn)btn.innerHTML=_X_ICON;
+}
+function closeMobileMenu(){
+  var dd=document.getElementById('mobileModDropdown');
+  if(dd)dd.classList.remove('open');
+  _mobileMenuOpen=false;
+  var btn=document.getElementById('mobileSideBtn');if(btn)btn.innerHTML=_HAM_ICON;
+}
+function switchMobileGroup(g){
+  switchGroup(g);
+  openMobileMenu();
+}
+// Close mobile menu on outside tap
+document.addEventListener('click',function(e){
+  if(!_mobileMenuOpen)return;
+  var dd=document.getElementById('mobileModDropdown');
+  var btn=document.getElementById('mobileSideBtn');
+  if(dd&&dd.contains(e.target))return;
+  if(btn&&btn.contains(e.target))return;
+  closeMobileMenu();
+});
 // Show mobile sidebar button only on small screens
 function checkMobile(){
   var btn=document.getElementById('mobileSideBtn');
   if(!btn)return;
   btn.style.display=window.innerWidth<=768?'flex':'none';
+  if(window.innerWidth>768&&_mobileMenuOpen)closeMobileMenu();
 }
 switchGroup('executive');
 checkMobile();
