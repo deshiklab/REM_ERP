@@ -830,6 +830,67 @@
       .content.table-view .tbl-scaffold>.stats-row{max-height:none!important;opacity:1!important}
       .content.table-view .table-wrap thead th,.content.table-view .pagination,.content.table-view table.has-row-menu th:last-child,.content.table-view table.has-row-menu .row-more-cell{position:static!important;box-shadow:none!important}
     }
+    /* ═══ DOCUMENTS VAULT ═══ */
+    .vault-wrap{display:flex;gap:10px;align-items:flex-start}
+    .vault-side{width:148px;flex-shrink:0;background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:8px;position:sticky;top:64px}
+    .vault-side-title{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;padding:2px 4px 8px}
+    .vault-cat{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:6px;font-size:10px;cursor:pointer;color:#555;margin-bottom:2px;transition:all .12s}
+    .vault-cat:hover{background:#f0f4ff;color:#2F80ED}
+    .vault-cat.active{background:#eef3ff;color:#2F80ED;font-weight:600}
+    .vault-cat-cnt{font-size:9px;background:#f0f0f0;border-radius:8px;padding:0 6px;color:#888}
+    .vault-cat.active .vault-cat-cnt{background:#2F80ED;color:#fff}
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;padding:10px}
+    .doc-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:10px;cursor:pointer;transition:all .15s;position:relative}
+    .doc-card:hover{border-color:#2F80ED;box-shadow:0 4px 14px rgba(47,128,237,.1);transform:translateY(-1px)}
+    .doc-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+    .doc-card-icon{font-size:24px;line-height:1}
+    .doc-card-actions{display:flex;gap:6px;font-size:11px;color:#999}
+    .doc-card-actions span{cursor:pointer}
+    .doc-card-actions span:hover{color:#2F80ED}
+    .doc-card-title{font-size:11px;font-weight:600;color:#333;line-height:1.3;min-height:28px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .doc-card-meta{font-size:9px;color:#999;margin-top:6px}
+    .doc-card-foot{display:flex;justify-content:space-between;font-size:9px;color:#aaa;margin-top:8px;padding-top:6px;border-top:1px solid #f0f0f0}
+    .doc-viewer-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,16,30,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:12000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .18s ease-out}
+    .doc-viewer-overlay.closing{animation:fadeOut .14s ease-in}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes fadeOut{from{opacity:1}to{opacity:0}}
+    .doc-viewer{background:#fff;border-radius:12px;width:880px;max-width:100%;height:min(640px,88vh);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .doc-viewer-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:13px}
+    .doc-viewer-close{width:26px;height:26px;border:none;border-radius:6px;background:#f5f5f5;color:#666;cursor:pointer;font-size:12px;flex-shrink:0}
+    .doc-viewer-close:hover{background:#fee;color:#c62828}
+    .doc-viewer-body{display:flex;flex:1;min-height:0}
+    .doc-preview{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;background:#f8f9fa;padding:14px;overflow:auto}
+    .doc-meta{width:230px;flex-shrink:0;border-left:1px solid #f0f0f0;padding:14px;overflow-y:auto;font-size:11px}
+    .doc-meta-title{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+    .doc-meta-row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed #f0f0f0;font-size:10px}
+    .doc-meta-row span{color:#888}
+    .doc-meta-row b{font-weight:600;color:#333;text-align:right;word-break:break-word}
+    .vault-file-fallback{text-align:center;color:#888;font-size:13px;padding:20px}
+    .vault-file-fallback span{font-size:10px;color:#aaa}
+    .dropzone{border:1.5px dashed #d0d0d0;border-radius:8px;padding:18px 10px;text-align:center;cursor:pointer;background:#fafafa;transition:all .15s;margin-bottom:10px}
+    .dropzone:hover,.dropzone.drag{border-color:#2F80ED;background:#f0f6ff}
+    html.dark .vault-side,html.dark .doc-card,html.dark .doc-viewer,html.dark .dropzone{background:var(--card-bg,#0e1626)!important;border-color:var(--card-border,#ffffff10)}
+    html.dark .doc-card-title,html.dark .doc-meta-row b,html.dark .doc-viewer-head{color:var(--fg,#e2e8f0)}
+    html.dark .doc-preview{background:var(--muted-bg,#0e1626)}
+    html.dark .doc-meta{border-left-color:var(--card-border,#ffffff10)}
+    html.dark .vault-cat{color:var(--muted,#94a3b8)}
+    html.dark .vault-cat:hover{background:var(--hover-bg,#1a2a4a)}
+    html.dark .vault-cat.active{background:var(--active-bg,#1a2a4a);color:var(--primary)}
+    html.dark .doc-card-foot,html.dark .doc-card-meta{color:var(--muted,#7c8ba1)}
+    html.dark .doc-viewer-close{background:var(--muted-bg,#1a2a4a);color:var(--muted,#94a3b8)}
+    html.dark .dropzone{background:var(--muted-bg,#1a2a4a)}
+    html.dark .doc-meta-row{border-bottom-color:var(--card-border,#ffffff10)}
+    @media(max-width:768px){
+      .vault-wrap{flex-direction:column}
+      .vault-side{width:100%;position:static;display:flex;flex-wrap:wrap;gap:4px}
+      .vault-side-title{width:100%}
+      .vault-cat{margin-bottom:0}
+      .doc-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+      .doc-viewer{height:90vh;border-radius:12px}
+      .doc-viewer-body{flex-direction:column}
+      .doc-meta{width:100%;border-left:none;border-top:1px solid #f0f0f0}
+      .doc-preview{max-height:45vh}
+    }
   </style>
 </head>
 <body>
@@ -967,7 +1028,7 @@ const GROUPS = {
   land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
   construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
-  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_reminders',label:'Payment Reminders',badge:true},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
+  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_reminders',label:'Payment Reminders',badge:true},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'bi_reports',label:'BI Reports',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
   system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] }
 };
@@ -1565,14 +1626,18 @@ window.mockEntities = DB.init('entities', [
   {id:'ENT-020',type:'individual',name:'Iftekhar Ahmad',phone:'+880 1711 007666',email:'iftekhar@marsconstech.com',nid:'3344556677',dob:'1987-06-20',occupation:'Sales Manager',roles:['employee'],address:'Head Office, Dhaka',nationality:'Bangladeshi',source:'Internal',priority:'Normal',notes:'Senior sales lead handling CRM and bookings.',totalProperties:0,totalValue:0,properties:[],createdAt:'2024-01-01',createdBy:'System',tags:['Staff','Sales']},
 ]);;
 window.mockDocuments = DB.init('documents', [
-  {id:1,title:'Muktodhara CS Khatiyan',type:'CS Khatiyan',date:'2023-10-12',property:'Muktodhara',status:'Verified'},
-  {id:2,title:'Jolshiri Land RS Parcha',type:'RS Khatiyan',date:'2023-11-05',property:'Jolshiri',status:'Verified'},
-  {id:3,title:'Saf-Kabala Dolil',type:'Purchase Deed',date:'2024-10-15',property:'Jolshiri',status:'Pending Review'},
-  {id:4,title:'Trade License Renewal',type:'Other',date:'2024-01-15',property:'Corporate',status:'Verified'},
-  {id:5,title:'Environmental Clearance',type:'Site Plan',date:'2023-12-01',property:'Muktodhara',status:'Verified'},
-  {id:6,title:'Rajuk Approval',type:'Other Legal',date:'2023-09-20',property:'Jolshiri',status:'Verified'},
-  {id:7,title:'Soil Test Report',type:'Site Plan',date:'2023-08-11',property:'Muktodhara',status:'Verified'},
-  {id:8,title:'Vendor Agreement',type:'Agreement',date:'2023-11-22',property:'Corporate',status:'Pending Review'}
+  {id:1,title:'Muktodhara CS Khatiyan',type:'CS Khatiyan',category:'Legal',date:'2023-10-12',property:'Muktodhara',status:'Verified',notes:'Original CS khatiyan for 30 bigha. Mutation pending at DC office.',uploadedBy:'Iftekhar Ahmad',fileSize:18240,file:{name:'muktodhara_cs.svg',size:18240,type:'image/svg+xml',dataUrl:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MjAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iNDIwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZjNmZiIvPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyODAiIHJ4PSI2IiBmaWxsPSJub25lIiBzdHJva2U9IiMyRjgwRUQiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjMwIiB5PSI0NSIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiMyRjgwRUQiPk1BUlMgQ09OU1RSVUNUSU9OIExURC48L3RleHQ+PHRleHQgeD0iMzAiIHk9IjcyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIj5DUyBLaGF0aXlhbiDigJQgTXVrdG9kaGFyYTwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMTEyIiBmb250LXNpemU9IjExIiBmaWxsPSIjNTU1Ij5EYWcgTm86IDQ1MiwgS2hhdGlhbiBObzogMTE4PC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxMzQiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM1NTUiPkFyZWE6IDMwIEJpZ2hhPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxNTYiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM1NTUiPk93bmVyOiBNZC4gSGFzYW4gQWxpPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxNzgiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM1NTUiPlN0YXR1czogVkVSSUZJRUQ8L3RleHQ+PC9zdmc+'}},
+  {id:2,title:'Jolshiri Land RS Parcha',type:'RS Khatiyan',category:'Legal',date:'2023-11-05',property:'Jolshiri',status:'Verified',notes:'RS parcha verified against DC records.',uploadedBy:'Iftekhar Ahmad',fileSize:0},
+  {id:3,title:'Saf-Kabala Dolil',type:'Purchase Deed',category:'Legal',date:'2024-10-15',property:'Jolshiri',status:'Pending Review',notes:'Awaiting stamp duty assessment from legal team.',uploadedBy:'Shamim Reza',fileSize:0},
+  {id:4,title:'Trade License Renewal',type:'Other',category:'Corporate',date:'2024-01-15',property:'Corporate',status:'Verified',notes:'Renewed for 2024-2025.',uploadedBy:'Admin',fileSize:0},
+  {id:5,title:'Environmental Clearance',type:'Site Plan',category:'Technical',date:'2023-12-01',property:'Muktodhara',status:'Verified',notes:'DOE clearance certificate.',uploadedBy:'Tanvir Ahmed',fileSize:0},
+  {id:6,title:'Rajuk Approval',type:'Other Legal',category:'Legal',date:'2023-09-20',property:'Jolshiri',status:'Verified',notes:'Layout approval Rajuk Ref 1145/23.',uploadedBy:'Tanvir Ahmed',fileSize:0},
+  {id:7,title:'Soil Test Report',type:'Site Plan',category:'Technical',date:'2023-08-11',property:'Muktodhara',status:'Verified',notes:'Bearing capacity 120 kPa — suitable for 12-storey.',uploadedBy:'Engr. Rofiqul Islam',fileSize:15600,file:{name:'soil_test_muktodhara.svg',size:15600,type:'image/svg+xml',dataUrl:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MjAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iNDIwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y1ZjBmZiIvPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyODAiIHJ4PSI2IiBmaWxsPSJub25lIiBzdHJva2U9IiM3YzRkZmYiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjMwIiB5PSI0NSIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiM3YzRkZmYiPlNPSUwgVEVTVCBSRVBPUlQ8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjcyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIj5NdWt0b2RoYXJhIEdyZWVuIFBhcms8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjExMiIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzU1NSI+QmVhcmluZyBjYXBhY2l0eTogMTIwIGtQYTwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMTM0IiBmb250LXNpemU9IjExIiBmaWxsPSIjNTU1Ij5Tb2lsIHR5cGU6IFNpbHR5IENsYXk8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjE1NiIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzU1NSI+V2F0ZXIgdGFibGU6IDQuMm08L3RleHQ+PHRleHQgeD0iMzAiIHk9IjE3OCIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzU1NSI+UmVwb3J0IG5vOiBTVC0yMDI0LTAxODwvdGV4dD48L3N2Zz4='}},
+  {id:8,title:'Vendor Agreement',type:'Agreement',category:'Corporate',date:'2023-11-22',property:'Corporate',status:'Pending Review',notes:'MOU with steel supplier — legal review in progress.',uploadedBy:'Accounts',fileSize:0},
+  {id:9,title:'NID Copy — Hasan Ali',type:'NID',category:'Land',date:'2024-11-02',property:'Both',status:'Verified',notes:'Seller NID for LP-001.',uploadedBy:'Land Team',fileSize:0},
+  {id:10,title:'Project Budget 2024',type:'Financial Statement',category:'Financial',date:'2024-11-10',property:'Corporate',status:'Pending Review',notes:'Annual budget workbook.',uploadedBy:'Accounts',fileSize:0},
+  {id:11,title:'Muktodhara Layout Plan',type:'Site Plan',category:'Technical',date:'2024-11-14',property:'Muktodhara',status:'Pending Review',notes:'Updated master layout v2.3 from Design team.',uploadedBy:'Design Team',fileSize:0},
+  {id:12,title:'Bank Guarantee — Sonali',type:'Other Legal',category:'Financial',date:'2024-11-18',property:'Corporate',status:'Verified',notes:'Performance guarantee for Phase 2 financing.',uploadedBy:'Accounts',fileSize:0}
 ]);
 window.mockLandProposals = DB.init('land_proposals', [
   {id:'LP-001',name:'Purbachal Sector 4',area:'15 Bigha',price:250000000,priceF:'৳25 Cr',location:'Purbachal',stage:'identification',status:'Screening',risk:'Low',roi:'35%',contact:'Mohiuddin Sir',notes:'Prime location near proposed IT hub',date:'2024-10-01',owner:'Md. Hasan Ali',budget:'৳22 Cr',priority:'High',progress:20,nextAction:'Site visit scheduled Nov 5'},
@@ -7194,41 +7259,222 @@ function openContact(id){
 function renderDocuments(el){
   var q=(document.getElementById('docSearch')||{}).value||'';
   var ft=(document.getElementById('docFType')||{}).value||'';
+  var cat=window._docCat||'All';
+  var view=window._docView||'grid';
+  var sort=window._docSort||'date_desc';
+  var cats=['All','Legal','Land','Financial','Technical','Corporate','Other'];
   var filtered=mockDocuments.filter(function(d){
     if(ft&&d.type!==ft)return false;
-    if(q&&!d.title.toLowerCase().includes(q.toLowerCase())&&!d.type.toLowerCase().includes(q.toLowerCase()))return false;
+    if(cat!=='All'&&(d.category||'Other')!==cat)return false;
+    if(q&&d.title.toLowerCase().indexOf(q.toLowerCase())<0&&d.type.toLowerCase().indexOf(q.toLowerCase())<0&&((d.property||'').toLowerCase().indexOf(q.toLowerCase())<0))return false;
     return true;
   });
+  filtered=filtered.slice().sort(function(a,b){
+    if(sort==='date_asc')return String(a.date).localeCompare(String(b.date));
+    if(sort==='title')return (a.title||'').localeCompare(b.title||'');
+    if(sort==='size')return ((b.fileSize||0)-(a.fileSize||0));
+    return String(b.date).localeCompare(String(a.date));
+  });
   var docTypes=mockDocuments.reduce(function(a,d){if(a.indexOf(d.type)<0)a.push(d.type);return a;},[]);
+  var totalSize=mockDocuments.reduce(function(s,d){return s+((d.fileSize||0));},0);
+  var verified=mockDocuments.filter(function(d){return d.status==='Verified'}).length;
+  var pending=mockDocuments.filter(function(d){return d.status==='Pending Review'}).length;
   var pagD=_pg('documents',filtered);
-  el.innerHTML='<div class="fade-in"><div class="page-title">Data Vault</div><div class="page-subtitle">'+mockDocuments.length+' documents \u00B7 '+mockDocuments.filter(function(d){return d.status==='Verified'}).length+' verified</div>'+
-    '<div class="toolbar" style="margin-bottom:6px">'+
-      '<input id="docSearch" placeholder="Search documents..." oninput="_PG.documents={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/>'+
-      '<select id="docFType" onchange="_PG.documents={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+docTypes.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('')+'</select>'+
-      '<div class="spacer"></div><button class="action-btn primary" onclick="crudDocument()" style="padding:3px 8px;font-size:10px">+ Upload Document</button>'+
+  var catSidebar=cats.map(function(c){
+    var cnt=c==='All'?mockDocuments.length:mockDocuments.filter(function(d){return (d.category||'Other')===c;}).length;
+    return '<div class="vault-cat'+(c===cat?' active':'')+'" onclick="window._docCat=\''+c+'\';_PG.documents={page:1,perPage:_pgPerPage};renderModule()">'+c+'<span class="vault-cat-cnt">'+cnt+'</span></div>';
+  }).join('');
+  var body = view==='list'
+    ? '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Category</th><th>Property</th><th>Date</th><th>Size</th><th>Status</th><th></th></tr></thead><tbody>'+
+      pagD.items.map(function(d){
+        return '<tr style="cursor:pointer" onclick="viewDocument(\''+d.id+'\')"><td style="font-weight:500">'+d.title+'</td>'+
+        '<td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#eef3ff;color:#2F80ED">'+d.type+'</span></td>'+
+        '<td style="font-size:10px">'+(d.category||'Other')+'</td>'+
+        '<td style="font-size:10px">'+(d.property||'—')+'</td>'+
+        '<td style="font-size:10px">'+d.date+'</td>'+
+        '<td style="font-size:10px">'+(d.fileSize?docFmtSize(d.fileSize):'—')+'</td>'+
+        '<td><span class="badge-status '+(d.status==='Verified'?'badge-active':'badge-pending')+'">'+d.status+'</span></td>'+
+        '<td><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudDocument(mockDocuments.find(function(x){return String(x.id)===\''+d.id+'\'}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();docDelete(\''+d.id+'\')">✕</span></td></tr>';
+      }).join('')+
+      '</tbody></table></div>'+_pgHtml('documents',pagD.total,pagD.page,pagD.totalPages,pagD.perPage)+'</div></div>'
+    : '<div class="card"><div class="card-body" style="padding:0"><div class="doc-grid">'+
+      (pagD.items.length?pagD.items.map(docCard).join(''):'<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;font-size:12px">No documents match your filters</div>')+
+      '</div></div>'+_pgHtml('documents',pagD.total,pagD.page,pagD.totalPages,pagD.perPage)+'</div>';
+  el.innerHTML='<div class="fade-in"><div class="page-title">📁 Documents Vault</div><div class="page-subtitle">'+mockDocuments.length+' documents · '+verified+' verified · '+pending+' pending · '+docFmtSize(totalSize)+' stored</div>'+
+    '<div class="stats-row" style="margin-bottom:8px">'+
+      '<div class="stat-card"><div class="stat-label">📄 Total</div><div class="stat-value">'+mockDocuments.length+'</div></div>'+
+      '<div class="stat-card"><div class="stat-label">✅ Verified</div><div class="stat-value">'+verified+'</div></div>'+
+      '<div class="stat-card"><div class="stat-label">⏳ Pending</div><div class="stat-value">'+pending+'</div></div>'+
+      '<div class="stat-card"><div class="stat-label">💾 Storage</div><div class="stat-value">'+docFmtSize(totalSize)+'</div></div>'+
     '</div>'+
-    '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Property</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>'+
-    pagD.items.map(function(d){
-      return '<tr style="cursor:pointer" onclick="showToast(\x27'+d.title+'\x27,\'info\x27)"><td style="font-weight:500">'+d.title+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#eef3ff;color:#2F80ED">'+d.type+'</span></td><td style="font-size:10px">'+d.property+'</td><td style="font-size:10px">'+d.date+'</td><td><span class="badge-status '+(d.status==='Verified'?'badge-active':'badge-pending')+'">'+d.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudDocument(mockDocuments.find(function(x){return x.id==='+d.id+'}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();if(confirm(\x27Delete '+d.title+'?\x27)){var idx=mockDocuments.findIndex(function(x){return x.id==='+d.id+'});if(idx>=0)mockDocuments.splice(idx,1);DB.save(\'documents\x27);showToast(\'Deleted\x27,\'info\x27);renderModule()}">\u2715</span></td></tr>';
-    }).join('')+
-    '</tbody></table>'+_pgHtml('documents',pagD.total,pagD.page,pagD.totalPages,pagD.perPage)+'</div></div></div></div>';
+    '<div class="vault-wrap">'+
+      '<div class="vault-side"><div class="vault-side-title">🗂 Categories</div>'+catSidebar+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+      '<div class="toolbar" style="margin-bottom:6px">'+
+        '<input id="docSearch" placeholder="Search documents..." oninput="_PG.documents={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:150px"/>'+
+        '<select id="docFType" onchange="_PG.documents={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+docTypes.map(function(t){return '<option value="'+t+'"'+(ft===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+        '<select onchange="window._docSort=this.value;renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px">'+
+          '<option value="date_desc"'+(sort==='date_desc'?' selected':'')+'>Newest</option>'+
+          '<option value="date_asc"'+(sort==='date_asc'?' selected':'')+'>Oldest</option>'+
+          '<option value="title"'+(sort==='title'?' selected':'')+'>Title A–Z</option>'+
+          '<option value="size"'+(sort==='size'?' selected':'')+'>Largest file</option>'+
+        '</select>'+
+        '<button class="action-btn secondary" onclick="window._docView=(window._docView===\'list\'?\'grid\':\'list\');renderModule()" style="padding:3px 8px;font-size:10px">'+(view==='list'?'▦ Grid':'☰ List')+'</button>'+
+        '<div class="spacer"></div>'+
+        '<button class="action-btn primary" onclick="crudDocument()" data-perm="Documents Vault:Create" style="padding:3px 8px;font-size:10px">📤 Upload Document</button>'+
+      '</div>'+
+      body+
+      '</div>'+
+    '</div></div>';
+}
+function docIcon(t){
+  var m={'CS Khatiyan':'📜','RS Khatiyan':'📜','Purchase Deed':'📄','Site Plan':'🗺️','Agreement':'🤝','Other Legal':'⚖️','Financial Statement':'💰','Tax Document':'🧾','NID':'🪪','Other':'📁'};
+  return m[t]||'📁';
+}
+function docFmtSize(b){if(!b)return'0 B';if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(2)+' MB';}
+function docCard(d){
+  var sz=(d.fileSize||0);
+  return '<div class="doc-card" onclick="viewDocument(\''+d.id+'\')">'+
+    '<div class="doc-card-top"><span class="doc-card-icon">'+docIcon(d.type)+'</span><span class="doc-card-actions">'+
+      '<span title="View" onclick="event.stopPropagation();viewDocument(\''+d.id+'\')">👁</span>'+
+      '<span title="Edit" onclick="event.stopPropagation();crudDocument(mockDocuments.find(function(x){return String(x.id)===\''+d.id+'\'}))">✎</span>'+
+      '<span title="Delete" onclick="event.stopPropagation();docDelete(\''+d.id+'\')">🗑</span>'+
+    '</span></div>'+
+    '<div class="doc-card-title">'+d.title+'</div>'+
+    '<div style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0">'+
+      '<span class="badge-status" style="background:#eef3ff;color:#2F80ED;font-size:9px">'+d.type+'</span>'+
+      '<span class="badge-status '+(d.status==='Verified'?'badge-active':'badge-pending')+'" style="font-size:9px">'+d.status+'</span>'+
+    '</div>'+
+    '<div class="doc-card-meta">'+(d.property||'—')+' · '+d.date+'</div>'+
+    '<div class="doc-card-foot"><span>'+(sz?docFmtSize(sz):'no file')+'</span><span>'+((d.uploadedBy||''))+'</span></div>'+
+  '</div>';
+}
+function docDelete(id){
+  var d=mockDocuments.find(function(x){return String(x.id)===String(id)});if(!d)return;
+  if(!confirm('Delete "'+d.title+'"?'))return;
+  var idx=mockDocuments.indexOf(d);
+  var _item=JSON.parse(JSON.stringify(d));
+  mockDocuments.splice(idx,1);docSave();showToast('Document deleted','info',function(){mockDocuments.splice(Math.min(idx,mockDocuments.length),0,_item);docSave();renderModule();showToast('Restored','info');});
+  logActivity('Deleted','Documents Vault','Document',d.id,d.title);
+  renderModule();
+}
+function docSave(){try{DB.save('documents');}catch(e){showToast('⚠ Storage full — delete some documents','error');}}
+function docSetStatus(id,status){
+  var d=mockDocuments.find(function(x){return String(x.id)===String(id)});if(!d)return;
+  d.status=status;docSave();showToast('Status → '+status,'info');renderModule();
+  var vw=document.getElementById('docViewerOverlay');if(vw){var b=vw.querySelector('#docViewStatus');if(b)b.textContent=status;}
+}
+function docDownload(id){
+  var d=mockDocuments.find(function(x){return String(x.id)===String(id)});if(!d)return;
+  var url=d.file&&d.file.dataUrl;
+  if(!url&&d.file&&d.file.text){url='data:text/plain;charset=utf-8,'+encodeURIComponent(d.file.text);}
+  if(url){var a=document.createElement('a');a.href=url;a.download=d.file.name||(d.title+'.txt');document.body.appendChild(a);a.click();document.body.removeChild(a);showToast('Downloading '+(d.file.name||''),'info');}
+  else showToast('No file attached — edit to upload','info');
+}
+function viewDocument(id){
+  var d=mockDocuments.find(function(x){return String(x.id)===String(id)});if(!d)return;
+  closeDocViewer();
+  var file=d.file;
+  var preview;
+  if(file&&(file.dataUrl||file.text)){
+    if(file.text)preview='<pre style="white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:11px;background:#f8f9fa;padding:12px;border-radius:6px;max-height:100%;overflow:auto;margin:0">'+((file.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'))+'</pre>';
+    else if(file.type&&file.type.indexOf('image/')===0)preview='<img src="'+file.dataUrl+'" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:6px"/>';
+    else if(file.type==='application/pdf')preview='<iframe src="'+file.dataUrl+'" style="width:100%;height:100%;border:none;border-radius:6px"></iframe>';
+    else preview='<div class="vault-file-fallback">📄 '+file.name+'<br><span>'+docFmtSize(file.size)+' · '+(file.type||'unknown')+'</span></div>';
+  } else preview='<div class="vault-file-fallback">🔍 No file attached<br><span>Click Edit to upload a file</span></div>';
+  var ov=document.createElement('div');ov.className='doc-viewer-overlay';ov.id='docViewerOverlay';
+  ov.innerHTML='<div class="doc-viewer">'+
+    '<div class="doc-viewer-head"><span style="font-size:15px">'+docIcon(d.type)+' '+d.title+'</span><button class="doc-viewer-close" onclick="closeDocViewer()">✕</button></div>'+
+    '<div class="doc-viewer-body">'+
+      '<div class="doc-preview">'+preview+'</div>'+
+      '<div class="doc-meta">'+
+        '<div class="doc-meta-title">Details</div>'+
+        '<div class="doc-meta-row"><span>Type</span><b>'+d.type+'</b></div>'+
+        '<div class="doc-meta-row"><span>Category</span><b>'+(d.category||'Other')+'</b></div>'+
+        '<div class="doc-meta-row"><span>Property</span><b>'+(d.property||'—')+'</b></div>'+
+        '<div class="doc-meta-row"><span>Date</span><b>'+d.date+'</b></div>'+
+        '<div class="doc-meta-row"><span>Size</span><b>'+(d.fileSize?docFmtSize(d.fileSize):'—')+'</b></div>'+
+        '<div class="doc-meta-row"><span>Uploaded by</span><b>'+(d.uploadedBy||'—')+'</b></div>'+
+        '<div class="doc-meta-row"><span>Status</span><b id="docViewStatus">'+d.status+'</b></div>'+
+        (d.notes?'<div style="font-size:10px;color:#666;margin-top:10px;line-height:1.5">📝 '+d.notes+'</div>':'')+
+        '<div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">'+
+          '<button class="action-btn primary" onclick="docDownload(\''+d.id+'\')" style="padding:5px 10px;font-size:10px">⬇ Download</button>'+
+          '<button class="action-btn secondary" onclick="closeDocViewer();crudDocument(mockDocuments.find(function(x){return String(x.id)===\''+d.id+'\'}))" style="padding:5px 10px;font-size:10px">✎ Edit</button>'+
+          '<button class="action-btn secondary" onclick="docSetStatus(\''+d.id+'\',this.dataset.s===\'Verified\'?\'Pending Review\':\'Verified\')" data-s="'+(d.status==='Verified'?'Verified':'')+'" style="padding:5px 10px;font-size:10px">'+(d.status==='Verified'?'⏳ Mark Pending':'✅ Mark Verified')+'</button>'+
+          '<button class="action-btn secondary" onclick="closeDocViewer();docDelete(\''+d.id+'\')" style="padding:5px 10px;font-size:10px;color:#c62828">🗑 Delete</button>'+
+        '</div>'+
+      '</div>'+
+    '</div></div>';
+  document.body.appendChild(ov);
+  setTimeout(function(){document.addEventListener('keydown',__docViewerKey=function(e){if(e.key==='Escape')closeDocViewer();});},30);
+}
+function closeDocViewer(){
+  var ov=document.getElementById('docViewerOverlay');
+  if(ov){ov.classList.add('closing');setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);},140);}
+  try{document.removeEventListener('keydown',__docViewerKey);}catch(e){}
 }
 function crudDocument(item){
   var n=!item;
+  window._docNewFile=null;
   var types=mockDocuments.reduce(function(a,d){if(a.indexOf(d.type)<0)a.push(d.type);return a;},[]);
+  var cats=['Legal','Land','Financial','Technical','Corporate','Other'];
   var props=['Muktodhara','Jolshiri','Corporate','Both'];
-  var d=n?{id:mockDocuments.length+1,title:'',type:types[0]||'CS Khatiyan',property:props[0],date:new Date().toISOString().split('T')[0],status:'Pending Review'}:item;
-  openModal(n?'Upload Document':'Edit Document',
-    formRow(inputField('Title','df_title',d.title,'',true),selectField('Type','df_type',d.type,types,true))+
-    formRow(selectField('Property','df_prop',d.property,props,true),inputField('Date','df_date',d.date))+
-    selectField('Status','df_stat',d.status,['Pending Review','Verified','Expired'],true),
+  var d=n?{id:nextId(mockDocuments),title:'',type:types[0]||'CS Khatiyan',category:'Legal',property:props[0],date:new Date().toISOString().split('T')[0],status:'Pending Review',notes:'',uploadedBy:window.currentRole||'Admin'}:item;
+  var dz='<div id="docDropZone" class="dropzone" onclick="document.getElementById(\'docFileInput\').click()" ondragover="event.preventDefault();this.classList.add(\'drag\')" ondragleave="this.classList.remove(\'drag\')" ondrop="event.preventDefault();this.classList.remove(\'drag\');docHandleFiles(event.dataTransfer.files)">'+
+    '<div style="font-size:22px">📎</div>'+
+    '<div style="font-size:11px;color:#888">Drag &amp; drop a file here, or <b style="color:#2F80ED">click to browse</b></div>'+
+    '<div style="font-size:9px;color:#aaa;margin-top:2px">Images compressed · max 1.5 MB</div>'+
+    '<input type="file" id="docFileInput" style="display:none" onchange="docHandleFiles(this.files)"/>'+
+    '</div>'+
+    '<div id="docDropPreview" style="display:none;margin-top:6px;padding:6px 10px;background:#eef7ee;border:1px solid #cde8cd;border-radius:6px;font-size:10px;color:#2e7d32"></div>';
+  openModal(n?'📤 Upload Document':'✏️ Edit Document',
+    dz+
+    formRow(inputField('Title','df_title',d.title,'Document title',true),selectField('Type','df_type',d.type,types.concat(['CS Khatiyan','RS Khatiyan','Purchase Deed','Site Plan','Agreement','Other Legal','NID','Other']).filter(function(t,i,a){return a.indexOf(t)===i;}),true))+
+    formRow(selectField('Category','df_cat',d.category,cats,true),selectField('Property','df_prop',d.property,props,true))+
+    formRow(inputField('Date','df_date',d.date),selectField('Status','df_stat',d.status,['Pending Review','Verified','Expired'],true))+
+    '<div class="form-group"><label class="form-label">Notes</label><textarea class="form-input" id="df_notes" rows="2" placeholder="Remarks...">'+(d.notes||'')+'</textarea></div>',
     function(){
-      var data={id:n?(mockDocuments.length+1):d.id,title:g('df_title'),type:g('df_type'),property:g('df_prop'),date:g('df_date'),status:g('df_stat')};
-      if(n){mockDocuments.push(data);DB.save('documents');showToast('Document uploaded','success');}
-      else{var idx=mockDocuments.findIndex(function(x){return x.id===d.id});if(idx>=0){mockDocuments[idx]=data;DB.save('documents');showToast('Document updated','info');}}
+      var data={id:n?nextId(mockDocuments):d.id,title:g('df_title'),type:g('df_type'),category:g('df_cat'),property:g('df_prop'),date:g('df_date'),status:g('df_stat'),notes:g('df_notes'),uploadedBy:d.uploadedBy||window.currentRole||'Admin'};
+      if(window._docNewFile){data.file=window._docNewFile;data.fileSize=window._docNewFile.size;}
+      else if(d.file){data.file=d.file;data.fileSize=d.fileSize||0;}
+      else data.fileSize=0;
+      if(n){mockDocuments.push(data);docSave();showToast('Document uploaded','success');logActivity('Created','Documents Vault','Document',data.id,data.title);}
+      else{var idx=mockDocuments.findIndex(function(x){return String(x.id)===String(d.id)});if(idx>=0){mockDocuments[idx]=data;docSave();showToast('Document updated','info');logActivity('Updated','Documents Vault','Document',data.id,data.title);}}
       renderModule();
     }
   );
+}
+function docHandleFiles(files){
+  if(!files||!files.length)return;
+  var f=files[0];
+  if(f.size>1572864){showToast('File too large — max 1.5 MB','error');return;}
+  var pv=document.getElementById('docDropPreview');
+  if(pv){pv.style.display='block';pv.textContent='⏳ Reading '+f.name+' ('+docFmtSize(f.size)+')…';}
+  if(f.type&&f.type.indexOf('image/')===0){
+    var rd=new FileReader();
+    rd.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var MAX=900,w=img.width,h=img.height,sc=Math.min(1,MAX/Math.max(w,h));
+        var cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(w*sc));cv.height=Math.max(1,Math.round(h*sc));
+        cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+        var jpg=cv.toDataURL('image/jpeg',0.82);
+        window._docNewFile={name:f.name,size:Math.round(jpg.length*0.75),type:'image/jpeg',dataUrl:jpg};
+        if(pv){pv.textContent='✅ '+f.name+' → image ('+docFmtSize(window._docNewFile.size)+')';}
+      };
+      img.onerror=function(){window._docNewFile={name:f.name,size:f.size,type:f.type,dataUrl:rd.result};if(pv){pv.textContent='✅ '+f.name+' ('+docFmtSize(f.size)+')';}};
+      img.src=rd.result;
+    };
+    rd.readAsDataURL(f);
+  } else if(f.type&&f.type.indexOf('text/')===0){
+    var rt=new FileReader();
+    rt.onload=function(){window._docNewFile={name:f.name,size:f.size,type:f.type,text:String(rt.result)};if(pv){pv.textContent='✅ '+f.name+' ('+docFmtSize(f.size)+')';}};
+    rt.readAsText(f);
+  } else {
+    var rb=new FileReader();
+    rb.onload=function(){window._docNewFile={name:f.name,size:f.size,type:f.type,dataUrl:rb.result};if(pv){pv.textContent='✅ '+f.name+' ('+docFmtSize(f.size)+')';}};
+    rb.readAsDataURL(f);
+  }
 }
 
 let financeTab='dashboard';
@@ -7883,7 +8129,7 @@ window.mockCOA = DB.init('coa', [
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Land Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Layout','Projects','Property & Units','Compliance','Bookings','Customer Portal','Handover','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Finance','Stock & Procurement','HR','Data Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Layout','Projects','Property & Units','Compliance','Bookings','Customer Portal','Handover','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -7895,7 +8141,7 @@ const MOCK_PERMISSIONS = {
     ['CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Bookings','Customer Portal'].indexOf(m)>=0?['✓','✓','✓','✓','✓','','✓']:
     ['Permissions','System Manual','Backup'].indexOf(m)>=0?['✓','','','','','','']:
     m==='Tasks'?['✓','✓','✓','✓','','','']:
-    m==='Data Vault'?['✓','✓','✓','','','','']:
+    m==='Documents Vault'?['✓','✓','✓','','','','']:
     m==='Finance'?['✓','','','','✓','','']:
     m==='Property & Units'?['✓','✓','✓','✓','✓','','']:
     ['✓','','','','','','']
@@ -8388,7 +8634,7 @@ var _sdDatasetDefs=[
   {g:'Finance & Admin',arr:'mockPurchaseOrders',label:'Purchase Orders',icon:'📄',mod:'stock',fields:['id','supplier','status']},
   {g:'Finance & Admin',arr:'mockTransactions',label:'Transactions',icon:'💳',mod:'finance',fields:['description','category','amount']},
   {g:'Finance & Admin',arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','department','designation']},
-  {g:'Finance & Admin',arr:'mockDocuments',label:'Documents',icon:'📄',mod:'documents',fields:['name','project','type']},
+  {g:'Finance & Admin',arr:'mockDocuments',label:'Documents Vault',icon:'📁',mod:'documents',fields:['title','property','type']},
   {g:'Finance & Admin',arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
   // Group: Collaboration
   {g:'Collaboration',arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']}
@@ -12861,7 +13107,7 @@ html.dark .inv-preview{background:rgba(15,23,42,.5);border-color:#334155}
 // ── LANGUAGE TOGGLE (EN / বাংলা) ──
 var LANG='en';
 var _BN_DICT={
-'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Property & Unit Inventory':'সম্পত্তি ও ইউনিট ইনভেন্টরি','Plots & Layout':'প্লট ও লেআউট','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Data Vault':'ডেটা ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
+'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Property & Unit Inventory':'সম্পত্তি ও ইউনিট ইনভেন্টরি','Plots & Layout':'প্লট ও লেআউট','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
 'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Land & Projects':'জমি ও প্রকল্প','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Collaboration':'সহযোগিতা','System':'সিস্টেম',
 'Super Admin':'সুপার অ্যাডমিন','Sales Agent':'সেলস এজেন্ট','Site Engineer':'সাইট ইঞ্জিনিয়ার','Finance':'ফাইন্যান্স','Executive Group':'নির্বাহী গ্রুপ',
 'New Inquiry':'নতুন অনুসন্ধান','Contacted':'যোগাযোগ হয়েছে','Site Visit':'সাইট পরিদর্শন','Negotiation':'আলোচনা','Booking':'বুকিং','Downpayment':'ডাউন পেমেন্ট','Installments':'কিস্তি','Possession':'দখল','Handover':'হস্তান্তর','Lost':'হারানো','Junk':'অপ্রাসঙ্গিক',
