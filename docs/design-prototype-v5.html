@@ -735,7 +735,7 @@
 <script>
 // ═══ GROUP DEFINITIONS ═══
 const GROUPS = {
-  executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'},{id:'analytics', label:'Analytics', badge:true}] },
+  executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'},{id:'analytics', label:'Analytics', badge:true},{id:'reports', label:'Reports', badge:true}] },
   sales_crm:     { label:'Sales & CRM',   icon:'👥', mods:[{id:'customers',    label:'Customers'},{id:'crm',          label:'CRM & Leads'},{id:'proposals',label:'Proposals',badge:true},{id:'contacts',label:'Contact Book'},{id:'sales_marketing',label:'Sales & Marketing'},{id:'dues_recovery',label:'Dues & Recovery'}] },
   land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
@@ -1854,6 +1854,7 @@ function switchModule(mod,skipSkel) {
     switch(mod) {
       case 'dashboard': renderDashboard(el); break;
       case 'analytics': renderAnalytics(el); break;
+      case 'reports': renderReports(el); break;
       case 'customers': renderCustomers(el); break;
       case 'crm': renderCRM(el); break;
       case 'proposals': renderProposals(el); break;
@@ -2053,6 +2054,337 @@ function renderAnalytics(el){
       window._anCharts.push(new Chart(rCtx,{type:'line',data:{labels:mnths,datasets:[{label:'Revenue (₹K)',data:rData,borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.1)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#2e7d32'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:function(v){return'₹'+v+'K'}}}}}}));
     }catch(e){}
   },100);
+}
+// ═══ ENHANCED REPORTS & DASHBOARDS (V5.2) ═══
+var _repTab='pipeline', _repPeriod='all', _repProject='all';
+function _repAnchorDate(){
+  var d=new Date();
+  [mockTransactions,mockInvoices,mockPayments].forEach(function(arr){arr.forEach(function(t){var x=t.date?new Date(t.date):null;if(x&&!isNaN(x)&&x>d)d=x;var y=t.dueDate?new Date(t.dueDate):null;if(y&&!isNaN(y)&&y>d)d=y;});});
+  return d;
+}
+function _repCutoff(){
+  var a=_repAnchorDate();
+  if(_repPeriod==='all')return null;
+  if(_repPeriod==='ytd')return new Date(a.getFullYear(),0,1);
+  var c=new Date(a); c.setDate(c.getDate()-(_repPeriod==='30d'?30:90)); return c;
+}
+function _repInDate(s,c){ if(!s)return !c; var d=new Date(s); if(isNaN(d))return !c; return c?d>=c:true; }
+function _repProjOK(p){ return _repProject==='all'||(p||'')===_repProject; }
+function _repLeadProjOK(p){ if(_repProject==='all')return true; var fw=_repProject.split(' ')[0]; return (p||'').indexOf(fw)===0; }
+function _repProjList(){
+  var s={};
+  mockProperties.forEach(function(p){if(p.name)s[p.name]=1;});
+  mockTransactions.forEach(function(t){if(t.project)s[t.project]=1;});
+  mockInvoices.forEach(function(i){if(i.project)s[i.project]=1;});
+  return Object.keys(s).sort();
+}
+function _repMoney(n){ return '৳'+(n/100000).toFixed(1)+'L'; }
+function _repNum(n){ return '৳'+Math.round(n).toLocaleString('en-IN'); }
+function renderReports(el){
+  if(window._repCharts)window._repCharts.forEach(function(c){c.destroy()});
+  window._repCharts=[];
+  var cutoff=_repCutoff();
+  var projs=_repProjList();
+  var periodName={all:'All Time','30d':'Last 30 Days','90d':'Last 90 Days',ytd:'Year To Date'}[_repPeriod];
+  var tabDefs=[['pipeline','📈 Sales Pipeline'],['collection','💰 Payment Collection'],['occupancy','🏢 Occupancy'],['revenue','📊 Revenue vs Expense']];
+  var tabs=tabDefs.map(function(t){return '<span class="qa-tab" style="padding:4px 12px;font-size:10px;font-weight:600;border-radius:6px;cursor:pointer;background:'+(_repTab===t[0]?'#2F80ED':'#f0f0f0')+';color:'+(_repTab===t[0]?'#fff':'#666')+';margin-right:4px" onclick="_repTab=\''+t[0]+'\';renderModule()">'+t[1]+'</span>';}).join('');
+  var toolbar='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+tabs+
+    '<div class="spacer"></div>'+
+    '<select onchange="_repPeriod=this.value;renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:6px;background:transparent"><option value="all"'+( _repPeriod==='all'?' selected':'')+'>All Time</option><option value="30d"'+( _repPeriod==='30d'?' selected':'')+'>Last 30 Days</option><option value="90d"'+( _repPeriod==='90d'?' selected':'')+'>Last 90 Days</option><option value="ytd"'+( _repPeriod==='ytd'?' selected':'')+'>Year To Date</option></select>'+
+    '<select onchange="_repProject=this.value;renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:6px;background:transparent"><option value="all">All Projects</option>'+projs.map(function(p){return '<option value="'+p+'"'+(_repProject===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'+
+    '<button class="action-btn secondary" onclick="reportsExportExcel()" title="Download as Excel" style="padding:4px 10px;font-size:10px">📥 Excel</button>'+
+    '<button class="action-btn secondary" onclick="reportsExportCSV()" title="Download as CSV" style="padding:4px 10px;font-size:10px">📄 CSV</button>'+
+    '<button class="action-btn primary" onclick="reportsPrintPDF()" title="Print / Save as PDF" style="padding:4px 10px;font-size:10px">🖨 PDF</button>'+
+    '</div>';
+  el.innerHTML='<div class="module-container fade-in">'+
+    '<div class="page-title">📊 Reports & Dashboards</div>'+
+    '<div class="page-subtitle">'+periodName+' · '+(_repProject==='all'?'All Projects':_repProject)+' · live from ERP data</div>'+
+    toolbar+'<div id="repArea"></div></div>';
+  var area=document.getElementById('repArea');
+  if(_repTab==='pipeline')_repPipeline(area,cutoff);
+  else if(_repTab==='collection')_repCollection(area,cutoff);
+  else if(_repTab==='occupancy')_repOccupancy(area);
+  else _repRevenue(area,cutoff);
+  setTimeout(function(){
+    if(_repTab==='pipeline')_repPipeChart();
+    else if(_repTab==='collection')_repCollChart();
+    else if(_repTab==='occupancy')_repOccChart();
+    else _repRevChart();
+  },80);
+}
+// ── 1. Sales Pipeline ──
+function _repPipeline(area,cutoff){
+  var leads=mockLeads.filter(function(l){return _repLeadProjOK(l.property)&&_repInDate(l.dateContacted,cutoff);});
+  var conv=leads.filter(function(l){return isConvertedStage(l.status);}).length;
+  var lost=leads.filter(function(l){return isLostStage(l.status);}).length;
+  var active=leads.length-conv-lost;
+  var winRate=leads.length?Math.round(conv/leads.length*100):0;
+  var pipeVal=leads.reduce(function(s,l){return s+(parseFloat(l.value)||0);},0);
+  var stages=['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'];
+  var stageRows=stages.map(function(s){
+    var ls=leads.filter(function(l){return l.status===s;});
+    var v=ls.reduce(function(t,l){return t+(parseFloat(l.value)||0);},0);
+    return {s:s,count:ls.length,value:v,pct:leads.length?Math.round(ls.length/leads.length*100):0};
+  });
+  var srcMap={};
+  leads.forEach(function(l){var k=l.source||'Unknown';if(!srcMap[k])srcMap[k]={count:0,value:0};srcMap[k].count++;srcMap[k].value+=(parseFloat(l.value)||0);});
+  var sources=Object.keys(srcMap).map(function(k){return {k:k,count:srcMap[k].count,value:srcMap[k].value};}).sort(function(a,b){return b.count-a.count;}).slice(0,8);
+  area.innerHTML=
+    '<div class="stats-row" style="margin-bottom:8px">'+
+    '<div class="stat-card"><div class="label">Total Leads</div><div class="value" style="color:#2F80ED">'+leads.length+'</div></div>'+
+    '<div class="stat-card"><div class="label">Active Pipeline</div><div class="value" style="color:#1565c0">'+active+'</div></div>'+
+    '<div class="stat-card"><div class="label">Converted</div><div class="value" style="color:#2e7d32">'+conv+'</div></div>'+
+    '<div class="stat-card"><div class="label">Win Rate</div><div class="value" style="color:#7b1fa2">'+winRate+'%</div></div>'+
+    '<div class="stat-card"><div class="label">Pipeline Value</div><div class="value" style="color:#00838f">'+_repMoney(pipeVal)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Lost / Junk</div><div class="value" style="color:#c62828">'+lost+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px">'+
+    '<div class="card"><div class="card-header"><h3>🔻 Funnel by Stage</h3></div><div class="card-body" style="padding:8px;height:230px"><canvas id="repPipeChart"></canvas></div></div>'+
+    '<div class="card"><div class="card-header"><h3>🏆 Top Sources</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><caption style="caption-side:top;text-align:left;padding:6px 10px;font-size:10px;font-weight:600;color:#666">Lead Sources</caption><thead><tr><th>Source</th><th class="num">Leads</th><th class="num">Value</th></tr></thead><tbody>'+
+      (sources.length?sources.map(function(s){return '<tr><td>'+s.k+'</td><td class="num" style="font-weight:600">'+s.count+'</td><td class="num" style="color:#00838f">'+_repMoney(s.value)+'</td></tr>';}).join(''):'<tr><td colspan="3" style="text-align:center;color:#999;padding:20px">No data</td></tr>')+
+    '</tbody></table></div></div></div></div>'+
+    '<div class="card" style="margin-top:8px"><div class="card-header"><h3>📋 Stage Breakdown</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><caption style="caption-side:top;text-align:left;padding:6px 10px;font-size:10px;font-weight:600;color:#666">Leads by pipeline stage</caption><thead><tr><th>Stage</th><th class="num">Leads</th><th class="num">% of Total</th><th class="num">Value</th></tr></thead><tbody>'+
+    stageRows.filter(function(r){return r.count>0||r.value>0;}).map(function(r){return '<tr><td>'+r.s+'</td><td class="num" style="font-weight:600">'+r.count+'</td><td class="num">'+r.pct+'%</td><td class="num" style="color:#00838f">'+_repMoney(r.value)+'</td></tr>';}).join('')+
+    '</tbody></table></div></div></div>';
+}
+function _repPipeChart(){
+  var ctx=document.getElementById('repPipeChart'); if(!ctx)return;
+  try{
+    var stages=['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'];
+    var data=stages.map(function(s){return mockLeads.filter(function(l){return l.status===s&&_repLeadProjOK(l.property);}).length;});
+    window._repCharts.push(new Chart(ctx,{type:'bar',data:{labels:stages,datasets:[{label:'Leads',data:data,backgroundColor:data.map(function(v,i){return i>=4?'rgba(46,125,50,.75)':'rgba(21,101,192,.65)';}),borderColor:data.map(function(v,i){return i>=4?'#2e7d32':'#1565c0';}),borderWidth:1,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},stepSize:1}},y:{grid:{display:false},ticks:{font:{size:9}}}}}}));
+  }catch(e){}
+}
+// ── 2. Payment Collection ──
+function _repCollection(area,cutoff){
+  var invs=mockInvoices.filter(function(i){return _repProjOK(i.project)&&(_repInDate(i.issuedDate,cutoff)||_repInDate(i.dueDate,cutoff));});
+  var invoiced=invs.reduce(function(s,i){return s+(i.amount||0);},0);
+  var paid=0;
+  var invPay={};
+  mockPayments.forEach(function(p){if(p.invoiceId){invPay[p.invoiceId]=(invPay[p.invoiceId]||0)+(p.amount||0);}});
+  invs.forEach(function(i){paid+=Math.min(i.amount||0,invPay[i.id]||0);});
+  var outstanding=Math.max(0,invoiced-paid);
+  var collRate=invoiced?Math.round(paid/invoiced*100):0;
+  var overdue=mockInvoices.filter(function(i){return i.status==='Overdue'&&_repProjOK(i.project);});
+  var overdueAmt=overdue.reduce(function(s,i){return s+(i.amount||0);},0);
+  var rows=invs.slice().sort(function(a,b){return (b.dueDate||'').localeCompare(a.dueDate||'');});
+  area.innerHTML=
+    '<div class="stats-row" style="margin-bottom:8px">'+
+    '<div class="stat-card"><div class="label">Invoiced</div><div class="value" style="color:#2F80ED">'+_repNum(invoiced)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Collected</div><div class="value" style="color:#2e7d32">'+_repNum(paid)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Outstanding</div><div class="value" style="color:#e65100">'+_repNum(outstanding)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Collection Rate</div><div class="value" style="color:#7b1fa2">'+collRate+'%</div></div>'+
+    '<div class="stat-card"><div class="label">Overdue Invoices</div><div class="value" style="color:#c62828">'+overdue.length+'</div></div>'+
+    '<div class="stat-card"><div class="label">Overdue Amount</div><div class="value" style="color:#c62828">'+_repNum(overdueAmt)+'</div></div>'+
+    '</div>'+
+    '<div class="card" style="margin-bottom:8px"><div class="card-header"><h3>📅 Monthly Invoiced vs Collected</h3></div><div class="card-body" style="padding:8px;height:210px"><canvas id="repCollChart"></canvas></div></div>'+
+    '<div class="card"><div class="card-header"><h3>🧾 Invoice Ledger</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><caption style="caption-side:top;text-align:left;padding:6px 10px;font-size:10px;font-weight:600;color:#666">'+rows.length+' invoices</caption><thead><tr><th>Invoice</th><th>Client</th><th>Project</th><th class="num">Amount</th><th class="num">Collected</th><th class="num">Outstanding</th><th>Due</th><th>Status</th></tr></thead><tbody>'+
+    (rows.length?rows.map(function(i){
+      var col=invPay[i.id]||0, out=Math.max(0,(i.amount||0)-col);
+      var badge=i.status==='Paid'?'badge-active':i.status==='Overdue'?'badge-sold':i.status==='Draft'?'badge-reserved':'badge-pending';
+      return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+i.id+'</td><td>'+i.client+'</td><td style="font-size:9px;color:#888">'+i.project+'</td><td class="num" style="font-weight:600">'+_repNum(i.amount)+'</td><td class="num" style="color:#2e7d32">'+_repNum(col)+'</td><td class="num" style="color:'+(out>0?'#c62828':'#888')+'">'+_repNum(out)+'</td><td style="font-size:9px;color:#888">'+(i.dueDate||'—')+'</td><td><span class="badge-status '+badge+'">'+i.status+'</span></td></tr>';
+    }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:20px">No invoices in this range</td></tr>')+
+    '</tbody></table></div></div></div>';
+}
+function _repCollChart(){
+  var ctx=document.getElementById('repCollChart'); if(!ctx)return;
+  try{
+    var a=_repAnchorDate(), yr=a.getFullYear();
+    var mnths=[];
+    for(var m=0;m<6;m++){var d=new Date(yr,m,1);mnths.push({key:yr+'-'+(m<9?'0':'')+(m+1),label:d.toLocaleString('en',{month:'short'})});}
+    var invData=mnths.map(function(m){return mockInvoices.filter(function(i){return _repProjOK(i.project)&&i.issuedDate&&i.issuedDate.indexOf(m.key)===0;}).reduce(function(s,i){return s+(i.amount||0);},0);});
+    var payData=mnths.map(function(m){return mockPayments.filter(function(p){var inv=mockInvoices.find(function(i){return i.id===p.invoiceId;});return _repProjOK(inv?inv.project:'')&&p.date&&p.date.indexOf(m.key)===0;}).reduce(function(s,p){return s+(p.amount||0);},0);});
+    window._repCharts.push(new Chart(ctx,{type:'bar',data:{labels:mnths.map(function(m){return m.label;}),datasets:[{label:'Invoiced',data:invData,backgroundColor:'rgba(47,128,237,.55)',borderColor:'#2F80ED',borderWidth:1,borderRadius:4},{label:'Collected',data:payData,backgroundColor:'rgba(46,125,50,.55)',borderColor:'#2e7d32',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:function(v){return'৳'+(v/100000).toFixed(0)+'L';}}}}}}));
+  }catch(e){}
+}
+// ── 3. Occupancy ──
+function _repOccupancy(area){
+  var props=mockProperties.filter(function(p){return _repProjOK(p.name);});
+  var rows=props.map(function(p){
+    var u=p.units||[], st={Available:0,Sold:0,Booked:0,Reserved:0};
+    u.forEach(function(x){st[x.status]=((st[x.status])||0)+1;});
+    var occ=st.Sold+st.Booked;
+    return {name:p.name,type:p.type,location:p.location,total:u.length,avail:st.Available,sold:st.Sold,booked:st.Booked,reserved:st.Reserved,occ:occ,pct:u.length?Math.round(occ/u.length*100):0};
+  });
+  var total=rows.reduce(function(s,r){return s+r.total;},0);
+  var avail=rows.reduce(function(s,r){return s+r.avail;},0);
+  var sold=rows.reduce(function(s,r){return s+r.sold;},0);
+  var booked=rows.reduce(function(s,r){return s+r.booked;},0);
+  var reserved=rows.reduce(function(s,r){return s+r.reserved;},0);
+  var occ=total?Math.round((sold+booked)/total*100):0;
+  var valTotal=0, valOcc=0;
+  props.forEach(function(p){p.units.forEach(function(u){valTotal+=(u.price||0);if(u.status==='Sold'||u.status==='Booked')valOcc+=(u.price||0);});});
+  area.innerHTML=
+    '<div class="stats-row" style="margin-bottom:8px">'+
+    '<div class="stat-card"><div class="label">Total Units</div><div class="value" style="color:#2F80ED">'+total+'</div></div>'+
+    '<div class="stat-card"><div class="label">Occupied</div><div class="value" style="color:#2e7d32">'+(sold+booked)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Available</div><div class="value" style="color:#1565c0">'+avail+'</div></div>'+
+    '<div class="stat-card"><div class="label">Occupancy Rate</div><div class="value" style="color:#7b1fa2">'+occ+'%</div></div>'+
+    '<div class="stat-card"><div class="label">Inventory Value</div><div class="value" style="color:#00838f">'+_repMoney(valTotal)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Value Occupied</div><div class="value" style="color:#e65100">'+_repMoney(valOcc)+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1.4fr;gap:8px">'+
+    '<div class="card"><div class="card-header"><h3>🍩 Status Mix</h3></div><div class="card-body" style="padding:8px;height:230px"><canvas id="repOccChart"></canvas></div></div>'+
+    '<div class="card"><div class="card-header"><h3>🏢 Occupancy by Project</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><caption style="caption-side:top;text-align:left;padding:6px 10px;font-size:10px;font-weight:600;color:#666">Per-project unit status</caption><thead><tr><th>Project</th><th class="num">Total</th><th class="num">Avail</th><th class="num">Sold</th><th class="num">Booked</th><th class="num">Resv</th><th class="num">Occ%</th></tr></thead><tbody>'+
+    rows.map(function(r){return '<tr><td style="font-weight:500">'+r.name+'</td><td class="num">'+r.total+'</td><td class="num" style="color:#1565c0">'+r.avail+'</td><td class="num" style="color:#c62828">'+r.sold+'</td><td class="num" style="color:#e65100">'+r.booked+'</td><td class="num" style="color:#888">'+r.reserved+'</td><td class="num" style="font-weight:600;color:'+(r.pct>=60?'#2e7d32':r.pct>=30?'#e65100':'#c62828')+'">'+r.pct+'%</td></tr>';}).join('')+
+    '</tbody></table></div></div></div></div>';
+}
+function _repOccChart(){
+  var ctx=document.getElementById('repOccChart'); if(!ctx)return;
+  try{
+    var st={Available:0,Sold:0,Booked:0,Reserved:0};
+    mockProperties.forEach(function(p){if(!_repProjOK(p.name))return;p.units.forEach(function(u){st[u.status]++;});});
+    window._repCharts.push(new Chart(ctx,{type:'doughnut',data:{labels:['Available','Sold','Booked','Reserved'],datasets:[{data:[st.Available,st.Sold,st.Booked,st.Reserved],backgroundColor:['#1565c0','#c62828','#e65100','#7b1fa2'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'48%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));
+  }catch(e){}
+}
+// ── 4. Revenue vs Expense ──
+function _repRevenue(area,cutoff){
+  var a=_repAnchorDate(), yr=a.getFullYear();
+  var mnths=[];
+  for(var m=0;m<12;m++){var d=new Date(yr,m,1);mnths.push({key:yr+'-'+(m<9?'0':'')+(m+1),label:d.toLocaleString('en',{month:'short'})});}
+  var rows=mnths.map(function(m){
+    var rev=mockTransactions.filter(function(t){return t.type==='Inflow'&&t.date&&t.date.indexOf(m.key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);
+    var exp=mockTransactions.filter(function(t){return t.type==='Outflow'&&t.date&&t.date.indexOf(m.key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);
+    return {label:m.label,rev:rev,exp:exp,net:rev-exp};
+  });
+  var cum=0; rows.forEach(function(r){cum+=r.net;r.cum=cum;});
+  var totRev=rows.reduce(function(s,r){return s+r.rev;},0);
+  var totExp=rows.reduce(function(s,r){return s+r.exp;},0);
+  var net=totRev-totExp;
+  var margin=totRev?Math.round(net/totRev*100):0;
+  var maxRow=rows.reduce(function(x,r){return r.rev>r.exp?x:'Expense';},'Revenue');
+  area.innerHTML=
+    '<div class="stats-row" style="margin-bottom:8px">'+
+    '<div class="stat-card"><div class="label">Total Revenue</div><div class="value" style="color:#2e7d32">'+_repMoney(totRev)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Total Expenses</div><div class="value" style="color:#c62828">'+_repMoney(totExp)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Net '+yr+'</div><div class="value" style="color:'+(net>=0?'#2F80ED':'#c62828')+'">'+_repMoney(net)+'</div></div>'+
+    '<div class="stat-card"><div class="label">Margin</div><div class="value" style="color:#7b1fa2">'+margin+'%</div></div>'+
+    '<div class="stat-card"><div class="label">Best Month</div><div class="value" style="color:#00838f">'+maxRow+'</div></div>'+
+    '<div class="stat-card"><div class="label">Expense Ratio</div><div class="value" style="color:#e65100">'+Math.round(totRev?totExp/totRev*100:0)+'%</div></div>'+
+    '</div>'+
+    '<div class="card" style="margin-bottom:8px"><div class="card-header"><h3>📊 Monthly Revenue vs Expense ('+yr+')</h3></div><div class="card-body" style="padding:8px;height:230px"><canvas id="repRevChart"></canvas></div></div>'+
+    '<div class="card"><div class="card-header"><h3>📋 Monthly P&L</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><caption style="caption-side:top;text-align:left;padding:6px 10px;font-size:10px;font-weight:600;color:#666">Profit &amp; loss by month</caption><thead><tr><th>Month</th><th class="num">Revenue</th><th class="num">Expenses</th><th class="num">Net</th><th class="num">Cumulative</th></tr></thead><tbody>'+
+    rows.map(function(r){return '<tr><td style="font-weight:500">'+r.label+' '+yr+'</td><td class="num" style="color:#2e7d32">'+_repNum(r.rev)+'</td><td class="num" style="color:#c62828">'+_repNum(r.exp)+'</td><td class="num" style="font-weight:600;color:'+(r.net>=0?'#2F80ED':'#c62828')+'">'+_repNum(r.net)+'</td><td class="num" style="color:#888">'+_repNum(r.cum)+'</td></tr>';}).join('')+
+    '</tbody></table></div></div></div>';
+}
+function _repRevChart(){
+  var ctx=document.getElementById('repRevChart'); if(!ctx)return;
+  try{
+    var a=_repAnchorDate(), yr=a.getFullYear();
+    var mnths=[];
+    for(var m=0;m<12;m++){var d=new Date(yr,m,1);mnths.push({key:yr+'-'+(m<9?'0':'')+(m+1),label:d.toLocaleString('en',{month:'short'})});}
+    var rev=mnths.map(function(m){return mockTransactions.filter(function(t){return t.type==='Inflow'&&t.date&&t.date.indexOf(m.key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);});
+    var exp=mnths.map(function(m){return mockTransactions.filter(function(t){return t.type==='Outflow'&&t.date&&t.date.indexOf(m.key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);});
+    window._repCharts.push(new Chart(ctx,{type:'bar',data:{labels:mnths.map(function(m){return m.label;}),datasets:[{label:'Revenue',data:rev,backgroundColor:'rgba(46,125,50,.6)',borderColor:'#2e7d32',borderWidth:1,borderRadius:3},{label:'Expenses',data:exp,backgroundColor:'rgba(198,40,40,.55)',borderColor:'#c62828',borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:function(v){return'৳'+(v/100000).toFixed(0)+'L';}}}}}}));
+  }catch(e){}
+}
+// ── Export helpers ──
+function _repReportData(){
+  if(_repTab==='pipeline'){
+    var stages=['New Inquiry','Contacted','Site Visit','Negotiation','Booking','Downpayment','Installments','Possession','Handover'];
+    var headers=['Stage','Leads','% of Total','Value'];
+    var rows=stages.map(function(s){var ls=mockLeads.filter(function(l){return l.status===s&&_repLeadProjOK(l.property);});var v=ls.reduce(function(t,l){return t+(parseFloat(l.value)||0);},0);return [s,ls.length,ls.length?Math.round(ls.length/mockLeads.length*100):0,v];});
+    return {title:'Sales Pipeline Report',subtitle:'REM ERP · '+({all:'All Time','30d':'Last 30 Days','90d':'Last 90 Days',ytd:'Year To Date'})[_repPeriod]+' · '+(_repProject==='all'?'All Projects':_repProject),headers:headers,rows:rows,numberCols:[1,2,3]};
+  }
+  if(_repTab==='collection'){
+    var invs=mockInvoices.filter(function(i){return _repProjOK(i.project);});
+    var invPay={};mockPayments.forEach(function(p){if(p.invoiceId)invPay[p.invoiceId]=(invPay[p.invoiceId]||0)+(p.amount||0);});
+    var headers=['Invoice','Client','Project','Amount','Collected','Outstanding','Due Date','Status'];
+    var rows=invs.map(function(i){var col=invPay[i.id]||0;return [i.id,i.client,i.project,i.amount,col,Math.max(0,(i.amount||0)-col),i.dueDate||'',i.status];});
+    return {title:'Payment Collection Report',subtitle:'REM ERP · '+(_repProject==='all'?'All Projects':_repProject),headers:headers,rows:rows,numberCols:[3,4,5]};
+  }
+  if(_repTab==='occupancy'){
+    var headers=['Project','Type','Location','Total','Available','Sold','Booked','Reserved','Occupancy %'];
+    var rows=mockProperties.filter(function(p){return _repProjOK(p.name);}).map(function(p){var u=p.units||[],st={Available:0,Sold:0,Booked:0,Reserved:0};u.forEach(function(x){st[x.status]++;});var occ=st.Sold+st.Booked;return [p.name,p.type||'',p.location||'',u.length,st.Available,st.Sold,st.Booked,st.Reserved,u.length?Math.round(occ/u.length*100):0];});
+    return {title:'Occupancy Report',subtitle:'REM ERP · '+(_repProject==='all'?'All Projects':_repProject),headers:headers,rows:rows,numberCols:[3,4,5,6,7,8]};
+  }
+  var a=_repAnchorDate(),yr=a.getFullYear();
+  var headers=['Month','Revenue','Expenses','Net','Cumulative'];
+  var rows=[],cum=0;
+  for(var m=0;m<12;m++){var d=new Date(yr,m,1);var key=yr+'-'+(m<9?'0':'')+(m+1);var rev=mockTransactions.filter(function(t){return t.type==='Inflow'&&t.date&&t.date.indexOf(key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);var exp=mockTransactions.filter(function(t){return t.type==='Outflow'&&t.date&&t.date.indexOf(key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);var net=rev-exp;cum+=net;rows.push([d.toLocaleString('en',{month:'long'})+' '+yr,rev,exp,net,cum]);}
+  return {title:'Revenue vs Expense Report',subtitle:'REM ERP · FY '+yr+' · '+(_repProject==='all'?'All Projects':_repProject),headers:headers,rows:rows,numberCols:[1,2,3,4]};
+}
+function reportsExportExcel(){
+  var d=_repReportData();
+  _repXLSX(d.title.replace(/\s+/g,'_'),d.title,d.headers,d.rows,d.numberCols);
+  showToast('Excel downloaded','success');
+}
+function reportsExportCSV(){
+  var d=_repReportData();
+  var esc=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';};
+  var csv=d.headers.map(esc).join(',')+'\n'+d.rows.map(function(r){return r.map(esc).join(',');}).join('\n');
+  _repDownload(d.title.replace(/\s+/g,'_')+'.csv','\ufeff'+csv,'text/csv');
+  showToast('CSV downloaded','success');
+}
+function reportsPrintPDF(){
+  var d=_repReportData();
+  var pr=document.getElementById('printArea')||(function(){var x=document.createElement('div');x.id='printArea';document.body.appendChild(x);return x;})();
+  var now=new Date();
+  var h='<div style="text-align:center;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:12px"><div style="font-size:18px;font-weight:700">'+d.title+'</div><div style="font-size:11px;color:#555;margin-top:3px">'+d.subtitle+' · Generated '+now.toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</div></div>'+
+    '<table style="border-collapse:collapse;width:100%"><thead><tr>'+d.headers.map(function(hx){return '<th style="border:1px solid #999;background:#f0f0f0;padding:5px;font-size:10px;text-align:left">'+hx+'</th>';}).join('')+'</tr></thead><tbody>'+
+    d.rows.map(function(r){return '<tr>'+r.map(function(v,i){var num=d.numberCols&&d.numberCols.indexOf(i)>=0;return '<td style="border:1px solid #ccc;padding:4px;font-size:10px;text-align:'+(num?'right':'left')+'">'+(num&&typeof v==='number'?v.toLocaleString('en-IN'):v)+'</td>';}).join('')+'</tr>';}).join('')+
+    '</tbody></table>';
+  pr.innerHTML=h;
+  showToast('Print dialog opening…','info');
+  setTimeout(function(){window.print();},150);
+}
+// ── Minimal XLSX writer (no external libs) ──
+var _crcTbl=null;
+function _repCRC32(byteStr){
+  if(!_crcTbl){_crcTbl=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);_crcTbl[n]=c>>>0;}}
+  var crc=0xFFFFFFFF;
+  for(var i=0;i<byteStr.length;i++)crc=(crc>>>8)^_crcTbl[(crc^byteStr.charCodeAt(i))&0xFF];
+  return (crc^0xFFFFFFFF)>>>0;
+}
+function _repUTF8(s){return unescape(encodeURIComponent(s));}
+function _u16(n){return String.fromCharCode(n&0xFF,(n>>8)&0xFF);}
+function _u32(n){return String.fromCharCode(n&0xFF,(n>>8)&0xFF,(n>>16)&0xFF,(n>>24)&0xFF);}
+function _repZip(files){
+  var chunks=[],central=[],offset=0;
+  files.forEach(function(f){
+    var name=_repUTF8(f.name),data=_repUTF8(f.data),crc=_repCRC32(data);
+    var lh='PK\x03\x04'+_u16(20)+_u16(0)+_u16(0)+_u16(0)+_u16(0)+_u32(crc)+_u32(data.length)+_u32(data.length)+_u16(name.length)+_u16(0)+name+data;
+    chunks.push(lh);
+    central.push('PK\x01\x02'+_u16(20)+_u16(20)+_u16(0)+_u16(0)+_u16(0)+_u16(0)+_u32(crc)+_u32(data.length)+_u32(data.length)+_u16(name.length)+_u16(0)+_u16(0)+_u16(0)+_u16(0)+_u32(0)+_u32(offset)+name);
+    offset+=lh.length;
+  });
+  var cdSize=central.reduce(function(s,c){return s+c.length;},0);
+  var end='PK\x05\x06'+_u16(0)+_u16(0)+_u16(files.length)+_u16(files.length)+_u32(cdSize)+_u32(offset)+_u16(0);
+  return chunks.join('')+central.join('')+end;
+}
+function _repDownload(name,data,mime){
+  var blob=new Blob([data],{type:mime});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href);},300);
+}
+function _repXLSX(outName,sheetName,headers,rows,numberCols){
+  var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
+  function colName(i){var s='';i++;while(i>0){var m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;}
+  function ref(r,c){return colName(c)+r;}
+  var sr=['<row r="1">'+headers.map(function(h,i){return '<c r="'+ref(1,i)+'" t="inlineStr"><is><t>'+esc(h)+'</t></is></c>';}).join('')+'</row>'];
+  rows.forEach(function(row,ri){
+    var r=ri+2;
+    sr.push('<row r="'+r+'">'+row.map(function(v,ci){
+      var c=ref(r,ci);
+      if(numberCols&&numberCols.indexOf(ci)>=0&&typeof v==='number'&&isFinite(v))return '<c r="'+c+'"><v>'+v+'</v></c>';
+      return '<c r="'+c+'" t="inlineStr"><is><t>'+esc(v)+'</t></is></c>';
+    }).join('')+'</row>');
+  });
+  var last=ref(rows.length+1,headers.length-1);
+  var sheetData='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:'+last+'"/><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><sheetData>'+sr.join('')+'</sheetData></worksheet>';
+  var ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
+  var rels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  var wb='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="'+esc(sheetName).slice(0,31)+'" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  var wbRels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>';
+  var zip=_repZip([
+    {name:'[Content_Types].xml',data:ct},
+    {name:'_rels/.rels',data:rels},
+    {name:'xl/workbook.xml',data:wb},
+    {name:'xl/_rels/workbook.xml.rels',data:wbRels},
+    {name:'xl/worksheets/sheet1.xml',data:sheetData}
+  ]);
+  _repDownload(outName+'.xlsx',zip,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 }
 
 var crmSubView='leads';
@@ -8345,7 +8677,7 @@ function filterLeads(){
     return true;
   });
 }
-const GROUPS_LOOKUP = {dashboard:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'finance_admin',documents:'finance_admin',knowledge_base:'finance_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
+const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'finance_admin',documents:'finance_admin',knowledge_base:'finance_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
 
 // ═══ CRUD ═══
 function openModal(title,body,onSave){
