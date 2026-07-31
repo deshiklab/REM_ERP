@@ -234,4 +234,5 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 - [x] **4.2** Contracts & Insurance + 30-day expiry reminders — SW v8-v27 (`774cdfb`)
 - [x] **5.1+5.2** WhatsApp Engine + Internal Chat (new 💬 group) — SW v8-v28 (`163de9a`)
 - [x] **5.3+5.4** AI Copilot + Dues auto-notifications — SW v8-v29 (`ce396ef`)
-- [ ] Phase 6 (investment/portal)
+- [x] **6.1** Investment, Loan & Contract Management — SW v8-v30 (`89de22b`)
+- [x] **6.2** Customer Portal client login simulation — SW v8-v31 (`435d260`)
