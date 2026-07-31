@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap');
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Inter',sans-serif;background:var(--bg,#f8f9fa);color:var(--fg,#333);overflow:hidden;height:100vh}
     :root{--bg:#f8f9fa;--fg:#333;--card-bg:#fff;--card-border:#e8e8e8;--sidebar-bg:#fff;--sidebar-border:#e8e8e8;--topbar-bg:#fff;--topbar-border:#e8e8e8;--hover-bg:#f0f4ff;--active-bg:#eef3ff;--primary:#2F80ED;--primary-hover:#2568c9;--success:#2e7d32;--danger:#c62828;--warning:#e65100;--muted:#888;--muted-bg:#f5f5f5;--table-header-bg:#fff;--table-border:#f0f0f0;--input-bg:#fff;--input-border:#e0e0e0;--tab-bg:#f5f5f5;--kanban-bg:#f8f9fa;--kanban-border:#e8e8e8;--footer-bg:#fff;--footer-border:#e8e8e8}
@@ -3060,7 +3060,7 @@ function showBrokerDetail(id){
       leads.map(function(l){return '<tr style="cursor:pointer" onclick="closeModal();openLead('+l.id+')"><td style="color:#2F80ED;font-weight:500">'+l.name+'</td><td>'+l.property+'</td><td>'+l.status+'</td><td>'+l.value+'</td></tr>'}).join('')+'</tbody></table>'
     :'<div style="color:#999;padding:8px;text-align:center">No referred leads yet.</div>')+
     '</div>',
-    '<button onclick="closeModal()">Close</button>'
+    '<button class="drawer-btn secondary" onclick="closeModal()">✕ Close</button>'
   );
 }
 
@@ -3130,7 +3130,7 @@ function openComplaint(id){
       '</div>'+
       (c.desc?'<h3 style="font-size:10px;font-weight:600;color:#555;margin:6px 0 3px">📝 Description</h3><div class="stat-card" style="white-space:pre-wrap">'+c.desc+'</div>':'')+
     '</div>',
-    resolveBtn+'<button onclick="closeModal()">Close</button>'
+    resolveBtn+'<button class="drawer-btn secondary" onclick="closeModal()">✕ Close</button>'
   );
 }
 
@@ -3241,7 +3241,7 @@ function openInvoice(id){
           return '<div class="installment-item"><div><div style="font-size:10px;font-weight:500">'+p.id+'</div><div style="font-size:9px;color:#888">'+p.date+' · '+p.method+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div><span style="font-size:8px;color:'+(p.status==='Cleared'?'#2e7d32':'#e65100')+'">'+p.status+'</span></div></div>';
         }).join(''):'')+
     '</div>',
-    actions+'<button class="action-btn secondary" onclick="printInvoice(id)" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(id)" style="padding:3px 8px;font-size:9px">📥 Download</button> <button onclick="closeModal()">Close</button>'
+    actions+'<button class="action-btn secondary" onclick="printInvoice(id)" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(id)" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
   );
 }
 function markInvoicePaid(id){
@@ -3364,7 +3364,7 @@ function openSalesProposal(id) {
     '</div>',
     '<button class="action-btn secondary" onclick="closeModal();crudSalesProposal(\'' + p.id + '\')" style="padding:3px 8px;font-size:9px">✎ Edit</button> ' +
     '<button class="action-btn secondary" onclick="closeModal();printProposal(\'' + p.id + '\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> ' +
-    '<button onclick="closeModal()">Close</button>'
+    '<button class="drawer-btn secondary" onclick="closeModal()">✕ Close</button>'
   );
 }
 
@@ -3431,7 +3431,7 @@ function openPayment(id){
       (inv?'<div class="stat-card" style="margin-bottom:6px"><div class="label">Linked Invoice</div><div style="font-size:11px;color:#2F80ED;cursor:pointer" onclick="closeModal();openInvoice(\''+inv.id+'\')">'+inv.id+' — '+inv.client+' (৳'+(inv.amount/100000).toFixed(1)+'L) →</div></div>':'')+
       (p.notes?'<h3 style="font-size:10px;font-weight:600;color:#555;margin:6px 0 3px">📝 Notes</h3><div class="stat-card" style="white-space:pre-wrap">'+p.notes+'</div>':'')+
     '</div>',
-    '<button class="action-btn secondary" onclick="crudPayment(mockPayments.find(function(x){return x.id===\''+p.id+'\'}))" style="padding:3px 8px;font-size:9px">✎ Edit</button> <button class="action-btn secondary" onclick="printPayment(\''+p.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadPayment(\''+p.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button onclick="closeModal()">Close</button>'
+    '<button class="action-btn secondary" onclick="crudPayment(mockPayments.find(function(x){return x.id===\''+p.id+'\'}))" style="padding:3px 8px;font-size:9px">✎ Edit</button> <button class="action-btn secondary" onclick="printPayment(\''+p.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadPayment(\''+p.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
   );
 }
 function crudPayment(item){
@@ -4717,7 +4717,7 @@ function openBooking(id){
         '<tr><td colspan="0" style="text-align:right;font-weight:600">Total</td><td style="font-weight:700;color:#2e7d32">\u09f3'+(totalPmt/100000).toFixed(1)+'L</td><td colspan="2"></td></tr>'+
       '</tbody></table>':'<div style="color:#999;padding:8px;text-align:center">No payments</div>')+
     '</div>',
-    '<button class="drawer-btn" onclick="closeModal();switchToPropertyUnit(\' + b.client + \')">View Unit</button><button onclick="closeModal()">Close</button>'
+    '<button class="drawer-btn" onclick="closeModal();switchToPropertyUnit(\' + b.client + \')">View Unit</button><button class="drawer-btn secondary" onclick="closeModal()">✕ Close</button>'
   );
 }
 function renderBookings(el){
@@ -7551,11 +7551,20 @@ function renderSettings(el){
         '<button class="action-btn secondary" onclick="resetCustomTheme()" style="padding:3px 10px;font-size:9px">Reset to Default</button>'+
       '</div></div></div>';
     var fs=localStorage.getItem('rem_fontsize')||'m';
-    var fsLabel={s:'13px · Compact',m:'14px · Default',l:'15px · Large'}[fs]||'14px · Default';
+    var fsCustom=parseInt(localStorage.getItem('rem_fontsize_custom')||'18',10)||18;
+    var fsPx={s:12,m:14,l:16,xl:18,xxl:20}[fs]||(fs==='custom'?fsCustom:14);
+    var fsLabel={s:'12px · Small',m:'14px · Default',l:'16px · Large',xl:'18px · XL',xxl:'20px · XXL'}[fs]||(fs==='custom'?fsCustom+'px · Custom':'14px · Default');
     var compact=localStorage.getItem('rem_compact')==='1';
-    var fontHtml='<div class="card" style="margin-top:8px"><div class="card-header"><h3>🔤 Font Size</h3></div><div class="card-body" style="display:flex;align-items:center;gap:6px">'+
-      [['s','S'],['m','M'],['l','L']].map(function(f){return '<button class="action-btn '+(fs===f[0]?'primary':'secondary')+'" onclick="setFontSize(\''+f[0]+'\')" style="padding:3px 12px;font-size:11px;font-weight:700">'+f[1]+'</button>';}).join('')+
-      '<span style="font-size:10px;color:var(--muted,#888);margin-left:6px">'+fsLabel+'</span></div></div>'+
+    var fontHtml='<div class="card" style="margin-top:8px"><div class="card-header"><h3>🔤 Font Size</h3></div><div class="card-body" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px">'+
+      [['s','S'],['m','M'],['l','L'],['xl','XL'],['xxl','XXL']].map(function(f){return '<button class="action-btn '+(fs===f[0]?'primary':'secondary')+'" onclick="setFontSize(\''+f[0]+'\')" style="padding:3px 12px;font-size:11px;font-weight:700">'+f[1]+'</button>';}).join('')+
+      '<span style="font-size:10px;color:var(--muted,#888);margin-left:6px">'+fsLabel+'</span></div>'+
+      '<div class="card-body" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:0">'+
+      '<span style="font-size:10px;color:var(--muted,#888)">Custom:</span>'+
+      '<input id="fsCustomInput" type="number" min="11" max="24" value="'+fsCustom+'" style="width:56px;padding:3px 6px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;background:transparent" onchange="setFontSize(\'custom\',this.value)"/>'+
+      '<span style="font-size:10px;color:var(--muted,#888)">px</span>'+
+      '<button class="action-btn secondary" onclick="setFontSizeDefault()" style="padding:3px 10px;font-size:9px" title="Save current size as the app default">Save as Default</button>'+
+      '<button class="action-btn secondary" onclick="resetFontSize()" style="padding:3px 10px;font-size:9px" title="Restore saved default">Reset</button>'+
+      '</div></div>'+
       '<div class="card" style="margin-top:8px"><div class="card-header"><h3>📐 Density</h3></div><div class="card-body" style="display:flex;align-items:center;gap:8px">'+
       '<div class="toggle '+(compact?'on':'')+'" onclick="toggleCompact()"></div>'+
       '<span style="font-size:11px">Compact Mode</span><span style="font-size:10px;color:var(--muted,#888)">Tighter tables, cards & kanban spacing</span></div></div>';
@@ -8221,7 +8230,12 @@ function initTheme(){
   if(baseTheme!=='default')document.documentElement.classList.add('theme-'+baseTheme);
   if(mode==='dark')document.documentElement.classList.add('dark');
   var fs=localStorage.getItem('rem_fontsize');
-  if(fs)document.documentElement.style.fontSize=(fs==='s'?'13px':fs==='l'?'15px':'14px');
+  if(fs){
+    var fpx=fs==='custom'?(parseInt(localStorage.getItem('rem_fontsize_custom')||'18',10)||18):{s:12,m:14,l:16,xl:18,xxl:20}[fs]||14;
+    if(fpx<11)fpx=14;if(fpx>24)fpx=14;
+    document.documentElement.style.fontSize=fpx+'px';
+    var fsh=document.querySelector('.app-shell');if(fsh)fsh.style.zoom=Math.round(fpx/14*100)+'%';
+  }
   if(localStorage.getItem('rem_compact')==='1')document.documentElement.classList.add('compact-mode');
   // Follow system light/dark until the user picks a theme manually
   if(!manual&&window.matchMedia){
@@ -8239,11 +8253,31 @@ function initTheme(){
 }
 // ═══ THEME & VISUALS UPGRADE ═══
 function openSettingsTab(tab){settingsTab=tab||'themes';switchModule('settings',true);}
-function setFontSize(s){
-  document.documentElement.style.fontSize=(s==='s'?'13px':s==='l'?'15px':'14px');
+function setFontSize(s,custom){
+  var px={s:12,m:14,l:16,xl:18,xxl:20}[s]||(s==='custom'?(parseInt(custom,10)||18):14);
+  if(px<11)px=11;if(px>24)px=24;
+  document.documentElement.style.fontSize=px+'px';
+  var sh=document.querySelector('.app-shell');if(sh)sh.style.zoom=Math.round(px/14*100)+'%';
   localStorage.setItem('rem_fontsize',s);
+  if(s==='custom')localStorage.setItem('rem_fontsize_custom',px);
   if(settingsTab==='themes')renderModule();
-  showToast('Font size: '+({s:'S · 13px',m:'M · 14px',l:'L · 15px'}[s]||'M · 14px'),'success');
+  showToast('Font size: '+({s:'S · 12px',m:'M · 14px',l:'L · 16px',xl:'XL · 18px',xxl:'XXL · 20px'}[s]||px+'px · Custom'),'success');
+}
+function setFontSizeDefault(){
+  var fs=localStorage.getItem('rem_fontsize')||'m';
+  var px={s:12,m:14,l:16,xl:18,xxl:20}[fs]||(fs==='custom'?(parseInt(localStorage.getItem('rem_fontsize_custom')||'18',10)||18):14);
+  localStorage.setItem('rem_fontsize_default',px);
+  showToast('Default font size saved: '+px+'px','success');
+}
+function resetFontSize(){
+  var d=parseInt(localStorage.getItem('rem_fontsize_default')||'14',10);
+  if(d<11)d=14;if(d>24)d=14;
+  document.documentElement.style.fontSize=d+'px';
+  var sh=document.querySelector('.app-shell');if(sh)sh.style.zoom=Math.round(d/14*100)+'%';
+  localStorage.setItem('rem_fontsize','custom');
+  localStorage.setItem('rem_fontsize_custom',d);
+  if(settingsTab==='themes')renderModule();
+  showToast('Font size reset to default: '+d+'px','info');
 }
 function toggleCompact(){
   var on=document.documentElement.classList.toggle('compact-mode');
@@ -8759,7 +8793,7 @@ function showLeadInfo(id){
     '<hr style="border:none;border-top:1px solid #eee;margin:6px 0">' +
     '<div style="display:flex;justify-content:space-between;font-size:10px;color:#555"><span>📞 '+l.phone+'</span><span>✉ '+l.email+'</span></div>'+
     '<div style="text-align:center;margin-top:8px"><span class="lead-badge" style="background:'+leadBadgeColor(l.status)+'15;color:'+leadBadgeColor(l.status)+';border:1px solid '+leadBadgeColor(l.status)+'">'+l.status+'</span> <span class="lead-badge" style="background:#eef3ff;color:#2F80ED;border:1px solid #d0ddf0">'+l.property+'</span></div>',
-    '<button onclick="closeModal()">Close</button>'
+    '<button class="drawer-btn secondary" onclick="closeModal()">✕ Close</button>'
   );
 }
 function crudEntityFromLead(id){
@@ -11166,7 +11200,7 @@ function renderPaymentReminders(el) {
     setTimeout(function() {
       var footer = document.querySelector('.modal-footer');
       if (footer) {
-        footer.innerHTML = '<button class="action-btn primary" onclick="window._drawerOnSave&&window._drawerOnSave()" style="padding:6px 14px;font-size:10px">📋 Copy to Clipboard</button> <button onclick="closeDrawer()" style="padding:6px 12px;font-size:10px">Close</button>';
+        footer.innerHTML = '<button class="action-btn primary" onclick="window._drawerOnSave&&window._drawerOnSave()" style="padding:6px 14px;font-size:10px">📋 Copy to Clipboard</button> <button class="action-btn secondary" onclick="closeDrawer()" style="padding:6px 12px;font-size:10px">✕ Close</button>';
       }
     }, 50);
   };
@@ -11919,7 +11953,7 @@ html.dark .rt-item .rt-ico{background:rgba(30,41,59,.6)}
 .lang-btn{width:auto;min-width:34px;padding:0 6px;font-size:10px;font-weight:700;border:1px solid #e0e0e0;border-radius:6px;background:#fff;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s}
 .lang-btn:hover{border-color:#2F80ED;color:#2F80ED}
 html.dark .lang-btn{background:rgba(30,41,59,.6);border-color:#334155;color:#cbd5e1}
-html.lang-bn body,html.lang-bn .app-shell{font-family:'Noto Sans Bengali','Hind Siliguri','Inter',sans-serif}
+html.lang-bn body,html.lang-bn .app-shell{font-family:'Noto Serif Bengali','Hind Siliguri','Inter',sans-serif}
 /* ── NOTIFICATIONS CENTER ── */
 .notif-tabs{display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid #e8e8e8;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
 .notif-tabs::-webkit-scrollbar{display:none}
