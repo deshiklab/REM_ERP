@@ -1,5 +1,5 @@
 /* REM ERP v6 — Service Worker */
-const CACHE = 'rem-erp-v6-v1';
+const CACHE = 'rem-erp-v6-v2';
 const CORE = [
   './design-prototype-v6.html',
   './manifest.json',
@@ -27,19 +27,34 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== location.origin) return; // CDNs (Chart.js etc.) stay network-only
+  if (url.origin !== location.origin) return; // CDNs stay network-only
 
-  e.respondWith(
-    caches.match(req).then((cached) => {
-      // cache-first, then network + populate cache
-      const fetched = fetch(req).then((res) => {
+  // HTML navigations: NETWORK-FIRST — always serve the latest file, cache as fallback for offline
+  if (req.mode === 'navigate') {
+    e.respondWith(
+      fetch(req).then((res) => {
         if (res && res.ok) {
           const clone = res.clone();
           caches.open(CACHE).then((c) => c.put(req, clone));
         }
         return res;
-      }).catch(() => cached);
-      return cached || fetched;
-    })
+      }).catch(() =>
+        caches.match(req).then((m) => m || caches.match('./design-prototype-v6.html'))
+      )
+    );
+    return;
+  }
+
+  // Assets: cache-first, then network + fill cache
+  e.respondWith(
+    caches.match(req).then((cached) =>
+      cached || fetch(req).then((res) => {
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, clone));
+        }
+        return res;
+      })
+    )
   );
 });

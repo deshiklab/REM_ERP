@@ -343,11 +343,20 @@
       .sidebar-bottom{display:none!important}
       .main-area{flex:none!important;height:auto!important}
       .top-nav{display:none!important}
+      .top-nav.mobile-open{display:flex!important;position:fixed;top:40px;left:0;right:0;z-index:9989;background:#fff;flex-direction:column;align-items:stretch;gap:2px;padding:8px 8px 10px;border-bottom:1px solid #e8e8e8;box-shadow:0 10px 28px rgba(0,0,0,.14);overflow-x:visible;overflow-y:auto;max-height:62vh;animation:ddIn .18s ease-out}
+      .top-nav.mobile-open .top-nav-item{display:flex!important;align-items:center;padding:11px 14px!important;font-size:13px!important;font-weight:500!important;border-radius:9px!important;margin-right:0!important;white-space:normal!important;flex-shrink:0!important}
+      .top-nav.mobile-open .top-nav-item.active{background:#eef3ff!important;color:#2F80ED!important;font-weight:600!important}
+      .top-nav.mobile-open .top-nav-item.badge-new::after{margin-left:auto!important}
+      html.dark .top-nav.mobile-open{background:var(--card-bg,#1a2234);border-bottom-color:var(--glass-edge,#ffffff10)}
+      html.dark .top-nav.mobile-open .top-nav-item.active{background:var(--hover-bg,#1a2a4a);color:var(--primary,#7ab7ff)}
       #mobileSideBtn{display:flex!important;flex-shrink:0!important}
       .top-actions .icon-btn{display:none!important}
       #moreBtn{display:flex!important}
-      .top-actions .user-avatar{width:22px!important;height:22px!important;font-size:8px!important;flex-shrink:0!important}
-      .top-actions{gap:5px!important}
+      .top-actions{flex:1!important;min-width:0!important;justify-content:flex-end!important;gap:4px!important}
+      #searchWrap{flex:1;min-width:0;max-width:calc(100vw - 120px)}
+      #searchBar{flex:1!important;min-width:0!important;width:auto!important;max-width:100%!important}
+      #searchBar:focus-within{width:auto!important}
+      .top-bar{overflow:hidden!important}
       .top-bar{height:40px!important;min-height:40px!important;padding:0 8px!important;gap:8px!important;position:sticky!important;top:0!important;z-index:50!important}
       .top-nav-item{padding:4px 8px!important;font-size:10px!important;white-space:nowrap!important;flex-shrink:0!important}
       .top-nav-item.badge-new::after{font-size:7px!important;padding:0 3px!important}
@@ -740,7 +749,6 @@
         <div class="user-avatar" onclick="toggleRoleMenu()" title="Switch Role">SA</div>
       </div>
     </div>
-    <div id="mobileModDropdown" class="mobile-mod-dropdown"></div>
     <div id="moreDropdown" class="more-dropdown"></div>
     <div class="content" id="mainContent"></div>
     <div class="app-footer" style="height:28px;min-height:28px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 12px;font-size:10px;color:#888;justify-content:space-between;position:sticky;bottom:0;z-index:20">
@@ -11107,48 +11115,32 @@ function renderCsvImport(el) {
 var _mobileMenuOpen=false;
 var _HAM_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
 var _X_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+// Hamburger ⇄ top-nav: on mobile, toggles the module tabs as a dropdown panel
 function toggleMobileSidebar(){
-  if(_mobileMenuOpen) closeMobileMenu();
+  var tn=document.getElementById('topNav');
+  if(!tn)return;
+  if(tn.classList.contains('mobile-open'))closeMobileMenu();
   else openMobileMenu();
 }
 function openMobileMenu(){
-  var dd=document.getElementById('mobileModDropdown');
-  if(!dd)return;
-  var grp=GROUPS[currentGroup]||GROUPS.executive;
-  var mods=grp.mods.filter(function(m){return canAccess(m.id);});
-  var groupsHtml=GROUP_ORDER.map(function(g){
-    var gg=GROUPS[g],active=g===currentGroup;
-    return '<div class="mm-grp'+(active?' active':'')+'" onclick="switchMobileGroup(\''+g+'\')" title="'+gg.label+'">'+gg.icon+'</div>';
-  }).join('');
-  var modsHtml=mods.map(function(m){
-    var active=m.id===currentModule;
-    return '<div class="mm-mod'+(active?' active':'')+'" onclick="switchModule(\''+m.id+'\');closeMobileMenu()">'+
-      '<span>'+(m.badge?'<span class="mm-badge">NEW</span>':'')+m.label+'</span>'+
-      (active?'<span class="mm-check">✓</span>':'')+'</div>';
-  }).join('');
-  dd.innerHTML='<div class="mm-title">'+grp.icon+' '+grp.label+'</div>'+
-    '<div class="mm-groups">'+groupsHtml+'</div>'+
-    '<div class="mm-mods">'+modsHtml+'</div>';
-  dd.classList.add('open');
+  var tn=document.getElementById('topNav');
+  if(!tn)return;
+  tn.classList.add('mobile-open');
   _mobileMenuOpen=true;
   var btn=document.getElementById('mobileSideBtn');if(btn)btn.innerHTML=_X_ICON;
 }
 function closeMobileMenu(){
-  var dd=document.getElementById('mobileModDropdown');
-  if(dd)dd.classList.remove('open');
+  var tn=document.getElementById('topNav');
+  if(tn)tn.classList.remove('mobile-open');
   _mobileMenuOpen=false;
   var btn=document.getElementById('mobileSideBtn');if(btn)btn.innerHTML=_HAM_ICON;
 }
-function switchMobileGroup(g){
-  switchGroup(g);
-  openMobileMenu();
-}
-// Close mobile menu on outside tap
+// Close mobile menu: outside tap, module picked, group switched, or more menu opened
 document.addEventListener('click',function(e){
   if(_mobileMenuOpen){
-    var dd=document.getElementById('mobileModDropdown');
+    var tn=document.getElementById('topNav');
     var btn=document.getElementById('mobileSideBtn');
-    if(dd&&dd.contains(e.target))return;
+    if(tn&&tn.contains(e.target)){closeMobileMenu();return;}
     if(btn&&btn.contains(e.target))return;
     closeMobileMenu();
   }
