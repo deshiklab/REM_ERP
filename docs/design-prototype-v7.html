@@ -2026,6 +2026,7 @@ window.mockKnowledgeBase = DB.init('knowledge_base', [
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
 let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard', boqTab = 'dashboard', eqTab = 'dashboard';
+let landSortKey = 'progress', landSortDir = -1;
 
 // ═══ GROUP & TOP BAR NAV ═══
 function switchGroup(group) {
@@ -4636,34 +4637,122 @@ function renderLandDashboard(){
 
 function renderLandPipeline(){
   const byStage={};stageNames.forEach(s=>{byStage[s]=mockLandProposals.filter(p=>p.stage===s)});
-  return `<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:8px">${stageNames.map(s=>{
+  const stageVal={};stageNames.forEach(s=>{stageVal[s]=byStage[s].reduce((v,p)=>v+(p.price||0),0)});
+  const totalVal=mockLandProposals.reduce((s,p)=>s+(p.price||0),0);
+  // Stage summary strip: count + value per stage, click to jump
+  const summary='<div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px">'+stageNames.map(s=>{
+    const n=byStage[s].length||0, v=stageVal[s]||0;
+    const pct=totalVal>0?Math.round(v/totalVal*100):0;
+    return '<div style="flex:0 0 auto;min-width:110px;padding:6px 8px;border-radius:6px;background:'+stageColors[s]+'12;border-left:3px solid '+stageColors[s]+';cursor:pointer" onclick="landTab=\'pipeline\';renderModule()"><div style="font-size:8px;color:#888">'+stageLabels[s].split(' ').slice(1).join(' ')+'</div><div style="display:flex;align-items:baseline;gap:4px;margin-top:1px"><span style="font-size:12px;font-weight:700;color:'+stageColors[s]+'">'+n+'</span><span style="font-size:8px;color:#888">· ৳'+(v/10000000).toFixed(1)+'Cr</span></div><div style="height:3px;background:#e0e0e0;border-radius:2px;margin-top:3px"><div style="width:'+pct+'%;height:3px;background:'+stageColors[s]+';border-radius:2px"></div></div></div>';
+  }).join('')+'</div>';
+  // Kanban columns with drag & drop
+  const cols=stageNames.map(s=>{
     const items=byStage[s]||[];
-    const val=items.reduce((v,p)=>v+(p.price||0),0);
-    return '<div style="min-width:0"><div class="card"><div class="card-header" style="padding:5px 6px"><h3 style="font-size:9px;color:'+stageColors[s]+'">'+stageLabels[s]+'</h3><span style="font-size:9px;color:#888">'+items.length+'</span></div><div style="padding:4px;min-height:120px">'+(items.length===0?'<div style="padding:10px;text-align:center;font-size:9px;color:#ccc">Empty</div>':items.map(p=>'<div style="padding:5px 4px;margin-bottom:3px;background:#f9f9fb;border-radius:4px;border-left:3px solid '+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+';cursor:pointer" onclick="openProposal('+p.id+')"><div style="font-size:8px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:7px;color:#888;margin-top:2px">'+p.priceF+' \u00B7 '+p.area+'</div><div style="display:flex;gap:2px;margin-top:2px;flex-wrap:wrap"><span style="padding:0 3px;font-size:7px;background:'+(p.risk==='Low'?'#e8f5e9;color:#2e7d32"':'#fff3e0;color:#e65100"')+';border-radius:2px">'+p.risk+' Risk</span><span style="font-size:7px;color:#888">'+p.roi+' ROI</span></div></div>').join(''))+'</div><div style="padding:3px 6px;border-top:1px solid #e8e8e8;font-size:8px;color:#888;text-align:right">\u09F3 '+(val/10000000).toFixed(1)+'Cr</div></div></div>';
-  }).join('')}</div>`;
+    const v=stageVal[s]||0;
+    return '<div class="kanban-col" style="min-width:200px;flex:1" ondragover="dragOver(event)" ondrop="dropLand(event,\''+s+'\')" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"><div style="padding:5px 8px;font-size:9px;font-weight:600;color:'+stageColors[s]+';background:'+stageColors[s]+'15;border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid '+stageColors[s]+'"><span>'+stageLabels[s]+'</span><span style="background:'+stageColors[s]+';color:#fff;border-radius:10px;padding:0 6px;font-size:9px">'+items.length+' · ৳'+(v/10000000).toFixed(1)+'Cr</span></div><div style="min-height:120px;padding:4px">'+(items.length===0?'<div style="padding:14px;text-align:center;font-size:8px;color:#ccc;border:1px dashed #e0e0e0;border-radius:4px">Drop here</div>':items.map(p=>{
+      return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'land\','+p.id+')" ondragend="dragEnd(event)" style="margin-bottom:4px;cursor:pointer;position:relative;border-left:3px solid '+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'" onclick="if(!_kdragged)openProposal('+p.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px">'+p.name+'</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:8px" onclick="event.stopPropagation();crudProposal(mockLandProposals.find(x=>x.id==='+p.id+'))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:8px" onclick="event.stopPropagation();landDelete('+p.id+')">\u2715</span></div></div><div style="font-size:8px;color:#888;margin-top:2px">'+p.area+' · '+p.location+'</div><div style="font-size:9px;font-weight:700;margin-top:2px">'+p.priceF+' <span style="color:'+(p.risk==='Low'?'#2e7d32':p.risk==='Medium'?'#e65100':'#c62828')+';font-weight:600">'+p.roi+'</span></div><div style="display:flex;gap:2px;margin-top:2px;flex-wrap:wrap"><span style="padding:0 3px;font-size:7px;background:'+(p.risk==='Low'?'#e8f5e9;color:#2e7d32':'#fff3e0;color:#e65100')+';border-radius:2px">'+p.risk+'</span><span style="padding:0 3px;font-size:7px;background:#eef3ff;color:#2F80ED;border-radius:2px">'+p.status+'</span></div><div style="margin-top:3px;display:flex;align-items:center;gap:4px"><div class="progress-bar" style="flex:1;height:4px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div><span style="font-size:7px;color:#888">'+p.progress+'%</span></div>'+(p.nextAction?'<div style="font-size:7px;color:#888;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">\u25B6 '+p.nextAction+'</div>':'')+'</div>';
+    }).join(''))+'</div></div>';
+  }).join('');
+  return summary+'<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px">'+cols+'</div>';
+}
+function landDelete(id){
+  var idx=mockLandProposals.findIndex(function(x){return x.id===id});
+  if(idx<0)return;
+  if(!confirm('Delete this land proposal?'))return;
+  mockLandProposals.splice(idx,1);
+  DB.save('land_proposals');
+  Object.keys(_PG).forEach(function(k){if(k.indexOf('land')===0)delete _PG[k]});
+  renderModule();
+  showToast('Proposal deleted','info');
+}
+function dropLand(e,status){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  e.currentTarget.classList.remove('kanban-drag-over');
+  if(!_dragItem||_dragItem.type!=='land')return;
+  var p=mockLandProposals.find(function(x){return x.id===_dragItem.id});
+  if(!p||p.stage===status)return;
+  var old=p.stage;
+  p.stage=status;
+  // auto-update progress by stage index
+  var idx=stageNames.indexOf(status);
+  p.progress=Math.min(100,Math.max(p.progress,idx*17+8));
+  if(status==='possession')p.progress=100;
+  if(status==='registration')p.progress=Math.max(p.progress,80);
+  p.status=status==='possession'?'Fully Acquired':status==='registration'?'Mutation Process':status==='agreement'?'MoU Drafting':p.status;
+  DB.save('land_proposals');
+  logActivity('Updated','Land Acquisition','Proposal',p.id,'Moved '+old+' → '+status);
+  renderModule();
+  showToast('Moved to '+stageLabels[status].split(' ').slice(1).join(' '),'success');
+}
+function landAdvance(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
+  var i=stageNames.indexOf(p.stage);
+  if(i>=stageNames.length-1){showToast('Already in final stage','info');return;}
+  dropLand({preventDefault:function(){},currentTarget:{classList:{remove:function(){}}}},stageNames[i+1]);
 }
 
+function landSortSet(k){
+  if(landSortKey===k)landSortDir=-landSortDir;else{landSortKey=k;landSortDir=-1;}
+  Object.keys(_PG).forEach(function(x){if(x.indexOf('land')===0)delete _PG[x]});
+  renderModule();
+}
+function landSortArrow(k){return landSortKey===k?(landSortDir>0?' ▾':' ▴'):'';}
+function landExportCSV(){
+  var rows=[['ID','Property','Location','Area','Value','Stage','Status','Risk','ROI','Priority','Owner','Contact','Progress','Next Action']];
+  mockLandProposals.forEach(function(p){
+    rows.push([p.id,p.name,p.location,p.area,p.priceF,stageLabels[p.stage]?stageLabels[p.stage].split(' ').slice(1).join(' '):p.stage,p.status,p.risk,p.roi,p.priority,p.owner,p.contact,p.progress+'%',p.nextAction||'']);
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',')}).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='land-proposals.csv';
+  a.click();
+  showToast('CSV exported','success');
+}
 function renderLandProposals(){
   const q=(document.getElementById('landSearch')||{}).value||'';
   const sf=(document.getElementById('landFStage')||{}).value||'';
   const rf=(document.getElementById('landFRisk')||{}).value||'';
+  const pf=(document.getElementById('landFPriority')||{}).value||'';
+  const lf=(document.getElementById('landFLoc')||{}).value||'';
   var filtered=mockLandProposals.filter(function(p){
     if(sf&&p.stage!==sf)return false;
     if(rf&&p.risk!==rf)return false;
+    if(pf&&p.priority!==pf)return false;
+    if(lf&&p.location!==lf)return false;
     if(q&&!p.name.toLowerCase().includes(q.toLowerCase())&&!p.id.toLowerCase().includes(q.toLowerCase())&&!p.location.toLowerCase().includes(q.toLowerCase()))return false;
     return true;
   });
+  filtered=filtered.slice().sort(function(a,b){
+    var av=a[landSortKey],bv=b[landSortKey];
+    if(landSortKey==='price'){av=a.price||0;bv=b.price||0;}
+    if(landSortKey==='progress'){av=a.progress||0;bv=b.progress||0;}
+    if(landSortKey==='roi'){av=parseInt(a.roi)||0;bv=parseInt(b.roi)||0;}
+    if(landSortKey==='name'){av=(a.name||'').toLowerCase();bv=(b.name||'').toLowerCase();}
+    if(av<bv)return landSortDir;if(av>bv)return -landSortDir;return 0;
+  });
   const pL=_pg('land',filtered);
+  const locations=[...new Set(mockLandProposals.map(function(p){return p.location}).filter(Boolean))];
+  // summary chips: counts per stage, click to filter
+  const chips=stageNames.map(function(s){
+    const n=mockLandProposals.filter(function(p){return p.stage===s}).length;
+    return '<span style="cursor:pointer;padding:2px 7px;border-radius:4px;font-size:8px;background:'+(sf===s?stageColors[s]:stageColors[s]+'22')+';color:'+(sf===s?'#fff':stageColors[s])+';border:1px solid '+(sf===s?stageColors[s]:stageColors[s]+'44')+'" onclick="var el=document.getElementById(\'landFStage\');if(el){el.value=\''+(sf===s?'':s)+'\';Object.keys(_PG).forEach(function(k){if(!k.startsWith(\'land\'))return;delete _PG[k]});renderModule()}">'+stageLabels[s].split(' ').slice(1).join(' ')+' · '+n+'</span>';
+  }).join('');
   return `<div class="toolbar" style="margin-bottom:6px">
     <input id="landSearch" placeholder="Search by name/ID/location..." oninput="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:180px"/>
     <select id="landFStage" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${stageNames.map(s=>'<option value="'+s+'"'+(sf===s?' selected':'')+'>'+stageLabels[s].split(' ').slice(1).join(' ')+'</option>').join('')}</select>
     <select id="landFRisk" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Risk</option><option value="Low"${rf==='Low'?' selected':''}>Low</option><option value="Medium"${rf==='Medium'?' selected':''}>Medium</option><option value="High"${rf==='High'?' selected':''}>High</option></select>
+    <select id="landFPriority" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Priority</option><option value="Low"${pf==='Low'?' selected':''}>Low</option><option value="Medium"${pf==='Medium'?' selected':''}>Medium</option><option value="High"${pf==='High'?' selected':''}>High</option><option value="Urgent"${pf==='Urgent'?' selected':''}>Urgent</option></select>
+    <select id="landFLoc" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Locations</option>${locations.map(l=>'<option value="'+l+'"'+(lf===l?' selected':'')+'>'+l+'</option>').join('')}</select>
     <div class="spacer"></div>
+    <button class="action-btn secondary" onclick="landExportCSV()" style="padding:3px 7px;font-size:9px" title="Export CSV">📥 CSV</button>
     <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Land Acquisition:Create">+ New Proposal</button>
   </div>
-  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Property</th><th>Location</th><th>Area</th><th class="num">Value</th><th>Stage</th><th>Status</th><th>Risk</th><th>ROI</th><th>Priority</th><th>Progress</th><th></th></tr></thead><tbody>${
+  <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px">${chips}</div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th style="cursor:pointer" onclick="landSortSet('id')">ID${landSortArrow('id')}</th><th style="cursor:pointer" onclick="landSortSet('name')">Property${landSortArrow('name')}</th><th>Location</th><th>Area</th><th class="num" style="cursor:pointer" onclick="landSortSet('price')">Value${landSortArrow('price')}</th><th>Stage</th><th>Status</th><th>Risk</th><th style="cursor:pointer" onclick="landSortSet('roi')">ROI${landSortArrow('roi')}</th><th>Priority</th><th style="cursor:pointer" onclick="landSortSet('progress')">Progress${landSortArrow('progress')}</th><th></th></tr></thead><tbody>${
     pL.items.map(function(p){
-      return '<tr style="cursor:pointer" onclick="openProposal('+p.id+')"><td style="font-weight:600;font-size:9px;font-family:monospace">'+p.id+'</td><td style="font-weight:500;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</td><td style="font-size:9px;color:#555">'+p.location+'</td><td style="font-size:9px">'+p.area+'</td><td class="num" style="font-weight:600">'+p.priceF+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;background:'+stageColors[p.stage]+'15;color:'+stageColors[p.stage]+'">'+stageLabels[p.stage].split(' ').slice(1).join(' ')+'</span></td><td style="font-size:9px;color:#555;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.status+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.risk==='Low'?'#2e7d32':p.risk==='Medium'?'#e65100':'#c62828')+'">'+p.risk+'</span></td><td style="font-weight:600;color:#2e7d32">'+p.roi+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'">'+p.priority+'</span></td><td style="width:80px"><div class="progress-bar" style="height:4px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudProposal(mockLandProposals.find(function(x){return x.id==='+p.id+'}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();if(confirm(\x27Delete this proposal?\x27)){var idx=mockLandProposals.findIndex(function(x){return x.id==='+p.id+'});if(idx>=0)mockLandProposals.splice(idx,1);Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();showToast(\x27Proposal deleted\x27,\x27info\x27)}">\u2715</span></td></tr>';
+      return '<tr style="cursor:pointer" onclick="openProposal('+p.id+')"><td style="font-weight:600;font-size:9px;font-family:monospace">'+p.id+'</td><td style="font-weight:500;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</td><td style="font-size:9px;color:#555">'+p.location+'</td><td style="font-size:9px">'+p.area+'</td><td class="num" style="font-weight:600">'+p.priceF+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;background:'+stageColors[p.stage]+'15;color:'+stageColors[p.stage]+'">'+stageLabels[p.stage].split(' ').slice(1).join(' ')+'</span></td><td style="font-size:9px;color:#555;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.status+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.risk==='Low'?'#2e7d32':p.risk==='Medium'?'#e65100':'#c62828')+'">'+p.risk+'</span></td><td style="font-weight:600;color:#2e7d32">'+p.roi+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'">'+p.priority+'</span></td><td style="width:80px"><div class="progress-bar" style="height:4px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudProposal(mockLandProposals.find(function(x){return x.id==='+p.id+'}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();landDelete('+p.id+')">\u2715</span></td></tr>';
     }).join('')
   }</tbody></table>${_pgHtml('land',pL.total,pL.page,pL.totalPages,pL.perPage)}</div></div></div>`;
 }
@@ -4672,56 +4761,108 @@ function openProposal(id){
   var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
   var stageL=stageLabels[p.stage]||p.stage;
   var stageC=stageColors[p.stage]||'#888';
-  showDetailPanel('\uD83C\uDFD7\uFE0F '+p.name,'<div style="font-size:11px;line-height:1.6"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+stageC+'15;color:'+stageC+';border-radius:4px;font-size:9px">'+stageL+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">\uD83D\uDCCD '+p.location+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">\uD83D\uDCC5 '+p.date+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+(p.risk==='Low'?'#e8f5e9':'#fff3e0')+';color:'+(p.risk==='Low'?'#2e7d32':'#e65100')+';border-radius:4px;font-size:9px">'+(p.risk==='Low'?'\u2705':'⚠️')+' '+p.risk+' Risk</span></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;font-size:10px"><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Value</span><div style="font-weight:600;font-size:12px">'+p.priceF+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Area</span><div style="font-weight:600">'+p.area+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Owner</span><div>'+p.owner+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Contact Person</span><div>'+p.contact+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Budget</span><div style="font-weight:600">'+p.budget+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">ROI</span><div style="font-weight:600;color:#2e7d32">'+p.roi+'</div></div></div>'+
+  var curIdx=stageNames.indexOf(p.stage);
+  // 6-step stage timeline
+  var timeline=stageNames.map(function(s,i){
+    var done=i<curIdx||(i===curIdx&&p.progress>=95);
+    return '<div style="flex:1;text-align:center;position:relative"><div style="width:16px;height:16px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;background:'+(done?'#2e7d32':i===curIdx?stageC:'#e0e0e0')+';border:2px solid '+(i===curIdx?stageC:'#e0e0e0')+'">'+(done?'✓':i===curIdx?'●':'')+'</div><div style="font-size:7px;color:'+(i===curIdx?'#333':'#999')+';margin-top:3px;font-weight:'+(i===curIdx?'600':'400')+'">'+stageLabels[s].split(' ').slice(1).join(' ')+'</div></div>';
+  }).join('');
+  var canAdvance=curIdx<stageNames.length-1;
+  showDetailPanel('🏗️ '+p.name,
+    '<div style="font-size:11px;line-height:1.6"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+stageC+'15;color:'+stageC+';border-radius:4px;font-size:9px">'+stageL+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">📍 '+p.location+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">📅 '+p.date+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+(p.risk==='Low'?'#e8f5e9':'#fff3e0')+';color:'+(p.risk==='Low'?'#2e7d32':'#e65100')+';border-radius:4px;font-size:9px">'+(p.risk==='Low'?'✅':'⚠️')+' '+p.risk+' Risk</span></div>'+
+    '<div style="display:flex;gap:2px;margin-bottom:10px">'+timeline+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;font-size:10px"><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Value</span><div style="font-weight:600;font-size:12px">'+p.priceF+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Area</span><div style="font-weight:600">'+p.area+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Owner</span><div>'+p.owner+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Contact Person</span><div>'+p.contact+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Budget</span><div style="font-weight:600">'+p.budget+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">ROI</span><div style="font-weight:600;color:#2e7d32">'+p.roi+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Priority</span><div style="font-weight:600;color:'+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'">'+p.priority+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Status</span><div>'+p.status+'</div></div></div>'+
     '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px"><span style="font-weight:500">Progress</span><span style="font-weight:600;color:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'">'+p.progress+'%</span></div><div class="progress-bar"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div></div>'+
-    '<div style="padding:6px;background:#f9f9fb;border-radius:4px;margin-bottom:8px;font-size:10px"><span style="color:#888;display:block;margin-bottom:2px">Notes</span><span>'+p.notes+'</span></div>'+
-    '<div style="padding:6px;background:#e3f2fd;border-radius:4px;font-size:10px"><span style="color:#1565c0;font-weight:500">\u25B6 Next Action: </span><span>'+p.nextAction+'</span></div></div>');
+    (p.notes?'<div style="padding:6px;background:#f9f9fb;border-radius:4px;margin-bottom:8px;font-size:10px"><span style="color:#888;display:block;margin-bottom:2px">Notes</span><span>'+p.notes+'</span></div>':'')+
+    '<div style="padding:6px;background:#e3f2fd;border-radius:4px;font-size:10px"><span style="color:#1565c0;font-weight:500">▶ Next Action: </span><span>'+p.nextAction+'</span></div></div>',
+    '<div class="lead-footer">'+
+      (canAdvance?'<button class="lead-foot-btn primary" onclick="landAdvance('+p.id+');closeLeadPanel()">→ Advance Stage</button>':'')+
+      '<button class="lead-foot-btn" onclick="crudProposal(mockLandProposals.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button>'+
+      '<button class="lead-foot-btn" style="color:#e53935" onclick="closeLeadPanel();landDelete('+p.id+')">🗑 Delete</button>'+
+    '</div>'
+  );
 }
 
 function crudProposal(item){
   var n=!item;
-  var stages=stageNames.map(function(s){return '<option value="'+s+'"'+(item&&item.stage===s?' selected':'')+'>'+stageLabels[s].split(' ').slice(1).join(' ')+'</option>';}).join('');
-  showModal(
+  var p=n?{name:'',location:'',area:'',price:'',stage:'identification',risk:'Low',priority:'Medium',owner:'',contact:'',notes:'',nextAction:'',date:new Date().toISOString().slice(0,10),sellerType:'Individual',acquisitionType:'Freehold',paymentTerms:'',targetDate:'',zoning:'Residential',legalStatus:''}:item;
+  var stages=stageNames.map(function(s){return '<option value="'+s+'"'+(p.stage===s?' selected':'')+'>'+stageLabels[s].split(' ').slice(1).join(' ')+'</option>';}).join('');
+  var esc=function(v){return String(v==null?'':v).replace(/"/g,'&quot;').replace(/'/g,'&#39;');};
+  openModal(
     n?'New Land Proposal':'Edit Proposal',
-    '<div class="form-grid" style="grid-template-columns:1fr">'+
-      '<div class="field-row"><label>Property Name *</label><input id="f_name" value="'+(item?item.name.replace(/'/g,"\\'"):'')+'" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px"/></div>'+
-      '<div class="field-row" style="grid-template-columns:1fr 1fr"><label>Stage</label><label>Area</label><select id="f_stage" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px">'+stages+'</select><input id="f_area" value="'+(item?item.area:'')+'" placeholder="e.g. 10 Bigha" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/></select></div>'+
-      '<div class="field-row" style="grid-template-columns:1fr 1fr"><label>Value (\u09F3)</label><label>Location</label><input id="f_price" value="'+(item?item.price:'')+'" type="number" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/><input id="f_location" value="'+(item?item.location:'')+'" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/></div>'+
-      '<div class="field-row" style="grid-template-columns:1fr 1fr"><label>Risk</label><label>Priority</label><select id="f_risk" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="Low"'+(item&&item.risk==='Low'?' selected':'')+'>Low</option><option value="Medium"'+(item&&item.risk==='Medium'?' selected':'')+'>Medium</option><option value="High"'+(item&&item.risk==='High'?' selected':'')+'>High</option></select><select id="f_priority" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="Low"'+(item&&item.priority==='Low'?' selected':'')+'>Low</option><option value="Medium"'+(item&&item.priority==='Medium'?' selected':'')+'>Medium</option><option value="High"'+(item&&item.priority==='High'?' selected':'')+'>High</option><option value="Urgent"'+(item&&item.priority==='Urgent'?' selected':'')+'>Urgent</option></select></div>'+
-      '<div class="field-row" style="grid-template-columns:1fr 1fr"><label>Owner/Seller</label><label>Contact Person</label><input id="f_owner" value="'+(item?item.owner:'')+'" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/><input id="f_contact" value="'+(item?item.contact:'')+'" style="padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/></div>'+
-      '<div class="field-row"><label>Notes</label><textarea id="f_notes" rows="3" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-family:inherit;resize:vertical">'+(item?item.notes:'')+'</textarea></div>'+
-      '<div class="field-row"><label>Next Action</label><input id="f_next" value="'+(item?item.nextAction:'')+'" style="width:100%;padding:6px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:11px"/></div>'+
+    '<div style="max-height:60vh;overflow-y:auto;padding-right:4px">'+
+      '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:6px;padding:2px 6px;background:#eef3ff;border-radius:4px">🏷️ Property Details</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Property Name *','f_name',p.name,'',true)+
+        inputField('Location','f_location',p.location,'')+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Area *','f_area',p.area,'e.g. 10 Bigha',true)+
+        inputField('Value (৳) *','f_price',p.price,'',true)+
+      '</div>'+
+      '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">⚖️ Deal Terms</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        '<div class="form-group"><label class="form-label">Stage</label><select class="form-input" id="f_stage">'+stageNames.map(function(s){return '<option value="'+s+'"'+(p.stage===s?' selected':'')+'>'+stageLabels[s].split(' ').slice(1).join(' ')+'</option>';}).join('')+'</select></div>'+
+        selectField('Risk','f_risk',p.risk,['Low','Medium','High'])+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        selectField('Priority','f_priority',p.priority,['Low','Medium','High','Urgent'])+
+        selectField('Zoning','f_zoning',p.zoning||'Residential',['Residential','Commercial','Mixed','Industrial','Agricultural'])+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        selectField('Seller Type','f_sellerType',p.sellerType||'Individual',['Individual','Institutional','Government','Trust'])+
+        selectField('Acquisition Type','f_acqType',p.acquisitionType||'Freehold',['Freehold','Leasehold','Government Allotment','Joint Venture'])+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Payment Terms','f_payTerms',p.paymentTerms||'','e.g. 10% advance, 6 installments')+
+        inputField('Target Date','f_targetDate',p.targetDate||'','')+
+      '</div>'+
+      '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">👥 Ownership</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Owner / Seller','f_owner',p.owner,'')+
+        inputField('Contact Person','f_contact',p.contact,'')+
+      '</div>'+
+      '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">📌 Tracking</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Date','f_date',p.date||new Date().toISOString().slice(0,10),'')+
+        inputField('Next Action','f_next',p.nextAction||'','')+
+      '</div>'+
+      '<div class="form-group"><label class="form-label">Notes</label><textarea id="f_notes" rows="3" class="form-input" style="resize:vertical">'+esc(p.notes||'')+'</textarea></div>'+
     '</div>',
-    [
-      {label:'Cancel',action:'close',secondary:true},
-      {label:n?'Create Proposal':'Save Changes',action:function(){
-        var name=document.getElementById('f_name').value.trim();
-        var stage=document.getElementById('f_stage').value;
-        var area=document.getElementById('f_area').value.trim();
-        var price=parseFloat(document.getElementById('f_price').value)||0;
-        var location=document.getElementById('f_location').value.trim();
-        var risk=document.getElementById('f_risk').value;
-        var priority=document.getElementById('f_priority').value;
-        var owner=document.getElementById('f_owner').value.trim();
-        var contact=document.getElementById('f_contact').value.trim();
-        var notes=document.getElementById('f_notes').value.trim();
-        var nextAction=document.getElementById('f_next').value.trim();
-        if(!name||!area){showToast('Name and Area are required','error');return;}
-        if(n){
-          var np={id:'LP-'+String(mockLandProposals.length+1).padStart(3,'0'),name:name,area:area,price:price,priceF:'\u09F3'+(price/10000000).toFixed(1)+' Cr',location:location||'TBD',stage:stage,status:'New',risk:risk,roi:'0%',contact:contact||'TBD',notes:notes,date:new Date().toISOString().slice(0,10),owner:owner||'TBD',budget:'\u09F3'+(price*0.85/10000000).toFixed(1)+' Cr',priority:priority,progress:0,nextAction:nextAction||'Initial assessment'};
-          mockLandProposals.push(np);
-          showToast('Proposal created','success');
-        }else{
-          item.name=name;item.stage=stage;item.area=area;item.price=price;
-          item.priceF='\u09F3'+(price/10000000).toFixed(1)+' Cr';item.location=location||'TBD';
-          item.risk=risk;item.priority=priority;item.owner=owner||'TBD';item.contact=contact||'TBD';
-          item.notes=notes;item.nextAction=nextAction||'Review';
-          showToast('Proposal updated','success');
-        }
-        closeDrawer();Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();
-      }}
-    ]
+    function(){
+      var name=g('f_name').trim();
+      var area=g('f_area').trim();
+      var price=parseFloat(g('f_price'))||0;
+      if(!name||!area){showToast('Name and Area are required','error');return;}
+      var stageRaw=g('f_stage');
+      var stage=stageNames.indexOf(stageRaw)>=0?stageRaw:'identification';
+      var d={
+        name:name,location:g('f_location').trim()||'TBD',area:area,price:price,
+        priceF:'৳'+(price/10000000).toFixed(1)+' Cr',stage:stage,
+        status:stage==='possession'?'Fully Acquired':stage==='registration'?'Mutation Process':'New',
+        risk:g('f_risk'),priority:g('f_priority'),zoning:g('f_zoning'),
+        sellerType:g('f_sellerType'),acquisitionType:g('f_acqType'),
+        paymentTerms:g('f_payTerms')||'—',targetDate:g('f_targetDate')||'—',
+        owner:g('f_owner').trim()||'TBD',contact:g('f_contact').trim()||'TBD',
+        notes:g('f_notes').trim(),nextAction:g('f_next').trim()||'Initial assessment',
+        date:g('f_date')||new Date().toISOString().slice(0,10),
+        roi:item?item.roi||'0%':'0%',progress:item?item.progress||0:0,
+        budget:'৳'+(price*0.85/10000000).toFixed(1)+' Cr'
+      };
+      if(n){
+        d.id='LP-'+String(nextId(mockLandProposals)).padStart(3,'0');
+        mockLandProposals.push(d);
+        DB.save('land_proposals');
+        logActivity('Created','Land Acquisition','Proposal',d.id,name);
+        showToast('Proposal created','success');
+      }else{
+        Object.keys(d).forEach(function(k){item[k]=d[k];});
+        DB.save('land_proposals');
+        logActivity('Updated','Land Acquisition','Proposal',item.id,name);
+        showToast('Proposal updated','success');
+      }
+      closeDrawer();Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();
+    }
   );
 }
 
