@@ -1,0 +1,21 @@
+{
+  "name": "REM ERP — Real Estate Management",
+  "short_name": "REM ERP",
+  "description": "Real Estate Management ERP — properties, sales, finance, construction and more. Prototype v6.",
+  "start_url": "./design-prototype-v6.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#2F80ED",
+  "icons": [
+    { "src": "pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Dashboard", "url": "./design-prototype-v6.html#dashboard", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] },
+    { "name": "CRM & Leads", "url": "./design-prototype-v6.html#crm", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Reports", "url": "./design-prototype-v6.html#reports", "icons": [{ "src": "pwa/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
