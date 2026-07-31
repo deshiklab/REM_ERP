@@ -2026,7 +2026,7 @@ window.mockKnowledgeBase = DB.init('knowledge_base', [
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
 let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard', boqTab = 'dashboard', eqTab = 'dashboard';
-let landSortKey = 'progress', landSortDir = -1;
+let landSortKey = 'progress', landSortDir = -1, landShowArchived = false;
 
 // ═══ GROUP & TOP BAR NAV ═══
 function switchGroup(group) {
@@ -4591,8 +4591,8 @@ const stageLabels={identification:'\uD83D\uDD0D Identification',due_diligence:'\
 const stageColors={identification:'#1565c0',due_diligence:'#e65100',negotiation:'#7b1fa2',agreement:'#2e7d32',registration:'#00838f',possession:'#37474f'};
 
 function renderLandMgmt(el){
-  const total=mockLandProposals.length;
-  const totalVal=mockLandProposals.reduce((s,p)=>s+(p.price||0),0);
+  const total=mockLandProposals.filter(p=>!p.archived).length;
+  const totalVal=mockLandProposals.filter(p=>!p.archived).reduce((s,p)=>s+(p.price||0),0);
   const stageNames=['identification','due_diligence','negotiation','agreement','registration','possession'];
   const stageLabels={identification:'\uD83D\uDD0D Identification',due_diligence:'\uD270\uFE0F Due Diligence',negotiation:'\uD83E\uDD1D Negotiation',agreement:'\uD83D\uDCDC Agreement',registration:'\uD83D\uDCCB Registration',possession:'\u2705 Possession'};
   const stageColors={identification:'#1565c0',due_diligence:'#e65100',negotiation:'#7b1fa2',agreement:'#2e7d32',registration:'#00838f',possession:'#37474f'};
@@ -4609,12 +4609,13 @@ function renderLandMgmt(el){
 }
 
 function renderLandDashboard(){
-  const total=mockLandProposals.length;
-  const totalVal=mockLandProposals.reduce((s,p)=>s+(p.price||0),0);
-  const byStage={};stageNames.forEach(s=>{byStage[s]=mockLandProposals.filter(p=>p.stage===s)});
-  const highP=mockLandProposals.filter(p=>p.priority==='Urgent').length;
-  const lowR=mockLandProposals.filter(p=>p.risk==='Low').length;
-  const avgRoi=Math.round(mockLandProposals.reduce((s,p)=>s+parseInt(p.roi),0)/total);
+  const active=mockLandProposals.filter(p=>!p.archived);
+  const total=active.length;
+  const totalVal=active.reduce((s,p)=>s+(p.price||0),0);
+  const byStage={};stageNames.forEach(s=>{byStage[s]=active.filter(p=>p.stage===s)});
+  const highP=active.filter(p=>p.priority==='Urgent').length;
+  const lowR=active.filter(p=>p.risk==='Low').length;
+  const avgRoi=total>0?Math.round(active.reduce((s,p)=>s+parseInt(p.roi),0)/total):0;
   return `<div class="stats-row" style="margin-bottom:6px">${[
     ['Total Proposals',total,'#1565c0'],
     ['Total Value','\u09F3 '+totalVal.toLocaleString('en-IN'),'#2e7d32'],
@@ -4624,21 +4625,22 @@ function renderLandDashboard(){
     ['Acquired',byStage.possession.length+byStage.registration.length,'#37474f']
   ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
-    <div class="card"><div class="card-header"><h3>Pipeline Overview</h3></div><div class="card-body" style="padding:8px">${stageNames.map(s=>{
-      const items=byStage[s]||[];
-      const val=items.reduce((v,p)=>v+(p.price||0),0);
+    <div class="card"><div class="card-header"><h3>Risk Distribution</h3></div><div class="card-body" style="padding:8px">${['Low','Medium','High'].map(r=>{
+      const items=mockLandProposals.filter(p=>p.risk===r&&!p.archived);
       const pct=total>0?Math.round(items.length/total*100):0;
-      return '<div style="margin-bottom:5px;cursor:pointer" onclick="landTab=\x27pipeline\x27;renderModule()"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px"><span style="color:'+stageColors[s]+'">'+stageLabels[s]+'</span><span>'+items.length+' props (\u09F3 '+(val/10000000).toFixed(1)+'Cr)</span></div><div style="height:5px;background:#e0e0e0;border-radius:3px"><div style="width:'+pct+'%;height:5px;background:'+stageColors[s]+';border-radius:3px"></div></div></div>';
-    }).join('')}</div></div>
-    <div class="card"><div class="card-header"><h3>Urgent Actions</h3></div><div class="card-body" style="padding:6px">${mockLandProposals.filter(p=>p.priority==='Urgent'||p.priority==='High').slice(0,6).map(p=>'<div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="openProposal(\''+p.id+'\')"><div style="width:20px;height:20px;border-radius:4px;background:'+(p.priority==='Urgent'?'#ffebee':'#fff3e0')+';color:'+(p.priority==='Urgent'?'#c62828':'#e65100')+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">!'+(p.priority==='Urgent'?'!':'')+'</div><div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:8px;color:#888">'+p.nextAction.substring(0,40)+'</div></div></div>').join('')}</div></div>
+      const col=r==='Low'?'#2e7d32':r==='Medium'?'#e65100':'#c62828';
+      return '<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px"><span style="color:'+col+'">'+r+' Risk</span><span>'+items.length+' props ('+pct+'%)</span></div><div style="height:5px;background:#e0e0e0;border-radius:3px"><div style="width:'+pct+'%;height:5px;background:'+col+';border-radius:3px"></div></div></div>';
+    }).join('')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:8px"><div style="padding:4px;background:#f9f9fb;border-radius:4px;text-align:center"><div style="font-size:11px;font-weight:700;color:#1565c0">${mockLandProposals.filter(p=>!p.archived).reduce((s,p)=>s+(p.owners?p.owners.length:0),0)}</div><div style="font-size:7px;color:#888">Owners</div></div><div style="padding:4px;background:#f9f9fb;border-radius:4px;text-align:center"><div style="font-size:11px;font-weight:700;color:#7b1fa2">${mockLandProposals.filter(p=>!p.archived).reduce((s,p)=>s+(p.documents?p.documents.length:0),0)}</div><div style="font-size:7px;color:#888">Documents</div></div><div style="padding:4px;background:#f9f9fb;border-radius:4px;text-align:center"><div style="font-size:11px;font-weight:700;color:#37474f">${mockLandProposals.filter(p=>p.archived).length}</div><div style="font-size:7px;color:#888">Archived</div></div></div></div></div>
+    <div class="card"><div class="card-header"><h3>Urgent Actions</h3></div><div class="card-body" style="padding:6px">${active.filter(p=>p.priority==='Urgent'||p.priority==='High').slice(0,6).map(p=>'<div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="openProposal(\''+p.id+'\')"><div style="width:20px;height:20px;border-radius:4px;background:'+(p.priority==='Urgent'?'#ffebee':'#fff3e0')+';color:'+(p.priority==='Urgent'?'#c62828':'#e65100')+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">!'+(p.priority==='Urgent'?'!':'')+'</div><div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:8px;color:#888">'+p.nextAction.substring(0,40)+'</div></div></div>').join('')}</div></div>
   </div>
+
   <div class="card"><div class="card-header"><h3>Recent Activity</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>ID</th><th>Property</th><th>Stage</th><th>Status</th><th>Progress</th><th>Next Action</th></tr></thead><tbody>${mockLandProposals.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8).map(p=>'<tr style="cursor:pointer" onclick="openProposal(\''+p.id+'\')"><td style="font-weight:500;font-size:9px;font-family:monospace">'+p.id+'</td><td style="font-weight:500">'+p.name.substring(0,25)+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;background:'+stageColors[p.stage]+'15;color:'+stageColors[p.stage]+'">'+stageLabels[p.stage].split(' ').slice(1).join(' ')+'</span></td><td style="font-size:9px;color:#555">'+p.status+'</td><td style="width:100px"><div class="progress-bar" style="height:5px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div><span style="font-size:8px;color:#888;margin-left:4px">'+p.progress+'%</span></td><td style="font-size:9px;color:#888;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.nextAction+'</td></tr>').join('')}</tbody></table></div></div>`;
 }
 
 function renderLandPipeline(){
-  const byStage={};stageNames.forEach(s=>{byStage[s]=mockLandProposals.filter(p=>p.stage===s)});
+  const byStage={};stageNames.forEach(s=>{byStage[s]=mockLandProposals.filter(p=>p.stage===s&&!p.archived)});
   const stageVal={};stageNames.forEach(s=>{stageVal[s]=byStage[s].reduce((v,p)=>v+(p.price||0),0)});
-  const totalVal=mockLandProposals.reduce((s,p)=>s+(p.price||0),0);
+  const totalVal=mockLandProposals.filter(p=>!p.archived).reduce((s,p)=>s+(p.price||0),0);
   // Stage summary strip: count + value per stage, click to jump
   const summary='<div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px">'+stageNames.map(s=>{
     const n=byStage[s].length||0, v=stageVal[s]||0;
@@ -4650,7 +4652,7 @@ function renderLandPipeline(){
     const items=byStage[s]||[];
     const v=stageVal[s]||0;
     return '<div class="kanban-col" style="min-width:200px;flex:1" ondragover="dragOver(event)" ondrop="dropLand(event,\''+s+'\')" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"><div style="padding:5px 8px;font-size:9px;font-weight:600;color:'+stageColors[s]+';background:'+stageColors[s]+'15;border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid '+stageColors[s]+'"><span>'+stageLabels[s]+'</span><span style="background:'+stageColors[s]+';color:#fff;border-radius:10px;padding:0 6px;font-size:9px">'+items.length+' · ৳'+(v/10000000).toFixed(1)+'Cr</span></div><div style="min-height:120px;padding:4px">'+(items.length===0?'<div style="padding:14px;text-align:center;font-size:8px;color:#ccc;border:1px dashed #e0e0e0;border-radius:4px">Drop here</div>':items.map(p=>{
-      return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'land\',\''+p.id+'\')" ondragend="dragEnd(event)" style="margin-bottom:4px;cursor:pointer;position:relative;border-left:3px solid '+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'" onclick="if(!_kdragged)openProposal(\''+p.id+'\')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px">'+p.name+'</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:8px" onclick="event.stopPropagation();crudProposal(mockLandProposals.find(x=>x.id===\''+p.id+'\'))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:8px" onclick="event.stopPropagation();landDelete(\''+p.id+'\')">\u2715</span></div></div><div style="font-size:8px;color:#888;margin-top:2px">'+p.area+' · '+p.location+'</div><div style="font-size:9px;font-weight:700;margin-top:2px">'+p.priceF+' <span style="color:'+(p.risk==='Low'?'#2e7d32':p.risk==='Medium'?'#e65100':'#c62828')+';font-weight:600">'+p.roi+'</span></div><div style="display:flex;gap:2px;margin-top:2px;flex-wrap:wrap"><span style="padding:0 3px;font-size:7px;background:'+(p.risk==='Low'?'#e8f5e9;color:#2e7d32':'#fff3e0;color:#e65100')+';border-radius:2px">'+p.risk+'</span><span style="padding:0 3px;font-size:7px;background:#eef3ff;color:#2F80ED;border-radius:2px">'+p.status+'</span></div><div style="margin-top:3px;display:flex;align-items:center;gap:4px"><div class="progress-bar" style="flex:1;height:4px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div><span style="font-size:7px;color:#888">'+p.progress+'%</span></div>'+(p.nextAction?'<div style="font-size:7px;color:#888;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">\u25B6 '+p.nextAction+'</div>':'')+'</div>';
+      return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'land\',\''+p.id+'\')" ondragend="dragEnd(event)" style="margin-bottom:4px;cursor:pointer;position:relative;border-left:3px solid '+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'" onclick="if(!_kdragged)openProposal(\''+p.id+'\')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px">'+p.name+'</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:8px" onclick="event.stopPropagation();crudProposal(mockLandProposals.find(x=>x.id===\''+p.id+'\'))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:8px" onclick="event.stopPropagation();landDelete(\''+p.id+'\')">\u2715</span></div></div><div style="font-size:8px;color:#888;margin-top:2px">'+p.area+' · '+p.location+'</div><div style="font-size:9px;font-weight:700;margin-top:2px">'+p.priceF+' <span style="color:'+(p.risk==='Low'?'#2e7d32':p.risk==='Medium'?'#e65100':'#c62828')+';font-weight:600">'+p.roi+'</span></div><div style="display:flex;gap:2px;margin-top:2px;flex-wrap:wrap"><span style="padding:0 3px;font-size:7px;background:'+(p.risk==='Low'?'#e8f5e9;color:#2e7d32':'#fff3e0;color:#e65100')+';border-radius:2px">'+p.risk+'</span><span style="padding:0 3px;font-size:7px;background:#eef3ff;color:#2F80ED;border-radius:2px">'+p.status+'</span></div><div style="margin-top:3px;display:flex;align-items:center;gap:4px"><div class="progress-bar" style="flex:1;height:4px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div><span style="font-size:7px;color:#888">'+p.progress+'%</span></div>'+(p.nextAction?'<div style="font-size:7px;color:#888;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">\u25B6 '+p.nextAction+'</div>':'')+(p.owners&&p.owners.length?'<div style="font-size:7px;color:#888;margin-top:2px">👥 '+p.owners.length+' owner'+(p.owners.length>1?'s':'')+(p.documents&&p.documents.length?' · 📎 '+p.documents.length:'')+'</div>':'')+'</div>';
     }).join(''))+'</div></div>';
   }).join('');
   return summary+'<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px">'+cols+'</div>';
@@ -4659,8 +4661,10 @@ function landDelete(id){
   var idx=mockLandProposals.findIndex(function(x){return x.id===id});
   if(idx<0)return;
   if(!confirm('Delete this land proposal?'))return;
+  var delP=mockLandProposals[idx];
   mockLandProposals.splice(idx,1);
   DB.save('land_proposals');
+  if(delP)logActivity('Deleted','Land Acquisition','Proposal',delP.id,delP.name);
   Object.keys(_PG).forEach(function(k){if(k.indexOf('land')===0)delete _PG[k]});
   renderModule();
   showToast('Proposal deleted','info');
@@ -4681,6 +4685,7 @@ function dropLand(e,status){
   if(status==='registration')p.progress=Math.max(p.progress,80);
   p.status=status==='possession'?'Fully Acquired':status==='registration'?'Mutation Process':status==='agreement'?'MoU Drafting':p.status;
   DB.save('land_proposals');
+  landAct(p,'Moved','Stage '+old+' → '+status);
   logActivity('Updated','Land Acquisition','Proposal',p.id,'Moved '+old+' → '+status);
   renderModule();
   showToast('Moved to '+stageLabels[status].split(' ').slice(1).join(' '),'success');
@@ -4700,9 +4705,10 @@ function landSortSet(k){
 }
 function landSortArrow(k){return landSortKey===k?(landSortDir>0?' ▾':' ▴'):'';}
 function landExportCSV(){
-  var rows=[['ID','Property','Location','Area','Value','Stage','Status','Risk','ROI','Priority','Owner','Contact','Progress','Next Action']];
+  var rows=[['ID','Property','Location','Area','Value','Stage','Status','Risk','ROI','Priority','Owner','Contact','Owners','Docs','Progress','Next Action']];
   mockLandProposals.forEach(function(p){
-    rows.push([p.id,p.name,p.location,p.area,p.priceF,stageLabels[p.stage]?stageLabels[p.stage].split(' ').slice(1).join(' '):p.stage,p.status,p.risk,p.roi,p.priority,p.owner,p.contact,p.progress+'%',p.nextAction||'']);
+    landNorm(p);
+    rows.push([p.id,p.name,p.location,p.area,p.priceF,stageLabels[p.stage]?stageLabels[p.stage].split(' ').slice(1).join(' '):p.stage,p.status,p.risk,p.roi,p.priority,p.owner,p.contact,p.owners.length,p.documents.length,p.progress+'%',p.nextAction||'']);
   });
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',')}).join('\n');
   var a=document.createElement('a');
@@ -4718,6 +4724,7 @@ function renderLandProposals(){
   const pf=(document.getElementById('landFPriority')||{}).value||'';
   const lf=(document.getElementById('landFLoc')||{}).value||'';
   var filtered=mockLandProposals.filter(function(p){
+    if(!landShowArchived&&p.archived)return false;
     if(sf&&p.stage!==sf)return false;
     if(rf&&p.risk!==rf)return false;
     if(pf&&p.priority!==pf)return false;
@@ -4737,7 +4744,7 @@ function renderLandProposals(){
   const locations=[...new Set(mockLandProposals.map(function(p){return p.location}).filter(Boolean))];
   // summary chips: counts per stage, click to filter
   const chips=stageNames.map(function(s){
-    const n=mockLandProposals.filter(function(p){return p.stage===s}).length;
+    const n=mockLandProposals.filter(function(p){return p.stage===s&&(!landShowArchived?!p.archived:true)}).length;
     return '<span style="cursor:pointer;padding:2px 7px;border-radius:4px;font-size:8px;background:'+(sf===s?stageColors[s]:stageColors[s]+'22')+';color:'+(sf===s?'#fff':stageColors[s])+';border:1px solid '+(sf===s?stageColors[s]:stageColors[s]+'44')+'" onclick="var el=document.getElementById(\'landFStage\');if(el){el.value=\''+(sf===s?'':s)+'\';Object.keys(_PG).forEach(function(k){if(!k.startsWith(\'land\'))return;delete _PG[k]});renderModule()}">'+stageLabels[s].split(' ').slice(1).join(' ')+' · '+n+'</span>';
   }).join('');
   return `<div class="toolbar" style="margin-bottom:6px">
@@ -4748,40 +4755,439 @@ function renderLandProposals(){
     <select id="landFLoc" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Locations</option>${locations.map(l=>'<option value="'+l+'"'+(lf===l?' selected':'')+'>'+l+'</option>').join('')}</select>
     <div class="spacer"></div>
     <button class="action-btn secondary" onclick="landExportCSV()" style="padding:3px 7px;font-size:9px" title="Export CSV">📥 CSV</button>
+    <button class="action-btn secondary" onclick="importData(mockLandProposals,'Land Proposals','land_proposals',IMPORT_FIELDS.land)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Land Acquisition:Import">📤 Import</button>
+    <button class="action-btn ${landShowArchived?'primary':'secondary'}" onclick="landShowArchived=!landShowArchived;Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:3px 7px;font-size:9px" title="Toggle archived">📦 ${landShowArchived?'All':'Active'}</button>
     <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Land Acquisition:Create">+ New Proposal</button>
+
   </div>
-  <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px">${chips}</div>
-  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th style="cursor:pointer" onclick="landSortSet('id')">ID${landSortArrow('id')}</th><th style="cursor:pointer" onclick="landSortSet('name')">Property${landSortArrow('name')}</th><th>Location</th><th>Area</th><th class="num" style="cursor:pointer" onclick="landSortSet('price')">Value${landSortArrow('price')}</th><th>Stage</th><th>Status</th><th>Risk</th><th style="cursor:pointer" onclick="landSortSet('roi')">ROI${landSortArrow('roi')}</th><th>Priority</th><th style="cursor:pointer" onclick="landSortSet('progress')">Progress${landSortArrow('progress')}</th><th></th></tr></thead><tbody>${
+    <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px">${chips}</div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th style="cursor:pointer" onclick="landSortSet('id')">ID${landSortArrow('id')}</th><th style="cursor:pointer" onclick="landSortSet('name')">Property${landSortArrow('name')}</th><th>Location</th><th>Area</th><th class="num" style="cursor:pointer" onclick="landSortSet('price')">Value${landSortArrow('price')}</th><th>Stage</th><th>Status</th><th>Risk</th><th style="cursor:pointer" onclick="landSortSet('roi')">ROI${landSortArrow('roi')}</th><th>Priority</th><th style="cursor:pointer" onclick="landSortSet('progress')">Progress${landSortArrow('progress')}</th><th>👥</th><th>📎</th><th></th></tr></thead><tbody>${
     pL.items.map(function(p){
-      return '<tr style="cursor:pointer" onclick="openProposal(\''+p.id+'\')"><td style="font-weight:600;font-size:9px;font-family:monospace">'+p.id+'</td><td style="font-weight:500;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</td><td style="font-size:9px;color:#555">'+p.location+'</td><td style="font-size:9px">'+p.area+'</td><td class="num" style="font-weight:600">'+p.priceF+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;background:'+stageColors[p.stage]+'15;color:'+stageColors[p.stage]+'">'+stageLabels[p.stage].split(' ').slice(1).join(' ')+'</span></td><td style="font-size:9px;color:#555;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.status+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.risk==='Low'?'#2e7d32':p.risk==='Medium'?'#e65100':'#c62828')+'">'+p.risk+'</span></td><td style="font-weight:600;color:#2e7d32">'+p.roi+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'">'+p.priority+'</span></td><td style="width:80px"><div class="progress-bar" style="height:4px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudProposal(mockLandProposals.find(function(x){return x.id===\''+p.id+'\'}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();landDelete(\''+p.id+'\')">\u2715</span></td></tr>';
+      return '<tr style="cursor:pointer" onclick="openProposal(\''+p.id+'\')"><td style="font-weight:600;font-size:9px;font-family:monospace">'+p.id+'</td><td style="font-weight:500;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</td><td style="font-size:9px;color:#555">'+p.location+'</td><td style="font-size:9px">'+p.area+'</td><td class="num" style="font-weight:600">'+p.priceF+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;background:'+stageColors[p.stage]+'15;color:'+stageColors[p.stage]+'">'+stageLabels[p.stage].split(' ').slice(1).join(' ')+'</span></td><td style="font-size:9px;color:#555;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.status+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.risk==='Low'?'#2e7d32':p.risk==='Medium'?'#e65100':'#c62828')+'">'+p.risk+'</span></td><td style="font-weight:600;color:#2e7d32">'+p.roi+'</td><td><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'">'+p.priority+'</span></td><td style="width:80px"><div class="progress-bar" style="height:4px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div></td><td style="font-size:9px;color:#888">'+(p.owners?p.owners.length:0)+'</td><td style="font-size:9px;color:#888">'+(p.documents?p.documents.length:0)+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudProposal(mockLandProposals.find(function(x){return x.id===\''+p.id+'\'}))">\u270E</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();landDelete(\''+p.id+'\')">\u2715</span></td></tr>';
     }).join('')
   }</tbody></table>${_pgHtml('land',pL.total,pL.page,pL.totalPages,pL.perPage)}</div></div></div>`;
 }
 
-function openProposal(id){
+function landNorm(p){
+  if(!p.owners)p.owners=[];
+  if(!p.documents)p.documents=[];
+  if(!p.activities)p.activities=[];
+  if(!p.archived)p.archived=false;
+  if(!p.mouza)p.mouza='';
+  if(!p.dag)p.dag='';
+  if(!p.cs)p.cs='';
+  if(!p.rs)p.rs='';
+  if(!p.commission)p.commission='';
+  if(!p.roadAccess)p.roadAccess='';
+  if(!p.landUse)p.landUse='';
+  if(!p.soilCondition)p.soilCondition='';
+  if(!p.floodRisk)p.floodRisk='';
+  if(!p.landmarks)p.landmarks='';
+  if(!p.coordinates)p.coordinates='';
+  if(!p.litigationCheck)p.litigationCheck='Pending';
+  if(!p.authority)p.authority='RAJUK';
+  if(!p.siteAccess)p.siteAccess='';
+  if(!p.targetProject)p.targetProject='';
+  if(!p.legalCostCr)p.legalCostCr=0.10;
+  if(!p.surveyCostCr)p.surveyCostCr=0.05;
+  if(!p.earthFillingCostCr)p.earthFillingCostCr=2.50;
+  if(!p.boundaryCostCr)p.boundaryCostCr=0.80;
+  if(!p.expectedRevenueCr)p.expectedRevenueCr=Math.round((p.price||0)/10000000*2.2*10)/10;
+  if(!p.salesVol)p.salesVol='';
+  if(!p.avgSaleRate)p.avgSaleRate='';
+  return p;
+}
+function landFmtCr(n){return '৳'+n.toFixed(1)+' Cr';}
+function landEsc(v){return String(v==null?'':v).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function landAct(p,action,note){
+  landNorm(p);
+  p.activities.unshift({action:action,note:note||'',date:new Date().toISOString().slice(0,10),user:currentRole||"Admin"});
+  DB.save('land_proposals');
+}
+function landFinancials(p){
+  landNorm(p);
+  var cr=(p.price||0)/10000000;
+  var reg=cr*0.12;
+  var comm=0;
+  if(p.commission){var cm=parseFloat(p.commission.replace(/[^0-9.]/g,''));if(p.commission.indexOf('%')>=0)comm=cr*cm/100;else comm=cm;}
+  var legal=p.legalCostCr||0.10,survey=p.surveyCostCr||0.05,fill=p.earthFillingCostCr||2.50,boundary=p.boundaryCostCr||0.80;
+  var misc=cr*0.05;
+  var total=cr+reg+comm+legal+survey+fill+boundary+misc;
+  var rev=p.expectedRevenueCr||0;
+  var net=rev-total;
+  var roi=total>0?net/total*100:0;
+  return {cr:cr,reg:reg,comm:comm,legal:legal,survey:survey,fill:fill,boundary:boundary,misc:misc,total:total,rev:rev,net:net,roi:roi};
+}
+
+function openProposal(id,tab){
   var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
+  landNorm(p);
+  tab=tab||'overview';
   var stageL=stageLabels[p.stage]||p.stage;
   var stageC=stageColors[p.stage]||'#888';
   var curIdx=stageNames.indexOf(p.stage);
-  // 6-step stage timeline
   var timeline=stageNames.map(function(s,i){
     var done=i<curIdx||(i===curIdx&&p.progress>=95);
-    return '<div style="flex:1;text-align:center;position:relative"><div style="width:16px;height:16px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;background:'+(done?'#2e7d32':i===curIdx?stageC:'#e0e0e0')+';border:2px solid '+(i===curIdx?stageC:'#e0e0e0')+'">'+(done?'✓':i===curIdx?'●':'')+'</div><div style="font-size:7px;color:'+(i===curIdx?'#333':'#999')+';margin-top:3px;font-weight:'+(i===curIdx?'600':'400')+'">'+stageLabels[s].split(' ').slice(1).join(' ')+'</div></div>';
+    return '<div style="flex:1;text-align:center;position:relative"><div style="width:16px;height:16px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;background:'+(done?'#2e7d32':i===curIdx?stageC:'#e0e0e0')+';border:2px solid '+(i===curIdx?stageC:'#e0e0e0')+'\">'+(done?'✓':i===curIdx?'●':'')+'</div><div style="font-size:7px;color:'+(i===curIdx?'#333':'#999')+';margin-top:3px;font-weight:'+(i===curIdx?'600':'400')+'\">'+stageLabels[s].split(' ').slice(1).join(' ')+'</div></div>';
   }).join('');
   var canAdvance=curIdx<stageNames.length-1;
-  showDetailPanel('🏗️ '+p.name,
-    '<div style="font-size:11px;line-height:1.6"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+stageC+'15;color:'+stageC+';border-radius:4px;font-size:9px">'+stageL+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">📍 '+p.location+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">📅 '+p.date+'</span><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+(p.risk==='Low'?'#e8f5e9':'#fff3e0')+';color:'+(p.risk==='Low'?'#2e7d32':'#e65100')+';border-radius:4px;font-size:9px">'+(p.risk==='Low'?'✅':'⚠️')+' '+p.risk+' Risk</span></div>'+
-    '<div style="display:flex;gap:2px;margin-bottom:10px">'+timeline+'</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;font-size:10px"><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Value</span><div style="font-weight:600;font-size:12px">'+p.priceF+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Area</span><div style="font-weight:600">'+p.area+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Owner</span><div>'+p.owner+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Contact Person</span><div>'+p.contact+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Budget</span><div style="font-weight:600">'+p.budget+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">ROI</span><div style="font-weight:600;color:#2e7d32">'+p.roi+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Priority</span><div style="font-weight:600;color:'+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'">'+p.priority+'</div></div><div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Status</span><div>'+p.status+'</div></div></div>'+
-    '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px"><span style="font-weight:500">Progress</span><span style="font-weight:600;color:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'">'+p.progress+'%</span></div><div class="progress-bar"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div></div>'+
-    (p.notes?'<div style="padding:6px;background:#f9f9fb;border-radius:4px;margin-bottom:8px;font-size:10px"><span style="color:#888;display:block;margin-bottom:2px">Notes</span><span>'+p.notes+'</span></div>':'')+
-    '<div style="padding:6px;background:#e3f2fd;border-radius:4px;font-size:10px"><span style="color:#1565c0;font-weight:500">▶ Next Action: </span><span>'+p.nextAction+'</span></div></div>',
-    '<div class="lead-footer">'+
-      (canAdvance?'<button class="lead-foot-btn primary" onclick="landAdvance(\''+p.id+'\');closeLeadPanel()">→ Advance Stage</button>':'')+
-      '<button class="lead-foot-btn" onclick="crudProposal(mockLandProposals.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button>'+
-      '<button class="lead-foot-btn" style="color:#e53935" onclick="closeLeadPanel();landDelete(\''+p.id+'\')">🗑 Delete</button>'+
-    '</div>'
+  var tabs=['overview','geo','financials','documents','activity'];
+  var tabLabels={overview:'ℹ️ Overview',geo:'🗺️ Geo & Risk',financials:'💰 Financials',documents:'📎 Docs ('+(p.documents||[]).length+')',activity:'🕒 Activity'};
+  var tabBar='<div style="display:flex;gap:2px;border-bottom:1px solid #e0e0e0;margin:0 0 8px;flex-wrap:wrap">'+tabs.map(function(t){
+    return '<button onclick="openProposal(\''+p.id+'\',\''+t+'\')" style="padding:4px 8px;font-size:9px;font-weight:600;cursor:pointer;border:none;border-bottom:2px solid '+(tab===t?'#2F80ED':'transparent')+';background:none;color:'+(tab===t?'#2F80ED':'#888')+';border-radius:0">'+tabLabels[t]+'</button>';
+  }).join('')+'</div>';
+  var body='<div style="font-size:11px;line-height:1.6">'+
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">'+
+      '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+stageC+'15;color:'+stageC+';border-radius:4px;font-size:9px;font-weight:600">'+stageL+'</span>'+
+      '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">📍 '+p.location+'</span>'+
+      '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:9px">📅 '+p.date+'</span>'+
+      '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:'+(p.risk==='Low'?'#e8f5e9':'#fff3e0')+';color:'+(p.risk==='Low'?'#2e7d32':'#e65100')+';border-radius:4px;font-size:9px">'+(p.risk==='Low'?'✅':'⚠️')+' '+p.risk+' Risk</span>'+
+      (p.archived?'<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:#eceff1;color:#546e7a;border-radius:4px;font-size:9px">📦 Archived</span>':'')+
+    '</div>'+
+    '<div style="display:flex;gap:2px;margin-bottom:8px">'+timeline+'</div>'+
+    tabBar+landTabBody(p,tab)+'</div>';
+  var footer='<div class="lead-footer">'+
+    (canAdvance?'<button class="lead-foot-btn primary" onclick="landAdvance(\''+p.id+'\');closeLeadPanel()">→ Advance</button>':'')+
+    '<button class="lead-foot-btn" onclick="crudProposal(mockLandProposals.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button>'+
+    (p.archived?'<button class="lead-foot-btn" onclick="landRestore(\''+p.id+'\');closeLeadPanel()">↩ Restore</button>':'<button class="lead-foot-btn" onclick="landArchive(\''+p.id+'\');closeLeadPanel()">📦 Archive</button>')+
+    (p.stage==='possession'||p.progress>=95?'<button class="lead-foot-btn success" onclick="moveLandToProject(\''+p.id+'\');closeLeadPanel()">🏗️ To Project</button>':'')+
+    '<button class="lead-foot-btn" style="color:#e53935" onclick="closeLeadPanel();landDelete(\''+p.id+'\')">🗑</button>'+
+  '</div>';
+  showDetailPanel('🏗️ '+p.name+' <span style="font-size:9px;color:#999;font-weight:400">'+p.id+'</span>',body,footer);
+}
+function landTabBody(p,tab){
+  if(tab==='geo')return landTabGeo(p);
+  if(tab==='financials')return landTabFinancials(p);
+  if(tab==='documents')return landTabDocs(p);
+  if(tab==='activity')return landTabActivity(p);
+  return landTabOverview(p);
+}
+function landTabOverview(p){
+  var f=landFinancials(p);
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;font-size:10px">'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Value</span><div style="font-weight:600;font-size:12px">'+p.priceF+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Area</span><div style="font-weight:600">'+p.area+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Owner / Seller</span><div>'+p.owner+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Contact</span><div>'+p.contact+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Budget</span><div style="font-weight:600">'+p.budget+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">ROI (model)</span><div style="font-weight:600;color:#2e7d32">'+f.roi.toFixed(1)+'%</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Priority</span><div style="font-weight:600;color:'+(p.priority==='Urgent'?'#c62828':p.priority==='High'?'#e65100':'#1565c0')+'">'+p.priority+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Status</span><div>'+p.status+'</div></div>'+
+  '</div>'+
+  '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px"><span style="font-weight:500">Progress</span><span style="font-weight:600;color:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'">'+p.progress+'%</span></div><div class="progress-bar"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>70?'#2e7d32':p.progress>40?'#e65100':'#1565c0')+'"></div></div></div>'+
+  '<h3 style="font-size:9px;font-weight:600;color:#555;text-transform:uppercase;margin:8px 0 4px">🏷️ Property Records</h3>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;margin-bottom:8px">'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Mouza</span><div style="font-weight:500">'+landEsc(p.mouza||'—')+'</div></div>'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Dag No.</span><div style="font-weight:500">'+landEsc(p.dag||'—')+'</div></div>'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">CS Khatian</span><div style="font-weight:500">'+landEsc(p.cs||'—')+'</div></div>'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">RS Khatian</span><div style="font-weight:500">'+landEsc(p.rs||'—')+'</div></div>'+
+  '</div>'+
+  '<div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 4px"><h3 style="font-size:9px;font-weight:600;color:#555;text-transform:uppercase">👥 Owners & Stakeholders ('+(p.owners||[]).length+')</h3><button class="action-btn secondary" style="padding:2px 6px;font-size:8px" onclick="openLandOwners(\''+p.id+'\')">Manage</button></div>'+
+  ((p.owners||[]).length?'<table style="width:100%;font-size:9px;border-collapse:collapse;margin-bottom:8px"><thead><tr style="background:#f5f5f5;color:#888;font-size:8px;text-align:left"><th style="padding:3px 5px">Name</th><th style="padding:3px 5px">Type</th><th style="padding:3px 5px">Share</th><th style="padding:3px 5px">Status</th></tr></thead><tbody>'+p.owners.map(function(o){
+    var sc=o.status==='Agreed'?'#2e7d32':o.status==='Negotiating'?'#e65100':'#c62828';
+    return '<tr style="border-bottom:1px solid #f0f0f0"><td style="padding:3px 5px;font-weight:500">'+landEsc(o.name)+'</td><td style="padding:3px 5px;color:#555">'+landEsc(o.type)+'</td><td style="padding:3px 5px;font-weight:600">'+landEsc(o.share)+'</td><td style="padding:3px 5px"><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:7px;font-weight:600;color:#fff;background:'+sc+'">'+landEsc(o.status)+'</span></td></tr>';
+  }).join('')+'</tbody></table>':'<div style="padding:8px;text-align:center;color:#bbb;font-size:9px;border:1px dashed #e0e0e0;border-radius:4px;margin-bottom:8px">No owners added yet</div>')+
+  '<h3 style="font-size:9px;font-weight:600;color:#555;text-transform:uppercase;margin:8px 0 4px">🏗️ Site Conditions</h3>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;margin-bottom:8px">'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Road Access</span><div style="font-weight:500">'+(p.roadAccess?p.roadAccess+' ft':'—')+'</div></div>'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Land Use</span><div style="font-weight:500">'+landEsc(p.landUse||'—')+'</div></div>'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Soil</span><div style="font-weight:500">'+landEsc(p.soilCondition||'—')+'</div></div>'+
+    '<div style="padding:5px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Flood Risk</span><div style="font-weight:500">'+landEsc(p.floodRisk||'—')+'</div></div>'+
+  '</div>'+
+  (p.landmarks?'<div style="padding:5px;background:#f9f9fb;border-radius:4px;font-size:9px;margin-bottom:8px"><span style="color:#888">📍 Nearby: </span>'+landEsc(p.landmarks)+'</div>':'')+
+  (p.notes?'<div style="padding:6px;background:#f9f9fb;border-radius:4px;margin-bottom:8px;font-size:10px"><span style="color:#888;display:block;margin-bottom:2px">Notes</span><span>'+p.notes+'</span></div>':'')+
+  '<div style="padding:6px;background:#e3f2fd;border-radius:4px;font-size:10px"><span style="color:#1565c0;font-weight:500">▶ Next Action: </span><span>'+p.nextAction+'</span></div>';
+}
+function landTabGeo(p){
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;margin-bottom:8px">'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Coordinates</span><div style="font-weight:500">'+landEsc(p.coordinates||'—')+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Authority</span><div style="font-weight:500">'+landEsc(p.authority||'—')+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Zoning</span><div style="font-weight:600;color:#2F80ED">'+landEsc(p.zoning||'—')+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Flood Zone</span><div style="font-weight:500">'+landEsc(p.floodRisk||'—')+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Litigation Check</span><div style="font-weight:600;color:'+(p.litigationCheck==='Clear'?'#2e7d32':p.litigationCheck==='Disputed'?'#c62828':'#e65100')+'">'+landEsc(p.litigationCheck||'—')+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Site Accessibility</span><div style="font-weight:500">'+landEsc(p.siteAccess||'—')+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Road Access Width</span><div style="font-weight:500">'+(p.roadAccess?p.roadAccess+' ft':'—')+'</div></div>'+
+    '<div style="padding:6px;background:#f9f9fb;border-radius:4px"><span style="color:#888">Current Land Use</span><div style="font-weight:500">'+landEsc(p.landUse||'—')+'</div></div>'+
+  '</div>'+
+  '<div style="padding:10px;background:linear-gradient(135deg,#eef3ff,#f6f8ff);border:1px solid #dbe6ff;border-radius:6px;font-size:9px;color:#1565c0;text-align:center">🗺️ Satellite map preview — '+landEsc(p.coordinates||'no coordinates set')+'</div>';
+}
+function landTabFinancials(p){
+  var f=landFinancials(p);
+  function row(label,val,c){return '<div style="display:flex;justify-content:space-between;padding:4px 6px;font-size:10px;border-bottom:1px solid #f2f2f2"><span style="color:#666">'+label+'</span><span style="font-weight:600;color:'+(c||'#333')+'">'+val+'</span></div>';}
+  return '<div style="background:#f9f9fb;border-radius:6px;padding:4px 0;margin-bottom:8px">'+
+    '<div style="padding:4px 6px;font-size:8px;font-weight:700;color:#888;text-transform:uppercase">Acquisition Costs</div>'+
+    row('Land Asking Price',landFmtCr(f.cr))+
+    row('Registration (12%)',landFmtCr(f.reg))+
+    row('Commission',p.commission?landEsc(p.commission):'—')+
+    row('Mutation & Legal',landFmtCr(f.legal))+
+  '</div>'+
+  '<div style="background:#f9f9fb;border-radius:6px;padding:4px 0;margin-bottom:8px">'+
+    '<div style="padding:4px 6px;font-size:8px;font-weight:700;color:#888;text-transform:uppercase">Development Costs</div>'+
+    row('Soil Test & Survey',landFmtCr(f.survey))+
+    row('Earth Filling',landFmtCr(f.fill))+
+    row('Boundary Wall',landFmtCr(f.boundary))+
+    row('Miscellaneous (5%)',landFmtCr(f.misc))+
+  '</div>'+
+  '<div style="background:#f9f9fb;border-radius:6px;padding:4px 0;margin-bottom:8px">'+
+    row('Total Est. Cost',landFmtCr(f.total),'#c62828')+
+    row('Expected Revenue',landFmtCr(f.rev),'#2e7d32')+
+    row('Net Profit (Est.)',landFmtCr(f.net),f.net>=0?'#2e7d32':'#c62828')+
+    row('Projected ROI',f.roi.toFixed(1)+'%',f.roi>=0?'#2e7d32':'#c62828')+
+  '</div>'+
+  (p.salesVol||p.avgSaleRate?'<div style="padding:6px;background:#f9f9fb;border-radius:4px;font-size:9px;margin-bottom:8px"><span style="color:#888">📊 Sales projection: </span><span style="font-weight:600">'+landEsc(p.salesVol||'—')+'</span> <span style="color:#888">at</span> <span style="font-weight:600">'+landEsc(p.avgSaleRate||'—')+'</span></div>':'')+
+  '<button class="action-btn primary" style="width:100%;padding:6px;font-size:10px" onclick="openRefineFinancials(\''+p.id+'\')">⚙️ Refine Financial Model</button>';
+}
+function landTabDocs(p){
+  var docs=p.documents||[];
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="font-size:9px;font-weight:600;color:#555;text-transform:uppercase">Documents ('+docs.length+')</h3><button class="action-btn secondary" style="padding:2px 6px;font-size:8px" onclick="uploadLandDoc(\''+p.id+'\')">+ Upload</button></div>'+
+  (docs.length?docs.map(function(d,i){
+    var ic={Map:'🗺️','CS Khatian':'📄','RS Khatian':'📄','Deed':'📜','Mutation':'🏛️','NOC':'🪪','Survey':'📐','Other':'📎'}[d.type]||'📎';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:5px 6px;border:1px solid #ececec;border-radius:4px;margin-bottom:4px;background:#fff"><span style="font-size:14px">'+ic+'</span><div style="flex:1;min-width:0"><div style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+landEsc(d.name)+'</div><div style="font-size:8px;color:#888">'+landEsc(d.type)+' • '+landEsc(d.date)+'</div></div><span style="cursor:pointer;color:#2F80ED;font-size:10px" onclick="previewLandDoc(\''+p.id+'\','+i+')">👁</span><span style="cursor:pointer;color:#e53935;font-size:10px" onclick="removeLandDoc(\''+p.id+'\','+i+')">✕</span></div>';
+  }).join(''):'<div style="padding:10px;text-align:center;color:#bbb;font-size:9px;border:1px dashed #e0e0e0;border-radius:4px">No documents uploaded</div>');
+}
+function landTabActivity(p){
+  var acts=p.activities||[];
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="font-size:9px;font-weight:600;color:#555;text-transform:uppercase">Activity Log</h3><button class="action-btn secondary" style="padding:2px 6px;font-size:8px" onclick="logLandActivity(\''+p.id+'\')">+ Log</button></div>'+
+  (acts.length?'<div style="position:relative;padding-left:12px;border-left:2px solid #e0e0e0">'+acts.map(function(a){
+    var icons={Created:'➕','Updated':'✏️','Moved':'🔄','Owner':'👥','Document':'📎','Payment':'💰','Site Visit':'🚗','Meeting':'🤝','Note':'📝','Archived':'📦','Restored':'↩️','Project':'🏗️'};
+    var ic=icons[a.action]||'📝';
+    return '<div style="position:relative;margin-bottom:8px;padding-left:8px"><span style="position:absolute;left:-16px;top:2px;width:8px;height:8px;border-radius:50%;background:#2F80ED;border:2px solid #fff"></span><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;font-weight:700">'+ic+' '+landEsc(a.action)+'</span><span style="font-size:8px;color:#aaa">'+landEsc(a.date)+'</span></div>'+(a.note?'<div style="font-size:9px;color:#666;margin-top:1px">'+landEsc(a.note)+'</div>':'')+'<div style="font-size:8px;color:#aaa;margin-top:1px">👤 '+landEsc(a.user||'Admin')+'</div></div>';
+  }).join('')+'</div>':'<div style="padding:10px;text-align:center;color:#bbb;font-size:9px;border:1px dashed #e0e0e0;border-radius:4px">No activity yet</div>');
+}
+function openLandOwners(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;landNorm(p);
+  var list=(p.owners||[]).map(function(o,i){
+    var sc=o.status==='Agreed'?'#2e7d32':o.status==='Negotiating'?'#e65100':'#c62828';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:6px;border:1px solid #ececec;border-radius:4px;margin-bottom:4px;background:#fff"><div style="width:26px;height:26px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+landEsc((o.name||'?').trim().charAt(0).toUpperCase())+'</div><div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:600">'+landEsc(o.name)+'</div><div style="font-size:8px;color:#888">'+landEsc(o.type||'')+' • '+landEsc(o.phone||'')+' • Share: '+landEsc(o.share||'—')+'</div></div><span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:7px;font-weight:600;color:#fff;background:'+sc+'">'+landEsc(o.status)+'</span><span style="cursor:pointer;color:#2F80ED;font-size:10px" onclick="editLandOwner(\''+p.id+'\','+i+')">✎</span><span style="cursor:pointer;color:#e53935;font-size:10px" onclick="removeLandOwner(\''+p.id+'\','+i+')">✕</span></div>';
+  }).join('')||'<div style="padding:10px;text-align:center;color:#bbb;font-size:9px;border:1px dashed #e0e0e0;border-radius:4px">No owners yet</div>';
+  openModal('👥 Owners — '+p.id+' '+p.name,
+    '<div style="max-height:50vh;overflow-y:auto;margin-bottom:8px">'+list+'</div>'+
+    '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:6px;padding:2px 6px;background:#eef3ff;border-radius:4px">➕ Add Owner</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+      inputField('Name *','lo_name','','e.g. Jashim Uddin',true)+
+      inputField('Phone','lo_phone','','017xx-xxxxxx')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+      selectField('Type','lo_type','Owner',['Owner','Co-owner','Power of Attorney','Broker / Media'])+
+      inputField('Share / %','lo_share','','e.g. 50%')+
+    '</div>'+
+    '<div class="form-group"><label class="form-label">Status</label><select class="form-input" id="lo_status"><option>Agreed</option><option>Negotiating</option><option>Holdout</option><option>Undecided</option></select></div>',
+    function(){
+      var nm=g('lo_name').trim();if(!nm){showToast('Owner name required','error');return;}
+      landNorm(p);
+      p.owners.push({name:nm,phone:g('lo_phone').trim(),type:g('lo_type'),share:g('lo_share').trim()||'—',status:g('lo_status')});
+      DB.save('land_proposals');
+      landAct(p,'Owner','Added owner '+nm);
+      showToast('Owner added','success');
+      closeDrawer();renderModule();openLandOwners(id);
+    }
   );
+}
+function editLandOwner(id,idx){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;landNorm(p);
+  var o=p.owners[idx];if(!o)return;
+  var opts=['Owner','Co-owner','Power of Attorney','Broker / Media'];
+  var types=opts.map(function(t){return '<option value="'+t+'"'+(o.type===t?' selected':'')+'>'+t+'</option>';}).join('');
+  var sts=['Agreed','Negotiating','Holdout','Undecided'];
+  var stOpts=sts.map(function(t){return '<option value="'+t+'"'+(o.status===t?' selected':'')+'>'+t+'</option>';}).join('');
+  openModal('✎ Edit Owner — '+landEsc(o.name),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+      inputField('Name *','lo_name',o.name,'',true)+
+      inputField('Phone','lo_phone',o.phone||'','')+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+      '<div class="form-group"><label class="form-label">Type</label><select class="form-input" id="lo_type">'+types+'</select></div>'+
+      inputField('Share / %','lo_share',o.share||'','')+
+    '</div>'+
+    '<div class="form-group"><label class="form-label">Status</label><select class="form-input" id="lo_status">'+stOpts+'</select></div>',
+    function(){
+      var nm=g('lo_name').trim();if(!nm){showToast('Owner name required','error');return;}
+      o.name=nm;o.phone=g('lo_phone').trim();o.type=g('lo_type');o.share=g('lo_share').trim()||'—';o.status=g('lo_status');
+      DB.save('land_proposals');
+      landAct(p,'Owner','Updated owner '+nm);
+      showToast('Owner updated','info');
+      closeDrawer();renderModule();openLandOwners(id);
+    }
+  );
+}
+function removeLandOwner(id,idx){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;landNorm(p);
+  var o=p.owners[idx];if(!o)return;
+  if(!confirm('Remove owner '+o.name+'?'))return;
+  p.owners.splice(idx,1);
+  DB.save('land_proposals');
+  landAct(p,'Owner','Removed owner '+o.name);
+  showToast('Owner removed','info');
+  renderModule();openLandOwners(id);
+}
+function uploadLandDoc(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;landNorm(p);
+  openModal('📎 Upload Document — '+p.id,
+    inputField('Document Name *','ld_name','','e.g. RS Parcha - Dag 145',true)+
+    selectField('Type','ld_type','CS Khatian',['CS Khatian','RS Khatian','Map','Deed','Mutation','NOC','Survey','Other'])+
+    inputField('Date','ld_date',new Date().toISOString().slice(0,10),''),
+    function(){
+      var nm=g('ld_name').trim();if(!nm){showToast('Document name required','error');return;}
+      landNorm(p);
+      p.documents.push({name:nm,type:g('ld_type'),date:g('ld_date')||new Date().toISOString().slice(0,10)});
+      DB.save('land_proposals');
+      landAct(p,'Document','Uploaded '+nm);
+      showToast('Document uploaded','success');
+      closeDrawer();renderModule();
+    }
+  );
+}
+function previewLandDoc(id,idx){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
+  var d=(p.documents||[])[idx];if(!d)return;
+  openModal('👁 '+landEsc(d.name),
+    '<div style="padding:20px;text-align:center;background:#f9f9fb;border:1px solid #ececec;border-radius:6px"><div style="font-size:34px;margin-bottom:8px">📄</div><div style="font-size:11px;font-weight:600">'+landEsc(d.name)+'</div><div style="font-size:9px;color:#888;margin-top:2px">'+landEsc(d.type)+' • '+landEsc(d.date)+' • '+landEsc(p.name)+'</div></div>',
+    '<button class="drawer-btn primary" onclick="closeDrawer()">OK</button>'
+  );
+}
+function removeLandDoc(id,idx){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
+  var d=(p.documents||[])[idx];if(!d)return;
+  if(!confirm('Delete document '+d.name+'?'))return;
+  p.documents.splice(idx,1);
+  DB.save('land_proposals');
+  landAct(p,'Document','Deleted '+d.name);
+  showToast('Document deleted','info');
+  renderModule();
+}
+function logLandActivity(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;landNorm(p);
+  openModal('🕒 Log Activity — '+p.id,
+    selectField('Action','la_action','Note',['Site Visit','Meeting','Payment','Note','Document','Other'])+
+    '<div class="form-group"><label class="form-label">Details</label><textarea id="la_note" rows="3" class="form-input" placeholder="What happened..."></textarea></div>',
+    function(){
+      var act=g('la_action');var note=g('la_note').trim();
+      if(!note){showToast('Details required','error');return;}
+      landAct(p,act,note);
+      showToast('Activity logged','success');
+      closeDrawer();renderModule();
+    }
+  );
+}
+function openRefineFinancials(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;landNorm(p);
+  var cr=(p.price||0)/10000000;
+  openModal('⚙️ Refine Financials — '+p.id,
+    '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin-bottom:6px;padding:2px 6px;background:#eef3ff;border-radius:4px">💰 Acquisition</div>'+
+    '<div class="form-group"><label class="form-label">Land Price (Cr)</label><input class="form-input" id="rf_price" type="number" step="0.1" value="'+cr+'" oninput="landFinancePreview()"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+      inputField('Commission','rf_commission',p.commission||'','e.g. 2% or 0.5 Cr')+
+      '<div class="form-group"><label class="form-label">Mutation & Legal (Cr)</label><input class="form-input" id="rf_legal" type="number" step="0.01" value="'+(p.legalCostCr||0.1)+'" oninput="landFinancePreview()"></div>'+
+    '</div>'+
+    '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">🏗️ Development</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">'+
+      '<div class="form-group"><label class="form-label">Soil Test (Cr)</label><input class="form-input" id="rf_survey" type="number" step="0.01" value="'+(p.surveyCostCr||0.05)+'" oninput="landFinancePreview()"></div>'+
+      '<div class="form-group"><label class="form-label">Earth Fill (Cr)</label><input class="form-input" id="rf_fill" type="number" step="0.01" value="'+(p.earthFillingCostCr||2.5)+'" oninput="landFinancePreview()"></div>'+
+      '<div class="form-group"><label class="form-label">Boundary (Cr)</label><input class="form-input" id="rf_boundary" type="number" step="0.01" value="'+(p.boundaryCostCr||0.8)+'" oninput="landFinancePreview()"></div>'+
+    '</div>'+
+    '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">📊 Revenue Projections</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+      inputField('Expected Sales Volume','rf_vol',p.salesVol||'','e.g. 150 Katha')+
+      inputField('Avg Sale Rate','rf_rate',p.avgSaleRate||'','e.g. ৳30L/Katha')+
+    '</div>'+
+    '<div class="form-group"><label class="form-label">Expected Revenue (Cr)</label><input class="form-input" id="rf_rev" type="number" step="0.1" value="'+(p.expectedRevenueCr||Math.round(cr*2.2*10)/10)+'" oninput="landFinancePreview()"></div>'+
+    '<div id="landFinPreview" style="padding:8px;background:#f9f9fb;border:1px solid #ececec;border-radius:6px;font-size:10px;line-height:1.7;margin-top:8px"></div>',
+    function(){
+      var cr2=parseFloat(g('rf_price'))||0;
+      p.price=cr2*10000000;p.priceF='৳'+cr2.toFixed(1)+' Cr';
+      p.commission=g('rf_commission').trim();
+      p.legalCostCr=parseFloat(g('rf_legal'))||0;
+      p.surveyCostCr=parseFloat(g('rf_survey'))||0;
+      p.earthFillingCostCr=parseFloat(g('rf_fill'))||0;
+      p.boundaryCostCr=parseFloat(g('rf_boundary'))||0;
+      p.salesVol=g('rf_vol').trim();p.avgSaleRate=g('rf_rate').trim();
+      p.expectedRevenueCr=parseFloat(g('rf_rev'))||0;
+      var f=landFinancials(p);
+      p.roi=f.roi.toFixed(0)+'%';
+      p.budget='৳'+(f.total*0.85).toFixed(1)+' Cr';
+      DB.save('land_proposals');
+      landAct(p,'Updated','Refined financial model — ROI '+p.roi);
+      logActivity('Updated','Land Acquisition','Proposal',p.id,'Financials refined, ROI '+p.roi);
+      showToast('Financials saved — ROI '+p.roi,'success');
+      closeDrawer();Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();
+    }
+  );
+  setTimeout(function(){landFinancePreview();},100);
+}
+function landFinancePreview(){
+  var cr=parseFloat((document.getElementById('rf_price')||{}).value)||0;
+  var legal=parseFloat((document.getElementById('rf_legal')||{}).value)||0;
+  var survey=parseFloat((document.getElementById('rf_survey')||{}).value)||0;
+  var fill=parseFloat((document.getElementById('rf_fill')||{}).value)||0;
+  var boundary=parseFloat((document.getElementById('rf_boundary')||{}).value)||0;
+  var rev=parseFloat((document.getElementById('rf_rev')||{}).value)||0;
+  var commStr=(document.getElementById('rf_commission')||{}).value||'';
+  var comm=0;
+  if(commStr){var cm=parseFloat(commStr.replace(/[^0-9.]/g,''));if(commStr.indexOf('%')>=0)comm=cr*cm/100;else comm=cm;}
+  var reg=cr*0.12,misc=cr*0.05;
+  var total=cr+reg+comm+legal+survey+fill+boundary+misc;
+  var net=rev-total;
+  var roi=total>0?net/total*100:0;
+  var el=document.getElementById('landFinPreview');
+  if(!el)return;
+  el.innerHTML='<div style="display:flex;justify-content:space-between"><span style="color:#888">Total Cost</span><span style="font-weight:700;color:#c62828">'+landFmtCr(total)+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:#888">Net Profit</span><span style="font-weight:700;color:'+(net>=0?'#2e7d32':'#c62828')+'">'+landFmtCr(net)+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:#888">Projected ROI</span><span style="font-weight:700;color:'+(roi>=0?'#2e7d32':'#c62828')+'">'+roi.toFixed(1)+'%</span></div>';
+}
+function landArchive(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
+  if(!confirm('Archive '+p.name+'?'))return;
+  p.archived=true;
+  DB.save('land_proposals');
+  landAct(p,'Archived','Proposal archived');
+  logActivity('Updated','Land Acquisition','Proposal',p.id,'Archived');
+  showToast('Proposal archived','info');
+  renderModule();
+}
+function landRestore(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
+  p.archived=false;
+  DB.save('land_proposals');
+  landAct(p,'Restored','Proposal restored to pipeline');
+  logActivity('Updated','Land Acquisition','Proposal',p.id,'Restored');
+  showToast('Proposal restored','success');
+  renderModule();
+}
+function moveLandToProject(id){
+  var p=mockLandProposals.find(function(x){return x.id===id});if(!p)return;
+  landNorm(p);
+  var cr=(p.price||0)/10000000;
+  if(p.targetProject){
+    var proj=mockProjects.find(function(x){return x.id===p.targetProject});
+    if(proj){
+      var oldB=parseFloat(String(proj.budget||'0').replace(/[^0-9.]/g,''))||0;
+      proj.budget='৳'+(oldB+cr).toFixed(1)+' Cr';
+      var addPlots=Math.max(1,Math.round(parseFloat(p.area)||0)*3);
+      if(proj.type==='land'){
+        proj.plots=(proj.plots||0)+addPlots;
+        proj.stats=proj.stats||{sold:0,reserved:0,available:0};
+        proj.stats.available=(proj.stats.available||0)+addPlots;
+      }
+      DB.save('projects');
+      landAct(p,'Project','Merged into '+proj.name);
+      logActivity('Updated','Land Acquisition','Proposal',p.id,'Merged into project '+proj.name);
+      showToast('Merged into '+proj.name,'success');
+    }
+  }else{
+    var newId='P-'+String(nextId(mockProjects)).padStart(3,'0');
+    var addPlots2=Math.max(1,Math.round(parseFloat(p.area)||0)*3);
+    mockProjects.unshift({
+      id:newId,name:p.name,type:'land',location:p.location,status:'Planning',progress:5,
+      budget:p.priceF,manager:p.contact||'Unassigned',plots:addPlots2,
+      stats:{sold:0,reserved:0,available:addPlots2},desc:'Created from land proposal '+p.id+' ('+p.area+')'
+    });
+    DB.save('projects');
+    p.targetProject=newId;
+    landAct(p,'Project','Created project '+newId+' from proposal');
+    logActivity('Created','Projects','Project',newId,p.name+' (from land '+p.id+')');
+    showToast('Project '+newId+' created','success');
+  }
+  DB.save('land_proposals');
+  renderModule();
+  switchModule('projects');
 }
 
 function crudProposal(item){
@@ -4801,6 +5207,15 @@ function crudProposal(item){
         inputField('Area *','f_area',p.area,'e.g. 10 Bigha',true)+
         inputField('Value (৳) *','f_price',p.price,'',true)+
       '</div>'+
+      '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">🏷️ Property Records</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Mouza','f_mouza',p.mouza||'','')+
+        inputField('Dag No.','f_dag',p.dag||'','')+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('CS Khatian','f_cs',p.cs||'','')+
+        inputField('RS Khatian','f_rs',p.rs||'','')+
+      '</div>'+
       '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">⚖️ Deal Terms</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
         '<div class="form-group"><label class="form-label">Stage</label><select class="form-input" id="f_stage">'+stageNames.map(function(s){return '<option value="'+s+'"'+(p.stage===s?' selected':'')+'>'+stageLabels[s].split(' ').slice(1).join(' ')+'</option>';}).join('')+'</select></div>'+
@@ -4815,9 +5230,27 @@ function crudProposal(item){
         selectField('Acquisition Type','f_acqType',p.acquisitionType||'Freehold',['Freehold','Leasehold','Government Allotment','Joint Venture'])+
       '</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Commission','f_commission',p.commission||'','e.g. 2% or 0.5 Cr')+
+        '<div class="form-group"><label class="form-label">Target Project</label><select class="form-input" id="f_targetProject"><option value="">— Independent / None —</option>'+mockProjects.map(function(pr){return '<option value="'+pr.id+'"'+(p.targetProject===pr.id?' selected':'')+'>'+pr.name+'</option>';}).join('')+'</select></div>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
         inputField('Payment Terms','f_payTerms',p.paymentTerms||'','e.g. 10% advance, 6 installments')+
         inputField('Target Date','f_targetDate',p.targetDate||'','')+
       '</div>'+
+      '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">🏗️ Site & Geo</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Road Access (ft)','f_road',p.roadAccess||'','')+
+        selectField('Land Use','f_landUse',p.landUse||'Agricultural',['Agricultural','Vacant/Fallow','Residential','Commercial','Waterbody'])+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        selectField('Soil Condition','f_soil',p.soilCondition||'Good Bearing',['Good Bearing','Sandy/Loose','Marshy/Waterlogged','Clay'])+
+        selectField('Flood Risk','f_flood',p.floodRisk||'Low',['Low','Medium','High'])+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+        inputField('Coordinates','f_coords',p.coordinates||'','e.g. 23.8324, 90.4932')+
+        selectField('Litigation Check','f_litigation',p.litigationCheck||'Pending',['Pending','Clear','Disputed'])+
+      '</div>'+
+      inputField('Nearby Landmarks','f_landmarks',p.landmarks||'','e.g. 2km from 300ft highway')+
       '<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:6px 0;padding:2px 6px;background:#eef3ff;border-radius:4px">👥 Ownership</div>'+
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
         inputField('Owner / Seller','f_owner',p.owner,'')+
@@ -4844,6 +5277,11 @@ function crudProposal(item){
         risk:g('f_risk'),priority:g('f_priority'),zoning:g('f_zoning'),
         sellerType:g('f_sellerType'),acquisitionType:g('f_acqType'),
         paymentTerms:g('f_payTerms')||'—',targetDate:g('f_targetDate')||'—',
+        mouza:g('f_mouza').trim(),dag:g('f_dag').trim(),cs:g('f_cs').trim(),rs:g('f_rs').trim(),
+        commission:g('f_commission').trim(),targetProject:g('f_targetProject'),
+        roadAccess:g('f_road').trim(),landUse:g('f_landUse'),soilCondition:g('f_soil'),
+        floodRisk:g('f_flood'),coordinates:g('f_coords').trim(),
+        litigationCheck:g('f_litigation'),landmarks:g('f_landmarks').trim(),
         owner:g('f_owner').trim()||'TBD',contact:g('f_contact').trim()||'TBD',
         notes:g('f_notes').trim(),nextAction:g('f_next').trim()||'Initial assessment',
         date:g('f_date')||new Date().toISOString().slice(0,10),
@@ -4852,13 +5290,17 @@ function crudProposal(item){
       };
       if(n){
         d.id='LP-'+String(nextId(mockLandProposals)).padStart(3,'0');
+        d.owners=[];d.documents=[];d.activities=[];
         mockLandProposals.push(d);
         DB.save('land_proposals');
+        landAct(d,'Created','Proposal created: '+name);
         logActivity('Created','Land Acquisition','Proposal',d.id,name);
         showToast('Proposal created','success');
       }else{
         Object.keys(d).forEach(function(k){item[k]=d[k];});
+        if(!item.owners)item.owners=[];if(!item.documents)item.documents=[];if(!item.activities)item.activities=[];
         DB.save('land_proposals');
+        landAct(item,'Updated','Proposal details updated');
         logActivity('Updated','Land Acquisition','Proposal',item.id,name);
         showToast('Proposal updated','success');
       }
@@ -9426,7 +9868,8 @@ var IMPORT_FIELDS={
   leads:[{name:'name',label:'Name *',required:true},{name:'phone',label:'Phone *',required:true},{name:'email',label:'Email'},{name:'property',label:'Property'},{name:'value',label:'Value'},{name:'source',label:'Source',default:'Website'},{name:'status',label:'Stage',default:'New Inquiry'},{name:'priority',label:'Priority',default:'Medium'},{name:'type',label:'Type',default:'Local'},{name:'owner',label:'Owner',default:'Unassigned'},{name:'facingDir',label:'Facing Dir'},{name:'floorPref',label:'Floor Pref'},{name:'flatType',label:'Flat Type'},{name:'sizeSqFt',label:'Size (sqft)'},{name:'paymentPlan',label:'Payment Plan'}],
   inventory:[{name:'item',label:'Item Name *',required:true},{name:'category',label:'Category',default:'Construction Material'},{name:'site',label:'Site',default:'Muktodhara'},{name:'qty',label:'Quantity',type:'number',default:0},{name:'unit',label:'Unit',default:'Pcs'},{name:'price',label:'Unit Price',type:'number',default:0},{name:'status',label:'Status',default:'Adequate'},{name:'reorder',label:'Reorder Level',type:'number',default:0},{name:'supplier',label:'Supplier'}],
   employees:[{name:'name',label:'Name *',required:true},{name:'designation',label:'Designation'},{name:'dept',label:'Department',default:'Construction'},{name:'phone',label:'Phone'}],
-  projects:[{name:'name',label:'Name *',required:true},{name:'location',label:'Location'},{name:'status',label:'Status',default:'Planning'},{name:'progress',label:'Progress %',type:'number',default:0},{name:'budget',label:'Budget'},{name:'manager',label:'Manager'},{name:'type',label:'Type',default:'land'},{name:'plots',label:'Plots',type:'number',default:0}]
+  projects:[{name:'name',label:'Name *',required:true},{name:'location',label:'Location'},{name:'status',label:'Status',default:'Planning'},{name:'progress',label:'Progress %',type:'number',default:0},{name:'budget',label:'Budget'},{name:'manager',label:'Manager'},{name:'type',label:'Type',default:'land'},{name:'plots',label:'Plots',type:'number',default:0}],
+  land:[{name:'name',label:'Property Name *',required:true},{name:'location',label:'Location'},{name:'area',label:'Area',default:'—'},{name:'price',label:'Price (Cr)',type:'number',default:0},{name:'stage',label:'Stage',default:'identification'},{name:'status',label:'Status',default:'New'},{name:'risk',label:'Risk',default:'Low'},{name:'priority',label:'Priority',default:'Medium'},{name:'owner',label:'Owner',default:'TBD'},{name:'contact',label:'Contact',default:'TBD'},{name:'roi',label:'ROI %',type:'number',default:0},{name:'progress',label:'Progress %',type:'number',default:0},{name:'zoning',label:'Zoning',default:'Residential'},{name:'date',label:'Date'}]
 };
 function importData(arr,name,key,fields){
   var inp=document.createElement('input');inp.type='file';inp.accept='.csv,.tsv';
@@ -9489,7 +9932,28 @@ function showImportMap(hdrs,rows,arr,name,key,fields){
         else if(fd.default!==undefined)obj[fd.name]=fd.default;
         else if(fd.required)ok=false;
       }
-      if(ok){obj.id=nextId(arr);arr.push(obj);imp++}else skp++;
+      if(ok){obj.id=nextId(arr);arr.push(obj);imp++;
+        // Land proposals need full normalization: LP-XXX id, Taka-scale price, priceF/budget/arrays
+        if(key==='land_proposals'&&arr.length){
+          var lo=arr[arr.length-1];
+          lo.id='LP-'+String(parseInt(String(lo.id).replace(/[^0-9]/g,''))||nextId(arr)).padStart(3,'0');
+          var pr=parseFloat(lo.price)||0;
+          lo.price=pr*10000000;
+          lo.priceF='৳'+(pr).toFixed(1)+' Cr';
+          lo.budget='৳'+(pr*0.85).toFixed(1)+' Cr';
+          lo.owners=[];lo.documents=[];lo.activities=[];lo.archived=false;
+          lo.roi=lo.roi?String(lo.roi).replace('%','')+'%':'0%';
+          if(!lo.status)lo.status='New';
+          if(!lo.progress)lo.progress=0;
+          if(!lo.stage||['identification','due_diligence','negotiation','agreement','registration','possession'].indexOf(lo.stage)<0)lo.stage='identification';
+          if(!lo.risk)lo.risk='Low';
+          if(!lo.priority)lo.priority='Medium';
+          if(!lo.date)lo.date=new Date().toISOString().slice(0,10);
+          if(!lo.owner)lo.owner='TBD';
+          if(!lo.contact)lo.contact='TBD';
+          if(!lo.nextAction)lo.nextAction='Initial assessment';
+        }
+      }else skp++;
     }
     if(key)DB.save(key);closeDrawer();renderModule();
     showToast('Imported '+imp+' '+name+(skp>0?' ('+skp+' skipped)':''),'success');
