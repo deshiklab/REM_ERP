@@ -947,13 +947,16 @@
       <!-- G5: Construction -->
       <div class="sidebar-item has-children" data-tip="Construction" onclick="switchGroup('construction')" id="s_construction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
       <div class="s-grp-sep"></div>
-      <!-- G6: Finance & Admin -->
-      <div class="sidebar-item has-children" data-tip="Finance & Admin" onclick="switchGroup('finance_admin')" id="s_finance_admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="M12 6v12"/></svg></div>
+      <!-- G6: Finance -->
+      <div class="sidebar-item has-children" data-tip="Finance" onclick="switchGroup('finance_admin')" id="s_finance_admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="M12 6v12"/></svg></div>
       <div class="s-grp-sep"></div>
-      <!-- G7: Collaboration -->
+      <!-- G7: HR & Admin -->
+      <div class="sidebar-item has-children" data-tip="HR & Admin" onclick="switchGroup('hr_admin')" id="s_hr_admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="s-grp-sep"></div>
+      <!-- G8: Collaboration -->
       <div class="sidebar-item has-children" data-tip="Collaboration" onclick="switchGroup('collaboration')" id="s_collaboration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
       <div class="s-grp-sep"></div>
-      <!-- G8: System -->
+      <!-- G9: System -->
       <div class="sidebar-item" data-tip="System" onclick="switchGroup('system')" id="s_system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg></div>
     </div>
     <div class="sidebar-bottom">
@@ -1050,11 +1053,12 @@ const GROUPS = {
   land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
   construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
-  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_reminders',label:'Payment Reminders',badge:true},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
+  finance_admin: { label:'Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_reminders',label:'Payment Reminders',badge:true},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'stock',label:'Stock & Procurement'}] },
+  hr_admin:      { label:'HR & Admin',icon:'👥',mods:[{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'bi_reports',label:'BI Reports',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
   system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] }
 };
-const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','collaboration','system'];
+const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','hr_admin','collaboration','system'];
 
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
@@ -8650,18 +8654,19 @@ var _sdDatasetDefs=[
   {g:'Construction',arr:'mockPayroll',label:'Payroll',icon:'💵',mod:'labor',fields:['name']},
   {g:'Construction',arr:'mockInspections',label:'Inspections',icon:'🔍',mod:'qc',fields:['area','inspector','status']},
   {g:'Construction',arr:'mockDesigns',label:'Designs',icon:'🎨',mod:'designs',fields:['name','designer','status']},
-  // Group: Finance & Admin
-  {g:'Finance & Admin',arr:'mockInventory',label:'Inventory',icon:'📦',mod:'stock',fields:['name','category','qty']},
-  {g:'Finance & Admin',arr:'mockSuppliers',label:'Suppliers',icon:'🏭',mod:'stock',fields:['name','material']},
-  {g:'Finance & Admin',arr:'mockPurchaseOrders',label:'Purchase Orders',icon:'📄',mod:'stock',fields:['id','supplier','status']},
-  {g:'Finance & Admin',arr:'mockTransactions',label:'Transactions',icon:'💳',mod:'finance',fields:['description','category','amount']},
-  {g:'Finance & Admin',arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','department','designation']},
-  {g:'Finance & Admin',arr:'mockDocuments',label:'Documents Vault',icon:'📁',mod:'documents',fields:['title','property','type']},
-  {g:'Finance & Admin',arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
+  // Group: Finance
+  {g:'Finance',arr:'mockInventory',label:'Inventory',icon:'📦',mod:'stock',fields:['name','category','qty']},
+  {g:'Finance',arr:'mockSuppliers',label:'Suppliers',icon:'🏭',mod:'stock',fields:['name','material']},
+  {g:'Finance',arr:'mockPurchaseOrders',label:'Purchase Orders',icon:'📄',mod:'stock',fields:['id','supplier','status']},
+  {g:'Finance',arr:'mockTransactions',label:'Transactions',icon:'💳',mod:'finance',fields:['description','category','amount']},
+  // Group: HR & Admin
+  {g:'HR & Admin',arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','department','designation']},
+  {g:'HR & Admin',arr:'mockDocuments',label:'Documents Vault',icon:'📁',mod:'documents',fields:['title','property','type']},
+  {g:'HR & Admin',arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
   // Group: Collaboration
   {g:'Collaboration',arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']}
 ];
-var _sdGroupOrder=['Executive','Sales & CRM','Land & Projects','Bookings & Customer','Construction','Finance & Admin','Collaboration'];
+var _sdGroupOrder=['Executive','Sales & CRM','Land & Projects','Bookings & Customer','Construction','Finance','HR & Admin','Collaboration'];
 function sdOpenResult(el){
   navigateSearch(el.getAttribute('data-mod'),el.getAttribute('data-title')||'');
 }
@@ -10000,7 +10005,7 @@ function filterLeads(){
     return true;
   });
 }
-const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'finance_admin',documents:'finance_admin',knowledge_base:'finance_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
+const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',dues_recovery:'sales_crm',contacts:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'land_projects',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',contractors:'construction',boq:'construction',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'construction',designs:'construction',finance:'finance_admin',stock:'finance_admin',hr:'hr_admin',documents:'hr_admin',knowledge_base:'hr_admin',tasks:'collaboration',workspace:'collaboration',bi_reports:'collaboration',notifications_page:'collaboration',settings:'system'};
 
 // ═══ CRUD ═══
 function openModal(title,body,onSave){
@@ -13136,7 +13141,7 @@ html.dark .inv-preview{background:rgba(15,23,42,.5);border-color:#334155}
 var LANG='en';
 var _BN_DICT={
 'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Property & Unit Inventory':'সম্পত্তি ও ইউনিট ইনভেন্টরি','Plots & Layout':'প্লট ও লেআউট','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
-'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Land & Projects':'জমি ও প্রকল্প','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Collaboration':'সহযোগিতা','System':'সিস্টেম',
+'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Land & Projects':'জমি ও প্রকল্প','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Finance':'ফাইন্যান্স','HR & Admin':'মানবসম্পদ ও প্রশাসন','Collaboration':'সহযোগিতা','System':'সিস্টেম',
 'Super Admin':'সুপার অ্যাডমিন','Sales Agent':'সেলস এজেন্ট','Site Engineer':'সাইট ইঞ্জিনিয়ার','Finance':'ফাইন্যান্স','Executive Group':'নির্বাহী গ্রুপ',
 'New Inquiry':'নতুন অনুসন্ধান','Contacted':'যোগাযোগ হয়েছে','Site Visit':'সাইট পরিদর্শন','Negotiation':'আলোচনা','Booking':'বুকিং','Downpayment':'ডাউন পেমেন্ট','Installments':'কিস্তি','Possession':'দখল','Handover':'হস্তান্তর','Lost':'হারানো','Junk':'অপ্রাসঙ্গিক',
 'Confirmed':'নিশ্চিত','Pending Review':'বিবেচনাধীন','Overdue':'অতীত','Paid':'পরিশোধিত','Sent':'প্রেরিত','Draft':'খসড়া','Active':'সক্রিয়','Inactive':'নিষ্ক্রিয়','Open':'খোলা','In Progress':'চলমান','Resolved':'সমাধান','Escalated':'উচ্চতর স্তরে','Critical':'জরুরি','High':'উচ্চ','Medium':'মাঝারি','Low':'নিম্ন','Hot':'গরম','Warm':'উষ্ণ','Cold':'ঠান্ডা','New':'নতুন','Available':'উপলব্ধ','Sold':'বিক্রিত','Reserved':'সংরক্ষিত','Cleared':'ক্লিয়ার্ড','Pending':'অপেক্ষমাণ','Published':'প্রকাশিত','Unassigned':'বণ্টিত হয়নি','Assigned':'বণ্টিত','Booked':'বুকড','Completed':'সম্পন্ন','Cancelled':'বাতিল','Rejected':'প্রত্যাখ্যাত','Approved':'অনুমোদিত','Waiting':'অপেক্ষমাণ','Delivered':'বিতরণ করা হয়েছে',
