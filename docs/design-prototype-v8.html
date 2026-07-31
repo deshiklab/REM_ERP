@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, hr_attendance:1, hr_timesheets:1, leave:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -1720,10 +1720,10 @@ window.mockHRAttendance = DB.init('hr_attendance', (function(){
 })());
 
 window.mockLeave = DB.init('leave', [
-  {id:'LV-001',employeeId:12,type:'Annual',from:'2026-07-28',to:'2026-07-30',days:3,status:'Approved',reason:'Family trip to Cox\'s Bazar'},
+  {id:'LV-001',employeeId:12,type:'Annual',from:'2026-07-28',to:'2026-07-30',days:3,status:'Approved',reason:'Family trip to Cox\'s Bazar',approver:'Sultana Razia',decidedAt:'2026-07-21'},
   {id:'LV-002',employeeId:6,type:'Sick',from:'2026-07-27',to:'2026-07-28',days:2,status:'Pending',reason:'Viral fever — medical certificate attached'},
   {id:'LV-003',employeeId:2,type:'Casual',from:'2026-08-02',to:'2026-08-02',days:1,status:'Pending',reason:'Personal work at bank'},
-  {id:'LV-004',employeeId:9,type:'Festival',from:'2026-07-30',to:'2026-08-01',days:3,status:'Approved',reason:'Eid-ul-Adha travel to hometown'},
+  {id:'LV-004',employeeId:9,type:'Festival',from:'2026-07-30',to:'2026-08-01',days:3,status:'Approved',reason:'Eid-ul-Adha travel to hometown',approver:'Sultana Razia',decidedAt:'2026-07-26'},
   {id:'LV-005',employeeId:5,type:'Annual',from:'2026-08-10',to:'2026-08-14',days:5,status:'Pending',reason:'Annual vacation — advance notice given'},
   {id:'LV-006',employeeId:10,type:'Sick',from:'2026-07-25',to:'2026-07-26',days:2,status:'Rejected',reason:'No medical certificate — resubmit'},
   {id:'LV-007',employeeId:3,type:'Casual',from:'2026-08-05',to:'2026-08-06',days:2,status:'Pending',reason:'Sister\'s wedding'},
@@ -1737,6 +1737,23 @@ window.mockHRPayroll = DB.init('hr_payroll', (function(){
     var allow=Math.round(basic*0.3)+7000;
     var ded=Math.round(basic*0.15);
     rows.push({id:'PR-202607-'+e.id,employeeId:e.id,month:'2026-07',basic:basic,allowance:allow,deduction:ded,bonus:0,net:Math.max(0,basic+allow-ded),status:e.id%3===0?'Paid':'Generated'});
+  });
+  return rows;
+})());
+
+window.mockTimesheets = DB.init('hr_timesheets', (function(){
+  var rows=[];var projects=['Muktodhara Tower','Jolshiri Abasan','Skyline Heights','Green Valley','Head Office'];
+  var tasks=['Site supervision','Progress report','Client meeting','Bill verification','Drawings review','Contractor coordination','Financial analysis','Design review'];
+  var today=new Date();var mon=new Date(today);mon.setDate(mon.getDate()-((today.getDay()+6)%7));
+  mockEmployees.forEach(function(e,ei){
+    for(var d=0;d<5;d++){
+      var dt=new Date(mon);dt.setDate(dt.getDate()+d);
+      if(dt>today)break;
+      var wd=new Date(dt.toISOString().split('T')[0]+'T00:00:00').getDay();
+      if(wd===0||wd===6)continue;
+      var iso=dt.toISOString().split('T')[0];
+      rows.push({id:'TS-'+String(rows.length+1).padStart(3,'0'),employeeId:e.id,date:iso,project:projects[(e.id+d)%projects.length],task:tasks[(e.id*2+d)%tasks.length],hours:6+((e.id+ei+d)%5),status:d<3?'Approved':'Submitted'});
+    }
   });
   return rows;
 })());
@@ -8831,10 +8848,11 @@ function renderHR(el){
   el.innerHTML='<div class="fade-in">'+
     '<div class="page-title">👥 Human Resources</div><div class="page-subtitle">'+total+' employees · '+active+' active · '+onLeave+' on leave · '+openJobs+' open positions</div>'+
     '<div class="toolbar" style="margin-bottom:6px">'+
-      '<div class="tabs">'+[['dashboard','📊 Dashboard'],['employees','👥 Employees'],['attendance','📅 Attendance'],['leave','🏖 Leave'],['payroll','💰 Payroll'],['recruitment','📢 Recruitment']].map(function(t){return '<div class="tab '+(hrTab===t[0]?'active':'')+'" onclick="hrTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
+      '<div class="tabs">'+[['dashboard','📊 Dashboard'],['employees','👥 Employees'],['attendance','📅 Attendance'],['leave','🏖 Leave'],['timesheets','⏱ Timesheets'],['payroll','💰 Payroll'],['recruitment','📢 Recruitment']].map(function(t){return '<div class="tab '+(hrTab===t[0]?'active':'')+'" onclick="hrTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
       '<div class="spacer"></div>'+
       '<button class="action-btn primary" onclick="crudEmployee()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='employees'?'':'none')+'">+ Add Employee</button>'+
       '<button class="action-btn primary" onclick="crudLeave()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='leave'?'':'none')+'">+ New Request</button>'+
+      '<button class="action-btn primary" onclick="crudTimesheet()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='timesheets'?'':'none')+'>+ Add Entry</button>'+
       '<button class="action-btn primary" onclick="crudPayroll()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='payroll'?'':'none')+'">+ Add Entry</button>'+
       '<button class="action-btn primary" onclick="crudJobOpening()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='recruitment'?'':'none')+'">+ Post Job</button>'+
     '</div>'+
@@ -8842,6 +8860,7 @@ function renderHR(el){
      hrTab==='employees'?renderHREmployees():
      hrTab==='attendance'?renderHRAttendance():
      hrTab==='leave'?renderHRLeave():
+     hrTab==='timesheets'?renderHRTimesheets():
      hrTab==='payroll'?renderHRPayroll():
      hrTab==='recruitment'?renderHRRecruitment():'')+
   '</div>';
@@ -8946,20 +8965,25 @@ function renderHRAttendance(){
   var present=todayAtt.filter(function(a){return a.status==='Present'}).length;
   var late=todayAtt.filter(function(a){return a.status==='Late'}).length;
   var absent=todayAtt.filter(function(a){return a.status==='Absent'}).length;
-  var leave=todayAtt.filter(function(a){return a.status==='Leave'}).length;
-  var employees=mockEmployees.filter(function(e){return !df||e.dept===df});
+  var leave=todayAtt.filter(function(a){return a.status==='Leave';}).length;
+  var checkedIn=todayAtt.filter(function(a){return a.checkIn;}).length;
+  var hrsTotal=0;todayAtt.forEach(function(a){if(a.checkIn&&a.checkOut)hrsTotal+=attHours(a.checkIn,a.checkOut);});
+  var employees=mockEmployees.filter(function(e){return !df||e.dept===df;});
   var depts=[];mockEmployees.forEach(function(e){if(depts.indexOf(e.dept)<0)depts.push(e.dept);});
   return '<div class="stats-row" style="margin-bottom:8px">'+[
     ['Present',present,'#2e7d32'],
     ['Late',late,late>0?'#e65100':'#999'],
     ['Absent',absent,absent>0?'#c62828':'#999'],
     ['On Leave',leave,leave>0?'#1565c0':'#999'],
-    ['Rate',todayAtt.length?Math.round(present/todayAtt.length*100)+'%':'—','#7b1fa2']
+    ['Checked In',checkedIn,'#2F80ED'],
+    ['Hours Today',hrsTotal.toFixed(1),'#7b1fa2'],
+    ['Rate',todayAtt.length?Math.round(present/todayAtt.length*100)+'%':'—','#00838f']
   ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
   '<div class="toolbar" style="margin-bottom:6px">'+
     '<select id="attDept" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Depts</option>'+depts.map(function(d){return '<option'+(df===d?' selected':'')+'>'+d+'</option>';}).join('')+'</select>'+
     '<div class="spacer"></div>'+
     '<button class="action-btn secondary" onclick="attendanceMarkAll(\'Present\')" style="padding:3px 7px;font-size:9px">✓ Mark All Present</button>'+
+    '<button class="action-btn secondary" onclick="attendancePunchAll()" style="padding:3px 7px;font-size:9px" title="Check in all employees now">⏱ Punch All In</button>'+
   '</div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Employee</th><th>Dept</th><th>Today</th>'+weekDays.map(function(d){return '<th style="text-align:center">'+labels[d.wd]+'<div style="font-size:8px;color:#bbb;font-weight:400">'+d.iso.slice(5)+'</div></th>';}).join('')+'<th></th></tr></thead><tbody>'+
   employees.map(function(e){
@@ -8972,8 +8996,12 @@ function renderHRAttendance(){
       var dot=s==='Present'?'#2e7d32':s==='Late'?'#e65100':s==='Absent'?'#c62828':s==='Leave'?'#1565c0':'#e0e0e0';
       return '<td style="text-align:center"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+dot+'"></span></td>';
     }).join('');
+    var punch;
+    if(!ta||(!ta.checkIn&&!ta.checkOut))punch='<button onclick="attPunch('+e.id+')" title="Check in" style="padding:2px 6px;font-size:9px;border:1px solid #2F80ED;color:#2F80ED;background:#fff;border-radius:4px;cursor:pointer">⏱ In</button>';
+    else if(!ta.checkOut)punch='<span style="font-size:9px;color:#2e7d32;font-weight:600">In '+ta.checkIn+'</span> <button onclick="attPunch('+e.id+')" title="Check out" style="padding:2px 6px;font-size:9px;border:1px solid #2F80ED;color:#2F80ED;background:#fff;border-radius:4px;cursor:pointer">⏱ Out</button>';
+    else punch='<span style="font-size:9px;color:#555">'+ta.checkIn+'→'+ta.checkOut+' · '+attHours(ta.checkIn,ta.checkOut).toFixed(1)+'h</span> <button onclick="attPunch('+e.id+')" title="Reset" style="padding:2px 6px;font-size:9px;border:1px solid #ccc;color:#888;background:#fff;border-radius:4px;cursor:pointer">↺</button>';
     var act='<select onchange="attendanceSet('+e.id+',this.value)" style="padding:2px 4px;font-size:8px;border:1px solid #e0e0e0;border-radius:4px"><option value="Present"'+(todaySt==='Present'?' selected':'')+'>P</option><option value="Late"'+(todaySt==='Late'?' selected':'')+'>L</option><option value="Absent"'+(todaySt==='Absent'?' selected':'')+'>A</option><option value="Leave"'+(todaySt==='Leave'?' selected':'')+'>LV</option></select>';
-    return '<tr><td style="font-weight:500">'+e.name+'</td><td style="font-size:9px">'+e.dept+'</td><td><span class="badge-status" style="background:'+bg+'">'+todaySt+'</span></td>'+cells+'<td>'+act+'</td></tr>';
+    return '<tr><td style="font-weight:500">'+e.name+'</td><td style="font-size:9px">'+e.dept+'</td><td><span class="badge-status" style="background:'+bg+'">'+todaySt+'</span>'+(ta&&ta.checkIn?'<div style="font-size:8px;color:#888;margin-top:2px">In '+ta.checkIn+' · Out '+(ta.checkOut||'—')+'</div>':'')+'</td>'+cells+'<td style="white-space:nowrap">'+punch+' '+act+'</td></tr>';
   }).join('')+
   '</tbody></table></div></div></div>';
 }
@@ -9073,12 +9101,77 @@ function renderHRRecruitment(){
   }).join('')+
   '</tbody></table></div></div></div>';
 }
+function renderHRTimesheets(){
+  var q=(document.getElementById('tsSearch')||{}).value||'';
+  var pf=(document.getElementById('tsProject')||{}).value||'';
+  var sf=(document.getElementById('tsStatus')||{}).value||'';
+  var filtered=mockTimesheets.filter(function(t){
+    if(pf&&t.project!==pf)return false;
+    if(sf&&t.status!==sf)return false;
+    if(q&&!hrEmpName(t.employeeId).toLowerCase().includes(q.toLowerCase())&&!t.task.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.date>b.date?-1:a.date<b.date?1:0;});
+  var pT=_pg('ts',filtered);
+  var projects=[];mockTimesheets.forEach(function(t){if(projects.indexOf(t.project)<0)projects.push(t.project);});
+  var wkHrs=0,moHrs=0;var today=new Date();var mon=new Date(today);mon.setDate(mon.getDate()-((today.getDay()+6)%7));var monIso=mon.toISOString().split('T')[0];var todayIso=today.toISOString().split('T')[0];var moIso=todayIso.slice(0,7);
+  mockTimesheets.forEach(function(t){if(t.date>=monIso&&t.date<=todayIso)wkHrs+=(t.hours||0);if(t.date.slice(0,7)===moIso)moHrs+=(t.hours||0);});
+  var submitted=mockTimesheets.filter(function(t){return t.status==='Submitted';}).length;
+  var approved=mockTimesheets.filter(function(t){return t.status==='Approved';}).length;
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['This Week',wkHrs.toFixed(1)+'h','#2F80ED'],
+    ['This Month',moHrs.toFixed(1)+'h','#7b1fa2'],
+    ['Submitted',submitted,'#ff8f00'],
+    ['Approved',approved,'#2e7d32'],
+    ['Entries',mockTimesheets.length,'#1565c0']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="tsSearch" placeholder="Search employee/task..." oninput="_PG.ts={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="tsProject" onchange="_PG.ts={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Projects</option>'+projects.map(function(p){return '<option'+(pf===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'+
+    '<select id="tsStatus" onchange="_PG.ts={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Submitted</option><option>Approved</option><option>Rejected</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Employee</th><th>Project</th><th>Date</th><th>Task</th><th class="num">Hours</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (pT.items.length?pT.items.map(function(t){
+    var sb=t.status==='Approved'?'#e8f5e9;color:#2e7d32':t.status==='Submitted'?'#fff8e1;color:#ff8f00':'#ffebee;color:#c62828';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+t.id+'</td><td style="font-weight:500">'+hrEmpName(t.employeeId)+'</td><td style="font-size:9px">'+t.project+'</td><td style="font-size:9px;color:#888">'+t.date+'</td><td style="font-size:9px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+t.task+'">'+t.task+'</td><td class="num" style="font-weight:600">'+t.hours+'h</td><td><span class="badge-status" style="background:'+sb+'">'+t.status+'</span></td><td style="white-space:nowrap">'+
+      (t.status==='Submitted'?'<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Approve" onclick="event.stopPropagation();timesheetStatus(\''+t.id+'\',\'Approved\')">✓</span> <span style="color:#c62828;cursor:pointer;font-size:10px" title="Reject" onclick="event.stopPropagation();timesheetStatus(\''+t.id+'\',\'Rejected\')">✕</span> ':'')+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudTimesheet(mockTimesheets.find(function(x){return x.id===\''+t.id+'\'}))">✎</span></td></tr>';
+  }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;font-size:11px">No timesheets match your filters</td></tr>')+
+  '</tbody></table>'+_pgHtml('ts',pT.total,pT.page,pT.totalPages,pT.perPage)+'</div></div></div>';
+}
+function timesheetStatus(id,status){
+  var t=mockTimesheets.find(function(x){return x.id===id});if(!t)return;
+  t.status=status;DB.save('hr_timesheets');showToast('Timesheet '+status.toLowerCase(),status==='Approved'?'success':'info');renderModule();
+}
+function crudTimesheet(item){
+  var n=!item;
+  var projects=[];mockTimesheets.forEach(function(t){if(projects.indexOf(t.project)<0)projects.push(t.project);});
+  if(!projects.length)projects=['Muktodhara Tower','Jolshiri Abasan','Skyline Heights','Green Valley','Head Office'];
+  var t=n?{id:'TS-'+String(mockTimesheets.length+1).padStart(3,'0'),employeeId:mockEmployees.length?mockEmployees[0].id:0,date:new Date().toISOString().split('T')[0],project:projects[0],task:'',hours:8,status:'Submitted'}:item;
+  window._formRules=[
+    {id:'tsf_hours',fn:function(v){var h=V.num(v);if(isNaN(h)||h<1||h>24)return 'Hours must be between 1 and 24';return null;}},
+    {id:'tsf_date',fn:function(v){var t=new Date();t.setHours(0,0,0,0);var d=new Date(v+'T00:00:00');return (!isNaN(d.getTime())&&d>t)?'Date cannot be in the future':null;}},
+    {id:'tsf_task',fn:function(v){return String(v||'').trim()?null:'Task description is required';}}
+  ];
+  openModal(n?'New Timesheet Entry':'Edit Timesheet Entry',
+    formRow(selectField('Employee','tsf_emp',t.employeeId,mockEmployees.map(function(e){return e.id+'|'+e.name;}),true),selectField('Project','tsf_project',t.project,projects,true))+
+    formRow(inputField('Date','tsf_date',t.date,'',true),inputField('Hours','tsf_hours',String(t.hours),'',true))+
+    formRow(selectField('Status','tsf_status',t.status,['Submitted','Approved','Rejected'],true),inputField('Task','tsf_task',t.task,'',true)),
+    function(){
+      var sel=g('tsf_emp');var eid=parseInt(sel.split('|')[0])||0;
+      var d={id:t.id,employeeId:eid,date:g('tsf_date'),project:g('tsf_project'),task:g('tsf_task'),hours:parseFloat(g('tsf_hours'))||0,status:g('tsf_status')};
+      if(n){mockTimesheets.push(d);DB.save('hr_timesheets');showToast('Timesheet entry added','success');}
+      else{var idx=mockTimesheets.findIndex(function(x){return x.id===t.id});if(idx>=0){mockTimesheets[idx]=d;DB.save('hr_timesheets');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
 function attendanceSet(empId,status){
   var today=(new Date()).toISOString().split('T')[0];
   var a=mockHRAttendance.find(function(x){return x.employeeId===empId&&x.date===today});
   if(a){a.status=status;}
   else{mockHRAttendance.push({id:'ATN-'+empId+'-'+today,employeeId:empId,date:today,status:status});}
-  DB.save('attendance');showToast(hrEmpName(empId)+' → '+status,'info');renderModule();
+  DB.save('hr_attendance');showToast(hrEmpName(empId)+' → '+status,'info');renderModule();
 }
 function attendanceMarkAll(status){
   var today=(new Date()).toISOString().split('T')[0];
@@ -9086,11 +9179,33 @@ function attendanceMarkAll(status){
     var a=mockHRAttendance.find(function(x){return x.employeeId===e.id&&x.date===today});
     if(a){a.status=status;}else{mockHRAttendance.push({id:'ATN-'+e.id+'-'+today,employeeId:e.id,date:today,status:status});}
   });
-  DB.save('attendance');showToast('All marked '+status,'success');renderModule();
+  DB.save('hr_attendance');showToast('All marked '+status,'success');renderModule();
+}
+function attNow(){var d=new Date();var h=d.getHours(),m=d.getMinutes();return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;}
+function attHours(i,o){var p=function(t){var s=String(t).split(':');return parseInt(s[0],10)*60+parseInt(s[1],10);};var m=p(o)-p(i);return m>0?m/60:0;}
+function attPunch(empId){
+  var today=(new Date()).toISOString().split('T')[0];
+  var a=mockHRAttendance.find(function(x){return x.employeeId===empId&&x.date===today;});
+  if(!a){mockHRAttendance.push({id:'ATN-'+empId+'-'+today,employeeId:empId,date:today,status:attNow()>'09:30'?'Late':'Present',checkIn:attNow(),checkOut:null});}
+  else if(!a.checkIn){a.checkIn=attNow();a.status=attNow()>'09:30'?'Late':'Present';}
+  else if(!a.checkOut){a.checkOut=attNow();}
+  else{a.checkIn=null;a.checkOut=null;a.status='Present';}
+  DB.save('hr_attendance');showToast(hrEmpName(empId)+' → '+(a.checkOut?'out at '+a.checkOut:a.checkIn?'in at '+a.checkIn:'reset'),'success');renderModule();
+}
+function attendancePunchAll(){
+  var today=(new Date()).toISOString().split('T')[0];
+  var n=0;mockEmployees.forEach(function(e){
+    var a=mockHRAttendance.find(function(x){return x.employeeId===e.id&&x.date===today;});
+    if(!a){mockHRAttendance.push({id:'ATN-'+e.id+'-'+today,employeeId:e.id,date:today,status:attNow()>'09:30'?'Late':'Present',checkIn:attNow(),checkOut:null});n++;}
+  });
+  DB.save('hr_attendance');showToast(n+' employees checked in','success');renderModule();
 }
 function leaveStatus(id,status){
   var l=mockLeave.find(function(x){return x.id===id});if(!l)return;
-  l.status=status;DB.save('leave');showToast(status==='Approved'?'Leave approved':'Leave rejected',status==='Approved'?'success':'info');renderModule();
+  l.status=status;l.decidedAt=new Date().toISOString().split('T')[0];l.approver='Sultana Razia';
+  if(status==='Approved'){var today=new Date().toISOString().split('T')[0];if(today>=l.from&&today<=l.to){var e=mockEmployees.find(function(x){return String(x.id)===String(l.employeeId);});if(e)e.status='on-leave';}}
+  else if(status==='Rejected'){var e2=mockEmployees.find(function(x){return String(x.id)===String(l.employeeId);});if(e2&&e2.status==='on-leave')e2.status='active';}
+  DB.save('leave');showToast(status==='Approved'?'Leave approved by '+l.approver:'Leave rejected',status==='Approved'?'success':'info');renderModule();
 }
 function payrollMarkPaid(id){
   var p=mockHRPayroll.find(function(x){return x.id===id});if(!p)return;
@@ -9123,9 +9238,10 @@ function viewLeave(id){
       '<div><div style="font-weight:600;font-size:13px">'+hrEmpName(l.employeeId)+' — '+l.type+' Leave</div><div style="font-size:9px;color:#888">'+l.id+' · <span class="badge-status" style="background:'+(l.status==='Approved'?'#e8f5e9;color:#2e7d32':l.status==='Pending'?'#fff8e1;color:#ff8f00':'#ffebee;color:#c62828')+'">'+l.status+'</span></div></div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+
-      ['From',l.from,'To',l.to,'Days',l.days,'Type',l.type].map(function(v,i,arr){return i%2===0?'<div style="padding:6px;border:1px solid #eee;border-radius:6px;font-size:9px;color:#888"><div style="font-weight:600;color:#555;margin-bottom:2px">'+v+'</div><div style="font-size:11px;color:#333">'+arr[i+1]+'</div></div>':'';}).join('')+
+      ['From',l.from,'To',l.to,'Days',l.days,'Type',l.type,'Approver',l.approver||'—','Decided',l.decidedAt||'—'].map(function(v,i,arr){return i%2===0?'<div style="padding:6px;border:1px solid #eee;border-radius:6px;font-size:9px;color:#888"><div style="font-weight:600;color:#555;margin-bottom:2px">'+v+'</div><div style="font-size:11px;color:#333">'+arr[i+1]+'</div></div>':'';}).join('')+
     '</div>'+
     '<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:600;color:#888;margin-bottom:4px">REASON</div><div style="font-size:11px;background:#f8f9fa;padding:10px;border-radius:6px;color:#444">'+(l.reason||'—')+'</div></div>'+
+    '<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:600;color:#888;margin-bottom:4px">WORKFLOW</div><div style="font-size:10px;background:#f8f9fa;padding:8px 10px;border-radius:6px;color:#444">📝 Submitted → <b>'+l.status+'</b>'+(l.approver?' · by '+l.approver+(l.decidedAt?' on '+l.decidedAt:''):' · awaiting approval')+'</div></div>'+
     '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
       (l.status==='Pending'?'<button class="action-btn primary" onclick="leaveStatus(\''+l.id+'\',\'Approved\')" style="padding:4px 10px;font-size:10px">✓ Approve</button><button class="action-btn secondary" onclick="leaveStatus(\''+l.id+'\',\'Rejected\')" style="padding:4px 10px;font-size:10px">✕ Reject</button>':'')+
       '<button class="action-btn secondary" onclick="closeLeadPanel();crudLeave(mockLeave.find(function(x){return x.id===\''+l.id+'\'}))" style="padding:4px 10px;font-size:10px">✎ Edit</button>'+
