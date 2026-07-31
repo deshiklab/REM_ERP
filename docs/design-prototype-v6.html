@@ -406,6 +406,11 @@
       #quickAddDropdown .panel{max-width:100vw!important;width:100vw!important;height:100%!important;border-radius:0!important;animation:slideUp .25s ease-out!important}
       #quickAddDropdown .backdrop{background:rgba(0,0,0,.5)!important;flex:0!important;height:0!important}
       #qaGrid{max-height:calc(100vh - 160px)!important}
+      table.has-row-menu th:last-child,table.has-row-menu .row-more-cell{position:sticky!important;right:0!important;background:#fff!important;z-index:4!important;box-shadow:-4px 0 8px rgba(0,0,0,.08)!important}
+      table.has-row-menu thead th:last-child{z-index:6!important}
+      html.dark table.has-row-menu th:last-child,html.dark table.has-row-menu .row-more-cell,html.theme-midnight table.has-row-menu th:last-child,html.theme-midnight table.has-row-menu .row-more-cell{background:#0e1626!important;box-shadow:-4px 0 8px rgba(0,0,0,.4)!important}
+      html.dark.theme-forest table.has-row-menu th:last-child,html.dark.theme-forest table.has-row-menu .row-more-cell{background:#0d1f0d!important}
+      html.dark.theme-sunset table.has-row-menu th:last-child,html.dark.theme-sunset table.has-row-menu .row-more-cell{background:#200c04!important}
     }
     @media(max-width:480px){
       .stats-row{grid-template-columns:repeat(2,1fr)!important}
@@ -11308,11 +11313,19 @@ _initTabArrows();
 // ═══ MOBILE ROW ACTION MENUS (⋮) ═══
 // Collapses table row action buttons into a per-row ⋮ dropdown (mobile only)
 var _ROW_GLYPH_LABELS={'\u270E':'Edit','\u2715':'Delete','\u25B6':'Advance','\uD83D\uDCCB':'Booking','✎':'Edit','✕':'Delete','✓':'Mark Paid','⚠':'Overdue','🖨':'Print','📥':'Download'};
+var _rowMenus=[];
 function _closeRowMenus(){
   document.querySelectorAll('.row-menu.open').forEach(function(m){m.classList.remove('open');});
 }
 function _wireRowMenus(){
   _closeRowMenus();
+  // drop menus whose row/button no longer exists (table re-rendered)
+  for(var i=_rowMenus.length-1;i>=0;i--){
+    if(!_rowMenus[i].btn.isConnected||!_rowMenus[i].menu.isConnected){
+      if(_rowMenus[i].menu.parentNode)_rowMenus[i].menu.parentNode.removeChild(_rowMenus[i].menu);
+      _rowMenus.splice(i,1);
+    }
+  }
   var scopes=['#mainContent','#leadSlideOut #leadPanelContent','.drawer-body'];
   scopes.forEach(function(s){
     var root=document.querySelector(s);
@@ -11329,6 +11342,7 @@ function _wireRowMenus(){
           items.push(n);
         });
         if(!items.length)return;
+        tbl.classList.add('has-row-menu');
         last.classList.add('row-more-cell');
         last.style.textAlign='right';
         last.style.whiteSpace='nowrap';
@@ -11348,7 +11362,10 @@ function _wireRowMenus(){
           menu.appendChild(c);
         });
         last.appendChild(btn);
-        last.appendChild(menu);
+        // menu lives in <body>, NOT inside the row — transformed ancestors (tr:hover translateX)
+        // would otherwise hijack position:fixed and offset the menu off-screen
+        document.body.appendChild(menu);
+        _rowMenus.push({btn:btn, menu:menu});
         btn.onclick=function(e){
           e.stopPropagation();e.preventDefault();
           _closeRowMenus();
@@ -11356,14 +11373,27 @@ function _wireRowMenus(){
           var r=btn.getBoundingClientRect();
           var h=menu.offsetHeight;
           var mw=menu.offsetWidth;
-          var left=r.right-mw-4;
-          if(left<8)left=8;
-          if(left+mw>window.innerWidth-8)left=Math.max(8,window.innerWidth-mw-8);
-          var top=r.bottom+4;
-          if(top+h>window.innerHeight-8)top=Math.max(8,r.top-h-4);
-          if(top<8)top=8;
+          var left,top;
+          if(r.right<0||r.left>window.innerWidth||r.bottom<0||r.top>window.innerHeight){
+            // button off-screen (layout shift / re-render) — drop menu at right edge
+            left=Math.max(8,window.innerWidth-mw-8);
+            top=Math.max(8,window.innerHeight-h-8);
+          }else{
+            left=r.right-mw-4;
+            if(left<8)left=8;
+            if(left+mw>window.innerWidth-8)left=Math.max(8,window.innerWidth-mw-8);
+            top=r.bottom+4;
+            if(top+h>window.innerHeight-8)top=Math.max(8,r.top-h-4);
+            if(top<8)top=8;
+          }
           menu.style.left=left+'px';
           menu.style.top=top+'px';
+          // final safety clamp: keep menu fully inside the viewport no matter what
+          var mr=menu.getBoundingClientRect();
+          if(mr.left<8)menu.style.left='8px';
+          if(mr.left+mr.width>window.innerWidth-8)menu.style.left=Math.max(8,window.innerWidth-mr.width-8)+'px';
+          if(mr.top<8)menu.style.top='8px';
+          if(mr.top+mr.height>window.innerHeight-8)menu.style.top=Math.max(8,window.innerHeight-mr.height-8)+'px';
         };
         // capture: close menu first, then the item's inline onclick still runs
         menu.addEventListener('click',function(){_closeRowMenus();},true);
