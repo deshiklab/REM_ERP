@@ -220,7 +220,7 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 - [x] **1.1** Currency consistency — 70 ₹→৳, seedV bumps, SW v8-v13 (`f45121b`)
 - [x] **1.2+1.3** Under Payment status + Open Inventory ledgers — SW v8-v14 (`3a2ba13`)
 - [x] **1.4** Module enable/disable + Menu Setup — SW v8-v15 (`2181345`)
-- [ ] 1.5 Calendar · 1.6 Announcements
+- [x] **1.5+1.6** Calendar + Announcements modules — SW v8-v16 (`28fac14`)
 - [ ] 1.7 Fund transfers · 1.8 Journal entries
 - [ ] 1.9 HR check-in/out · 1.10 Leave approval · 1.11 Timesheets
 - [ ] 1.12 Notification templates · 1.13 Bulk exports

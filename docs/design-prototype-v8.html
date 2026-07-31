@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -8300,6 +8300,142 @@ function docHandleFiles(files){
 
 let financeTab='dashboard';
 function fmtNum(v){return v.toLocaleString('en-IN');}
+// ═══ FUND TRANSFERS & JOURNAL ENTRIES (Phase 1.7 + 1.8) ═══
+window.mockTransfers = DB.init('transfers', [
+  {id:'TRF-001',date:'2026-07-02',from:'BRAC Bank Ltd.',to:'Dutch Bangla Bank',amount:1500000,ref:'Project payroll Jul',note:'Staff salary funding',status:'Completed'},
+  {id:'TRF-002',date:'2026-07-09',from:'Eastern Bank Ltd.',to:'BRAC Bank Ltd.',amount:500000,ref:'Vendor payment reserve',note:'Contractor mobilization',status:'Completed'},
+  {id:'TRF-003',date:'2026-07-18',from:'Dutch Bangla Bank',to:'Cash in Hand',amount:250000,ref:'Petty cash top-up',note:'Site daily expenses',status:'Completed'},
+  {id:'TRF-004',date:'2026-07-25',from:'Islami Bank BD',to:'Eastern Bank Ltd.',amount:800000,ref:'Land registry settlement',note:'Purbachal plot payment',status:'Pending'}
+]);
+window.mockJournals = DB.init('journals', [
+  {id:'JNL-001',date:'2026-07-01',ref:'Opening balance carry',desc:'Carry forward opening balances for FY 2026-27',lines:[{acc:'1-1000 Cash & Bank',dr:20750000,cr:0},{acc:'1-2000 Accounts Receivable',dr:48250000,cr:0},{acc:'4-1000 Construction Costs',dr:41000000,cr:0},{acc:'2-1000 Customer Deposits',dr:0,cr:32000000},{acc:'3-1000 Revenue - Booking',dr:0,cr:78000000}]},
+  {id:'JNL-002',date:'2026-07-05',ref:'Booking BKG-101 advance',desc:'Advance received from Kamrul Hasan against Jolshiri unit',lines:[{acc:'1-1000 Cash & Bank',dr:1800000,cr:0},{acc:'2-1000 Customer Deposits',dr:0,cr:1800000}]},
+  {id:'JNL-003',date:'2026-07-12',ref:'Cement purchase',desc:'Construction material purchase for Jolshiri slab',lines:[{acc:'4-1000 Construction Costs',dr:950000,cr:0},{acc:'1-1000 Cash & Bank',dr:0,cr:950000}]},
+  {id:'JNL-004',date:'2026-07-19',ref:'Salary accrual Jul',desc:'Monthly payroll accrual',lines:[{acc:'4-2000 Admin Expenses',dr:3600000,cr:0},{acc:'2-2000 Accounts Payable',dr:0,cr:3600000}]},
+  {id:'JNL-005',date:'2026-07-22',ref:'Installment collection',desc:'2nd installment Dr. Rubina Ali',lines:[{acc:'1-1000 Cash & Bank',dr:2200000,cr:0},{acc:'3-2000 Revenue - Installments',dr:0,cr:2200000}]},
+  {id:'JNL-006',date:'2026-07-28',ref:'TDS contractor deduction',desc:'10% TDS on contractor bill',lines:[{acc:'2-2000 Accounts Payable',dr:120000,cr:0},{acc:'4-1000 Construction Costs',dr:0,cr:120000}]}
+]);
+function _balNum(s){return parseInt(String(s||'').replace(/[^0-9]/g,''))||0;}
+function renderFinanceTransfers(){
+  var rows=mockTransfers.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  var total=rows.reduce(function(s,t){return s+(t.status==='Completed'?t.amount:0);},0);
+  return `<div class="stats-row" style="margin-bottom:8px">${[
+      ['Transfers',rows.length,'#2F80ED'],['Completed',rows.filter(function(t){return t.status==='Completed';}).length,'#2e7d32'],
+      ['Pending',rows.filter(function(t){return t.status==='Pending';}).length,'#e65100'],['Transferred','৳'+fmtNum(total),'#1565c0']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')}</div>
+  <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudTransfer()" data-perm="Accounts & Finance:Create" style="padding:3px 8px;font-size:10px">+ New Transfer</button></div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Date</th><th>From</th><th>To</th><th class="num">Amount</th><th>Ref</th><th>Note</th><th>Status</th><th></th></tr></thead><tbody>${
+    rows.map(function(t){return `<tr><td style="font-weight:500;font-family:monospace;font-size:9px">${t.id}</td><td>${t.date}</td><td style="font-size:10px">${t.from}</td><td style="font-size:10px">${t.to}</td><td class="num" style="font-weight:600">৳${fmtNum(t.amount)}</td><td style="font-size:10px;color:#555">${t.ref}</td><td style="font-size:9px;color:#888;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.note||'—'}</td><td><span class="badge-status ${t.status==='Completed'?'badge-active':'badge-pending'}">${t.status}</span></td>`+
+      `<td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="crudTransfer(mockTransfers.find(function(x){return x.id===\x27${t.id}\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="if(confirm(\x27Delete ${t.id}?\x27)){var i=mockTransfers.findIndex(function(x){return x.id===\x27${t.id}\x27});if(i>=0)mockTransfers.splice(i,1);DB.save(\x27transfers\x27);showToast(\x27Deleted\x27,\x27info\x27);renderModule()}">✕</span></td></tr>`;}).join('')}
+  </tbody></table></div></div></div>`;
+}
+function crudTransfer(item){
+  var n=!item;
+  var t=n?{id:'TRF-'+String(mockTransfers.length+1+100).padStart(4,'0'),date:new Date().toISOString().slice(0,10),from:mockBankAccounts.length?mockBankAccounts[0].name:'',to:mockBankAccounts.length>1?mockBankAccounts[1].name:'',amount:0,ref:'',note:'',status:'Pending'}:item;
+  showModal(n?'New Fund Transfer':'Edit Transfer',
+    '<div style="padding:8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">From Account *</label><select id="tr_from" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px">'+mockBankAccounts.map(function(b){return '<option value="'+b.name+'"'+(t.from===b.name?' selected':'')+'>'+b.name+'</option>';}).join('')+'</select></div>'+
+    '<div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">To Account *</label><select id="tr_to" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px">'+mockBankAccounts.map(function(b){return '<option value="'+b.name+'"'+(t.to===b.name?' selected':'')+'>'+b.name+'</option>';}).join('')+'</select></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Amount (৳) *</label><input id="tr_amt" type="number" min="1" value="'+(t.amount||'')+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div>'+
+    '<div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Date *</label><input id="tr_date" type="date" value="'+t.date+'" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div></div>'+
+    '<label style="font-size:11px;font-weight:500;display:block;margin:8px 0 4px">Reference</label><input id="tr_ref" value="'+t.ref+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/>'+
+    '<label style="font-size:11px;font-weight:500;display:block;margin:8px 0 4px">Note</label><input id="tr_note" value="'+t.note+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/>'+
+    '<div style="margin-top:8px"><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Status</label><select id="tr_status" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px"><option value="Completed"'+(t.status==='Completed'?' selected':'')+'>Completed</option><option value="Pending"'+(t.status==='Pending'?' selected':'')+'>Pending</option></select></div></div>',
+    [
+      {label:'Cancel',action:'close',secondary:true},
+      {label:n?'Transfer':'Update',action:function(){
+        var from=document.getElementById('tr_from').value;
+        var to=document.getElementById('tr_to').value;
+        var amt=parseFloat(document.getElementById('tr_amt').value);
+        var date=document.getElementById('tr_date').value;
+        if(!from||!to){showToast('Select both accounts','error');return;}
+        if(from===to){showToast('From and To accounts must differ','error');return;}
+        if(!amt||isNaN(amt)||amt<=0){showToast('Amount must be positive','error');return;}
+        if(!date){showToast('Date is required','error');return;}
+        var src=mockBankAccounts.find(function(b){return b.name===from;});
+        if(src){var bal=_balNum(src.balance);if(amt>bal){showToast('Insufficient balance in '+from+' (৳'+fmtNum(bal)+')','error');return;}}
+        var data={id:t.id,date:date,from:from,to:to,amount:amt,ref:document.getElementById('tr_ref').value||'—',note:document.getElementById('tr_note').value||'',status:document.getElementById('tr_status').value};
+        if(n){mockTransfers.unshift(data);DB.save('transfers');showToast('Transfer recorded!','success');}
+        else{var idx=mockTransfers.findIndex(function(x){return x.id===t.id});if(idx>=0){mockTransfers[idx]=data;DB.save('transfers');showToast('Updated','info');}}
+        closeDrawer();renderModule();
+      }}
+    ]
+  );
+}
+function renderFinanceJournals(){
+  var rows=mockJournals.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  var totDr=rows.reduce(function(s,j){return s+j.lines.reduce(function(x,l){return x+(l.dr||0);},0);},0);
+  var balanced=rows.filter(function(j){var dr=j.lines.reduce(function(x,l){return x+(l.dr||0);},0);var cr=j.lines.reduce(function(x,l){return x+(l.cr||0);},0);return dr===cr&&dr>0;}).length;
+  return `<div class="stats-row" style="margin-bottom:8px">${[
+      ['Journal Entries',rows.length,'#2F80ED'],['Balanced',balanced,'#2e7d32'],
+      ['Unbalanced',rows.length-balanced,'#c62828'],['Total Debits','৳'+fmtNum(totDr),'#1565c0']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')}</div>
+  <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudJournal()" data-perm="Accounts & Finance:Create" style="padding:3px 8px;font-size:10px">+ New Journal Entry</button></div>
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Date</th><th>Ref</th><th>Description</th><th class="num">Lines</th><th class="num">Debit Total</th><th class="num">Credit Total</th><th>Status</th><th></th></tr></thead><tbody>${
+    rows.map(function(j){
+      var dr=j.lines.reduce(function(x,l){return x+(l.dr||0);},0);
+      var cr=j.lines.reduce(function(x,l){return x+(l.cr||0);},0);
+      var ok=dr===cr&&dr>0;
+      return `<tr><td style="font-weight:500;font-family:monospace;font-size:9px">${j.id}</td><td>${j.date}</td><td style="font-size:10px;color:#555">${j.ref}</td><td style="font-size:10px;color:#555;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${j.desc}">${j.desc}</td><td class="num">${j.lines.length}</td><td class="num" style="font-weight:600">৳${fmtNum(dr)}</td><td class="num" style="font-weight:600">৳${fmtNum(cr)}</td><td><span class="badge-status ${ok?'badge-active':'badge-sold'}">${ok?'Balanced':'Unbalanced'}</span></td>`+
+        `<td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="crudJournal(mockJournals.find(function(x){return x.id===\x27${j.id}\x27}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="if(confirm(\x27Delete ${j.id}?\x27)){var i=mockJournals.findIndex(function(x){return x.id===\x27${j.id}\x27});if(i>=0)mockJournals.splice(i,1);DB.save(\x27journals\x27);showToast(\x27Deleted\x27,\x27info\x27);renderModule()}">✕</span></td></tr>`;}).join('')}
+  </tbody></table></div></div></div>`;
+}
+function crudJournal(item){
+  var n=!item;
+  var j=n?{id:'JNL-'+String(mockJournals.length+1+100).padStart(4,'0'),date:new Date().toISOString().slice(0,10),ref:'',desc:'',lines:[{acc:mockCOA.length?mockCOA[0].name:'',dr:'',cr:''},{acc:mockCOA.length>1?mockCOA[1].name:'',dr:'',cr:''}]}:item;
+  var accOpts=mockCOA.map(function(a){return a.code+' '+a.name;});
+  function lineRow(l,i){
+    return '<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-bottom:6px">'+
+      '<select id="jl_acc_'+i+'" style="width:100%;padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px">'+accOpts.map(function(a){return '<option value="'+a+'"'+(l.acc===a?' selected':'')+'>'+a+'</option>';}).join('')+'</select>'+
+      '<input id="jl_dr_'+i+'" type="number" min="0" placeholder="Debit" value="'+(l.dr===''?'':l.dr)+'" style="width:100%;padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/>'+
+      '<input id="jl_cr_'+i+'" type="number" min="0" placeholder="Credit" value="'+(l.cr===''?'':l.cr)+'" style="width:100%;padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div>';
+  }
+  showModal(n?'New Journal Entry':'Edit Journal Entry',
+    '<div style="padding:8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Date *</label><input id="jl_date" type="date" value="'+j.date+'" style="width:100%;padding:5px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div>'+
+    '<div><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">Reference</label><input id="jl_ref" value="'+j.ref+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div></div>'+
+    '<label style="font-size:11px;font-weight:500;display:block;margin:8px 0 4px">Description *</label><input id="jl_desc" value="'+j.desc+'" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/>'+
+    '<label style="font-size:11px;font-weight:500;display:block;margin:10px 0 4px">Journal Lines (debits must equal credits)</label>'+
+    '<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-bottom:4px"><span style="font-size:8px;font-weight:700;color:#999">ACCOUNT</span><span style="font-size:8px;font-weight:700;color:#999">DEBIT (৳)</span><span style="font-size:8px;font-weight:700;color:#999">CREDIT (৳)</span></div>'+
+    j.lines.map(lineRow).join('')+
+    '<button class="action-btn secondary" onclick="addJournalLine()" style="padding:3px 8px;font-size:9px;margin-top:4px">+ Add Line</button>'+
+    '<div id="jl_more"></div></div>',
+    [
+      {label:'Cancel',action:'close',secondary:true},
+      {label:n?'Post':'Update',action:function(){
+        var date=document.getElementById('jl_date').value;
+        var desc=document.getElementById('jl_desc').value.trim();
+        if(!date){showToast('Date is required','error');return;}
+        if(!desc){showToast('Description is required','error');return;}
+        var lines=[];var drTot=0,crTot=0;var i=0;
+        while(document.getElementById('jl_acc_'+i)){
+          var acc=document.getElementById('jl_acc_'+i).value;
+          var dr=parseFloat(document.getElementById('jl_dr_'+i).value)||0;
+          var cr=parseFloat(document.getElementById('jl_cr_'+i).value)||0;
+          if(acc&&(dr||cr)){lines.push({acc:acc,dr:dr,cr:cr});drTot+=dr;crTot+=cr;}
+          i++;
+        }
+        if(!lines.length){showToast('Add at least one journal line','error');return;}
+        if(drTot<=0&&crTot<=0){showToast('Enter amounts on journal lines','error');return;}
+        if(Math.abs(drTot-crTot)>0.01){showToast('Journal is not balanced — Debits ৳'+fmtNum(Math.round(drTot))+' vs Credits ৳'+fmtNum(Math.round(crTot)),'error');return;}
+        var data={id:j.id,date:date,ref:document.getElementById('jl_ref').value||'—',desc:desc,lines:lines};
+        if(n){mockJournals.unshift(data);DB.save('journals');showToast('Journal entry posted!','success');}
+        else{var idx=mockJournals.findIndex(function(x){return x.id===j.id});if(idx>=0){mockJournals[idx]=data;DB.save('journals');showToast('Updated','info');}}
+        closeDrawer();renderModule();
+      }}
+    ]
+  );
+}
+var _jlLineCount=0;
+function addJournalLine(){
+  var box=document.getElementById('jl_more');
+  if(!box)return;
+  var idx=100+(_jlLineCount++);
+  var accOpts=mockCOA.map(function(a){return a.code+' '+a.name;});
+  box.insertAdjacentHTML('beforeend','<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-bottom:6px">'+
+    '<select id="jl_acc_'+idx+'" style="width:100%;padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px">'+accOpts.map(function(a){return '<option value="'+a+'">'+a+'</option>';}).join('')+'</select>'+
+    '<input id="jl_dr_'+idx+'" type="number" min="0" placeholder="Debit" style="width:100%;padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/>'+
+    '<input id="jl_cr_'+idx+'" type="number" min="0" placeholder="Credit" style="width:100%;padding:5px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;box-sizing:border-box"/></div>');
+}
+
 function renderFinance(el){
   const finT=financeTab;
   const GRp=t=>t.type==='Inflow'?t.amount:0;
@@ -8312,7 +8448,7 @@ function renderFinance(el){
   el.innerHTML=`<div class="fade-in">
     <div class="page-title">Finance Dashboard</div><div class="page-subtitle">${mockTransactions.length} transactions \u00B7 \u09F3 ${fmtNum(netProfit)} net</div>
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','invoices','payments','bank_accounts','budgets','tax'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','invoices':'\uD83D\uDCC4 Invoices','payments':'\uD83D\uDCB0 Payments','bank_accounts':'\uD83C\uDFE6 Banks','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax'}[t]}</div>`).join('')}</div>
+      <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','invoices','payments','bank_accounts','transfers','journals','budgets','tax'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','invoices':'\uD83D\uDCC4 Invoices','payments':'\uD83D\uDCB0 Payments','bank_accounts':'\uD83C\uDFE6 Banks','transfers':'\uD83D\uDD01 Transfers','journals':'\uD83D\uDCD2 Journals','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax'}[t]}</div>`).join('')}</div>
     </div>
     ${finT==='dashboard'?renderFinanceDashboard(grossIncome,grossExpense,netProfit,bankTotal):
       finT==='transactions'?renderFinanceTransactions():
@@ -8321,6 +8457,8 @@ function renderFinance(el){
       finT==='invoices'?renderFinanceInvoices():
       finT==='payments'?renderFinancePayments():
       finT==='bank_accounts'?renderFinanceBankAccounts():
+      finT==='transfers'?renderFinanceTransfers():
+      finT==='journals'?renderFinanceJournals():
       finT==='budgets'?renderProjectBudgets():
       finT==='tax'?renderTaxAdjustments():''}
   </div>`;
