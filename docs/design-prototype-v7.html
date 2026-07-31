@@ -7324,10 +7324,10 @@ function renderDocuments(el){
       '</div></div>'+_pgHtml('documents',pagD.total,pagD.page,pagD.totalPages,pagD.perPage)+'</div>';
   el.innerHTML='<div class="fade-in"><div class="page-title">📁 Documents Vault</div><div class="page-subtitle">'+mockDocuments.length+' documents · '+verified+' verified · '+pending+' pending · '+docFmtSize(totalSize)+' stored</div>'+
     '<div class="stats-row" style="margin-bottom:8px">'+
-      '<div class="stat-card"><div class="stat-label">📄 Total</div><div class="stat-value">'+mockDocuments.length+'</div></div>'+
-      '<div class="stat-card"><div class="stat-label">✅ Verified</div><div class="stat-value">'+verified+'</div></div>'+
-      '<div class="stat-card"><div class="stat-label">⏳ Pending</div><div class="stat-value">'+pending+'</div></div>'+
-      '<div class="stat-card"><div class="stat-label">💾 Storage</div><div class="stat-value">'+docFmtSize(totalSize)+'</div></div>'+
+      '<div class="stat-card"><div class="label">📄 Total</div><div class="value" style="color:#2F80ED">'+mockDocuments.length+'</div></div>'+
+      '<div class="stat-card"><div class="label">✅ Verified</div><div class="value" style="color:#2e7d32">'+verified+'</div></div>'+
+      '<div class="stat-card"><div class="label">⏳ Pending</div><div class="value" style="color:#e65100">'+pending+'</div></div>'+
+      '<div class="stat-card"><div class="label">💾 Storage</div><div class="value" style="color:#7b1fa2">'+docFmtSize(totalSize)+'</div></div>'+
     '</div>'+
     '<div class="vault-wrap">'+
       '<div class="vault-side"><div class="vault-side-title">🗂 Categories</div>'+catSidebar+'</div>'+
