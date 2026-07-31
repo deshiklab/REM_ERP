@@ -1,5 +1,9 @@
 # REM ERP — Next Big Update Plan
 
+**Change log (V8):**
+- **2026-06 (commit `d36f318` → SW v8-v9):** Renamed "Land & Projects" → **Projects**; "Land Acquisition" → **Project Acquisition**; new **Layout & Unit Builder** (drag-drop land + building modes); **Pricing Matrix** tabs for Plots & Blocks and Flats & Units.
+- **2026-06 (commit `d36f318+` → SW v8-v10):** Projects group overhaul — 12 enriched projects (fixed ₹→৳ currency bug, desc/phase/milestones, P-109..P-112 added); 17 Project Acquisition proposals with owners/documents/geo records + LP-016/017; mockPlots expanded 8→40 plots across blocks A–D + plot_pricing blocks C/D; PROJ-004 Uttara Rose Garden added (70 units total); Projects module stats row + status/search filters + All/Land/Flats/Gantt tabs + milestone detail panel; Plots & Blocks inventory stats/search/block filter + layout block chips + click-to-edit; Layout Builder pre-seeded demo; Project Acquisition dashboard Total Area stat; DB seed-versioning (`DB._seedV`) auto-resets stale demo data.
+
 **Current state:** V5 static prototype (`design-prototype-v5.html`, ~1MB, commit `c435b15`) — 29+ modules, RBAC, CRUD, Analytics, Activity Log, Payment Reminders, CSV Import, Floor Plan, Proposals. All data in localStorage (simulated persistence).
 
 ---

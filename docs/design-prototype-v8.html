@@ -940,8 +940,8 @@
       <!-- G2: Sales & CRM -->
       <div class="sidebar-item has-children" data-tip="Sales & CRM" onclick="switchGroup('sales_crm')" id="s_sales_crm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
       <div class="s-grp-sep"></div>
-      <!-- G3: Land & Projects -->
-      <div class="sidebar-item has-children" data-tip="Land & Projects" onclick="switchGroup('land_projects')" id="s_land_projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 22V2l20 20H2z"/><path d="M22 2v20H2"/></svg></div>
+      <!-- G3: Projects -->
+      <div class="sidebar-item has-children" data-tip="Projects" onclick="switchGroup('land_projects')" id="s_land_projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 22V2l20 20H2z"/><path d="M22 2v20H2"/></svg></div>
       <div class="s-grp-sep"></div>
       <!-- G4: Bookings & Customer -->
       <div class="sidebar-item has-children" data-tip="Bookings & Customer" onclick="switchGroup('bookings_customer')" id="s_bookings_customer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
@@ -1055,7 +1055,7 @@
 const GROUPS = {
   executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'},{id:'analytics', label:'Analytics', badge:true},{id:'reports', label:'Reports', badge:true},{id:'bi_reports',label:'BI Reports',badge:true}] },
   sales_crm:     { label:'Sales & CRM',   icon:'🎯', mods:[{id:'customers',    label:'Customers'},{id:'crm',          label:'CRM & Leads'},{id:'proposals',label:'Proposals',badge:true},{id:'contacts',label:'Contact Book'},{id:'sales_marketing',label:'Sales & Marketing'}] },
-  land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Flats & Units', badge:true},{id:'plots',label:'Plots & Blocks'},{id:'layout_builder',label:'Layout & Unit Builder',badge:true},{id:'projects',label:'Projects'}] },
+  land_projects: { label:'Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Project Acquisition',badge:false},{id:'properties_units', label:'Flats & Units', badge:true},{id:'plots',label:'Plots & Blocks'},{id:'layout_builder',label:'Layout & Unit Builder',badge:true},{id:'projects',label:'Projects'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'},{id:'dues_recovery',label:'Dues & Recovery'},{id:'ticketing',label:'Ticketing & Issue',badge:true}] },
   construction:  { label:'Engineering & Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'designs',label:'Design Mgmt'}] },
   finance_admin: { label:'Accounts & Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'approvals',label:'Financial Approvals',badge:true},{id:'boq',label:'BOQ & Cost Control',badge:true}] },
@@ -1069,8 +1069,20 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:2, layouts:2, plot_pricing:2},
   init(key, defaultData) {
     try {
+      const wantV = this._seedV[key];
+      if (wantV !== undefined) {
+        const curV = parseInt(localStorage.getItem('rem_'+key+'_v')||'0',10);
+        if (curV !== wantV) {
+          localStorage.setItem('rem_'+key+'_v', String(wantV));
+          localStorage.removeItem('rem_'+key);
+          this._data[key] = JSON.parse(JSON.stringify(defaultData));
+          this.save(key);
+          return this._data[key];
+        }
+      }
       const saved = localStorage.getItem('rem_'+key);
       if (saved) { this._data[key] = JSON.parse(saved);
         if (!Array.isArray(this._data[key]) && typeof this._data[key] !== 'object')
@@ -1254,6 +1266,23 @@ window.mockProperties = DB.init('properties', [
      {id:'G-305', number:'305', floor:3, type:'Penthouse', size:'2500 sqft', price:48000000, facing:'South', status:'Available'},
      {id:'G-306', number:'306', floor:3, type:'Penthouse', size:'2500 sqft', price:50000000, facing:'East', status:'Available'},
      ]},
+  {id:'PROJ-004', name:'Uttara Rose Garden', location:'Uttara Sector 7', type:'Apartment',
+   totalFloors:4, unitsPerFloor:3, totalUnits:12,
+   status:'Active', startDate:'Jan 2025', endDate:'Dec 2027',
+   units:[
+    {id:'UR-101', number:'101', floor:1, type:'2BHK', size:'1050 sqft', price:16500000, facing:'South', status:'Available'},
+    {id:'UR-102', number:'102', floor:1, type:'3BHK', size:'1350 sqft', price:21500000, facing:'East', status:'Booked', customer:'Mizanur Rahman'},
+    {id:'UR-103', number:'103', floor:1, type:'3BHK', size:'1350 sqft', price:22000000, facing:'West', status:'Available'},
+    {id:'UR-201', number:'201', floor:2, type:'3BHK', size:'1400 sqft', price:23500000, facing:'South', status:'Sold', customer:'Nadia Akhter'},
+    {id:'UR-202', number:'202', floor:2, type:'2BHK', size:'1100 sqft', price:17500000, facing:'East', status:'Available'},
+    {id:'UR-203', number:'203', floor:2, type:'3BHK', size:'1400 sqft', price:24000000, facing:'West', status:'Reserved', customer:'Kazi Nizam'},
+    {id:'UR-301', number:'301', floor:3, type:'4BHK', size:'1900 sqft', price:36000000, facing:'South', status:'Available'},
+    {id:'UR-302', number:'302', floor:3, type:'3BHK', size:'1450 sqft', price:25000000, facing:'East', status:'Available'},
+    {id:'UR-303', number:'303', floor:3, type:'3BHK', size:'1450 sqft', price:25500000, facing:'West', status:'Available'},
+    {id:'UR-401', number:'401', floor:4, type:'4BHK', size:'2000 sqft', price:39000000, facing:'South', status:'Available'},
+    {id:'UR-402', number:'402', floor:4, type:'Penthouse', size:'2500 sqft', price:52000000, facing:'East', status:'Available'},
+    {id:'UR-403', number:'403', floor:4, type:'Penthouse', size:'2500 sqft', price:53000000, facing:'West', status:'Available'}
+  ]},
      ]);
      // Seed initial unit history
      mockProperties.forEach(function(p) {
@@ -1272,22 +1301,64 @@ window.mockProperties = DB.init('properties', [
      });
      });
      window.mockProjects = DB.init('projects', [
-  {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30}},
-  {id:'P-102',name:'Jolshiri Abason',type:'flat',location:'Rupganj, Narayanganj',status:'In Progress',progress:42,budget:'৳120.0 Cr',manager:'Iftekhar Ahmad',units:48,stats:{sold:36,reserved:2,available:10}},
-  {id:'P-103',name:'Green Valley Estate',type:'land',location:'Savar, Dhaka',status:'Planning',progress:10,budget:'৳25.0 Cr',manager:'Tariqul Islam',plots:80,stats:{sold:20,reserved:10,available:50}},
-  {id:'P-104',name:'Skyline Towers',type:'flat',location:'Bashundhara, Dhaka',status:'Near Completion',progress:85,budget:'৳80.0 Cr',manager:'Rubina Ali',units:36,stats:{sold:30,reserved:4,available:2}}
-,
-  {id:'P-105',name:'Riverside Heights',type:'land',location:'Keraniganj, Dhaka',status:'Planning',progress:10,budget:'₹35.0 Cr',manager:'Mohiuddin Sir',plots:80,stats:{sold:0,reserved:10,available:70},start:'2026-Q3',desc:'Premium riverfront plotted development with 80 residential plots'},
-  {id:'P-106',name:'Uttara Lake View',type:'land',location:'Uttara Sector 18, Dhaka',status:'Planning',progress:5,budget:'₹28.0 Cr',manager:'MD Hasanul Banna',plots:60,stats:{sold:5,reserved:8,available:47},start:'2026-Q4',desc:'Lake view plots with modern amenities'},
-  {id:'P-107',name:'Ashulia Smart Town',type:'land',location:'Ashulia, Savar',status:'Planning',progress:3,budget:'₹60.0 Cr',manager:'Mohiuddin Sir',plots:200,stats:{sold:0,reserved:15,available:185},start:'2027-Q1',desc:'Large-scale smart township with integrated facilities'},
-  {id:'P-108',name:'Mirpur Garden Residency',type:'apartment',location:'Mirpur 12, Dhaka',status:'Planning',progress:8,budget:'₹22.0 Cr',manager:'Engr. Khan',units:48,stats:{sold:4,reserved:6,available:38},start:'2026-Q3',desc:'Mid-rise apartment complex with garden'}
+  {id:'P-101',name:'Muktodhara Green Park',type:'land',location:'Purbachal, Dhaka',status:'In Progress',progress:65,budget:'৳45.5 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:85,reserved:5,available:30},start:'2023-Q3',end:'2026-Q4',phase:'Phase 2 — Plot Sales & Development',desc:'Flagship plotted residential development in Purbachal with 120 residential plots, commercial corners and a central lakefront park.',milestones:[{label:'Land Acquisition',date:'2023-Q3',status:'done'},{label:'Layout & Approvals',date:'2024-Q1',status:'done'},{label:'Site Development',date:'2024-Q2',status:'done'},{label:'Plot Sales Launch',date:'2024-Q4',status:'done'},{label:'Infrastructure (Roads/Utility)',date:'2025-Q2',status:'active'},{label:'Amenities & Handover',date:'2026-Q4',status:'todo'}]},
+  {id:'P-102',name:'Jolshiri Abason',type:'flat',location:'Rupganj, Narayanganj',status:'In Progress',progress:42,budget:'৳120.0 Cr',manager:'Iftekhar Ahmad',units:48,stats:{sold:36,reserved:2,available:10},start:'2024-Q1',end:'2027-Q2',phase:'Phase 1 — Tower A & B Construction',desc:'Premium gated apartment community — 2 towers, 12 floors each, 4 units per floor with rooftop gardens and basement parking.',milestones:[{label:'Land Acquisition',date:'2024-Q1',status:'done'},{label:'Design & Approvals',date:'2024-Q3',status:'done'},{label:'Piling & Substructure',date:'2025-Q1',status:'done'},{label:'Tower A Superstructure',date:'2025-Q3',status:'active'},{label:'Tower B Superstructure',date:'2026-Q1',status:'todo'},{label:'Finishing & Handover',date:'2027-Q2',status:'todo'}]},
+  {id:'P-103',name:'Green Valley Estate',type:'land',location:'Savar, Dhaka',status:'Planning',progress:10,budget:'৳25.0 Cr',manager:'Tariqul Islam',plots:80,stats:{sold:20,reserved:10,available:50},start:'2025-Q1',end:'2028-Q4',phase:'Phase 1 — Feasibility & Layout',desc:'Eco-friendly plotted estate in Savar with 80 plots, green buffer zones, and a community clubhouse.',milestones:[{label:'Land Acquisition',date:'2025-Q1',status:'done'},{label:'Topographic Survey',date:'2025-Q3',status:'active'},{label:'Master Layout Design',date:'2025-Q4',status:'todo'},{label:'RAJUK Approvals',date:'2026-Q2',status:'todo'},{label:'Plot Sales Launch',date:'2026-Q4',status:'todo'},{label:'Handover',date:'2028-Q4',status:'todo'}]},
+  {id:'P-104',name:'Skyline Towers',type:'flat',location:'Bashundhara, Dhaka',status:'Near Completion',progress:85,budget:'৳80.0 Cr',manager:'Rubina Ali',units:36,stats:{sold:30,reserved:4,available:2},start:'2022-Q1',end:'2026-Q3',phase:'Phase 2 — Finishing & Handover',desc:'Mid-rise residential towers in Bashundhara R/A — 9 floors, 36 premium units with panoramic city views.',milestones:[{label:'Land Acquisition',date:'2022-Q1',status:'done'},{label:'Design & Approvals',date:'2022-Q4',status:'done'},{label:'Substructure & Piling',date:'2023-Q2',status:'done'},{label:'Superstructure',date:'2024-Q1',status:'done'},{label:'Finishing Works',date:'2025-Q1',status:'done'},{label:'Handover & OCC',date:'2026-Q3',status:'active'}]},
+  {id:'P-105',name:'Riverside Heights',type:'land',location:'Keraniganj, Dhaka',status:'Planning',progress:12,budget:'৳35.0 Cr',manager:'Mohiuddin Sir',plots:80,stats:{sold:6,reserved:14,available:60},start:'2026-Q3',end:'2029-Q2',phase:'Pre-Launch — Reservation Open',desc:'Premium riverfront plotted development on the Buriganga — 80 residential plots with waterfront walkway and boat club.',milestones:[{label:'Land Acquisition',date:'2026-Q3',status:'active'},{label:'River Erosion Study',date:'2026-Q4',status:'todo'},{label:'Master Layout',date:'2027-Q1',status:'todo'},{label:'Sales Launch',date:'2027-Q3',status:'todo'},{label:'Embankment & Utilities',date:'2028-Q1',status:'todo'},{label:'Handover',date:'2029-Q2',status:'todo'}]},
+  {id:'P-106',name:'Uttara Lake View',type:'land',location:'Uttara Sector 18, Dhaka',status:'Planning',progress:8,budget:'৳28.0 Cr',manager:'MD Hasanul Banna',plots:60,stats:{sold:5,reserved:8,available:47},start:'2026-Q4',end:'2029-Q4',phase:'Pre-Launch — Feasibility',desc:'Lake view plots near Uttara Sector 18 — 60 residential plots adjacent to a scenic lake with jogging track.',milestones:[{label:'Land Acquisition',date:'2026-Q4',status:'active'},{label:'Feasibility & Soil Test',date:'2027-Q1',status:'todo'},{label:'Layout Design',date:'2027-Q2',status:'todo'},{label:'Sales Launch',date:'2027-Q4',status:'todo'},{label:'Development Works',date:'2028-Q2',status:'todo'},{label:'Handover',date:'2029-Q4',status:'todo'}]},
+  {id:'P-107',name:'Ashulia Smart Town',type:'land',location:'Ashulia, Savar',status:'Planning',progress:6,budget:'৳60.0 Cr',manager:'Mohiuddin Sir',plots:200,stats:{sold:0,reserved:15,available:185},start:'2027-Q1',end:'2030-Q4',phase:'Concept — Master Planning',desc:'Large-scale smart township in Ashulia with 200 plots, integrated commercial zone, school, and smart utility grid.',milestones:[{label:'Land Acquisition',date:'2027-Q1',status:'active'},{label:'Township Master Plan',date:'2027-Q3',status:'todo'},{label:'RAJUK & CDA Approvals',date:'2028-Q1',status:'todo'},{label:'Phase-1 Sales Launch',date:'2028-Q3',status:'todo'},{label:'Phase-1 Development',date:'2029-Q1',status:'todo'},{label:'Phase-2 & Handover',date:'2030-Q4',status:'todo'}]},
+  {id:'P-108',name:'Mirpur Garden Residency',type:'flat',location:'Mirpur 12, Dhaka',status:'Planning',progress:12,budget:'৳22.0 Cr',manager:'Engr. Khan',units:48,stats:{sold:4,reserved:6,available:38},start:'2026-Q3',end:'2029-Q3',phase:'Pre-Launch — Construction Planning',desc:'Mid-rise apartment complex in Mirpur 12 — 8 floors, 48 units (2BHK & 3BHK) with rooftop garden and 2-level parking.',milestones:[{label:'Land Acquisition',date:'2026-Q3',status:'active'},{label:'Architectural Design',date:'2026-Q4',status:'todo'},{label:'RAJUK Approval',date:'2027-Q2',status:'todo'},{label:'Piling & Substructure',date:'2027-Q4',status:'todo'},{label:'Superstructure',date:'2028-Q2',status:'todo'},{label:'Handover',date:'2029-Q3',status:'todo'}]},
+  {id:'P-109',name:'Gulshan Bay View Tower',type:'flat',location:'Gulshan Avenue, Dhaka',status:'In Progress',progress:28,budget:'৳95.0 Cr',manager:'Rubina Ali',units:40,stats:{sold:20,reserved:4,available:16},start:'2025-Q2',end:'2028-Q1',phase:'Phase 1 — Substructure Works',desc:'High-end residential tower on Gulshan Avenue — 14 floors, 40 luxury units (3BHK & 4BHK) with serviced amenities.',milestones:[{label:'Land Acquisition',date:'2025-Q2',status:'done'},{label:'Design & Approvals',date:'2025-Q4',status:'done'},{label:'Piling & Substructure',date:'2026-Q2',status:'active'},{label:'Superstructure',date:'2027-Q1',status:'todo'},{label:'Finishing',date:'2027-Q3',status:'todo'},{label:'Handover',date:'2028-Q1',status:'todo'}]},
+  {id:'P-110',name:'Badda Smart Residence',type:'flat',location:'Badda, Dhaka',status:'Near Completion',progress:88,budget:'৳45.0 Cr',manager:'Tariqul Islam',units:32,stats:{sold:28,reserved:2,available:2},start:'2023-Q1',end:'2026-Q2',phase:'Phase 2 — Finishing & Handover',desc:'Smart-home-enabled residential building in Badda — 10 floors, 32 units with home automation and solar backup.',milestones:[{label:'Land Acquisition',date:'2023-Q1',status:'done'},{label:'Design & Approvals',date:'2023-Q3',status:'done'},{label:'Substructure',date:'2024-Q1',status:'done'},{label:'Superstructure',date:'2024-Q3',status:'done'},{label:'Finishing & Smart Fit-out',date:'2025-Q2',status:'done'},{label:'Handover & OCC',date:'2026-Q2',status:'active'}]},
+  {id:'P-111',name:'Keraniganj River View',type:'land',location:'Keraniganj, Dhaka',status:'In Progress',progress:38,budget:'৳40.0 Cr',manager:'MD Hasanul Banna',plots:120,stats:{sold:45,reserved:10,available:65},start:'2024-Q2',end:'2027-Q4',phase:'Phase 1 — Development & Sales',desc:'River-view plotted development with 120 plots, gated community, clubhouse and a 2km riverside promenade.',milestones:[{label:'Land Acquisition',date:'2024-Q2',status:'done'},{label:'Layout & Approvals',date:'2024-Q4',status:'done'},{label:'Site Development',date:'2025-Q2',status:'done'},{label:'Plot Sales Launch',date:'2025-Q4',status:'active'},{label:'Embankment & Promenade',date:'2026-Q3',status:'todo'},{label:'Handover',date:'2027-Q4',status:'todo'}]},
+  {id:'P-112',name:'Mirpur DOHS Extension',type:'land',location:'Mirpur DOHS, Dhaka',status:'In Progress',progress:22,budget:'৳30.0 Cr',manager:'Iftekhar Ahmad',plots:90,stats:{sold:18,reserved:12,available:60},start:'2025-Q1',end:'2028-Q2',phase:'Phase 1 — Layout & Development',desc:'DOHS-style plotted residential extension in Mirpur — 90 plots with wide roads, park and community mosque.',milestones:[{label:'Land Acquisition',date:'2025-Q1',status:'done'},{label:'Layout Design',date:'2025-Q3',status:'active'},{label:'Approvals (RAJUK/Army)',date:'2026-Q1',status:'todo'},{label:'Sales Launch',date:'2026-Q2',status:'todo'},{label:'Road & Utility Works',date:'2027-Q1',status:'todo'},{label:'Handover',date:'2028-Q2',status:'todo'}]}
 ]);
 window.mockPlots = DB.init('plots', [
-  {id:'M-101',type:'3 Katha',status:'sold',block:'A'},{id:'M-102',type:'3 Katha',status:'available',block:'A'},{id:'M-103',type:'5 Katha',status:'reserved',block:'A'},{id:'M-104',type:'5 Katha',status:'not_acquired',block:'A'},
-  {id:'M-105',type:'3 Katha',status:'sold',block:'B'},{id:'M-106',type:'10 Katha',status:'available',block:'B'},{id:'M-107',type:'5 Katha',status:'not_acquired',block:'B'},{id:'M-108',type:'3 Katha',status:'available',block:'B'}
+  {id:'M-A01',type:'3 Katha',status:'sold',block:'A'},
+  {id:'M-A02',type:'3 Katha',status:'available',block:'A'},
+  {id:'M-A03',type:'5 Katha',status:'reserved',block:'A'},
+  {id:'M-A04',type:'5 Katha',status:'not_acquired',block:'A'},
+  {id:'M-A05',type:'3 Katha',status:'sold',block:'A'},
+  {id:'M-A06',type:'10 Katha',status:'available',block:'A'},
+  {id:'M-A07',type:'5 Katha',status:'not_acquired',block:'A'},
+  {id:'M-A08',type:'3 Katha',status:'available',block:'A'},
+  {id:'M-A09',type:'5 Katha',status:'available',block:'A'},
+  {id:'M-A10',type:'10 Katha',status:'sold',block:'A'},
+  {id:'M-B01',type:'3 Katha',status:'available',block:'B'},
+  {id:'M-B02',type:'5 Katha',status:'sold',block:'B'},
+  {id:'M-B03',type:'3 Katha',status:'available',block:'B'},
+  {id:'M-B04',type:'10 Katha',status:'reserved',block:'B'},
+  {id:'M-B05',type:'3 Katha',status:'sold',block:'B'},
+  {id:'M-B06',type:'5 Katha',status:'available',block:'B'},
+  {id:'M-B07',type:'3 Katha',status:'available',block:'B'},
+  {id:'M-B08',type:'5 Katha',status:'reserved',block:'B'},
+  {id:'M-B09',type:'10 Katha',status:'available',block:'B'},
+  {id:'M-B10',type:'3 Katha',status:'sold',block:'B'},
+  {id:'M-C01',type:'10 Katha',status:'available',block:'C'},
+  {id:'M-C02',type:'5 Katha',status:'sold',block:'C'},
+  {id:'M-C03',type:'5 Katha',status:'available',block:'C'},
+  {id:'M-C04',type:'3 Katha',status:'reserved',block:'C'},
+  {id:'M-C05',type:'3 Katha',status:'available',block:'C'},
+  {id:'M-C06',type:'10 Katha',status:'reserved',block:'C'},
+  {id:'M-C07',type:'5 Katha',status:'available',block:'C'},
+  {id:'M-C08',type:'3 Katha',status:'sold',block:'C'},
+  {id:'M-C09',type:'5 Katha',status:'available',block:'C'},
+  {id:'M-C10',type:'10 Katha',status:'not_acquired',block:'C'},
+  {id:'M-D01',type:'3 Katha',status:'available',block:'D'},
+  {id:'M-D02',type:'3 Katha',status:'available',block:'D'},
+  {id:'M-D03',type:'5 Katha',status:'available',block:'D'},
+  {id:'M-D04',type:'5 Katha',status:'reserved',block:'D'},
+  {id:'M-D05',type:'3 Katha',status:'available',block:'D'},
+  {id:'M-D06',type:'10 Katha',status:'available',block:'D'},
+  {id:'M-D07',type:'5 Katha',status:'available',block:'D'},
+  {id:'M-D08',type:'3 Katha',status:'not_acquired',block:'D'},
+  {id:'M-D09',type:'3 Katha',status:'available',block:'D'},
+  {id:'M-D10',type:'10 Katha',status:'reserved',block:'D'}
+
 ]);
 window.mockPlotPricing = DB.init('plot_pricing', {
-  rates: { A: { katha: 1400000, cornerPct: 8, roadPct: 5 }, B: { katha: 1250000, cornerPct: 6, roadPct: 4 } },
+  rates: { A: { katha: 1400000, cornerPct: 8, roadPct: 5 }, B: { katha: 1250000, cornerPct: 6, roadPct: 4 }, C: { katha: 1550000, cornerPct: 10, roadPct: 6 }, D: { katha: 1150000, cornerPct: 5, roadPct: 3 } },
   types: [ { key:'3K', label:'3 Katha', size:3 }, { key:'5K', label:'5 Katha', size:5 }, { key:'10K', label:'10 Katha', size:10 } ],
   premiums: [ { key:'base', label:'Base Rate' }, { key:'corner', label:'Corner Premium' }, { key:'road', label:'Road-Facing Premium' } ]
 });
@@ -1731,22 +1802,23 @@ window.mockDocuments = DB.init('documents', [
   {id:11,title:'Muktodhara Layout Plan',type:'Site Plan',category:'Technical',date:'2024-11-14',property:'Muktodhara',status:'Pending Review',notes:'Updated master layout v2.3 from Design team.',uploadedBy:'Design Team',fileSize:0},
   {id:12,title:'Bank Guarantee — Sonali',type:'Other Legal',category:'Financial',date:'2024-11-18',property:'Corporate',status:'Verified',notes:'Performance guarantee for Phase 2 financing.',uploadedBy:'Accounts',fileSize:0}
 ]);
-window.mockLandProposals = DB.init('land_proposals', [
-  {id:'LP-001',name:'Purbachal Sector 4',area:'15 Bigha',price:250000000,priceF:'৳25 Cr',location:'Purbachal',stage:'identification',status:'Screening',risk:'Low',roi:'35%',contact:'Mohiuddin Sir',notes:'Prime location near proposed IT hub',date:'2024-10-01',owner:'Md. Hasan Ali',budget:'৳22 Cr',priority:'High',progress:20,nextAction:'Site visit scheduled Nov 5'},
-  {id:'LP-002',name:'Savar Hemayetpur Plot',area:'50 Bigha',price:150000000,priceF:'৳15 Cr',location:'Savar',stage:'identification',status:'Pending Visit',risk:'Medium',roi:'40%',contact:'Rofiqul Islam',notes:'Large parcel, need soil test',date:'2024-10-05',owner:'Abdur Rahim Khan',budget:'৳12 Cr',priority:'Medium',progress:10,nextAction:'Schedule soil test'},
-  {id:'LP-003',name:'Gazipur Industrial Zone',area:'15 Bigha',price:100000000,priceF:'৳10 Cr',location:'Gazipur',stage:'due_diligence',status:'Feasible',risk:'Low',roi:'32%',contact:'Tanvir Ahmed',notes:'Industrial zoning approved, near EPZ',date:'2024-09-15',owner:'Shahidul Islam',budget:'৳8.5 Cr',priority:'High',progress:35,nextAction:'Environmental assessment report'},
-  {id:'LP-004',name:'Purbachal Sector 5',area:'10 Bigha',price:120000000,priceF:'৳12 Cr',location:'Purbachal',stage:'due_diligence',status:'Survey Pending',risk:'High',roi:'46%',contact:'Shamim Reza',notes:'Title dispute with 3rd party, legal review needed',date:'2024-09-20',owner:'Mrs. Jahanara Begum',budget:'৳10 Cr',priority:'Urgent',progress:25,nextAction:'Title verification report'},
-  {id:'LP-005',name:'Jolshiri Extension West',area:'10 Bigha',price:120000000,priceF:'৳12 Cr',location:'Jolshiri',stage:'negotiation',status:'Price Negotiation',risk:'Low',roi:'55%',contact:'Nazma Akhter',notes:'Seller asking ৳1.5 Cr/Bigha, target ৳1.2 Cr',date:'2024-10-10',owner:'Khondkar Momin',budget:'৳11 Cr',priority:'High',progress:50,nextAction:'Final offer submission'},
-  {id:'LP-006',name:'Muktodhara Phase 2',area:'30 Bigha',price:400000000,priceF:'৳40 Cr',location:'Muktodhara',stage:'negotiation',status:'Term Sheet Review',risk:'Medium',roi:'45%',contact:'MD Hasanul Banna',notes:'Strategic expansion of existing project. Payment in 3 installments.',date:'2024-08-20',owner:'Delowar Hossain',budget:'৳35 Cr',priority:'High',progress:55,nextAction:'Sign term sheet'},
-  {id:'LP-007',name:'Uttara Sector 18',area:'8 Bigha',price:180000000,priceF:'৳18 Cr',location:'Uttara',stage:'negotiation',status:'Counter Offer',risk:'Medium',roi:'38%',contact:'Iftekhar Ahmad',notes:'Premium location near metro rail. Seller asking ৳2.25 Cr/Bigha',date:'2024-10-12',owner:'Mirza Azam',budget:'৳15 Cr',priority:'Medium',progress:45,nextAction:'Respond to counter offer'},
-  {id:'LP-008',name:'Bashundhara Block J',area:'5 Bigha',price:75000000,priceF:'৳7.5 Cr',location:'Bashundhara',stage:'agreement',status:'MoU Drafting',risk:'Low',roi:'42%',contact:'Legal Team',notes:'Clear title, ready for MoU. Payment 10% advance.',date:'2024-09-25',owner:'Fazlur Rahman',budget:'৳6.5 Cr',priority:'High',progress:65,nextAction:'Finalize MoU draft'},
-  {id:'LP-009',name:'Mirpur DOHS Extension',area:'12 Bigha',price:300000000,priceF:'৳30 Cr',location:'Mirpur',stage:'agreement',status:'Agreement Review',risk:'Low',roi:'48%',contact:'Legal Team',notes:'Institutional seller. 60-day due diligence completed. Board approval pending.',date:'2024-08-05',owner:'Bangladesh Army Welfare Trust',budget:'৳27 Cr',priority:'High',progress:70,nextAction:'Board approval meeting'},
-  {id:'LP-010',name:'Dhanmondi Lake View',area:'2 Bigha',price:450000000,priceF:'৳45 Cr',location:'Dhanmondi',stage:'registration',status:'Mutation Process',risk:'Low',roi:'60%',contact:'Legal Team',notes:'Premium location for showroom/commercial. Price includes 5% registration fee.',date:'2024-07-15',owner:'Dr. Kamrul Hasan',budget:'৳40 Cr',priority:'Urgent',progress:80,nextAction:'Submit mutation at DC office'},
-  {id:'LP-011',name:'Gulshan Avenue Plot',area:'3.5 Bigha',price:875000000,priceF:'৳87.5 Cr',location:'Gulshan',stage:'registration',status:'Deed Registration',risk:'Low',roi:'42%',contact:'Legal Team',notes:'High-end commercial development. Bank finance arranged.',date:'2024-06-10',owner:'Gulshan Development Corp',budget:'৳80 Cr',priority:'High',progress:85,nextAction:'Registration at Sub-Registry'},
-  {id:'LP-012',name:'Banani Commercial Zone',area:'1.5 Bigha',price:300000000,priceF:'৳30 Cr',location:'Banani',stage:'possession',status:'Possession Received',risk:'Low',roi:'35%',contact:'Admin Team',notes:'Physical possession received. Boundary wall construction started.',date:'2024-05-20',owner:'Banani Properties Ltd',budget:'৳28 Cr',priority:'High',progress:95,nextAction:'Start development planning'},
-  {id:'LP-013',name:'Rampura Boro Moghbazar',area:'4 Bigha',price:160000000,priceF:'৳16 Cr',location:'Rampura',stage:'possession',status:'Fully Acquired',risk:'Low',roi:'50%',contact:'Admin Team',notes:'All paperwork complete. Ready for development handover to construction team.',date:'2024-04-10',owner:'Shah Mohammad Properties',budget:'৳14 Cr',priority:'Medium',progress:100,nextAction:'Handover to Projects team'},
-  {id:'LP-014',name:'Mohakhali Khamarbari',area:'6 Bigha',price:240000000,priceF:'৳24 Cr',location:'Mohakhali',stage:'identification',status:'Initial Research',risk:'High',roi:'44%',contact:'Shamim Reza',notes:'Multiple owners, complex title. Potential high ROI due to proximity to flyover.',date:'2024-10-25',owner:'Multiple (7 owners)',budget:'৳20 Cr',priority:'Medium',progress:5,nextAction:'Initial title search'},
-  {id:'LP-015',name:'Tejgaon Industrial Area',area:'20 Bigha',price:500000000,priceF:'৳50 Cr',location:'Tejgaon',stage:'due_diligence',status:'Feasibility Study',risk:'Medium',roi:'36%',contact:'Tanvir Ahmed',notes:'Large industrial plot. Rented to 3 factories currently. Vacancy timeline 6 months.',date:'2024-10-18',owner:'Tejgaon Development Board',budget:'৳45 Cr',priority:'Medium',progress:30,nextAction:'Structural assessment of existing buildings'}
+window.mockLandProposals = DB.init('land_proposals', [  {id:'LP-001',name:'Purbachal Sector 4',area:'15 Bigha',price:250000000,priceF:'৳25 Cr',location:'Purbachal',stage:'identification',status:'Screening',risk:'Low',roi:'35%',contact:'Mohiuddin Sir',notes:'Prime location near proposed IT hub',date:'2024-10-01',owner:'Md. Hasan Ali',budget:'৳22 Cr',priority:'High',progress:20,nextAction:'Site visit scheduled Nov 5',owners:[{name:'Md. Hasan Ali',share:'60%'},{name:'Hasan Ali Jute Mills',share:'40%'}],documents:[{name:'Sale Deed 2019',type:'Deed',status:'Verified'},{name:'RS Khatian',type:'Khatian',status:'Verified'},{name:'Tax Receipt 2024',type:'Tax',status:'Paid'}],mouza:'Purbachal Sector 4',dag:'Dag 118',cs:'CS 204',rs:'RS 289',commission:'1.5%',roadAccess:'120ft Rajuk Road',landUse:'Residential (RAJUK)',soilCondition:'Alluvial — good bearing',floodRisk:'Low',landmarks:'500m from proposed IT hub',coordinates:'23.8213° N, 90.4127° E',litigationCheck:'Clear',targetProject:'Muktodhara Green Park Phase 3'},
+  {id:'LP-002',name:'Savar Hemayetpur Plot',area:'50 Bigha',price:150000000,priceF:'৳15 Cr',location:'Savar',stage:'identification',status:'Pending Visit',risk:'Medium',roi:'40%',contact:'Rofiqul Islam',notes:'Large parcel, need soil test',date:'2024-10-05',owner:'Abdur Rahim Khan',budget:'৳12 Cr',priority:'Medium',progress:10,nextAction:'Schedule soil test',owners:[{name:'Abdur Rahim Khan',share:'50%'},{name:'Rahim Sons Ltd',share:'50%'}],documents:[{name:'Sale Deed 2015',type:'Deed',status:'Verified'},{name:'CS Khatian',type:'Khatian',status:'Pending'},{name:'Non-Encumbrance Cert',type:'Legal',status:'Pending'}],mouza:'Hemayetpur',dag:'Dag 55',cs:'CS 98',rs:'RS 121',commission:'2%',roadAccess:'60ft Hemayetpur Road',landUse:'Agricultural → Residential',soilCondition:'Silty loam — needs soil test',floodRisk:'Medium',landmarks:'3km from Dhaka-Aricha Highway',coordinates:'23.8119° N, 90.2815° E',litigationCheck:'Pending',targetProject:'Savar Green Valley Expansion'},
+  {id:'LP-003',name:'Gazipur Industrial Zone',area:'15 Bigha',price:100000000,priceF:'৳10 Cr',location:'Gazipur',stage:'due_diligence',status:'Feasible',risk:'Low',roi:'32%',contact:'Tanvir Ahmed',notes:'Industrial zoning approved, near EPZ',date:'2024-09-15',owner:'Shahidul Islam',budget:'৳8.5 Cr',priority:'High',progress:35,nextAction:'Environmental assessment report',owners:[{name:'Shahidul Islam',share:'100%'}],documents:[{name:'Sale Deed 2020',type:'Deed',status:'Verified'},{name:'RS Khatian',type:'Khatian',status:'Verified'},{name:'Industrial License',type:'License',status:'Valid'}],mouza:'Gazipur Sadar',dag:'Dag 220',cs:'CS 310',rs:'RS 402',commission:'',roadAccess:'100ft EPZ Road',landUse:'Industrial Zone',soilCondition:'Firm — industrial grade',floodRisk:'Low',landmarks:'Adjacent to Konabari EPZ',coordinates:'23.9989° N, 90.4203° E',litigationCheck:'Clear',targetProject:'Gazipur Industrial Park'},
+  {id:'LP-004',name:'Purbachal Sector 5',area:'10 Bigha',price:120000000,priceF:'৳12 Cr',location:'Purbachal',stage:'due_diligence',status:'Survey Pending',risk:'High',roi:'46%',contact:'Shamim Reza',notes:'Title dispute with 3rd party, legal review needed',date:'2024-09-20',owner:'Mrs. Jahanara Begum',budget:'৳10 Cr',priority:'Urgent',progress:25,nextAction:'Title verification report',owners:[{name:'Mrs. Jahanara Begum',share:'70%'},{name:'Begum Estate',share:'30%'}],documents:[{name:'Sale Deed 2008',type:'Deed',status:'Dispute'},{name:'RS Khatian',type:'Khatian',status:'Pending'},{name:'Mutation Cert',type:'Legal',status:'Pending'}],mouza:'Purbachal Sector 5',dag:'Dag 77',cs:'CS 155',rs:'RS 203',commission:'1%',roadAccess:'80ft proposed road',landUse:'Residential (RAJUK)',soilCondition:'Sandy clay',floodRisk:'Medium',landmarks:'Near proposed metro depot',coordinates:'23.8322° N, 90.5011° E',litigationCheck:'Dispute Found',targetProject:'Purbachal Lakeview City'},
+  {id:'LP-005',name:'Jolshiri Extension West',area:'10 Bigha',price:120000000,priceF:'৳12 Cr',location:'Jolshiri',stage:'negotiation',status:'Price Negotiation',risk:'Low',roi:'55%',contact:'Nazma Akhter',notes:'Seller asking ৳1.5 Cr/Bigha, target ৳1.2 Cr',date:'2024-10-10',owner:'Khondkar Momin',budget:'৳11 Cr',priority:'High',progress:50,nextAction:'Final offer submission',owners:[{name:'Khondkar Momin',share:'100%'}],documents:[{name:'Sale Deed 2017',type:'Deed',status:'Verified'},{name:'CS Khatian',type:'Khatian',status:'Verified'},{name:'Land Tax Receipt',type:'Tax',status:'Paid'}],mouza:'Jolshiri',dag:'Dag 41',cs:'CS 88',rs:'RS 134',commission:'2.5%',roadAccess:'70ft Jolshiri Link Road',landUse:'Residential',soilCondition:'Good — river silt deposit',floodRisk:'Low',landmarks:'1km from Jolshiri Abason',coordinates:'23.6105° N, 90.5120° E',litigationCheck:'Clear',targetProject:'Jolshiri Abason Phase 2'},
+  {id:'LP-006',name:'Muktodhara Phase 2',area:'30 Bigha',price:400000000,priceF:'৳40 Cr',location:'Muktodhara',stage:'negotiation',status:'Term Sheet Review',risk:'Medium',roi:'45%',contact:'MD Hasanul Banna',notes:'Strategic expansion of existing project. Payment in 3 installments.',date:'2024-08-20',owner:'Delowar Hossain',budget:'৳35 Cr',priority:'High',progress:55,nextAction:'Sign term sheet',owners:[{name:'Delowar Hossain',share:'55%'},{name:'Hossain Developers',share:'45%'}],documents:[{name:'Sale Deed 2018',type:'Deed',status:'Verified'},{name:'RS Khatian',type:'Khatian',status:'Verified'},{name:'Mutation Certificate',type:'Legal',status:'Verified'}],mouza:'Rupganj',dag:'Dag 302',cs:'CS 410',rs:'RS 512',commission:'1.5%',roadAccess:'90ft Rupganj Road',landUse:'Residential (RAJUK)',soilCondition:'Excellent — developed land',floodRisk:'Low',landmarks:'2km from Muktodhara Green Park',coordinates:'23.7780° N, 90.5192° E',litigationCheck:'Clear',targetProject:'Muktodhara Green Park Phase 2'},
+  {id:'LP-007',name:'Uttara Sector 18',area:'8 Bigha',price:180000000,priceF:'৳18 Cr',location:'Uttara',stage:'negotiation',status:'Counter Offer',risk:'Medium',roi:'38%',contact:'Iftekhar Ahmad',notes:'Premium location near metro rail. Seller asking ৳2.25 Cr/Bigha',date:'2024-10-12',owner:'Mirza Azam',budget:'৳15 Cr',priority:'Medium',progress:45,nextAction:'Respond to counter offer',owners:[{name:'Mirza Azam',share:'80%'},{name:'Azam Family Trust',share:'20%'}],documents:[{name:'Sale Deed 2021',type:'Deed',status:'Verified'},{name:'RS Khatian',type:'Khatian',status:'Verified'},{name:'City Tax Receipt',type:'Tax',status:'Paid'}],mouza:'Uttara Sector 18',dag:'Dag 65',cs:'CS 120',rs:'RS 178',commission:'2%',roadAccess:'60ft Sector 18 Road',landUse:'Residential (RAJUK)',soilCondition:'Medium — sandy',floodRisk:'Low',landmarks:'300m from Metro Rail station',coordinates:'23.8802° N, 90.3780° E',litigationCheck:'Clear',targetProject:'Uttara Lake View'},
+  {id:'LP-008',name:'Bashundhara Block J',area:'5 Bigha',price:75000000,priceF:'৳7.5 Cr',location:'Bashundhara',stage:'agreement',status:'MoU Drafting',risk:'Low',roi:'42%',contact:'Legal Team',notes:'Clear title, ready for MoU. Payment 10% advance.',date:'2024-09-25',owner:'Fazlur Rahman',budget:'৳6.5 Cr',priority:'High',progress:65,nextAction:'Finalize MoU draft',owners:[{name:'Fazlur Rahman',share:'100%'}],documents:[{name:'Sale Deed 2016',type:'Deed',status:'Verified'},{name:'CS Khatian',type:'Khatian',status:'Verified'},{name:'BIDA Approval',type:'Legal',status:'Valid'}],mouza:'Bashundhara Block J',dag:'Dag 22',cs:'CS 45',rs:'RS 89',commission:'1%',roadAccess:'100ft Main Avenue',landUse:'Residential (RAJUK)',soilCondition:'Good',floodRisk:'Low',landmarks:'Near Bashundhara City',coordinates:'23.8137° N, 90.4310° E',litigationCheck:'Clear',targetProject:'Bashundhara Block J Residency'},
+  {id:'LP-009',name:'Mirpur DOHS Extension',area:'12 Bigha',price:300000000,priceF:'৳30 Cr',location:'Mirpur',stage:'agreement',status:'Agreement Review',risk:'Low',roi:'48%',contact:'Legal Team',notes:'Institutional seller. 60-day due diligence completed. Board approval pending.',date:'2024-08-05',owner:'Bangladesh Army Welfare Trust',budget:'৳27 Cr',priority:'High',progress:70,nextAction:'Board approval meeting',owners:[{name:'Bangladesh Army Welfare Trust',share:'100%'}],documents:[{name:'Government Allotment',type:'Deed',status:'Verified'},{name:'Army Welfare Board Order',type:'Legal',status:'Verified'},{name:'Mutation Certificate',type:'Legal',status:'Verified'}],mouza:'Mirpur DOHS',dag:'Dag 15',cs:'CS 30',rs:'RS 58',commission:'',roadAccess:'80ft DOHS Main Road',landUse:'Residential (DOHS)',soilCondition:'Excellent',floodRisk:'Low',landmarks:'Inside Mirpur DOHS',coordinates:'23.8034° N, 90.3700° E',litigationCheck:'Clear',targetProject:'Mirpur DOHS Extension'},
+  {id:'LP-010',name:'Dhanmondi Lake View',area:'2 Bigha',price:450000000,priceF:'৳45 Cr',location:'Dhanmondi',stage:'registration',status:'Mutation Process',risk:'Low',roi:'60%',contact:'Legal Team',notes:'Premium location for showroom/commercial. Price includes 5% registration fee.',date:'2024-07-15',owner:'Dr. Kamrul Hasan',budget:'৳40 Cr',priority:'Urgent',progress:80,nextAction:'Submit mutation at DC office',owners:[{name:'Dr. Kamrul Hasan',share:'100%'}],documents:[{name:'Sale Deed 2014',type:'Deed',status:'Verified'},{name:'RS Khatian',type:'Khatian',status:'Verified'},{name:'DNCC Tax Receipt',type:'Tax',status:'Paid'}],mouza:'Dhanmondi',dag:'Dag 8',cs:'CS 18',rs:'RS 35',commission:'1%',roadAccess:'40ft Lake Road',landUse:'Commercial (DNCC)',soilCondition:'Excellent — lakefront',floodRisk:'Low',landmarks:'Dhanmondi Lake view',coordinates:'23.7437° N, 90.3786° E',litigationCheck:'Clear',targetProject:'Dhanmondi Commercial Plaza'},
+  {id:'LP-011',name:'Gulshan Avenue Plot',area:'3.5 Bigha',price:875000000,priceF:'৳87.5 Cr',location:'Gulshan',stage:'registration',status:'Deed Registration',risk:'Low',roi:'42%',contact:'Legal Team',notes:'High-end commercial development. Bank finance arranged.',date:'2024-06-10',owner:'Gulshan Development Corp',budget:'৳80 Cr',priority:'High',progress:85,nextAction:'Registration at Sub-Registry',owners:[{name:'Gulshan Development Corp',share:'100%'}],documents:[{name:'Corporate Deed 2012',type:'Deed',status:'Verified'},{name:'RS Khatian',type:'Khatian',status:'Verified'},{name:'Bank Finance Agreement',type:'Legal',status:'Signed'}],mouza:'Gulshan Avenue',dag:'Dag 12',cs:'CS 25',rs:'RS 48',commission:'',roadAccess:'120ft Gulshan Avenue',landUse:'Commercial (DNCC)',soilCondition:'Excellent',floodRisk:'Low',landmarks:'Gulshan 2 circle, 200m',coordinates:'23.7925° N, 90.4140° E',litigationCheck:'Clear',targetProject:'Gulshan Bay View Tower'},
+  {id:'LP-012',name:'Banani Commercial Zone',area:'1.5 Bigha',price:300000000,priceF:'৳30 Cr',location:'Banani',stage:'possession',status:'Possession Received',risk:'Low',roi:'35%',contact:'Admin Team',notes:'Physical possession received. Boundary wall construction started.',date:'2024-05-20',owner:'Banani Properties Ltd',budget:'৳28 Cr',priority:'High',progress:95,nextAction:'Start development planning',owners:[{name:'Banani Properties Ltd',share:'100%'}],documents:[{name:'Sale Deed 2011',type:'Deed',status:'Verified'},{name:'CS Khatian',type:'Khatian',status:'Verified'},{name:'Handover Certificate',type:'Legal',status:'Received'}],mouza:'Banani',dag:'Dag 33',cs:'CS 61',rs:'RS 102',commission:'',roadAccess:'80ft Banani Road 11',landUse:'Commercial (DNCC)',soilCondition:'Good',floodRisk:'Low',landmarks:'Banani Bazaar',coordinates:'23.7930° N, 90.4050° E',litigationCheck:'Clear',targetProject:'Banani Commercial Tower'},
+  {id:'LP-013',name:'Rampura Boro Moghbazar',area:'4 Bigha',price:160000000,priceF:'৳16 Cr',location:'Rampura',stage:'possession',status:'Fully Acquired',risk:'Low',roi:'50%',contact:'Admin Team',notes:'All paperwork complete. Ready for development handover to construction team.',date:'2024-04-10',owner:'Shah Mohammad Properties',budget:'৳14 Cr',priority:'Medium',progress:100,nextAction:'Handover to Projects team',owners:[{name:'Shah Mohammad Properties',share:'100%'}],documents:[{name:'Sale Deed 2010',type:'Deed',status:'Verified'},{name:'RS Khatian',type:'Khatian',status:'Verified'},{name:'Mutation Certificate',type:'Legal',status:'Verified'},{name:'Possession Receipt',type:'Legal',status:'Received'}],mouza:'Rampura',dag:'Dag 44',cs:'CS 88',rs:'RS 156',commission:'',roadAccess:'50ft Boro Moghbazar Road',landUse:'Mixed Use',soilCondition:'Good',floodRisk:'Medium',landmarks:'Rampura Bridge',coordinates:'23.7715° N, 90.4335° E',litigationCheck:'Clear',targetProject:'Rampura Mixed-Use Complex'},
+  {id:'LP-014',name:'Mohakhali Khamarbari',area:'6 Bigha',price:240000000,priceF:'৳24 Cr',location:'Mohakhali',stage:'identification',status:'Initial Research',risk:'High',roi:'44%',contact:'Shamim Reza',notes:'Multiple owners, complex title. Potential high ROI due to proximity to flyover.',date:'2024-10-25',owner:'Multiple (7 owners)',budget:'৳20 Cr',priority:'Medium',progress:5,nextAction:'Initial title search',owners:[{name:'7 individual owners',share:'various'}],documents:[{name:'Multiple deeds',type:'Deed',status:'In Review'},{name:'CS Khatian',type:'Khatian',status:'Pending'}],mouza:'Mohakhali Khamarbari',dag:'Dag 91',cs:'CS 150',rs:'RS 240',commission:'3%',roadAccess:'100ft Khamarbari Road',landUse:'Mixed Use (DNCC)',soilCondition:'Good',floodRisk:'Low',landmarks:'Near Mohakhali Flyover',coordinates:'23.7795° N, 90.4015° E',litigationCheck:'Dispute Found',targetProject:'Mohakhali Smart Plaza'},
+  {id:'LP-015',name:'Tejgaon Industrial Area',area:'20 Bigha',price:500000000,priceF:'৳50 Cr',location:'Tejgaon',stage:'due_diligence',status:'Feasibility Study',risk:'Medium',roi:'36%',contact:'Tanvir Ahmed',notes:'Large industrial plot. Rented to 3 factories currently. Vacancy timeline 6 months.',date:'2024-10-18',owner:'Tejgaon Development Board',budget:'৳45 Cr',priority:'Medium',progress:30,nextAction:'Structural assessment of existing buildings',owners:[{name:'Tejgaon Development Board',share:'100%'}],documents:[{name:'Government Allotment',type:'Deed',status:'Verified'},{name:'Industrial Lease',type:'Legal',status:'Active'},{name:'Tenant Agreements ×3',type:'Legal',status:'Valid'}],mouza:'Tejgaon Industrial Area',dag:'Dag 120',cs:'CS 210',rs:'RS 350',commission:'',roadAccess:'80ft Tejgaon Industrial Road',landUse:'Industrial (RAJUK)',soilCondition:'Excellent',floodRisk:'Low',landmarks:'Tejgaon I/A, 6 months vacancy timeline',coordinates:'23.7570° N, 90.3980° E',litigationCheck:'Clear',targetProject:'Tejgaon Industrial Park'},
+{id:'LP-016',name:'Bashundhara Block K',area:'6 Bigha',price:110000000,priceF:'৳11 Cr',location:'Bashundhara',stage:'identification',status:'Site Identified',risk:'Low',roi:'41%',contact:'Rofiqul Islam',notes:'Contiguous parcel near Block J, seller motivated. Quick due diligence possible.',date:'2024-11-02',owner:'Mahmuda Rahman',budget:'৳9.5 Cr',priority:'Medium',progress:15,nextAction:'Title search & seller verification',owners:[{name:'Mahmuda Rahman',share:'100%'}],documents:[{name:'Sale Deed 2019',type:'Deed',status:'Pending'}],mouza:'Bashundhara Block K',dag:'Dag 28',cs:'CS 52',rs:'RS 96',commission:'2%',roadAccess:'60ft Block K Road',landUse:'Residential (RAJUK)',soilCondition:'Good',floodRisk:'Low',landmarks:'2km from Bashundhara City',coordinates:'23.8210° N, 90.4380° E',litigationCheck:'Pending',targetProject:'Bashundhara Block K Residency'},
+{id:'LP-017',name:'Ashulia Smart Town Land',area:'25 Bigha',price:325000000,priceF:'৳32.5 Cr',location:'Ashulia',stage:'negotiation',status:'JV Discussion',risk:'Medium',roi:'47%',contact:'MD Hasanul Banna',notes:'Joint venture with Ashulia Development Ltd — 60/40 split. Land for Smart Town Phase 1.',date:'2024-11-08',owner:'Ashulia Development Ltd',budget:'৳28 Cr',priority:'High',progress:40,nextAction:'JV term sheet review',owners:[{name:'Ashulia Development Ltd',share:'100%'}],documents:[{name:'Corporate Deed',type:'Deed',status:'Verified'},{name:'JV Draft Agreement',type:'Legal',status:'Draft'}],mouza:'Ashulia',dag:'Dag 210',cs:'CS 305',rs:'RS 420',commission:'',roadAccess:'120ft Dhaka-Ashulia Highway',landUse:'Residential (RAJUK)',soilCondition:'Good — farmland',floodRisk:'Medium',landmarks:'Near Abdullahpur bus stand',coordinates:'23.9050° N, 90.3180° E',litigationCheck:'Pending',targetProject:'Ashulia Smart Town'},
 ]);
 window.mockDesigns = DB.init('designs', [
   {id:'DSG-001',name:'Muktodhara Master Layout',type:'Master Plan',typeIcon:'\uD83D\uDCCB',version:'v2.3',status:'Approved',project:'Muktodhara Green Park',designer:'Ar. Hasan Mahmud',description:'Complete master layout plan for Muktodhara Green Park residential project including plot division, road network, amenities, and utility corridors.',submitted:'2024-06-01',approved:'2024-09-15',versions:[{v:'v1.0',date:'2024-01-10',status:'Draft'},{v:'v2.0',date:'2024-04-15',status:'Approved'},{v:'v2.3',date:'2024-09-15',status:'Approved'}],downloadUrl:'#'},
@@ -2153,7 +2225,7 @@ window.mockBIReports = DB.init('bi_reports', [
   {id:'BIR-011',name:'Employee Productivity Dashboard',type:'Chart',category:'HR',period:'Jun 2026',updated:'2026-06-08',status:'Auto',desc:'Department-wise productivity metrics and headcount analysis',metrics:{employees:145,'avg productivity':'87.3%',departments:8,'top dept':'IT (96%)','attendance':'94.5%'},chart:{type:'bar',labels:['Sales','Construction','Finance','HR','IT','Admin','Legal','Marketing'],values:[92,85,88,79,96,82,91,87],color:'#7b1fa2'}},
   {id:'BIR-012',name:'Stock Inventory Status',type:'Chart',category:'Construction',period:'Jun 2026',updated:'2026-06-07',status:'Auto',desc:'Real-time stock levels, reorder alerts, and consumption trends',metrics:{items:340,'low stock':12,'out of stock':3,'reorder value':'৳45 Lac','monthly consumption':'৳1.2 Cr'},chart:{type:'bar',labels:['Cement','Steel','Bricks','Sand','Tiles','Paint','Pipes','Electrical'],values:[450,280,650,320,180,90,210,150],color:'#00838f'}},
   {id:'BIR-013',name:'Customer Satisfaction Trends',type:'Line Chart',category:'CRM',period:'H1 2026',updated:'2026-06-11',status:'Manual',desc:'Quarterly customer satisfaction scores from post-handover surveys',metrics:{surveys:124,'avg score':'4.2/5','positive':'78%','neutral':'15%','negative':'7%'},chart:{type:'line',labels:['Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026','Q2 2026'],values:[3.8,4.0,4.1,3.9,4.2,4.3],color:'#1565c0'}},
-  {id:'BIR-014',name:'Land Acquisition Pipeline',type:'Funnel',category:'Land',period:'Jun 2026',updated:'2026-06-09',status:'Manual',desc:'Land acquisition tracking — from identification to registration',metrics:{identified:15,'under eval':8,'legal review':5,'mutation':3,registered:2,total:'45 bigha'},chart:{type:'funnel',labels:['Identified','Under Eval','Legal Review','Mutation','Registered'],values:[15,8,5,3,2],color:'#4e342e'}},
+  {id:'BIR-014',name:'Project Acquisition Pipeline',type:'Funnel',category:'Land',period:'Jun 2026',updated:'2026-06-09',status:'Manual',desc:'Land acquisition tracking — from identification to registration',metrics:{identified:15,'under eval':8,'legal review':5,'mutation':3,registered:2,total:'45 bigha'},chart:{type:'funnel',labels:['Identified','Under Eval','Legal Review','Mutation','Registered'],values:[15,8,5,3,2],color:'#4e342e'}},
   {id:'BIR-015',name:'Marketing ROI Analysis',type:'Bar Chart',category:'Sales',period:'Q2 2026',updated:'2026-06-10',status:'Auto',desc:'Channel-wise marketing spend vs lead generation ROI',metrics:{totalSpend:'৳45 Lac',leadsGenerated:320,'cost per lead':'৳1,406','avg deal value':'৳1.2 Cr','roi':'853%'},chart:{type:'bar',labels:['Facebook','Google Ads','Billboard','TV','Events','Print'],values:[120,85,45,30,28,12],color:'#e65100'}},
   {id:'BIR-016',name:'Safety & Incident Report',type:'Table',category:'Construction',period:'Q2 2026',updated:'2026-06-06',status:'Manual',desc:'Construction site safety metrics and incident tracking',metrics:{totalHours:'85,000','incidents':4,'lost time':2,'severity rate':'0.47','safety score':'94.6%'},chart:{type:'table',headers:['Site','Incidents','Severity','Status','Score'],rows:[['Jolshiri Abason',1,'Minor','Resolved','97%'],['Muktodhara Green Park',0,'None','Clear','100%'],['Skyline Towers',2,'Moderate','Monitoring','91%'],['Green Valley',1,'Minor','Resolved','96%'],['Riverside',0,'None','Clear','99%']],color:'#e65100'}}
 ]);
@@ -2182,11 +2254,11 @@ window.kbCategories = [
   {id:'finance',label:'Finance & Accounts',icon:'💰',color:'#2e7d32'},
   {id:'procurement',label:'Procurement & Supply Chain',icon:'📦',color:'#6a1b9a'},
   {id:'hr',label:'HR & Admin',icon:'👥',color:'#00838f'},
-  {id:'land',label:'Land Acquisition',icon:'🏗️',color:'#4e342e'},
+  {id:'land',label:'Project Acquisition',icon:'🏗️',color:'#4e342e'},
   {id:'operations',label:'Operations & QC',icon:'🔧',color:'#37474f'}
 ];
 window.mockKnowledgeBase = DB.init('knowledge_base', [
-  {title:'Land Acquisition Process — Step by Step Guide',category:'Legal & Compliance',catId:'legal',content:'This document outlines the complete land acquisition process for REM projects. Step 1: Site identification and feasibility study. Step 2: Title verification at Sub-Registry office. Step 3: Mutation and name transfer with DC office. Step 4: Land survey and demarcation by licensed surveyor. Step 5: Physical possession handover with signed deed. Step 6: Final registration at Sub-Registry and tax payment. Each step requires specific documentation. The legal team must verify all original deeds dating back 20+ years. Environmental clearance certificate required for projects over 5 bigha.',tags:['land','acquisition','legal','deed'],author:'Legal Team',updated:'2024-10-15',views:342,status:'Published'},
+  {title:'Project Acquisition Process — Step by Step Guide',category:'Legal & Compliance',catId:'legal',content:'This document outlines the complete land acquisition process for REM projects. Step 1: Site identification and feasibility study. Step 2: Title verification at Sub-Registry office. Step 3: Mutation and name transfer with DC office. Step 4: Land survey and demarcation by licensed surveyor. Step 5: Physical possession handover with signed deed. Step 6: Final registration at Sub-Registry and tax payment. Each step requires specific documentation. The legal team must verify all original deeds dating back 20+ years. Environmental clearance certificate required for projects over 5 bigha.',tags:['land','acquisition','legal','deed'],author:'Legal Team',updated:'2024-10-15',views:342,status:'Published'},
   {title:'Sales Commission Policy v3 — Agent Payout Structure',category:'Sales & Marketing',catId:'sales',content:'Updated commission structure effective January 2025. BASE RATES: Direct Sales Agents — 2.5% of deal value on first booking, 1.5% on subsequent. Senior Agents — 3% on first 3 deals, 2% thereafter. Team Leads — 1% override on team deals. REFERRAL BONUS: Referral from existing customer — additional 0.5%. Corporate referrals — 1%. BULK DISCOUNT: 3+ units purchased same project — negotiate. Commission is paid 50% on downpayment, 50% on handover. Clawback applies if customer defaults within 6 months.',tags:['commission','sales','policy','agent','payout'],author:'HR',updated:'2024-09-20',views:567,status:'Published'},
   {title:'VAT & Tax Calculation Guide — Real Estate',category:'Finance & Accounts',catId:'finance',content:'Comprehensive guide for VAT and tax calculations in real estate transactions. VAT RATES: Apartment sales — 5% on land value portion, 7.5% on construction portion. Land plots — 5% on total. Commercial properties — 10% on construction portion. TAX DEDUCTION: Source tax (AIT) at 3% for individual buyers, 5% for corporate. TDS on contractor payments — 5% for registered firms, 10% for unregistered. IMPORTANT: File monthly VAT returns by 15th of following month. Annual tax returns by September 15. Keep all challans for minimum 7 years.',tags:['vat','tax','finance','calculation','compliance'],author:'Accounts',updated:'2024-10-01',views:289,status:'Published'},
   {title:'QC Checklist — Concrete Works & Structural Testing',category:'Operations & QC',catId:'operations',content:'Standard quality control checklist for all REM construction projects. PRE-POUR: Check slump (target 75-100mm). Verify rebar spacing per structural drawing. Check formwork alignment (±3mm tolerance). Verify concrete grade (minimum C30 for slabs, C35 for columns). DURING POUR: Continuous pouring preferred. Maximum delay 30 mins between batches. Consolidate with needle vibrator (25mm dia for dense reinforcement). POST-POUR: Initial curing with wet jute bags for 7 days. Remove formwork at 14 days (slabs) or 7 days (columns). Test cylinders at 7 days (70% target) and 28 days (100%).',tags:['qc','concrete','testing','structural','quality'],author:'Quality Team',updated:'2024-10-10',views:198,status:'Published'},
@@ -2198,7 +2270,7 @@ window.mockKnowledgeBase = DB.init('knowledge_base', [
   {title:'Fire Safety & Building Code Compliance',category:'Legal & Compliance',catId:'legal',content:'Fire safety requirements for REM properties as per Bangladesh National Building Code (BNBC). HIGH-RISE (6+ stories): Fire-rated stairwell doors (90 min rating). Fire hydrant on every floor. Sprinkler system in common areas. Smoke detectors in all units. Emergency lighting and exit signs. Fire alarm panel at ground floor entrance. LOW-RISE: Fire extinguishers every 500 sqft. Clear fire exit paths marked with photoluminescent signs. Fire drill twice per year. All buildings require fire clearance from Fire Service & Civil Defense before occupancy certificate.',tags:['fire','safety','building','code','compliance','bnbc'],author:'Legal Team',updated:'2024-10-22',views:156,status:'Published'},
   {title:'Leave Policy & Attendance Guidelines',category:'HR & Admin',catId:'hr',content:'Company leave and attendance policy effective 2024. LEAVE ENTITLEMENT: Annual Leave — 14 days per calendar year (prorated for new joiners). Sick Leave — 10 days per year (medical certificate required for 3+ consecutive days). Casual Leave — 7 days per year (1 day minimum, max 3 at a time). Festival Leave — 7 days (Eid-ul-Fitr 3, Eid-ul-Adha 3, other 1). Maternity — 4 months fully paid (after 1 year service). Paternity — 5 working days. ATTENDANCE: Core hours 9:00 AM-6:00 PM. 30 min grace period. Late 3 times = 1 day casual leave deducted.',tags:['hr','leave','attendance','policy'],author:'HR',updated:'2024-10-03',views:523,status:'Published'},
   {title:'Marketing Campaign Strategy & ROI Framework',category:'Sales & Marketing',catId:'sales',content:'Standard marketing campaign framework for REM Projects. CAMPAIGN TYPES: Digital (Facebook/Youtube/Google Ads) — 40% of budget. Traditional (Billboard/Print/TV) — 30%. Events & Exhibitions — 20%. Agent Network — 10%. ROI TARGETS: Digital — minimum 500% ROI (cost per lead < Tk 500). Traditional — 200% ROI minimum. Events — target 50+ quality leads per event. BUDGET ALLOCATION: New project launch — 3% of projected revenue. Ongoing project — 1.5% of remaining inventory value. Monthly performance review with actual vs budget tracking.',tags:['marketing','campaign','roi','strategy','advertising'],author:'Marketing',updated:'2024-10-25',views:345,status:'Published'},
-  {title:'Land Mutation & Title Transfer Process',category:'Land Acquisition',catId:'land',content:'Detailed mutation process for land purchased by REM. Step 1: Application to DC office with original deed and khatian. Step 2: Physical verification by Assistant Commissioner (Land) — site visit within 30 days. Step 3: Hearing and objection period — 14 days public notice. Step 4: Mutation order issued by AC(Land). Step 5: Mutation certificate printed. REQUIRED DOCUMENTS: Original sale deed, Previous mutation certificate, Khatian copies (current & 20-year old), Tax receipt, Non-encumbrance certificate, Possession proof. Timeline: 90-180 days depending on district. Legal fee: 2% of land value.',tags:['land','mutation','title','transfer','legal'],author:'Legal Team',updated:'2024-10-28',views:189,status:'Published'},
+  {title:'Land Mutation & Title Transfer Process',category:'Project Acquisition',catId:'land',content:'Detailed mutation process for land purchased by REM. Step 1: Application to DC office with original deed and khatian. Step 2: Physical verification by Assistant Commissioner (Land) — site visit within 30 days. Step 3: Hearing and objection period — 14 days public notice. Step 4: Mutation order issued by AC(Land). Step 5: Mutation certificate printed. REQUIRED DOCUMENTS: Original sale deed, Previous mutation certificate, Khatian copies (current & 20-year old), Tax receipt, Non-encumbrance certificate, Possession proof. Timeline: 90-180 days depending on district. Legal fee: 2% of land value.',tags:['land','mutation','title','transfer','legal'],author:'Legal Team',updated:'2024-10-28',views:189,status:'Published'},
   {title:'Monthly Financial Reporting — Templates & Deadlines',category:'Finance & Accounts',catId:'finance',content:'Standard monthly financial reporting package for REM management. REPORTS DUE: 5th — Bank reconciliation & cash position. 7th — Sales report (bookings, collections, dues). 10th — Project-wise cost report (actual vs budget). 12th — Ageing of payables & receivables. 15th — VAT return filing. 20th — Fund flow forecast for next 45 days. 25th — Monthly management accounts (P&L, Balance Sheet). FORMAT: Excel templates with standard chart of accounts. Submit to CFO with variance analysis. Board pack prepared by 30th for monthly board meeting.',tags:['finance','reporting','monthly','deadline','template'],author:'Finance',updated:'2024-10-20',views:267,status:'Published'},
   {title:'Contractor Evaluation & Performance Scorecard',category:'Procurement & Supply Chain',catId:'procurement',content:'Quarterly contractor evaluation system. EVALUATION CRITERIA: Quality (30%) — Pass rate on QC inspections. Timeliness (25%) — % of milestones met on schedule. Safety (15%) — Incident rate per 1000 man-hours. Cost Control (15%) — % within budget. Compliance (15%) — Documentation, labor law adherence. RATING SCALE: A (90-100%) — Preferred, fast-track payment. B (75-89%) — Standard terms. C (60-74%) — Enhanced supervision, 50% payment hold until completion. D (below 60%) — Show cause notice, no new contracts for 1 year.',tags:['contractor','evaluation','performance','scorecard','vendor'],author:'Procurement',updated:'2024-10-15',views:145,status:'Published'},
   {title:'Emergency Response Plan — Construction Sites',category:'Operations & QC',catId:'operations',content:'Emergency procedures for all REM construction sites. MEDICAL EMERGENCY: First aid kit at every site office. Designated first aider on each shift. Nearest hospital mapped with contact numbers. Ambulance on-call for sites with 50+ workers. FIRE: Evacuation drill every 3 months. Fire extinguishers inspected monthly. Designated assembly point 50m from structure. STRUCTURAL: Stop work immediately if unusual movement/cracks detected. Site engineer evaluates. Structural engineer visit within 24 hours. SAFETY INCIDENTS: Report within 1 hour to safety officer. Root cause analysis within 48 hours. Safety stand-down if fatality occurs.',tags:['safety','emergency','construction','response','plan'],author:'Safety Officer',updated:'2024-10-18',views:123,status:'Published'},
@@ -2206,7 +2278,7 @@ window.mockKnowledgeBase = DB.init('knowledge_base', [
 ]);
 
 let currentGroup = 'executive', currentModule = 'dashboard', currentRole = 'Super Admin';
-let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'land', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard', boqTab = 'dashboard', eqTab = 'dashboard';
+let landTab = 'dashboard', stockTab = 'inventory', settingsTab = 'users', projectsTab = 'all', crmView = 'list', kbTab = 'dashboard', ctTab = 'dashboard', boqTab = 'dashboard', eqTab = 'dashboard';
 let landSortKey = 'progress', landSortDir = -1, landShowArchived = false;
 
 // ═══ GROUP & TOP BAR NAV ═══
@@ -4219,7 +4291,7 @@ function openDuesDetail(id){
   );
 }
 
-var plotsTab='layout';
+var plotsTab='layout';var plotLBlock='';
 function renderPlots(el){
   plotsTab=plotsTab||'layout';
   const pP2=_pg('plots',mockPlots);
@@ -4235,20 +4307,41 @@ function renderPlots(el){
   </div>`;
 }
 function renderPlotsLayout(){
+  const vis=mockPlots.filter(p=>!plotLBlock||p.block===plotLBlock);
   return `<div class="stats-row" style="margin-bottom:10px">${[
       ['Available',mockPlots.filter(p=>p.status==='available').length,'#4caf50'],['Sold',mockPlots.filter(p=>p.status==='sold').length,'#e53935'],
       ['Reserved',mockPlots.filter(p=>p.status==='reserved').length,'#1e88e5'],['Not Acquired',mockPlots.filter(p=>p.status==='not_acquired').length,'#999']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value" style="color:${c}">${v}</div></div>`).join('')}</div>
     <div class="card"><div class="card-body">
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center"><span style="font-size:9px;color:#888;font-weight:600">BLOCK:</span>${['','A','B','C','D'].map(b=>`<span style="cursor:pointer;padding:2px 10px;border-radius:10px;font-size:9px;font-weight:600;background:${plotLBlock===b?'#2F80ED':'#f0f0f0'};color:${plotLBlock===b?'#fff':'#666'}" onclick="plotLBlock='${b}';renderModule()">${b||'All'}</span>`).join('')}<span style="margin-left:auto;font-size:9px;color:#888">${vis.length} plots shown · click a plot to edit</span></div>
       <div style="display:flex;gap:14px;margin-bottom:10px;font-size:10px">${[
         ['Available','#4caf50'],['Sold','#e53935'],['Reserved','#1e88e5'],
         ['Not Acquired','repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)']
       ].map(([l,b])=>`<span><span style="display:inline-block;width:10px;height:10px;background:${b};border-radius:2px;vertical-align:middle;margin-right:3px${l==='Not Acquired'?';border:1px dashed #ccc':''}"></span>${l}</span>`).join('')}</div>
-      <div class="plot-grid">${mockPlots.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`}).join('')}</div>
+      <div class="plot-grid">${vis.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id} · ${p.type} · ${p.status} · click to edit" onclick="crudPlot(mockPlots.find(x=>x.id==='${p.id}'))">${p.id.split('-')[1]}</div>`}).join('')}</div>
     </div></div>`;
 }
 function renderPlotsInventory(pP2){
-  return `<div class="card"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${pP2.items.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages,pP2.perPage)}</div></div></div>`;
+  const q=(document.getElementById('plotSearch')||{}).value||'';
+  const bf=(document.getElementById('plotBlock')||{}).value||'';
+  var rows=pP2.items.filter(p=>{
+    if(bf&&p.block!==bf)return false;
+    if(q&&p.id.toLowerCase().indexOf(q.toLowerCase())<0&&p.type.toLowerCase().indexOf(q.toLowerCase())<0)return false;
+    return true;
+  });
+  const blocks=[...new Set(mockPlots.map(p=>p.block))];
+  const stCol={available:'badge-active',sold:'badge-sold',reserved:'badge-reserved',not_acquired:'badge-closed'};
+  return `<div class="stats-row" style="margin-bottom:8px">${[
+      ['Available',mockPlots.filter(p=>p.status==='available').length,'#4caf50'],['Sold',mockPlots.filter(p=>p.status==='sold').length,'#e53935'],
+      ['Reserved',mockPlots.filter(p=>p.status==='reserved').length,'#1e88e5'],['Not Acquired',mockPlots.filter(p=>p.status==='not_acquired').length,'#999'],
+      ['Total Plots',mockPlots.length,'#2F80ED']
+    ].map(s=>`<div class="stat-card"><div class="label">${s[0]}</div><div class="value" style="color:${s[2]}">${s[1]}</div></div>`).join('')}</div>
+  <div class="toolbar" style="margin-bottom:6px">
+    <input id="plotSearch" placeholder="Search plot ID / type..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:150px"/>
+    <select id="plotBlock" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Blocks</option>${blocks.map(b=>`<option${bf===b?' selected':''}>${b}</option>`).join('')}</select>
+    <div class="spacer"></div>
+  </div>
+  <div class="card"><div class="card-header"><h3>Plot Inventory (${rows.length} shown)</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody>${rows.length?rows.map(p=>`<tr style="cursor:pointer" onclick="crudPlot(mockPlots.find(x=>x.id==='${p.id}'))"><td style="font-weight:500">${p.id}</td><td>Block ${p.block}</td><td>${p.type}</td><td><span class="badge-status ${stCol[p.status]}">${p.status.replace('_',' ')}</span></td><td style="text-align:right;color:#2F80ED;font-size:11px">✎</td></tr>`).join(''):`<tr><td colspan="5" style="text-align:center;color:#999;padding:14px">No plots match the current filter</td></tr>`}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages,pP2.perPage)}</div></div></div>`;
 }
 function renderPlotsPricing(){
   var P=mockPlotPricing;
@@ -4290,8 +4383,26 @@ function crudPlot(item){
 // ═══ LAYOUT & UNIT BUILDER (Drag & Drop) ═══
 var lbTab='land';
 window.mockLayouts = DB.init('layouts', {
-  land:{cols:8,rows:6,items:[]},
-  building:{projectId:'PROJ-001',floors:5,perFloor:4,items:[]}
+  land:{cols:8,rows:6,items:[
+    {id:'LT-10001',label:'P-1',type:'3 Katha',row:0,col:0,w:2,h:1,status:'available'},
+    {id:'LT-10002',label:'P-2',type:'5 Katha',row:0,col:2,w:2,h:2,status:'available'},
+    {id:'LT-10003',label:'P-3',type:'3 Katha',row:0,col:4,w:2,h:1,status:'sold'},
+    {id:'LT-10004',label:'P-4',type:'10 Katha',row:2,col:0,w:4,h:2,status:'available'},
+    {id:'LT-10005',label:'P-5',type:'5 Katha',row:2,col:4,w:2,h:2,status:'reserved'},
+    {id:'LT-10006',label:'P-6',type:'5 Katha',row:2,col:6,w:2,h:2,status:'available'},
+    {id:'LT-10007',label:'P-7',type:'3 Katha',row:4,col:0,w:2,h:1,status:'available'},
+    {id:'LT-10008',label:'P-8',type:'3 Katha',row:4,col:2,w:2,h:1,status:'sold'},
+    {id:'LT-10009',label:'P-9',type:'3 Katha',row:4,col:4,w:2,h:1,status:'available'},
+    {id:'LT-10010',label:'P-10',type:'5 Katha',row:4,col:6,w:2,h:2,status:'available'}
+  ]},
+  building:{projectId:'PROJ-001',floors:5,perFloor:4,items:[
+    {id:'BT-20001',floor:1,slot:0,type:'2BHK',status:'available'},
+    {id:'BT-20002',floor:1,slot:1,type:'3BHK',status:'sold'},
+    {id:'BT-20003',floor:1,slot:2,type:'3BHK',status:'booked'},
+    {id:'BT-20004',floor:2,slot:0,type:'3BHK',status:'available'},
+    {id:'BT-20005',floor:2,slot:3,type:'4BHK',status:'available'},
+    {id:'BT-20006',floor:3,slot:1,type:'Penthouse',status:'available'}
+  ]}
 });
 var _lbDrag=null;
 var _LB_LAND_DEFS={'3K':{w:2,h:1,label:'3 Katha',type:'3 Katha'},'5K':{w:2,h:2,label:'5 Katha',type:'5 Katha'},'10K':{w:4,h:2,label:'10 Katha',type:'10 Katha'}};
@@ -5032,11 +5143,11 @@ function renderLandMgmt(el){
   const stageNames=['identification','due_diligence','negotiation','agreement','registration','possession'];
   const stageLabels={identification:'\uD83D\uDD0D Identification',due_diligence:'\uD270\uFE0F Due Diligence',negotiation:'\uD83E\uDD1D Negotiation',agreement:'\uD83D\uDCDC Agreement',registration:'\uD83D\uDCCB Registration',possession:'\u2705 Possession'};
   const stageColors={identification:'#1565c0',due_diligence:'#e65100',negotiation:'#7b1fa2',agreement:'#2e7d32',registration:'#00838f',possession:'#37474f'};
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Land Acquisition</div><div class="page-subtitle">${total} proposals \u00B7 \u09F3 ${totalVal.toLocaleString('en-IN')} total value \u00B7 6-stage pipeline</div>
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Project Acquisition</div><div class="page-subtitle">${total} proposals \u00B7 \u09F3 ${totalVal.toLocaleString('en-IN')} total value \u00B7 6-stage pipeline</div>
     <div class="toolbar" style="margin-bottom:6px">
       <div class="tabs">${['dashboard','pipeline','proposals'].map(t=>`<div class="tab ${landTab===t?'active':''}" onclick="landTab='${t}';Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','pipeline':'\uD83D\uDCCB Pipeline','proposals':'\uD83D\uDCC4 Proposals'}[t]}</div>`).join('')}</div>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Land Acquisition:Create">+ New Proposal</button>
+      <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Project Acquisition:Create">+ New Proposal</button>
     </div>
     ${landTab==='dashboard'?renderLandDashboard():
       landTab==='pipeline'?renderLandPipeline():
@@ -5057,7 +5168,7 @@ function renderLandDashboard(){
     ['Total Value','\u09F3 '+totalVal.toLocaleString('en-IN'),'#2e7d32'],
     ['Avg ROI',avgRoi+'%','#7b1fa2'],
     ['Urgent',highP,'#c62828'],
-    ['Low Risk',lowR,'#2e7d32'],
+    ['Total Area',total>0?active.reduce(function(s,p){return s+(parseFloat(String(p.area).replace(/[^0-9.]/g,''))||0)},0).toFixed(1)+' Bigha':'0','#e65100'],
     ['Acquired',byStage.possession.length+byStage.registration.length,'#37474f']
   ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
@@ -5100,7 +5211,7 @@ function landDelete(id){
   var delP=mockLandProposals[idx];
   mockLandProposals.splice(idx,1);
   DB.save('land_proposals');
-  if(delP)logActivity('Deleted','Land Acquisition','Proposal',delP.id,delP.name);
+  if(delP)logActivity('Deleted','Project Acquisition','Proposal',delP.id,delP.name);
   Object.keys(_PG).forEach(function(k){if(k.indexOf('land')===0)delete _PG[k]});
   renderModule();
   showToast('Proposal deleted','info');
@@ -5122,7 +5233,7 @@ function dropLand(e,status){
   p.status=status==='possession'?'Fully Acquired':status==='registration'?'Mutation Process':status==='agreement'?'MoU Drafting':p.status;
   DB.save('land_proposals');
   landAct(p,'Moved','Stage '+old+' → '+status);
-  logActivity('Updated','Land Acquisition','Proposal',p.id,'Moved '+old+' → '+status);
+  logActivity('Updated','Project Acquisition','Proposal',p.id,'Moved '+old+' → '+status);
   renderModule();
   showToast('Moved to '+stageLabels[status].split(' ').slice(1).join(' '),'success');
 }
@@ -5191,9 +5302,9 @@ function renderLandProposals(){
     <select id="landFLoc" onchange="Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Locations</option>${locations.map(l=>'<option value="'+l+'"'+(lf===l?' selected':'')+'>'+l+'</option>').join('')}</select>
     <div class="spacer"></div>
     <button class="action-btn secondary" onclick="landExportCSV()" style="padding:3px 7px;font-size:9px" title="Export CSV">📥 CSV</button>
-    <button class="action-btn secondary" onclick="importData(mockLandProposals,'Land Proposals','land_proposals',IMPORT_FIELDS.land)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Land Acquisition:Import">📤 Import</button>
+    <button class="action-btn secondary" onclick="importData(mockLandProposals,'Project Proposals','land_proposals',IMPORT_FIELDS.land)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Project Acquisition:Import">📤 Import</button>
     <button class="action-btn ${landShowArchived?'primary':'secondary'}" onclick="landShowArchived=!landShowArchived;Object.keys(_PG).forEach(function(k){if(!k.startsWith('land'))return;delete _PG[k]});renderModule()" style="padding:3px 7px;font-size:9px" title="Toggle archived">📦 ${landShowArchived?'All':'Active'}</button>
-    <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Land Acquisition:Create">+ New Proposal</button>
+    <button class="action-btn primary" onclick="crudProposal()" style="padding:3px 8px;font-size:10px" data-perm="Project Acquisition:Create">+ New Proposal</button>
 
   </div>
     <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px">${chips}</div>
@@ -5543,7 +5654,7 @@ function openRefineFinancials(id){
       p.budget='৳'+(f.total*0.85).toFixed(1)+' Cr';
       DB.save('land_proposals');
       landAct(p,'Updated','Refined financial model — ROI '+p.roi);
-      logActivity('Updated','Land Acquisition','Proposal',p.id,'Financials refined, ROI '+p.roi);
+      logActivity('Updated','Project Acquisition','Proposal',p.id,'Financials refined, ROI '+p.roi);
       showToast('Financials saved — ROI '+p.roi,'success');
       closeDrawer();Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();
     }
@@ -5574,7 +5685,7 @@ function landArchive(id){
   p.archived=true;
   DB.save('land_proposals');
   landAct(p,'Archived','Proposal archived');
-  logActivity('Updated','Land Acquisition','Proposal',p.id,'Archived');
+  logActivity('Updated','Project Acquisition','Proposal',p.id,'Archived');
   showToast('Proposal archived','info');
   renderModule();
 }
@@ -5583,7 +5694,7 @@ function landRestore(id){
   p.archived=false;
   DB.save('land_proposals');
   landAct(p,'Restored','Proposal restored to pipeline');
-  logActivity('Updated','Land Acquisition','Proposal',p.id,'Restored');
+  logActivity('Updated','Project Acquisition','Proposal',p.id,'Restored');
   showToast('Proposal restored','success');
   renderModule();
 }
@@ -5604,7 +5715,7 @@ function moveLandToProject(id){
       }
       DB.save('projects');
       landAct(p,'Project','Merged into '+proj.name);
-      logActivity('Updated','Land Acquisition','Proposal',p.id,'Merged into project '+proj.name);
+      logActivity('Updated','Project Acquisition','Proposal',p.id,'Merged into project '+proj.name);
       showToast('Merged into '+proj.name,'success');
     }
   }else{
@@ -5730,14 +5841,14 @@ function crudProposal(item){
         mockLandProposals.push(d);
         DB.save('land_proposals');
         landAct(d,'Created','Proposal created: '+name);
-        logActivity('Created','Land Acquisition','Proposal',d.id,name);
+        logActivity('Created','Project Acquisition','Proposal',d.id,name);
         showToast('Proposal created','success');
       }else{
         Object.keys(d).forEach(function(k){item[k]=d[k];});
         if(!item.owners)item.owners=[];if(!item.documents)item.documents=[];if(!item.activities)item.activities=[];
         DB.save('land_proposals');
         landAct(item,'Updated','Proposal details updated');
-        logActivity('Updated','Land Acquisition','Proposal',item.id,name);
+        logActivity('Updated','Project Acquisition','Proposal',item.id,name);
         showToast('Proposal updated','success');
       }
       closeDrawer();Object.keys(_PG).forEach(function(k){delete _PG[k]});renderModule();
@@ -5746,13 +5857,31 @@ function crudProposal(item){
 }
 
 function renderProjects(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active projects</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div><div class="tab ${projectsTab==='gantt'?'active':''}" onclick="projectsTab='gantt';renderModule()">📊 Gantt</div></div><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockProjects,'Projects','projects',IMPORT_FIELDS.projects)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Projects:Import">📥</button><button class="action-btn primary" onclick="crudProject()" data-perm="Projects:Create">+ New Project</button></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${projectsTab==='gantt'?renderProjectGantt():mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
-      <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><div style="font-size:12px;font-weight:600">${p.name}</div><div style="font-size:10px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
+  const pq=(document.getElementById('projSearch')||{}).value||'';
+  const ps=(document.getElementById('projStatus')||{}).value||'';
+  var list=mockProjects.filter(function(p){
+    if(projectsTab!=='all'&&projectsTab!=='gantt'&&p.type!==projectsTab)return false;
+    if(ps&&p.status!==ps)return false;
+    if(pq&&p.name.toLowerCase().indexOf(pq.toLowerCase())<0&&p.location.toLowerCase().indexOf(pq.toLowerCase())<0)return false;
+    return true;
+  });
+  var totalVal=mockProjects.reduce(function(s,p){return s+(parseFloat(String(p.budget).replace(/[^0-9.]/g,''))||0);},0);
+  const statusCol={'In Progress':'#2e7d32','Planning':'#ff9800','Near Completion':'#1565c0','Completed':'#2e7d32'};
+  el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active projects · ৳${totalVal.toFixed(0)} Cr portfolio value</div>
+    <div class="stats-row" style="margin-bottom:8px">${[
+      ['Total Projects',mockProjects.length,'#2F80ED'],
+      ['In Progress',mockProjects.filter(p=>p.status==='In Progress').length,'#2e7d32'],
+      ['Near Completion',mockProjects.filter(p=>p.status==='Near Completion').length,'#1565c0'],
+      ['Planning',mockProjects.filter(p=>p.status==='Planning').length,'#ff9800'],
+      ['Portfolio Value','৳'+totalVal.toFixed(0)+' Cr','#7b1fa2']
+    ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
+    <div class="toolbar" style="margin-bottom:6px"><div class="tabs">${[['all','All'],['land','Land'],['flat','Flats'],['gantt','📊 Gantt']].map(t=>`<div class="tab ${projectsTab===t[0]?'active':''}" onclick="projectsTab='${t[0]}';renderModule()">${t[1]}</div>`).join('')}</div>${projectsTab!=='gantt'?`<input id="projSearch" placeholder="Search projects..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/><select id="projStatus" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Planning</option><option>In Progress</option><option>Near Completion</option></select>`:''}<div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockProjects,'Projects','projects',IMPORT_FIELDS.projects)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Projects:Import">📥</button><button class="action-btn primary" onclick="crudProject()" data-perm="Projects:Create">+ New Project</button></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${projectsTab==='gantt'?renderProjectGantt():list.map(p=>`
+      <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-size:12px;font-weight:600">${p.name}</div><div style="font-size:10px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}" style="background:${statusCol[p.status]||'#888'}15;color:${statusCol[p.status]||'#888'};border:1px solid ${statusCol[p.status]||'#888'}44">${p.status}</span></div>
+      ${p.desc?`<div style="font-size:9px;color:#888;margin-bottom:5px;line-height:1.4">${p.desc.substring(0,90)}${p.desc.length>90?'…':''}</div>`:''}
       <div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:10px"><span>Progress</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div></div>
-      <div style="font-size:10px;color:#666;display:flex;gap:10px"><span>${p.budget}</span><span>${p.manager}</span>${p.plots?`<span>${p.plots} plots</span>`:''}${p.units?`<span>${p.units} units</span>`:''}</div>
-      <div style="margin-top:5px;display:flex;gap:5px"><span class="badge-status badge-active">${p.stats.sold} sold</span><span class="badge-status badge-reserved">${p.stats.reserved} reserved</span><span class="badge-status badge-closed">${p.stats.available} avail</span></div>
+      <div style="font-size:10px;color:#666;display:flex;gap:10px;flex-wrap:wrap"><span>💰 ${p.budget}</span><span>👤 ${p.manager}</span>${p.plots?`<span>🗺 ${p.plots} plots</span>`:''}${p.units?`<span>🏢 ${p.units} units</span>`:''}</div>
+      <div style="margin-top:5px;display:flex;gap:5px;align-items:center"><span class="badge-status badge-active">${p.stats.sold} sold</span><span class="badge-status badge-reserved">${p.stats.reserved} reserved</span><span class="badge-status badge-closed">${p.stats.available} avail</span>${p.phase?`<span style="margin-left:auto;font-size:8px;color:#888;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px">${p.phase}</span>`:''}</div>
     </div></div>`).join('')}</div></div>`;
 }
 
@@ -9088,9 +9217,9 @@ window.mockCOA = DB.init('coa', [
   {code:'4-1030',name:'ADMIN & OVERHEAD',type:'Expense',balance:'₹1,80,00,000'}
 ]);
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
-  {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Land Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
+  {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Project Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -9565,9 +9694,9 @@ var _sdDatasetDefs=[
   {g:'Sales & CRM',arr:'mockEntities',label:'Customers',icon:'🏢',mod:'customers',fields:['name','companyName','phone','email']},
   {g:'Sales & CRM',arr:'mockCampaigns',label:'Campaigns',icon:'📢',mod:'sales_marketing',fields:['name','status']},
   {g:'Sales & CRM',arr:'mockAgents',label:'Agents',icon:'🤝',mod:'sales_marketing',fields:['name','branch']},
-  // Group: Land & Projects
-  {g:'Land & Projects',arr:'mockPlots',label:'Plots',icon:'🏞️',mod:'plots',fields:['id','type','status']},
-  {g:'Land & Projects',arr:'mockLandProposals',label:'Land Proposals',icon:'📄',mod:'land_mgmt',fields:['name','location']},
+  // Group: Projects
+  {g:'Projects',arr:'mockPlots',label:'Plots',icon:'🏞️',mod:'plots',fields:['id','type','status']},
+  {g:'Projects',arr:'mockLandProposals',label:'Project Proposals',icon:'📄',mod:'land_mgmt',fields:['name','location']},
   // Group: Bookings & Customer
   {g:'Bookings & Customer',arr:'mockBookings',label:'Bookings',icon:'📝',mod:'bookings',fields:['client','property','id','status']},
   {g:'Bookings & Customer',arr:'mockCustomers',label:'Customers',icon:'👥',mod:'customer_portal',fields:['name','phone','project']},
@@ -9588,7 +9717,7 @@ var _sdDatasetDefs=[
   {g:'Engineering & Construction',arr:'mockPayroll',label:'Payroll',icon:'💵',mod:'labor',fields:['name']},
   {g:'Legal & Compliance',arr:'mockInspections',label:'Inspections',icon:'🔍',mod:'qc',fields:['area','inspector','status']},
   {g:'Engineering & Construction',arr:'mockDesigns',label:'Designs',icon:'🎨',mod:'designs',fields:['name','designer','status']},
-  {g:'Land & Projects',arr:'mockProjects',label:'Projects',icon:'🏗️',mod:'projects',fields:['name','location','status']},
+  {g:'Projects',arr:'mockProjects',label:'Projects',icon:'🏗️',mod:'projects',fields:['name','location','status']},
   {g:'Legal & Compliance',arr:'mockCompliance',label:'Compliance',icon:'✅',mod:'compliance',fields:['name','type','priority']},
   {g:'Admin & Operations',arr:'mockInventory',label:'Inventory',icon:'📦',mod:'stock',fields:['name','category','qty']},
   {g:'Admin & Operations',arr:'mockSuppliers',label:'Suppliers',icon:'🏭',mod:'stock',fields:['name','material']},
@@ -9605,7 +9734,7 @@ var _sdDatasetDefs=[
   // Group: Collaboration
   {g:'Collaboration',arr:'mockWorkspaceChannels',label:'Chat Channels',icon:'💬',mod:'workspace',fields:['name','description']}
 ];
-var _sdGroupOrder=['Executive','Sales & CRM','Land & Projects','Bookings & Customer','Engineering & Construction','Accounts & Finance','Admin & Operations','Legal & Compliance','Collaboration'];
+var _sdGroupOrder=['Executive','Sales & CRM','Projects','Bookings & Customer','Engineering & Construction','Accounts & Finance','Admin & Operations','Legal & Compliance','Collaboration'];
 var _sdModuleCount=Object.keys(GROUPS).reduce(function(s,g){return s+GROUPS[g].mods.length},0);
 function sdOpenResult(el){
   navigateSearch(el.getAttribute('data-mod'),el.getAttribute('data-title')||'');
@@ -11204,10 +11333,19 @@ function detailStatRow(items){return '<div class="stats-row" style="grid-templat
 
 function openProject(id){
   const p=mockProjects.find(function(x){return x.id===id});if(!p)return;
+  const pctCol=p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935';
+  const milestones=(p.milestones||[]).map(function(m){
+    var c=m.status==='done'?'#2e7d32':m.status==='active'?'#2F80ED':'#999';
+    var bg=m.status==='done'?'#e8f5e9':m.status==='active'?'#eef3ff':'#f5f5f5';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f5f5f5"><span style="width:14px;height:14px;border-radius:50%;background:'+bg+';border:2px solid '+c+';display:flex;align-items:center;justify-content:center;font-size:7px;color:'+c+';flex-shrink:0">'+(m.status==='done'?'✓':m.status==='active'?'●':'')+'</span><div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:500">'+m.label+'</div><div style="font-size:8px;color:#888">'+m.date+'</div></div><span style="font-size:8px;font-weight:600;color:'+c+'">'+(m.status==='done'?'Done':m.status==='active'?'Active':'Planned')+'</span></div>';
+  }).join('');
   showDetailPanel('Project: '+p.name,
     detailStatRow([['ID',p.id],['Location',p.location],['Status',p.status],['Manager',p.manager],['Budget',p.budget],['Type',p.type]])+
-    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Progress</h3><div class="progress-bar" style="height:8px"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935')+';height:8px;border-radius:4px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:3px"><span>'+p.progress+'% complete</span><span style="color:'+(p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935')+';font-weight:600">'+(p.progress>60?'On Track':p.progress>30?'Needs Attention':'At Risk')+'</span></div></div>'+
-    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Unit Status</h3>'+detailStatRow([['Sold',p.stats.sold],['Reserved',p.stats.reserved],['Available',p.stats.available],['Total',p.plots||p.units||0]])+'</div>',
+    (p.desc?'<div style="margin-top:10px;padding:8px;background:#f9f9fb;border-radius:6px;font-size:10px;color:#555;line-height:1.5">'+p.desc+'</div>':'')+
+    (p.phase?'<div style="margin-top:8px"><span style="display:inline-block;padding:2px 8px;background:#eef3ff;color:#2F80ED;border-radius:4px;font-size:9px;font-weight:600">'+p.phase+'</span></div>':'')+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Progress</h3><div class="progress-bar" style="height:8px"><div class="fill" style="width:'+p.progress+'%;background:'+pctCol+';height:8px;border-radius:4px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:3px"><span>'+p.progress+'% complete</span><span style="color:'+pctCol+';font-weight:600">'+(p.progress>60?'On Track':p.progress>30?'Needs Attention':'At Risk')+'</span></div></div>'+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Unit Status</h3>'+detailStatRow([['Sold',p.stats.sold],['Reserved',p.stats.reserved],['Available',p.stats.available],['Total',p.plots||p.units||0]])+'</div>'+
+    '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Milestones ('+(p.milestones||[]).length+')</h3>'+(milestones||'<div style="color:#999;font-size:10px">No milestones yet</div>')+'</div>',
     '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudProject(mockProjects.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel();switchModule(\'bookings\')">📋 View Bookings</button></div>'
   );
 }
@@ -14111,8 +14249,8 @@ html.dark .inv-preview{background:rgba(15,23,42,.5);border-color:#334155}
 // ── LANGUAGE TOGGLE (EN / বাংলা) ──
 var LANG='en';
 var _BN_DICT={
-'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Flats & Units':'ফ্ল্যাট ও ইউনিট','Plots & Blocks':'প্লট ও ব্লক','Layout & Unit Builder':'লেআউট ও ইউনিট বিল্ডার','Pricing Matrix':'মূল্য ম্যাট্রিক্স','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Attendance':'উপস্থিতি','Leave':'ছুটি','Payroll':'বেতন','Recruitment':'নিয়োগ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
-'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Land & Projects':'জমি ও প্রকল্প','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Engineering & Construction':'প্রকৌশল ও নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Finance':'ফাইন্যান্স','Accounts & Finance':'অ্যাকাউন্টস ও ফাইন্যান্স','HR & Admin':'মানবসম্পদ ও প্রশাসন','Admin & Operations':'প্রশাসন ও কার্যক্রম','Legal & Compliance':'আইনি ও সম্মতি','Collaboration':'সহযোগিতা','System':'সিস্টেম',
+'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Project Acquisition':'প্রকল্প অধিগ্রহণ','Flats & Units':'ফ্ল্যাট ও ইউনিট','Plots & Blocks':'প্লট ও ব্লক','Layout & Unit Builder':'লেআউট ও ইউনিট বিল্ডার','Pricing Matrix':'মূল্য ম্যাট্রিক্স','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Attendance':'উপস্থিতি','Leave':'ছুটি','Payroll':'বেতন','Recruitment':'নিয়োগ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
+'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Engineering & Construction':'প্রকৌশল ও নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Finance':'ফাইন্যান্স','Accounts & Finance':'অ্যাকাউন্টস ও ফাইন্যান্স','HR & Admin':'মানবসম্পদ ও প্রশাসন','Admin & Operations':'প্রশাসন ও কার্যক্রম','Legal & Compliance':'আইনি ও সম্মতি','Collaboration':'সহযোগিতা','System':'সিস্টেম',
 'Super Admin':'সুপার অ্যাডমিন','Sales Agent':'সেলস এজেন্ট','Site Engineer':'সাইট ইঞ্জিনিয়ার','Finance':'ফাইন্যান্স','Executive Group':'নির্বাহী গ্রুপ',
 'New Inquiry':'নতুন অনুসন্ধান','Contacted':'যোগাযোগ হয়েছে','Site Visit':'সাইট পরিদর্শন','Negotiation':'আলোচনা','Booking':'বুকিং','Downpayment':'ডাউন পেমেন্ট','Installments':'কিস্তি','Possession':'দখল','Handover':'হস্তান্তর','Lost':'হারানো','Junk':'অপ্রাসঙ্গিক',
 'Confirmed':'নিশ্চিত','Pending Review':'বিবেচনাধীন','Overdue':'অতীত','Paid':'পরিশোধিত','Sent':'প্রেরিত','Draft':'খসড়া','Active':'সক্রিয়','Inactive':'নিষ্ক্রিয়','Open':'খোলা','In Progress':'চলমান','Resolved':'সমাধান','Escalated':'উচ্চতর স্তরে','Critical':'জরুরি','High':'উচ্চ','Medium':'মাঝারি','Low':'নিম্ন','Hot':'গরম','Warm':'উষ্ণ','Cold':'ঠান্ডা','New':'নতুন','Available':'উপলব্ধ','Sold':'বিক্রিত','Reserved':'সংরক্ষিত','Cleared':'ক্লিয়ার্ড','Pending':'অপেক্ষমাণ','Published':'প্রকাশিত','Unassigned':'বণ্টিত হয়নি','Assigned':'বণ্টিত','Booked':'বুকড','Completed':'সম্পন্ন','Cancelled':'বাতিল','Rejected':'প্রত্যাখ্যাত','Approved':'অনুমোদিত','Waiting':'অপেক্ষমাণ','Delivered':'বিতরণ করা হয়েছে',
