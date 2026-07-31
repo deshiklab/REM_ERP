@@ -209,7 +209,7 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 | 1.7–1.8 | v8-v17 | Fund transfers + Journal entries |
 | 1.9–1.11 | v8-v18 | HR: check-in/out, leave approval, timesheets | ✅ done |
 | 1.12–1.13 | v8-v19 | Notification templates + bulk exports | ✅ done |
-| 2.x | v8-v20..22 | Accounting deep-dive |
+| 2.1–2.6 | v8-v20..22 | Reconcile · SFP/SCI/SCE/SCF · fiscal year · credit notes · purchase invoices · CoA linkage | ✅ done |
 | 3.x | v8-v23..25 | Sales & inventory |
 | 4.x | v8-v26..27 | HR deep-dive |
 | 5.x | v8-v28..31 | Communication & AI group |
@@ -224,4 +224,7 @@ Sidebar: 11 icons still fit (flex-shrink pattern from v8-v12).
 - [x] **1.7+1.8** Fund transfers + Journal entries (balanced dr=cr) — SW v8-v17 (`b37ec61`)
 - [x] **1.9–1.11** HR check-in/out · Leave approval workflow · Timesheets — SW v8-v18 (`f0f6554`)
 - [x] **1.12–1.13** Notification templates · Bulk PDF/e-Invoice exports — SW v8-v19 (`6f66460`)
-- [ ] Phase 2 (accounting) · Phase 3 (sales/inventory) · Phase 4 (HR) · Phase 5 (comm/AI) · Phase 6 (investment/portal)
+- [x] **2.1+2.2** Bank reconciliation + Audit statements (SFP/SCI/SCE/SCF) — SW v8-v20 (`c7841ba`)
+- [x] **2.4+2.5** Credit notes + Purchase invoices — SW v8-v21 (`277dc3d`)
+- [x] **2.3+2.6** Fiscal year/periods + CoA→transaction linkage — SW v8-v22 (`8624710`)
+- [ ] Phase 3 (sales/inventory) · Phase 4 (HR) · Phase 5 (comm/AI) · Phase 6 (investment/portal)
