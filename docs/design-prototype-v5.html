@@ -182,6 +182,9 @@
     .kanban-card.dragging{opacity:.4;border-style:dashed}
     .kanban-col.drag-over{background:#e8f0fe!important;border:2px dashed #2F80ED!important;border-radius:8px}
     .kanban-col.drag-over .kanban-card{pointer-events:none}
+    .kanban-card{cursor:grab}
+    .kanban-card:active{cursor:grabbing}
+    .kanban-drag-over{outline:2px dashed #2F80ED;background:rgba(47,128,237,.06)}
     .toast-container{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
     .toast{padding:8px 14px;border-radius:8px;font-size:11px;font-weight:500;color:#fff;animation:fadeIn .2s ease-out}
     .toast.success{background:#2e7d32}
@@ -499,6 +502,45 @@
     #qaGrid{display:flex;flex-direction:column;overflow-y:auto;max-height:380px}
     #qaGrid .qa-grid-inner{display:grid;grid-template-columns:1fr 1fr;gap:3px}
     html.dark #qaSearch input{border-color:#2a3a52;color:#e0e0e0}
+    /* ═══ FEEDBACK & POLISH ═══ */
+    /* Shimmer loading skeletons */
+    .skel{background:linear-gradient(90deg,var(--muted-bg,#eee) 25%,rgba(200,200,200,.25) 37%,var(--muted-bg,#eee) 63%);background-size:400% 100%;animation:shimmer 1.2s ease-in-out infinite;border-radius:4px}
+    @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+    /* Illustrated empty states */
+    .empty-state{padding:40px 20px;text-align:center}
+    .empty-state .es-icon{font-size:40px;line-height:1;margin-bottom:10px;opacity:.85}
+    .empty-state .es-title{font-size:13px;font-weight:600;color:var(--fg,#333);margin-bottom:4px}
+    .empty-state .es-sub{font-size:11px;color:var(--muted,#888);margin-bottom:12px}
+    .empty-state .es-cta{display:inline-block}
+    /* Kanban column empty hint */
+    .kanban-empty{margin:4px;padding:12px 6px;border:1px dashed var(--card-border,#d8d8d8);border-radius:6px;text-align:center;font-size:9px;color:var(--muted,#999)}
+    /* Toast undo button */
+    .toast{display:flex;align-items:center;gap:4px;justify-content:space-between}
+    .toast .toast-undo{font-size:10px;color:var(--primary,#fff);cursor:pointer;margin-left:8px;text-decoration:underline;background:none;border:none;padding:0;font-weight:600;flex-shrink:0;opacity:.95}
+    .toast .toast-undo:hover{opacity:1;text-decoration:none}
+    html.dark .toast .toast-undo{color:#bfdbfe}
+    /* Micro-animations */
+    .table-wrap tbody tr{transition:background .15s,transform .15s,box-shadow .15s}
+    .table-wrap tbody tr:hover{transform:translateX(2px)}
+    .card,.stat-card,.quick-card{transition:transform .15s ease,box-shadow .15s ease}
+    .card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+    .btn,button,.tab,.icon-btn,.sidebar-item{transition:transform .1s ease,background .15s}
+    .btn:active,button:active,.tab:active{transform:scale(.96)}
+    .drawer-sheet{animation:slideUp .3s cubic-bezier(.32,.72,0,1),modalPop .18s ease-out}
+    @keyframes modalPop{from{transform:scale(.92) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+    @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+    /* Print-friendly views */
+    @media print{
+      body *{visibility:visible!important}
+      body{overflow:visible!important;background:#fff!important}
+      #sidebar,.top-bar,.app-footer,.content-footer,.toast,.toast-container,.notification-panel,.drawer-overlay,#searchDropdown,#recentTray,.breadcrumb-picker,.toolbar,.pagination,.col-menu,.filter-panel,#quickAddDropdown,.lead-panel,.slide-out,.no-print{display:none!important}
+      .main-area{margin:0!important;flex:none!important}
+      #mainContent{overflow:visible!important;height:auto!important}
+      .card{break-inside:avoid;box-shadow:none!important;border:1px solid #ddd}
+      table{font-size:9px}
+      thead{display:table-header-group}
+      tr{break-inside:avoid}
+    }
   </style>
 </head>
 <body>
@@ -551,9 +593,9 @@
       <div class="top-actions" style="position:relative">
         <div id="mobileSideBtn" onclick="toggleMobileSidebar()" style="display:none;width:26px;height:26px;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#666;font-size:16px" class="mobile-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
         <div id="searchWrap">
-          <div id="searchBar" tabindex="-1">
+          <div id="searchBar" tabindex="-1" onclick="openCommandPalette()" title="Search anything (Ctrl+K)" style="cursor:pointer">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input id="gsInput" placeholder="Search anything..." onfocus="openSearchDropdown()" oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
+            <input id="gsInput" placeholder="Search anything..." oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
             <span class="kbd">⌘K</span>
           </div>
           <div id="searchDropdown">
@@ -566,6 +608,10 @@
             <div class="sd-footer"><span id="sdResultCount">All 28 modules</span><span>↑↓ Navigate · ↩ Open · ⎋ Close</span></div>
           </div>
         </div>
+        <div class="icon-btn" id="recentBtn" onclick="toggleRecentTray()" title="Recent Items" style="position:relative;font-size:15px;line-height:1">🕘<span id="recentBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#2F80ED;color:#fff;font-size:8px;font-weight:700;border-radius:8px;padding:1px 4px;line-height:1.3;min-width:14px;text-align:center">0</span>
+          <div id="recentTray" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:300px;max-height:300px;overflow-y:auto;background:var(--card-bg,#fff);border:1px solid var(--card-border,#e0e0e0);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.18);z-index:9999;padding:6px"></div>
+        </div>
+        <div class="icon-btn" onclick="showShortcutsHelp()" title="Keyboard Shortcuts (?)" style="font-size:15px;line-height:1">⌨</div>
         <div class="icon-btn" onclick="openQuickAdd()" title="Quick Add" style="font-weight:700;font-size:16px;color:#2F80ED">+</div>
         <div class="icon-btn" onclick="printReport()" title="Print Report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></div>
         <div class="icon-btn" onclick="exportAllTables()" title="Export All as CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
@@ -574,8 +620,8 @@
       </div>
     </div>
     <div class="content" id="mainContent"></div>
-    <div style="height:28px;min-height:28px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 12px;font-size:10px;color:#888;justify-content:space-between;position:sticky;bottom:0;z-index:20">
-      <div class="breadcrumb">REM ERP <span>›</span> <span id="footerGroup">Executive</span> <span>›</span> <span id="footerModName">Dashboard</span></div>
+    <div class="app-footer" style="height:28px;min-height:28px;background:#fff;border-top:1px solid #e8e8e8;display:flex;align-items:center;padding:0 12px;font-size:10px;color:#888;justify-content:space-between;position:sticky;bottom:0;z-index:20">
+      <div class="breadcrumb"><span class="crumb-part crumb-root" onclick="openCommandPalette()" title="Search (Ctrl+K)">REM ERP</span> <span class="crumb-sep">›</span> <span id="footerGroup" class="crumb-part" onclick="showGroupPicker(event)" title="Switch group">Executive</span> <span class="crumb-sep">›</span> <span id="footerModName" class="crumb-part" onclick="showModulePicker(event)" title="Switch module">Dashboard</span></div>
       <div style="display:flex;align-items:center;gap:5px">
         <button onclick="changeZoom(-10)" style="padding:1px 5px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;cursor:pointer;font-size:10px;color:#555">−</button>
         <span id="zoomLabel" onclick="resetZoom()" style="cursor:pointer;font-weight:600;min-width:36px;text-align:center;font-size:11px">100%</span>
@@ -619,7 +665,7 @@ const GROUPS = {
   land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'},{id:'compliance',label:'Compliance'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'}] },
   construction:  { label:'Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'qc',label:'QC & Inspection'},{id:'designs',label:'Design Mgmt'}] },
-  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_reminders',label:'Payment Reminders',badge:true},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
+  finance_admin: { label:'Finance & Admin',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_reminders',label:'Payment Reminders',badge:true},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'stock',label:'Stock & Procurement'},{id:'hr',label:'HR'},{id:'documents',label:'Data Vault'},{id:'knowledge_base',label:'Knowledge Base'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'bi_reports',label:'BI Reports',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
   system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] }
 };
@@ -1703,13 +1749,13 @@ function switchGroup(group) {
 
 // Cross-module navigation helpers
 function navigateTo(mod, state) { if (state) Object.assign(window, state); switchModule(mod); }
-function openUnit(unitId) { window._navUnitId = unitId; switchModule('properties_units'); }
-function openCrmCustomer(name) { window._navCustName = name; switchModule('customers'); }
-function openBookingRef(id) { window._navBookingId = id; switchModule('bookings'); }
-function openInvoiceRef(id) { window._navInvoiceId = id; switchModule('finance'); }
-function openPropertyRef(name) { window._navPropertyName = name; switchModule('properties_units'); }
+function openUnit(unitId) { var u=_findUnit(unitId); trackRecent('unit', u?(u.id+' · '+u.proj):('Unit '+unitId), {mod:'properties_units', ref:unitId}); window._navUnitId = unitId; switchModule('properties_units'); }
+function openCrmCustomer(name) { trackRecent('customer', name, {mod:'customers', name:name}); window._navCustName = name; switchModule('customers'); }
+function openBookingRef(id) { var b=(window.mockBookings||[]).find(function(x){return String(x.id)===String(id);}); trackRecent('booking', id+(b?' · '+b.client:''), {mod:'bookings', ref:id}); window._navBookingId = id; switchModule('bookings'); }
+function openInvoiceRef(id) { var v=(window.mockInvoices||[]).find(function(x){return String(x.id)===String(id);}); trackRecent('invoice', id+(v?' · '+v.client:''), {mod:'finance', ref:id}); window._navInvoiceId = id; switchModule('finance'); }
+function openPropertyRef(name) { trackRecent('property', name, {mod:'properties_units', name:name}); window._navPropertyName = name; switchModule('properties_units'); }
 
-function switchModule(mod) {
+function switchModule(mod,skipSkel) {
   closeLeadPanel();
   currentModule = mod;
   // Update top bar active
@@ -1721,53 +1767,60 @@ function switchModule(mod) {
   // Footer
   const names = {}; grp.mods.forEach(m => { names[m.id] = m.label; });
   document.getElementById('footerModName').textContent = names[mod] || mod;
+  // Fast redirect cases — run synchronously BEFORE any skeleton logic
+  if(mod==='invoices_view'){crmSubView='invoices';crmInvTab='all';switchModule('crm');return;}
+  if(mod==='payments_view'){crmSubView='payments';switchModule('crm');return;}
   // Render
   const el = document.getElementById('mainContent');
-  switch(mod) {
-    case 'invoices_view': crmSubView='invoices';crmInvTab='all';switchModule('crm');return;
-    case 'payments_view': crmSubView='payments';switchModule('crm');return;
-    case 'dashboard': renderDashboard(el); break;
-    case 'analytics': renderAnalytics(el); break;
-    case 'customers': renderCustomers(el); break;
-    case 'crm': renderCRM(el); break;
-    case 'proposals': renderProposals(el); break;
-    case 'sales_marketing': renderSalesMarketing(el); break;
-    case 'dues_recovery': renderDues(el); break;
-    case 'contacts': renderContacts(el); break;
-    case 'land_mgmt': renderLandMgmt(el); break;
-    case 'plots': renderPlots(el); break;
-    case 'properties_units': renderPropertiesUnits(el); break;
-    case 'projects': renderProjects(el); break;
-    case 'compliance': renderCompliance(el); break;
-    case 'bookings': renderBookings(el); break;
-    case 'customer_portal': renderCustomerPortal(el); break;
-    case 'handover': renderHandover(el); break;
-    case 'contractors': renderContractors(el); break;
-    case 'boq': renderBOQ(el); break;
-    case 'variation_orders': renderVariations(el); break;
-    case 'equipment': renderEquipment(el); break;
-    case 'labor': renderLabor(el); break;
-    case 'qc': renderQC(el); break;
-    case 'designs': renderDesigns(el); break;
-    case 'finance': renderFinance(el); break;
-    case 'stock': renderStock(el); break;
-    case 'hr': renderHR(el); break;
-    case 'documents': renderDocuments(el); break;
-    case 'knowledge_base': renderKB(el); break;
-    case 'tasks': renderTasks(el); break;
-    case 'workspace': renderWorkspace(el); break;
-    case 'bi_reports': renderBIReports(el); break;
-    case 'notifications_page': renderNotificationsPage(el); break;
-    case 'payment_reminders': renderPaymentReminders(el); break;
-    case 'activity_log': renderActivityLog(el); break;
-    case 'csv_import': renderCsvImport(el); break;
-    case 'permissions': renderPermissions(el); break;
-    case 'settings': renderSettings(el); break;
-    case 'system_docs': renderSystemDocs(el); break;
-    case 'backup_restore': renderBackupRestore(el); break;
-    default: renderDashboard(el);
-  }
-  setTimeout(applyPerms,0);
+  // Shimmer skeleton on heavy module switches (skipped for same-module re-renders via renderModule)
+  const _heavy=['dashboard','crm','finance','properties_units','bookings','analytics','hr','stock','projects'];
+  if(!skipSkel&&_heavy.indexOf(mod)>=0){ showSkeleton(el); }
+  setTimeout(function(){
+    switch(mod) {
+      case 'dashboard': renderDashboard(el); break;
+      case 'analytics': renderAnalytics(el); break;
+      case 'customers': renderCustomers(el); break;
+      case 'crm': renderCRM(el); break;
+      case 'proposals': renderProposals(el); break;
+      case 'sales_marketing': renderSalesMarketing(el); break;
+      case 'dues_recovery': renderDues(el); break;
+      case 'contacts': renderContacts(el); break;
+      case 'land_mgmt': renderLandMgmt(el); break;
+      case 'plots': renderPlots(el); break;
+      case 'properties_units': renderPropertiesUnits(el); break;
+      case 'projects': renderProjects(el); break;
+      case 'compliance': renderCompliance(el); break;
+      case 'bookings': renderBookings(el); break;
+      case 'customer_portal': renderCustomerPortal(el); break;
+      case 'handover': renderHandover(el); break;
+      case 'contractors': renderContractors(el); break;
+      case 'boq': renderBOQ(el); break;
+      case 'variation_orders': renderVariations(el); break;
+      case 'equipment': renderEquipment(el); break;
+      case 'labor': renderLabor(el); break;
+      case 'qc': renderQC(el); break;
+      case 'designs': renderDesigns(el); break;
+      case 'finance': renderFinance(el); break;
+      case 'stock': renderStock(el); break;
+      case 'hr': renderHR(el); break;
+      case 'documents': renderDocuments(el); break;
+      case 'knowledge_base': renderKB(el); break;
+      case 'tasks': renderTasks(el); break;
+      case 'workspace': renderWorkspace(el); break;
+      case 'bi_reports': renderBIReports(el); break;
+      case 'notifications_page': renderNotificationsPage(el); break;
+      case 'payment_reminders': renderPaymentReminders(el); break;
+      case 'payment_heatmap': renderPaymentHeatmap(el); break;
+      case 'activity_log': renderActivityLog(el); break;
+      case 'csv_import': renderCsvImport(el); break;
+      case 'permissions': renderPermissions(el); break;
+      case 'settings': renderSettings(el); break;
+      case 'system_docs': renderSystemDocs(el); break;
+      case 'backup_restore': renderBackupRestore(el); break;
+      default: renderDashboard(el);
+    }
+    setTimeout(applyPerms,0);
+  },skipSkel?0:30);
 }
 
 // ═══ PAGINATION SYSTEM ═══
@@ -1804,7 +1857,7 @@ function _pgHtml(id,total,page,tp,perPage){
   h+=`<span class="pg-info">${total} records (${tp} pages)</span></div>`;
   return h;
 }
-function renderModule() { switchModule(currentModule); }// ═══ RENDER FUNCTIONS ═══
+function renderModule() { switchModule(currentModule,true); }// ═══ RENDER FUNCTIONS ═══
 function renderDashboard(el){
   const pDbB=_pg('db_bookings',mockBookings);
   var dbLeadsSorted = mockLeads.slice().sort(function(a,b){var p={High:0,Medium:1,Low:2};return (p[a.priority]||9)-(p[b.priority]||9)});
@@ -1940,7 +1993,7 @@ function renderCustomers(el){
   var fg=(document.getElementById('custFGroup')||{}).value||'';
   var fri=(document.getElementById('custFStatus')||{}).value||'';
   filtered=filtered.filter(function(e){
-    if(q&&!e.name.toLowerCase().includes(q.toLowerCase())&&!(e.companyName||'').toLowerCase().includes(q.toLowerCase())&&!e.phone.includes(q))return false;
+    if(q&&!(e.name||'').toLowerCase().includes(q.toLowerCase())&&!(e.companyName||'').toLowerCase().includes(q.toLowerCase())&&!e.phone.includes(q))return false;
     if(ft&&e.type!==ft)return false;
     if(fr&&e.roles.indexOf(fr)<0)return false;
     if(fg&&(!e.tags||e.tags.indexOf(fg)<0))return false;
@@ -1969,8 +2022,8 @@ function renderCustomers(el){
       '<div class="spacer"></div>'+
       '<button class="action-btn primary" onclick="crudEntity()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ New Customer</button>'+
     '</div>'+
-    '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name / Company</th><th>Type</th><th>Roles</th><th>Phone</th><th>Properties</th><th>Total Value</th><th>Repeat?</th><th></th></tr></thead><tbody>'+
-    pcust.items.map(function(e){
+    '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th></th><th>Name / Company</th><th>Type</th><th>Roles</th><th>Phone</th><th>Properties</th><th>Total Value</th><th>Repeat?</th><th class="num">Value Trend</th><th></th></tr></thead><tbody>'+
+    pcust.items.length?pcust.items.map(function(e,ei){
       var typeIcon={'individual':'👤','company':'🏢','joint':'👥'}[e.type]||'📎';
       var typeColor={'individual':'#1565c0','company':'#e65100','joint':'#7b1fa2'}[e.type]||'#888';
       var displayName=e.type==='company'?e.companyName:e.name;
@@ -1979,8 +2032,8 @@ function renderCustomers(el){
         return '<span style="display:inline-block;padding:0 5px;border-radius:3px;font-size:7px;font-weight:600;color:#fff;background:'+rc+';margin:0 1px">'+r+'</span>';
       }).join('');
       var repeat=(e.totalProperties||0)>1?'<span style="color:#2e7d32;font-size:10px">🔄 Yes ('+(e.totalProperties||0)+')</span>':'<span style="color:#999;font-size:9px">—</span>';
-      return '<tr style="cursor:pointer" onclick="openCustomer(\''+e.id+'\')"><td style="padding:4px 4px 4px 8px;width:26px"><div style="width:24px;height:24px;border-radius:50%;background:'+typeColor+'22;color:'+typeColor+';display:flex;align-items:center;justify-content:center;font-size:10px">'+typeIcon+'</div></td><td style="font-weight:500;font-size:11px">'+displayName+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td><td style="font-size:8px">'+roleBadges+'</td><td style="font-size:10px;color:#555">'+e.phone+'</td><td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td><td style="font-size:10px;font-weight:600;color:#2e7d32">'+(e.totalValue?'৳'+(e.totalValue/100000).toFixed(1)+'L':'—')+'</td><td>'+repeat+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEntity(\''+e.id+'\')" data-perm="CRM & Leads:Edit">✎</span></td></tr>';
-    }).join('')+
+      return '<tr style="cursor:pointer" onclick="openCustomer(\''+e.id+'\')"><td style="padding:4px 4px 4px 8px;width:26px"><div style="width:24px;height:24px;border-radius:50%;background:'+typeColor+'22;color:'+typeColor+';display:flex;align-items:center;justify-content:center;font-size:10px">'+typeIcon+'</div></td><td style="font-weight:500;font-size:11px">'+displayName+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;font-weight:600;color:#fff;background:'+typeColor+'">'+e.type+'</span></td><td style="font-size:8px">'+roleBadges+'</td><td style="font-size:10px;color:#555">'+e.phone+'</td><td style="font-size:10px;font-weight:500;color:'+(e.totalProperties>0?'#2e7d32':'#999')+'">'+(e.totalProperties||0)+'</td><td style="font-size:10px;font-weight:600;color:#2e7d32">'+(e.totalValue?'৳'+(e.totalValue/100000).toFixed(1)+'L':'—')+'</td><td>'+repeat+'</td><td style="width:110px;text-align:right">'+sparkline(sparkWalk(ei+(e.totalProperties||0)*2),'#e65100')+'</td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEntity(\''+e.id+'\')" data-perm="CRM & Leads:Edit">✎</span></td></tr>';
+    }).join(''):'<tr><td colspan="10">'+emptyState('👥','No customers found','No customers match your filters. Try adjusting the search.','+ New Customer','crudEntity()')+'</td></tr>'+
     '</tbody></table>'+_pgHtml('customers',pcust.total,pcust.page,pcust.totalPages,pcust.perPage)+'</div></div></div></div>';
   // Handle cross-module navigation: pre-fill search for customer name
   if (window._navCustName) {
@@ -2251,7 +2304,7 @@ function renderCRM(el){
       return '<div class="stat-card" style="padding:5px 6px"><div class="label" style="font-size:8px">'+s+'</div><div class="value" style="font-size:13px;color:'+{NIC:'#1565c0',CT:'#e65100',SV:'#c62828',NG:'#7b1fa2',BK:'#2e7d32',DP:'#00838f',IN:'#f9a825',PS:'#00695c',HO:'#33691e'}[{NIC:'NIC',CT:'CT',SV:'SV',NG:'NG',BK:'BK',DP:'DP',IN:'IN',PS:'PS',HO:'HO'}[s.slice(0,2)]||'NIC']+'">'+c+'</div></div>';
     }).join('')}</div>`:''}
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Pipeline</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div><div class="tab ${crmSubView==='reports'?'active':''}" onclick="crmSubView='reports';renderModule()">Reports</div><div class="tab ${crmSubView==='activities'?'active':''}" onclick="crmSubView='activities';renderModule()">Activities</div></div>
+      <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">📋 Kanban</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div><div class="tab ${crmSubView==='reports'?'active':''}" onclick="crmSubView='reports';renderModule()">Reports</div><div class="tab ${crmSubView==='activities'?'active':''}" onclick="crmSubView='activities';renderModule()">Activities</div></div>
       ${crmSubView==='leads'||crmSubView==='pipeline'?`
       <input id="crmSearch" placeholder="Search name/phone/property..." oninput="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
       <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${LEAD_STAGES.map(function(s){return '<option value="'+s+'"'+(f.sf===s?' selected':'')+'>'+s+'</option>'}).join('')}<option value="Lost"${f.sf==='Lost'?' selected':''}>Lost</option><option value="Junk"${f.sf==='Junk'?' selected':''}>Junk</option></select>
@@ -2299,7 +2352,7 @@ function renderCRM(el){
 
 function renderCRMList(filtered,pcrm){
   return `<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th style="width:24px;padding:4px 2px 4px 4px"><input type="checkbox" onchange="toggleBulkAll()" ${Object.keys(_bulkSel).length===filtered.length&&filtered.length>0?'checked':''} style="accent-color:#2F80ED"/></th><th>Name</th><th>Phone</th><th>Property</th><th>Source</th><th>Value</th><th>Score</th><th>Priority</th><th>Owner</th><th>Next F/U</th><th>Stage</th><th></th></tr></thead><tbody>${
-    pcrm.items.map(function(l){
+    pcrm.items.length?pcrm.items.map(function(l){
       var sc=calcLeadScore(l);
       var next={'New Inquiry':'Contacted','Contacted':'Site Visit','Site Visit':'Negotiation','Negotiation':'Booking','Booking':'Downpayment','Downpayment':'Installments','Installments':'Possession','Possession':'Handover'}[l.status];
       var scc={'New Inquiry':'#e3f2fd','Contacted':'#fff3e0','Site Visit':'#fce4ec','Negotiation':'#f3e5f5','Booking':'#e8f5e9','Downpayment':'#e0f7fa','Installments':'#fff8e1','Possession':'#e0f2e1','Handover':'#f1f8e9'}[l.status];
@@ -2311,7 +2364,7 @@ function renderCRMList(filtered,pcrm){
       (next&&next!=='Completed'?' <span style="color:#2e7d32;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();advanceLeadStage('+l.id+')" data-perm="CRM & Leads:Edit">\u25B6 '+next+'</span>':'')+
       (l.status==='Booking'||l.status==='Downpayment'||l.status==='Installments'||l.status==='Possession'||l.status==='Handover'?'':' <span style="color:#1565c0;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();convertLeadToBooking('+l.id+')" data-perm="CRM & Leads:Edit">\uD83D\uDCCB</span>')+
     '</td></tr>'
-    }).join('')
+    }).join(''):'<tr><td colspan="12">'+emptyState('🎯','No leads found','No leads match your filters. Try clearing them or add a new lead.','+ Add Lead','crudLead()')+'</td></tr>'
   }</tbody></table>${_pgHtml('crm',pcrm.total,pcrm.page,pcrm.totalPages,pcrm.perPage)}</div></div></div>`;
 }
 
@@ -2321,12 +2374,12 @@ function renderCRMKanban(){
     var bc={'New Inquiry':'#e3f2fd','Contacted':'#fff3e0','Site Visit':'#fce4ec','Negotiation':'#f3e5f5','Booking':'#e8f5e9','Downpayment':'#e0f7fa','Installments':'#fff8e1','Possession':'#e0f2e1','Handover':'#f1f8e9'}[st];
     var stc={'New Inquiry':'#1565c0','Contacted':'#e65100','Site Visit':'#c62828','Negotiation':'#7b1fa2','Booking':'#2e7d32','Downpayment':'#00838f','Installments':'#f9a825','Possession':'#00695c','Handover':'#33691e'}[st];
     return '<div class="kanban-col" style="min-width:170px;flex:1" ondragover="dragOver(event)" ondrop="dropLead(event,\''+st+'\')" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"><div style="padding:5px 8px;font-size:9px;font-weight:600;color:'+stc+';background:'+bc+';border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center"><span>'+st+'</span><span style="background:'+stc+';color:#fff;border-radius:10px;padding:0 6px;font-size:9px">'+items.length+'</span></div><div style="flex:1;overflow-y:auto;padding:4px">'+
-    items.map(function(l){
+    items.length?items.map(function(l){
       var next={'New Inquiry':'Contacted','Contacted':'Site Visit','Site Visit':'Negotiation','Negotiation':'Booking','Booking':'Downpayment','Downpayment':'Installments','Installments':'Possession','Possession':'Handover'}[l.status];
-      return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'lead\','+l.id+')" ondragend="dragEnd(event)" style="margin-bottom:4px;cursor:pointer;position:relative" onclick="openLead('+l.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:10px;font-weight:600">'+l.name+'</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:8px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id==='+l.id+'))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:8px" onclick="event.stopPropagation();deleteLead('+l.id+')">\u2715</span></div></div><div style="font-size:9px;color:#888;margin-top:2px">'+l.property+'</div><div style="font-size:9px;color:#888">'+l.value+' \u00B7 '+l.source+'</div><div style="margin-top:3px;display:flex;gap:2px;align-items:center;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:2px;padding:0 5px;border-radius:6px;font-size:7px;font-weight:600;background:'+leadScoreColor(calcLeadScore(l))+'22;color:'+leadScoreColor(calcLeadScore(l))+';border:1px solid '+leadScoreColor(calcLeadScore(l))+'55">'+calcLeadScore(l)+'</span><span class="badge-status '+(l.priority==='High'?'badge-sold':l.priority==='Medium'?'badge-pending':'badge-closed')+'" style="font-size:7px">'+l.priority+'</span><span class="badge-status '+(l.type==='NRB'?'badge-reserved':'badge-closed')+'" style="font-size:7px">'+l.type+'</span>'+
+      return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'lead\','+l.id+')" ondragend="dragEnd(event)" style="margin-bottom:4px;cursor:pointer;position:relative" onclick="if(!_kdragged)openLead('+l.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:10px;font-weight:600">'+l.name+'</div><div style="display:flex;gap:2px"><span style="color:#2F80ED;cursor:pointer;font-size:8px" onclick="event.stopPropagation();crudLead(mockLeads.find(x=>x.id==='+l.id+'))">\u270E</span><span style="color:#e53935;cursor:pointer;font-size:8px" onclick="event.stopPropagation();deleteLead('+l.id+')">\u2715</span></div></div><div style="font-size:9px;color:#888;margin-top:2px">'+l.property+'</div><div style="font-size:9px;color:#888">'+l.value+' \u00B7 '+l.source+'</div><div style="margin-top:3px;display:flex;gap:2px;align-items:center;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:2px;padding:0 5px;border-radius:6px;font-size:7px;font-weight:600;background:'+leadScoreColor(calcLeadScore(l))+'22;color:'+leadScoreColor(calcLeadScore(l))+';border:1px solid '+leadScoreColor(calcLeadScore(l))+'55">'+calcLeadScore(l)+'</span><span class="badge-status '+(l.priority==='High'?'badge-sold':l.priority==='Medium'?'badge-pending':'badge-closed')+'" style="font-size:7px">'+l.priority+'</span><span class="badge-status '+(l.type==='NRB'?'badge-reserved':'badge-closed')+'" style="font-size:7px">'+l.type+'</span>'+
       (next&&next!=='Completed'?'<span style="color:#2e7d32;cursor:pointer;font-size:8px;font-weight:600;padding:1px 4px;background:#e8f5e9;border-radius:3px" onclick="event.stopPropagation();advanceLeadStage('+l.id+')" data-perm="CRM & Leads:Edit">\u25B6</span>':'')+
       '</div></div>';
-    }).join('')+
+    }).join(''):'<div class="kanban-empty">No leads here</div>'+
     '</div></div>';
   }).join('')}</div>`;
 }
@@ -2456,7 +2509,7 @@ function renderInvoices(filtered){
     }).join('')+
     '<div class="stat-card" style="padding:4px"><div class="label" style="font-size:8px">Total Value</div><div class="value" style="font-size:14px;color:#2e7d32">৳'+(totalAmt/10000000).toFixed(1)+'Cr</div></div>'+
   '</div><div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Client</th><th>Project</th><th>Amount</th><th>Issued</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+
-  pi.items.map(function(inv){
+  pi.items.length?pi.items.map(function(inv){
     var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[inv.status]||'#888';
     var stBg={Draft:'#f5f5f5',Sent:'#fff3e0',Paid:'#e8f5e9',Overdue:'#ffebee'}[inv.status]||'#f5f5f5';
     var paidAmt=mockPayments.filter(function(p){return p.invoiceId===inv.id}).reduce(function(s,p){return s+(p.amount||0)},0);
@@ -2466,7 +2519,7 @@ function renderInvoices(filtered){
       (inv.status!=='Overdue'?'<span style="color:#e65100;cursor:pointer;font-size:9px;font-weight:600" onclick="event.stopPropagation();markInvoiceOverdue(\''+inv.id+'\')">⚠ Overdue</span> ':'')+
       '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')" title="View">👁</span> <span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudInvoice(mockInvoices.find(function(x){return x.id===\''+inv.id+'\'}))" data-perm="CRM & Leads:Edit">✎</span>'+
     '</td></tr>';
-  }).join('')+
+  }).join(''):'<tr><td colspan="8">'+emptyState('🧾','No invoices found','No invoices match your filters or status tab.','+ New Invoice','crudInvoice()')+'</td></tr>'+
   '</tbody></table>'+_pgHtml('invoices',pi.total,pi.page,pi.totalPages,pi.perPage)+'</div></div></div>';
 }
 function renderPayments(){
@@ -2690,15 +2743,17 @@ function deleteSalesProposal(id) {
   var idx = -1;
   for (var i = 0; i < proposals.length; i++) { if (proposals[i].id === id) { idx = i; break; } }
   if (idx < 0) return;
+  var item = JSON.parse(JSON.stringify(proposals[idx]));
   proposals.splice(idx, 1);
   DB.save('proposals');
   logActivity('Deleted', 'Sales', 'Proposal', id, 'Proposal deleted');
-  showToast(id + ' deleted', 'info');
+  showToast(id + ' deleted', 'info', function(){proposals.splice(Math.min(idx,proposals.length),0,item);DB.save('proposals');renderModule();showToast('Restored','info');});
   renderModule();
 }
 
 function printProposal(id) {
   showToast('Printing proposal ' + id + '...', 'info');
+  setTimeout(function(){window.print();},300);
 }
 
 // ═══ PAYMENTS ═══
@@ -3935,8 +3990,8 @@ function crudProposal(item){
 
 function renderProjects(el){
   el.innerHTML=`<div class="fade-in"><div class="page-title">Projects</div><div class="page-subtitle">${mockProjects.length} active projects</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div></div><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockProjects,'Projects','projects',IMPORT_FIELDS.projects)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Projects:Import">📥</button><button class="action-btn primary" onclick="crudProject()" data-perm="Projects:Create">+ New Project</button></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
+    <div class="toolbar" style="margin-bottom:6px"><div class="tabs"><div class="tab ${projectsTab==='land'?'active':''}" onclick="projectsTab='land';renderModule()">Land</div><div class="tab ${projectsTab==='flat'?'active':''}" onclick="projectsTab='flat';renderModule()">Flats</div><div class="tab ${projectsTab==='gantt'?'active':''}" onclick="projectsTab='gantt';renderModule()">📊 Gantt</div></div><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockProjects,'Projects','projects',IMPORT_FIELDS.projects)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="Projects:Import">📥</button><button class="action-btn primary" onclick="crudProject()" data-perm="Projects:Create">+ New Project</button></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${projectsTab==='gantt'?renderProjectGantt():mockProjects.filter(p=>projectsTab==='all'||p.type===projectsTab).map(p=>`
       <div class="card" style="cursor:pointer" onclick="openProject('${p.id}')"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><div style="font-size:12px;font-weight:600">${p.name}</div><div style="font-size:10px;color:#888">${p.location}</div></div><span class="badge-status ${p.status==='In Progress'?'badge-active':p.status==='Planning'?'badge-pending':'badge-reserved'}">${p.status}</span></div>
       <div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:10px"><span>Progress</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="fill" style="width:${p.progress}%;background:${p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935'}"></div></div></div>
       <div style="font-size:10px;color:#666;display:flex;gap:10px"><span>${p.budget}</span><span>${p.manager}</span>${p.plots?`<span>${p.plots} plots</span>`:''}${p.units?`<span>${p.units} units</span>`:''}</div>
@@ -3982,13 +4037,13 @@ function renderBookings(el){
   const pB=_pg('bookings',mockBookings);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Bookings</div><div class="page-subtitle">${mockBookings.length} bookings \u00b7 ${mockBookings.filter(b=>b.status==='Confirmed').length} confirmed \u00b7 ${mockInvoices.filter(function(i){return mockBookings.some(function(b){return b.client===i.client})}).length} invoiced</div>
     <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn primary" onclick="crudBooking()" data-perm="Bookings:Create">+ New Booking</button></div>
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Invoices</th><th>Payments</th><th>Status</th></tr></thead><tbody>${pB.items.map(b=>{
+    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th>Unit</th><th class="num">Price</th><th class="num">Advance</th><th>Invoices</th><th>Payments</th><th>Status</th><th class="num">Activity</th></tr></thead><tbody>${pB.items.length?pB.items.map(function(b,bi){
       var bInvs=mockInvoices.filter(function(i){return i.client===b.client});
       var bPmts=mockPayments.filter(function(p){return p.client===b.client});
       var invBadge=bInvs.length?'<span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openBooking(\'+b.id+\')">'+bInvs.length+' \ud83d\udcc4</span>':'<span style="color:#999;font-size:9px">\u2014</span>';
       var pmtBadge=bPmts.length?'<span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:#2e7d32;cursor:pointer" onclick="event.stopPropagation();openBooking(\'+b.id+\')">\u09f3'+(bPmts.reduce(function(s,p){return s+(p.amount||0)},0)/100000).toFixed(1)+'L</span>':'<span style="color:#999;font-size:9px">\u2014</span>';
-      return '<tr style="cursor:pointer" onclick="openBooking(\'+b.id+\')"><td style="font-weight:500">'+b.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+b.client.replace(/'/g,"\\'")+'\')">'+b.client+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openPropertyRef(\''+b.property.replace(/'/g,"\\'")+'\')">'+b.property+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openUnit(\''+b.unit+'\')">'+b.unit+'</td><td class="num">'+b.price+'</td><td class="num">'+b.advance+'</td><td style="text-align:center">'+invBadge+'</td><td style="text-align:center">'+pmtBadge+'</td><td><span class="badge-status '+(b.status==='Confirmed'?'badge-active':'badge-pending')+'">'+b.status+'</span></td></tr>';
-    }).join('')}</tbody></table>${_pgHtml('bookings',pB.total,pB.page,pB.totalPages,pB.perPage)}</div></div></div></div>`;
+      return '<tr style="cursor:pointer" onclick="openBooking(\'+b.id+\')"><td style="font-weight:500">'+b.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+b.client.replace(/'/g,"\\'")+'\')">'+b.client+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openPropertyRef(\''+b.property.replace(/'/g,"\\'")+'\')">'+b.property+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openUnit(\''+b.unit+'\')">'+b.unit+'</td><td class="num">'+b.price+'</td><td class="num">'+b.advance+'</td><td style="text-align:center">'+invBadge+'</td><td style="text-align:center">'+pmtBadge+'</td><td><span class="badge-status '+(b.status==='Confirmed'?'badge-active':'badge-pending')+'">'+b.status+'</span></td><td style="width:110px;text-align:right">'+sparkline(sparkWalk(bi),'#1565c0')+'</td></tr>';
+    }).join(''):'<tr><td colspan="10">'+emptyState('📭','No bookings found','No bookings match your current view yet.','+ New Booking','crudBooking()')+'</td></tr>'}</tbody></table>${_pgHtml('bookings',pB.total,pB.page,pB.totalPages,pB.perPage)}</div></div></div></div>`;
   // Handle cross-module navigation: auto-open booking
   if (window._navBookingId) {
     var nb = window._navBookingId; delete window._navBookingId;
@@ -5898,8 +5953,8 @@ function renderFinanceTransactions(){
     <div class="spacer"></div>
     <button class="action-btn primary" onclick="crudTransaction()" style="padding:3px 8px;font-size:10px">+ Add Transaction</button data-perm="Finance:Create">
   </div>
-  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>${
-    pF.items.map(t=>'<tr style="cursor:pointer" onclick="openTransaction(\''+t.id+'\')"><td style="font-weight:500;font-family:monospace;font-size:9px">'+t.id+'</td><td style="font-size:10px;color:#666">'+t.date+'</td><td>'+t.desc+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:9px;background:#f0f4ff;color:#2F80ED">'+(t.category||'\u2014')+'</span></td><td><span class="badge-status '+(t.type==='Inflow'?'badge-active':'badge-sold')+'">'+t.type+'</span></td><td class="num" style="font-weight:600;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.fmt+'</td><td><span class="badge-status '+(t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved')+'">'+t.status+'</span></td></tr>').join('')
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="num">Amount</th><th>Status</th><th class="num">Trend</th></tr></thead><tbody>${
+    pF.items.map(function(t,i){return '<tr style="cursor:pointer" onclick="openTransaction(\''+t.id+'\')"><td style="font-weight:500;font-family:monospace;font-size:9px">'+t.id+'</td><td style="font-size:10px;color:#666">'+t.date+'</td><td>'+t.desc+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:9px;background:#f0f4ff;color:#2F80ED">'+(t.category||'\u2014')+'</span></td><td><span class="badge-status '+(t.type==='Inflow'?'badge-active':'badge-sold')+'">'+t.type+'</span></td><td class="num" style="font-weight:600;color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+t.fmt+'</td><td><span class="badge-status '+(t.status==='Received'||t.status==='Paid'?'badge-active':t.status==='Pending'?'badge-pending':'badge-reserved')+'">'+t.status+'</span></td><td style="width:110px;text-align:right">'+sparkline(clientInflowTrend(t.client||'',i),'#2e7d32')+'</td></tr>';}).join('')
   }</tbody></table>${_pgHtml('finance',pF.total,pF.page,pF.totalPages,pF.perPage)}</div></div></div>`;
 }
 
@@ -6096,7 +6151,7 @@ function renderStockInv(pI){
     ['Warning',filtered.filter(i=>i.status==='Warning').length,'#e65100'],
     ['Adequate',filtered.filter(i=>i.status==='Adequate').length,'#2e7d32']
   ].map(s=>'<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>').join('')}</div>
-  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Item</th><th>Category</th><th>Site</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Value</th><th>Status</th><th>Supplier</th><th>Last Received</th></tr></thead><tbody>${pp.items.map(i=>'<tr style="cursor:pointer" onclick="openStockItem('+i.id+')"><td style="font-weight:500">'+i.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+i.category+'</span></td><td>'+i.site+'</td><td class="num">'+i.qty+' '+i.unit+'</td><td class="num">\u09F3 '+i.price.toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600">\u09F3 '+i.value.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold')+'" style="font-size:8px">'+i.status+'</span></td><td style="font-size:9px;color:#555">'+i.supplier+'</td><td style="font-size:9px;color:#888">'+i.lastReceived+'</td></tr>').join('')}</tbody></table>${_pgHtml('inv_filtered',pp.total,pp.page,pp.totalPages,pp.perPage)}</div></div></div>`;
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Item</th><th>Category</th><th>Site</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Value</th><th>Status</th><th>Supplier</th><th>Last Received</th></tr></thead><tbody>${pp.items.length?pp.items.map(i=>'<tr style="cursor:pointer" onclick="openStockItem('+i.id+')"><td style="font-weight:500">'+i.item+'</td><td><span style="padding:1px 5px;border-radius:3px;font-size:8px;background:#f0f4ff;color:#2F80ED">'+i.category+'</span></td><td>'+i.site+'</td><td class="num">'+i.qty+' '+i.unit+'</td><td class="num">\u09F3 '+i.price.toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600">\u09F3 '+i.value.toLocaleString('en-IN')+'</td><td><span class="badge-status '+(i.status==='Adequate'?'badge-active':i.status==='Warning'?'badge-pending':'badge-sold')+'" style="font-size:8px">'+i.status+'</span></td><td style="font-size:9px;color:#555">'+i.supplier+'</td><td style="font-size:9px;color:#888">'+i.lastReceived+'</td></tr>').join(''):'<tr><td colspan="9">'+emptyState('📦','No stock items found','No items match the current category or site filter.','+ New Item','crudStockItem()')+'</td></tr>'}</tbody></table>${_pgHtml('inv_filtered',pp.total,pp.page,pp.totalPages,pp.perPage)}</div></div></div>`;
 }
 
 function renderStockPO(pPO){
@@ -6210,17 +6265,17 @@ function renderTasks(el){
       '<button class="action-btn secondary" onclick="tasksExportCSV()" style="padding:3px 7px;font-size:9px">📥</button>'+
       '<button class="action-btn primary" onclick="taskCrudQuick()" style="padding:3px 7px;font-size:9px">+ Task</button>'+
     '</div>'+
-    (!filtered.length?'<div style="padding:40px;text-align:center;color:#999;font-size:12px">No tasks match your filters</div>':'')+
+    (!filtered.length?emptyState('🗂️','No tasks match your filters','Try adjusting the filters, or create a new task.','+ New Task','taskCrudQuick()'):'')+
     '<div style="display:flex;gap:8px;min-height:320px;overflow-x:auto">'+
     colMap.map(function(st,ci){
       var items=filtered.filter(function(t){return t.status===st});
       return '<div class="kanban-col" style="min-width:240px" ondragover="dragOver(event)" ondrop="dropTask(event,\''+st+'\')" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"><div style="padding:6px 8px;font-size:10px;font-weight:600;color:#555;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center"><span>'+st+'</span><span style="background:#e0e0e0;border-radius:10px;padding:0 6px;font-size:9px">'+items.length+'</span></div>'+
         '<div style="flex:1;overflow-y:auto;padding:4px 6px;display:flex;flex-direction:column;gap:4px">'+
-        items.map(function(t){
+        items.length?items.map(function(t){
           var isOverdue=t.deadline&&t.status!=='Done'&&new Date(t.deadline)<now;
           var dueToday=t.deadline&&t.status!=='Done'&&!isOverdue&&new Date(t.deadline).toDateString()===now.toDateString();
           var initials=t.assignee.split(' ').map(function(s){return s[0]}).join('').slice(0,2).toUpperCase();
-          return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'task\','+t.id+')" ondragend="dragEnd(event)" style="cursor:pointer;padding:8px" onclick="openTaskDetail('+t.id+')">'+
+          return '<div class="kanban-card" draggable="true" ondragstart="dragStart(event,\'task\','+t.id+')" ondragend="dragEnd(event)" style="cursor:pointer;padding:8px" onclick="if(!_kdragged)openTaskDetail('+t.id+')">'+
             '<div style="display:flex;align-items:flex-start;gap:5px;margin-bottom:4px">'+
               '<span style="margin-top:3px;width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+(t.priority==='High'?'#e53935':t.priority==='Medium'?'#ff9800':'#999')+'"></span>'+
               '<div style="flex:1;font-size:11px;font-weight:500;word-break:break-word;line-height:1.3">'+t.title+'</div>'+
@@ -6238,7 +6293,7 @@ function renderTasks(el){
                 (t.status!=='Done'?'<span style="font-size:8px;color:#2e7d32;cursor:pointer" onclick="event.stopPropagation();toggleTaskStatus('+t.id+')">▶ '+stageTarget[t.status]+'</span>':'<span style="font-size:8px;color:#2e7d32">✓ Done</span>')+
               '</div>'+
             '</div></div>';
-        }).join('')+
+        }).join(''):'<div class="kanban-empty">No tasks here</div>'+
         '</div></div>';
     }).join('')+'</div>'+
     '<div class="card" style="margin-top:10px"><div class="card-header"><h3>➕ Quick Add</h3></div><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">'+
@@ -6691,10 +6746,34 @@ function renderSettings(el){
   el.innerHTML='<div class="fade-in" style="display:flex;gap:8px;height:100%;flex:1"><div style="width:180px;min-width:180px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:6px;display:flex;flex-direction:column;overflow-y:auto"><div style="font-size:12px;font-weight:700;color:#222;margin-bottom:6px;padding:0 4px">Settings</div>'+sidebar+'<div style="margin-top:auto;padding-top:6px;border-top:1px solid #f0f0f0"><button onclick="showToast(\'All settings saved!\',\'success\')" style="width:100%;padding:5px 0;background:#2F80ED;color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button><button onclick="resetAllAppData()" style="width:100%;padding:4px 0;background:transparent;color:#c62828;border:1px solid #f5c6cb;border-radius:6px;font-size:9px;font-weight:500;cursor:pointer;margin-top:3px">↺ Reset All Data</button></div></div><div style="flex:1;overflow-y:auto">'+mc+'<div class="content-footer" style="margin-top:8px"><div class="breadcrumb">Settings <span>›</span> '+settingsTab+'</div></div></div></div>';
 }
 
+// ═══ FEEDBACK & POLISH ═══
+function emptyState(icon,title,sub,ctaText,ctaFn){
+  var h='<div class="empty-state"><div class="es-icon">'+icon+'</div><div class="es-title">'+title+'</div><div class="es-sub">'+sub+'</div>';
+  if(ctaText&&ctaFn)h+='<button class="es-cta" onclick="'+ctaFn+'" style="padding:6px 14px;background:var(--primary,#2F80ED);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">'+ctaText+'</button>';
+  return h+'</div>';
+}
+function showSkeleton(el){
+  if(!el)el=document.getElementById('mainContent');
+  var blocks='';
+  for(var i=0;i<8;i++)blocks+='<div class="skel" style="height:20px;margin:10px 14px;border-radius:4px"></div>';
+  el.innerHTML='<div class="fade-in"><div class="skel" style="width:130px;height:20px;margin:2px 0 8px;border-radius:4px"></div>'+
+    '<div class="skel" style="width:240px;height:11px;margin-bottom:14px;border-radius:4px"></div>'+
+    '<div class="stats-row" style="margin-bottom:12px">'+
+      '<div class="skel" style="height:58px;border-radius:6px"></div><div class="skel" style="height:58px;border-radius:6px"></div><div class="skel" style="height:58px;border-radius:6px"></div><div class="skel" style="height:58px;border-radius:6px"></div>'+
+    '</div>'+
+    '<div class="card" style="padding:0"><div class="card-body" style="padding:0">'+blocks+'</div></div></div>';
+}
 // ═══ TOAST, SEARCH, THEME, ROLE, ZOOM ═══
-function showToast(msg,t='success'){
+function showToast(msg,t='success',undoFn){
   const c=document.getElementById('toastContainer');
-  const d=document.createElement('div');d.className='toast '+t;d.textContent=msg;c.appendChild(d);
+  const d=document.createElement('div');d.className='toast '+t;
+  const sp=document.createElement('span');sp.style.flex='1';sp.textContent=msg;d.appendChild(sp);
+  if(typeof undoFn==='function'){
+    const ub=document.createElement('button');ub.className='toast-undo';ub.type='button';ub.textContent='↩ Undo';
+    ub.onclick=function(){d.remove();try{undoFn();}catch(e){} };
+    d.appendChild(ub);
+  }
+  c.appendChild(d);
   setTimeout(()=>d.remove(),3000);
   // Also push as notification (skip for minor info toasts)
   if(t!=='info'||msg.includes('Added')||msg.includes('Updated')||msg.includes('Deleted')||msg.includes('Created')||msg.includes('Saved')){
@@ -7668,7 +7747,7 @@ function crudEntityFromLead(id){
 }
 // Keep convertLeadToBooking for backward compatibility
 function convertLeadToBooking(id){convertToCustomer(id);}
-function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.findIndex(x=>x.id===id);if(i>-1){mockLeads.splice(i,1);DB.save('leads');closeLeadPanel();renderModule();showToast('Deleted','info')}}
+function deleteLead(id){if(!confirm('Delete lead?'))return;const i=mockLeads.findIndex(x=>x.id===id);if(i>-1){const _item=JSON.parse(JSON.stringify(mockLeads[i]));mockLeads.splice(i,1);DB.save('leads');closeLeadPanel();renderModule();showToast('Deleted','info',function(){mockLeads.splice(Math.min(i,mockLeads.length),0,_item);DB.save('leads');renderModule();showToast('Restored','info');});}}
 // ═══ LEAD SCORING ═══
 function calcLeadScore(l){
   var score=0;
@@ -7735,16 +7814,57 @@ function bulkActionPriority(priority){
   ids.forEach(function(id){var l=mockLeads.find(function(x){return x.id===parseInt(id)});if(l)l.priority=priority;});
   DB.save('leads');_bulkSel={};showToast('Updated '+ids.length+' leads priority','success');renderModule();
 }
+// ═══ SPARKLINES ═══
+function sparkline(data,color){
+  color=color||'#2F80ED';
+  if(!data||data.length<2)data=[0,0];
+  var min=Math.min.apply(null,data),max=Math.max.apply(null,data);
+  var range=(max-min)||1;
+  var pts=data.map(function(v,i){
+    var x=i*(100/(data.length-1));
+    var y=22-((v-min)/range)*20;
+    return x.toFixed(1)+','+y.toFixed(1);
+  }).join(' ');
+  return '<svg viewBox="0 0 100 24" width="100" height="24" style="display:inline-block;vertical-align:middle" aria-hidden="true">'+
+    '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<polygon points="0,23 '+pts+' 100,23" fill="'+color+'" fill-opacity="0.08"/>'+
+    '</svg>';
+}
+// Deterministic pseudo-random walk (0-10 scale) — stable per row index
+function sparkWalk(i){
+  var base=[2,3,5,4,6,7];
+  var out=[];
+  for(var k=0;k<6;k++)out.push(((base[k]+i*3+k)%9)+1);
+  return out;
+}
+// Last-6-months monthly inflow trend (0-10 scale) for a client, from mockTransactions
+function clientInflowTrend(client,seedIdx){
+  var months=[],d=new Date();d.setDate(1);
+  for(var k=5;k>=0;k--){var m=new Date(d.getFullYear(),d.getMonth()-k,1);months.push(m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0'));}
+  var sums=months.map(function(ym){
+    return (window.mockTransactions||[]).filter(function(t){
+      return t.type==='Inflow'&&t.client===client&&(t.date||'').slice(0,7)===ym;
+    }).reduce(function(s,t){return s+(t.amount||0)},0);
+  });
+  var hasData=sums.some(function(v){return v>0});
+  if(!hasData)return sparkWalk(seedIdx||0);
+  var mx=Math.max.apply(null,sums)||1;
+  return sums.map(function(v){return Math.max(1,Math.round(v/mx*10));});
+}
+
 // ═══ DRAG & DROP ═══
 var _dragItem=null;
+var _kdragged=false;
 function dragStart(e,type,id){
   _dragItem={type:type,id:id};
+  _kdragged=true;
   e.dataTransfer.effectAllowed='move';
   e.target.classList.add('dragging');
 }
 function dragEnd(e){
   e.target.classList.remove('dragging');
-  document.querySelectorAll('.kanban-col').forEach(function(el){el.classList.remove('drag-over');});
+  document.querySelectorAll('.kanban-col').forEach(function(el){el.classList.remove('drag-over');el.classList.remove('kanban-drag-over');});
+  setTimeout(function(){_kdragged=false;},120);
 }
 function dragOver(e){
   e.preventDefault();
@@ -7752,31 +7872,39 @@ function dragOver(e){
 }
 function dragEnter(e){
   e.currentTarget.classList.add('drag-over');
+  e.currentTarget.classList.add('kanban-drag-over');
 }
 function dragLeave(e){
   e.currentTarget.classList.remove('drag-over');
+  e.currentTarget.classList.remove('kanban-drag-over');
 }
 function dropLead(e,status){
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
+  e.currentTarget.classList.remove('kanban-drag-over');
   if(!_dragItem||_dragItem.type!=='lead')return;
   var l=mockLeads.find(function(x){return x.id===_dragItem.id});
   if(!l||l.status===status)return;
+  var from=l.status;
   l.status=status;l.lastContact='Just now';
   if(!l.activities)l.activities=[];
   l.activities.unshift({type:'System',user:'System',date:'Just now',text:'Dragged to '+status});
   DB.save('leads');_dragItem=null;
+  logActivity('Updated','CRM','Lead',l.id,'Moved to '+status+' (from '+from+') via drag & drop');
   if(typeof crmSubView!=='undefined')renderModule();
   showToast('✓ Moved to '+status,'success');
 }
 function dropTask(e,status){
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
+  e.currentTarget.classList.remove('kanban-drag-over');
   if(!_dragItem||_dragItem.type!=='task')return;
   var t=mockTasks.find(function(x){return x.id===_dragItem.id});
   if(!t||t.status===status)return;
+  var from=t.status;
   t.status=status;
   DB.save('tasks');_dragItem=null;
+  logActivity('Updated','Tasks','Task',t.id,'Moved to '+status+' (from '+from+') via drag & drop');
   renderModule();
   showToast('✓ Moved to '+status,'success');
 }
@@ -7867,7 +7995,7 @@ function formRow(a,b){return '<div style="display:grid;grid-template-columns:1fr
 function nextId(a){var m=0;a.forEach(function(i){var v=parseInt(i.id)||0;if(v>m)m=v;});var s=a.reduce(function(x,i){return x+String(i.id).replace(/[^0-9]/g,'')},'');if(s&&!m){var ex=0;a.forEach(function(i){var n=parseInt(String(i.id).replace(/[^0-9]/g,''),10)||0;if(n>ex)ex=n;});return ex+1;}return m+1;}
 function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');logActivity('Created',k||'Unknown',k,i.id);renderModule()}
 function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');logActivity('Updated',k||'Unknown',k,id,JSON.stringify(u));renderModule()}}
-function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info');logActivity('Deleted',k||'Unknown',k,id,l);renderModule()}}
+function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){const _item=JSON.parse(JSON.stringify(a[i]));a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info',function(){a.splice(Math.min(i,a.length),0,_item);if(k)DB.save(k);renderModule();showToast('Restored','info');});logActivity('Deleted',k||'Unknown',k,id,l);renderModule()}}
 // showModal: button-array based modal (used by Property & Units module)
 function showModal(title, body, buttons) {
   var footerHtml = buttons.map(function(b) {
@@ -8507,7 +8635,7 @@ setTimeout(function(){
 var origRender=renderModule;
 renderModule=function(){origRender();setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();},50);};
 var origSwitch=switchModule;
-switchModule=function(mod){currentModule=mod;origSwitch(mod);setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();},50);};
+switchModule=function(mod,skipSkel){currentModule=mod;origSwitch(mod,skipSkel);setTimeout(function(){enhanceAllTables();initTooltips();enableInlineEdit();},50);};
 function resetAllAppData(){if(confirm("Reset ALL app data? This cannot be undone.")){localStorage.clear();location.reload()}}
 // ═══ KEYBOARD SHORTCUTS ═══
 document.addEventListener('keydown',function(e){
@@ -9847,6 +9975,604 @@ function crudTask(item) {
 function deleteTask(id) {
   deleteItem(mockTasks, id, 'task', 'tasks');
 }
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION & SEARCH UPGRADE
+//  A) Ctrl+K command palette   B) recent-items tray (persisted)
+//  C) clickable breadcrumb     D) keyboard shortcuts
+// ═══════════════════════════════════════════════════════════════════
+function _esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function _findUnit(unitId){
+  var props=window.mockProperties||[];
+  for(var i=0;i<props.length;i++){
+    var units=props[i].units||[];
+    for(var j=0;j<units.length;j++){
+      if(String(units[j].id)===String(unitId))return {id:units[j].id, proj:props[i].name, unit:units[j]};
+    }
+  }
+  return null;
+}
+(function(){
+  var css=`
+#cpOverlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding-top:15vh}
+#cpOverlay.active{display:flex}
+#cpBox{width:100%;max-width:560px;background:var(--card-bg,#fff);border:1px solid var(--card-border,#e0e0e0);border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,.28);overflow:hidden;color:var(--fg,#333)}
+html.dark #cpBox{backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%)}
+#cpInputWrap{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--card-border,#e8e8e8)}
+#cpInput{flex:1;border:none;outline:none;font-size:14px;background:transparent;color:var(--fg,#333)}
+#cpInput::placeholder{color:#999}
+#cpResults{max-height:380px;overflow-y:auto;padding:6px}
+.cp-group{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#999;padding:8px 10px 3px}
+.cp-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;cursor:pointer}
+.cp-item.hl{background:var(--hover-bg,#eef3ff)}
+.cp-item .cp-ico{width:26px;height:26px;border-radius:6px;background:var(--muted-bg,#f0f4ff);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.cp-item .cp-t{font-size:12px;font-weight:500;color:var(--fg,#333);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-item .cp-s{font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-item .cp-badge{margin-left:auto;font-size:8px;color:#2F80ED;background:rgba(47,128,237,.1);border-radius:4px;padding:1px 5px;flex-shrink:0}
+.cp-empty{padding:36px 20px;text-align:center;color:#999;font-size:12px}
+.cp-empty .big{font-size:30px;margin-bottom:8px;opacity:.5}
+#cpFooter{padding:6px 12px;border-top:1px solid var(--card-border,#e8e8e8);font-size:9px;color:#999;display:flex;justify-content:space-between;gap:8px}
+html.dark #cpInput{color:#e2e8f0}
+html.dark .cp-item .cp-t{color:#e2e8f0}
+html.dark .cp-item.hl{background:rgba(59,130,246,.12)}
+html.dark .cp-item .cp-ico{background:rgba(30,41,59,.6)}
+.crumb-sep{color:#ccc;font-size:11px}
+.crumb-part{font-size:11px;cursor:pointer;color:#666;transition:color .12s}
+.content-footer .breadcrumb .crumb-part{font-size:11px}
+.crumb-part:hover{color:#2F80ED;text-decoration:underline}
+.crumb-part::after{content:' ▾';font-size:8px;opacity:.65}
+.crumb-root{color:#2F80ED;font-weight:600}
+.crumb-root::after{content:''}
+#crumbMenu{position:fixed;z-index:10000;background:var(--card-bg,#fff);border:1px solid var(--card-border,#e0e0e0);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:5px;min-width:190px;max-height:320px;overflow-y:auto;display:none}
+html.dark #crumbMenu{backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%)}
+.crumb-menu-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;cursor:pointer;font-size:11px;color:var(--fg,#333)}
+.crumb-menu-item:hover{background:var(--hover-bg,#eef3ff);color:#2F80ED}
+.crumb-menu-item .cm-ico{width:20px;text-align:center;font-size:12px;flex-shrink:0}
+.crumb-menu-item.active{background:var(--active-bg,#eef3ff);font-weight:600}
+html.dark .crumb-menu-item{color:#e2e8f0}
+#recentTray::-webkit-scrollbar{width:6px}
+#recentTray::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+.rt-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:11px;color:var(--fg,#333)}
+.rt-item:hover{background:var(--hover-bg,#eef3ff)}
+.rt-item .rt-ico{width:24px;height:24px;border-radius:6px;background:var(--muted-bg,#f0f4ff);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.rt-item .rt-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-item .rt-x{color:#bbb;font-size:13px;padding:0 3px;border-radius:4px;flex-shrink:0}
+.rt-item .rt-x:hover{color:#c62828;background:#fdecea}
+html.dark .rt-item{color:#e2e8f0}
+html.dark .rt-item .rt-ico{background:rgba(30,41,59,.6)}
+.rt-head{padding:4px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#999;display:flex;justify-content:space-between;align-items:center}
+.rt-clear{color:#2F80ED;cursor:pointer;font-weight:600;text-transform:none;letter-spacing:0;font-size:9px}
+.rt-empty{padding:22px 12px;text-align:center;color:#999;font-size:11px}
+`;
+  var st=document.createElement('style');
+  st.id='navUpgradeCss';
+  st.textContent=css;
+  document.head.appendChild(st);
+})();
+// ── FEATURE A: Command Palette (Ctrl+K / ⌘K) ──
+var _cpMatches=[]; window._cpMatches=_cpMatches;
+var _cpHL=-1, _cpBuilt=false;
+var _cpActions=[
+  {label:'+ New Booking', icon:'📝', sub:'Create a booking', fn:function(){crudBooking();}},
+  {label:'+ New Lead', icon:'🎯', sub:'Capture a new lead', fn:function(){if(typeof crudLead==='function')crudLead();else switchModule('crm');}},
+  {label:'+ New Task', icon:'✅', sub:'Create a task', fn:function(){crudTask();}},
+  {label:'New Invoice', icon:'🧾', sub:'Create an invoice', fn:function(){crudInvoice();}},
+  {label:'New Transaction', icon:'💳', sub:'Record income / expense', fn:function(){crudTransaction();}},
+  {label:'New Employee', icon:'👤', sub:'Onboard an employee', fn:function(){crudEmployee();}},
+  {label:'Send Payment Reminders', icon:'🔔', sub:'Payment reminders module', fn:function(){switchModule('payment_reminders');}},
+  {label:'View Activity Log', icon:'📜', sub:'Audit trail of all actions', fn:function(){switchModule('activity_log');}},
+  {label:'Import CSV', icon:'📥', sub:'Bulk import data', fn:function(){switchModule('csv_import');}},
+  {label:'Export All as CSV', icon:'📤', sub:'Export current data', fn:function(){if(typeof exportAllTables==='function')exportAllTables();else showToast('Export not available','info');}},
+  {label:'Go to Settings', icon:'⚙️', sub:'System settings', fn:function(){switchModule('settings');}},
+  {label:'Toggle Dark Mode', icon:'🌙', sub:'Switch light / dark theme', fn:function(){toggleDarkMode();}},
+  {label:'Go to Notifications', icon:'🔕', sub:'Open notifications panel', fn:function(){toggleNotifications();}},
+  {label:'Open Quick Add', icon:'➕', sub:'Quick-add menu', fn:function(){openQuickAdd();}},
+  {label:'Go to Dashboard', icon:'📊', sub:'Executive dashboard', fn:function(){switchModule('dashboard');}}
+];
+function _buildPalette(){
+  if(_cpBuilt)return;
+  _cpBuilt=true;
+  var ov=document.createElement('div');
+  ov.id='cpOverlay';
+  ov.innerHTML='<div id="cpBox">'+
+    '<div id="cpInputWrap"><span style="font-size:15px;opacity:.6">🔍</span><input id="cpInput" placeholder="Search modules, actions, records…" autocomplete="off"/><span style="font-size:8px;color:#bbb;background:#fff;border:1px solid #e0e0e0;border-radius:3px;padding:1px 4px;flex-shrink:0">ESC</span></div>'+
+    '<div id="cpResults"></div>'+
+    '<div id="cpFooter"><span id="cpCount"></span><span>↑↓ Navigate · ↵ Open · Esc Close</span></div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov.addEventListener('click',function(e){
+    if(e.target===ov){closeCommandPalette();return;}
+    var item=e.target.closest?e.target.closest('.cp-item'):null;
+    if(item){_cpRun(parseInt(item.getAttribute('data-idx'),10));}
+  });
+  ov.addEventListener('mousemove',function(e){
+    var item=e.target.closest?e.target.closest('.cp-item'):null;
+    if(item){var i=parseInt(item.getAttribute('data-idx'),10);if(i!==_cpHL){_cpHL=i;_cpPaint();}}
+  });
+  var inp=document.getElementById('cpInput');
+  inp.addEventListener('input',function(){_cpSearch(this.value);});
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){e.preventDefault();_cpHL=Math.min(_cpHL+1,_cpMatches.length-1);_cpPaint();}
+    else if(e.key==='ArrowUp'){e.preventDefault();_cpHL=Math.max(_cpHL-1,0);_cpPaint();}
+    else if(e.key==='Enter'){e.preventDefault();if(_cpHL>=0&&_cpMatches[_cpHL])_cpRun(_cpHL);}
+    else if(e.key==='Escape'){e.preventDefault();closeCommandPalette();}
+    e.stopPropagation();
+  });
+}
+function _cpPaint(){
+  var rows=document.querySelectorAll('#cpResults .cp-item');
+  rows.forEach(function(el,i){el.classList.toggle('hl',i===_cpHL);});
+  if(_cpHL>=0&&rows[_cpHL])rows[_cpHL].scrollIntoView({block:'nearest'});
+}
+function openCommandPalette(){
+  _buildPalette();
+  var ov=document.getElementById('cpOverlay');
+  if(ov.classList.contains('active')){document.getElementById('cpInput').focus();return;}
+  closeSearchDropdown();
+  _cpSearch('');
+  ov.classList.add('active');
+  setTimeout(function(){document.getElementById('cpInput').focus();},30);
+}
+function closeCommandPalette(){
+  var ov=document.getElementById('cpOverlay');
+  if(ov)ov.classList.remove('active');
+}
+function toggleCommandPalette(){
+  var ov=document.getElementById('cpOverlay');
+  if(ov&&ov.classList.contains('active'))closeCommandPalette();
+  else openCommandPalette();
+}
+function _cpSearch(q){
+  q=(q||'').toLowerCase().trim();
+  _cpMatches.length=0; _cpHL=-1;
+  var c=document.getElementById('cpResults');
+  if(!c)return;
+  var out='';
+  if(!q){
+    var recents=(window._recent||[]).slice(0,5);
+    if(recents.length){
+      out+='<div class="cp-group">🕘 Recent</div>';
+      recents.forEach(function(r,i){
+        _cpMatches.push({type:'recent', idx:i});
+        out+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">'+_recKindIcon(r.kind)+'</div><div style="min-width:0"><div class="cp-t">'+_esc(r.label)+'</div><div class="cp-s">'+_esc(_recKindLabel(r.kind))+'</div></div><span class="cp-badge">↩</span></div>';
+      });
+    }
+  }
+  // Modules
+  var modHits=[];
+  Object.keys(GROUPS).forEach(function(gid){
+    var g=GROUPS[gid];
+    (g.mods||[]).forEach(function(m){
+      var hay=(m.label+' '+g.label).toLowerCase();
+      if(!q||hay.indexOf(q)>=0)modHits.push({id:m.id,label:m.label,group:g.label,icon:g.icon||'📁'});
+    });
+  });
+  if(modHits.length){
+    out+='<div class="cp-group">🧭 Modules</div>';
+    modHits.slice(0,8).forEach(function(m){
+      _cpMatches.push({type:'module', id:m.id});
+      out+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">'+m.icon+'</div><div style="min-width:0"><div class="cp-t">'+_esc(m.label)+'</div><div class="cp-s">'+_esc(m.group)+'</div></div><span class="cp-badge">Go</span></div>';
+    });
+  }
+  // Actions
+  var actHits=_cpActions.filter(function(a){return !q||(a.label+' '+a.sub).toLowerCase().indexOf(q)>=0;});
+  if(actHits.length){
+    out+='<div class="cp-group">⚡ Actions</div>';
+    actHits.slice(0,8).forEach(function(a){
+      _cpMatches.push({type:'action', idx:_cpActions.indexOf(a)});
+      out+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">'+a.icon+'</div><div style="min-width:0"><div class="cp-t">'+_esc(a.label)+'</div><div class="cp-s">'+_esc(a.sub)+'</div></div></div>';
+    });
+  }
+  // Records (only while typing, keeps empty state light)
+  if(q)out+=_cpRecordSection(q);
+  if(!_cpMatches.length){
+    out='<div class="cp-empty"><div class="big">🔎</div>No results for "<b>'+_esc(q)+'</b>"<div style="font-size:10px;color:#999;margin-top:6px">Try a module, action, customer, booking, invoice, unit, lead or task</div></div>';
+  }
+  c.innerHTML=out;
+  var cnt=document.getElementById('cpCount');
+  if(cnt)cnt.textContent=_cpMatches.length+' result'+( _cpMatches.length===1?'':'s');
+  if(_cpMatches.length){_cpHL=0;_cpPaint();}
+}
+function _cpRecordSection(q){
+  var out='', cap=8;
+  function hit(v){return !q||String(v==null?'':v).toLowerCase().indexOf(q)>=0;}
+  // Customers
+  var sec='', n=0;
+  (window.mockEntities||[]).forEach(function(e){
+    if(n>=cap)return;
+    var nm=e.name||e.companyName;
+    if(nm&&hit(nm)){
+      n++;
+      _cpMatches.push({type:'record', go:function(){openCrmCustomer(nm);}, rec:{kind:'customer',label:nm,mod:'customers',name:nm}});
+      sec+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">👤</div><div style="min-width:0"><div class="cp-t">'+_esc(nm)+'</div><div class="cp-s">'+_esc(e.phone||e.email||'Customer')+'</div></div><span class="cp-badge">Open</span></div>';
+    }
+  });
+  if(n){out+='<div class="cp-group">👥 Customers</div>'+sec;}
+  // Bookings
+  sec=''; n=0;
+  (window.mockBookings||[]).forEach(function(b){
+    if(n>=cap)return;
+    var lbl=b.id+' · '+b.client;
+    if(hit(lbl)||hit(b.client)||hit(b.id)){
+      n++;
+      _cpMatches.push({type:'record', go:function(){openBookingRef(b.id);}, rec:{kind:'booking',label:lbl,mod:'bookings',ref:b.id}});
+      sec+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">📝</div><div style="min-width:0"><div class="cp-t">'+_esc(lbl)+'</div><div class="cp-s">'+_esc(b.property||b.status||'Booking')+'</div></div><span class="cp-badge">Open</span></div>';
+    }
+  });
+  if(n){out+='<div class="cp-group">📝 Bookings</div>'+sec;}
+  // Invoices
+  sec=''; n=0;
+  (window.mockInvoices||[]).forEach(function(v){
+    if(n>=cap)return;
+    var lbl=v.id+' · '+v.client;
+    if(hit(lbl)||hit(v.client)||hit(v.id)){
+      n++;
+      _cpMatches.push({type:'record', go:function(){openInvoiceRef(v.id);}, rec:{kind:'invoice',label:lbl,mod:'finance',ref:v.id}});
+      sec+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">🧾</div><div style="min-width:0"><div class="cp-t">'+_esc(lbl)+'</div><div class="cp-s">'+_esc(v.status||'Invoice')+'</div></div><span class="cp-badge">Open</span></div>';
+    }
+  });
+  if(n){out+='<div class="cp-group">🧾 Invoices</div>'+sec;}
+  // Units
+  sec=''; n=0;
+  (window.mockProperties||[]).forEach(function(p){
+    (p.units||[]).forEach(function(u){
+      if(n>=cap)return;
+      var lbl=u.id+' · '+p.name;
+      if(hit(lbl)||hit(u.id)||hit(p.name)){
+        n++;
+        _cpMatches.push({type:'record', go:function(){openUnit(u.id);}, rec:{kind:'unit',label:lbl,mod:'properties_units',ref:u.id}});
+        sec+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">🏠</div><div style="min-width:0"><div class="cp-t">'+_esc(lbl)+'</div><div class="cp-s">'+_esc((u.type||'')+' · '+(u.status||''))+'</div></div><span class="cp-badge">Open</span></div>';
+      }
+    });
+  });
+  if(n){out+='<div class="cp-group">🏠 Units</div>'+sec;}
+  // Leads
+  sec=''; n=0;
+  (window.mockLeads||[]).forEach(function(l){
+    if(n>=cap)return;
+    if(hit(l.name)||hit(l.property)){
+      n++;
+      _cpMatches.push({type:'record', go:function(){openLead(l.id);}, rec:{kind:'lead',label:l.name,mod:'crm',ref:l.id}});
+      sec+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">🎯</div><div style="min-width:0"><div class="cp-t">'+_esc(l.name)+'</div><div class="cp-s">'+_esc(l.property||l.status||'Lead')+'</div></div><span class="cp-badge">Open</span></div>';
+    }
+  });
+  if(n){out+='<div class="cp-group">🎯 Leads</div>'+sec;}
+  // Tasks
+  sec=''; n=0;
+  (window.mockTasks||[]).forEach(function(t){
+    if(n>=cap)return;
+    if(hit(t.title)){
+      n++;
+      _cpMatches.push({type:'record', go:function(){switchModule('tasks');}, rec:{kind:'task',label:t.title,mod:'tasks',ref:t.id}});
+      sec+='<div class="cp-item" data-idx="'+(_cpMatches.length-1)+'"><div class="cp-ico">✅</div><div style="min-width:0"><div class="cp-t">'+_esc(t.title)+'</div><div class="cp-s">'+_esc((t.status||'')+' · '+(t.assignee||''))+'</div></div><span class="cp-badge">Open</span></div>';
+    }
+  });
+  if(n){out+='<div class="cp-group">✅ Tasks</div>'+sec;}
+  return out;
+}
+function _cpRun(idx){
+  var m=_cpMatches[idx];
+  if(!m)return;
+  closeCommandPalette();
+  if(m.type==='module'){switchModule(m.id);}
+  else if(m.type==='action'){try{_cpActions[m.idx].fn();}catch(err){showToast('Action failed: '+err.message,'error');}}
+  else if(m.type==='record'){trackRecent(m.rec.kind,m.rec.label,m.rec);try{m.go();}catch(err){switchModule(m.rec.mod);}}
+  else if(m.type==='recent'){var r=(window._recent||[])[m.idx];if(r)_recentGo(r);}
+}
+// ── FEATURE B: Recent Items Tray (persisted) ──
+var _recentKey='rem_recent';
+window._recent=[];
+try{var _rSaved=JSON.parse(localStorage.getItem(_recentKey)||'[]');if(Array.isArray(_rSaved))window._recent=_rSaved.filter(function(x){return x&&x.label;});}catch(e){}
+function _recKindIcon(kind){
+  return {booking:'📝',invoice:'🧾',unit:'🏠',customer:'👤',property:'🏗️',lead:'🎯',task:'✅'}[kind]||'📄';
+}
+function _recKindLabel(kind){
+  return {booking:'Booking',invoice:'Invoice',unit:'Unit',customer:'Customer',property:'Property',lead:'Lead',task:'Task'}[kind]||'Record';
+}
+function trackRecent(kind,label,ser){
+  if(!label)return;
+  var arr=window._recent.filter(function(x){return x.label!==label;});
+  arr.unshift({kind:kind,label:String(label),mod:(ser&&ser.mod)||'',ref:(ser&&ser.ref)!=null?ser.ref:null,name:(ser&&ser.name)||null});
+  if(arr.length>10)arr=arr.slice(0,10);
+  window._recent=arr;
+  try{localStorage.setItem(_recentKey,JSON.stringify(arr));}catch(e){}
+  _renderRecentTray();
+}
+function _recentGo(r){
+  if(!r)return;
+  if(r.kind==='booking'&&r.ref){window._navBookingId=r.ref;switchModule('bookings');}
+  else if(r.kind==='invoice'&&r.ref){window._navInvoiceId=r.ref;switchModule('finance');}
+  else if(r.kind==='unit'&&r.ref){window._navUnitId=r.ref;switchModule('properties_units');}
+  else if(r.kind==='customer'&&r.name){window._navCustName=r.name;switchModule('customers');}
+  else if(r.kind==='property'&&r.name){window._navPropertyName=r.name;switchModule('properties_units');}
+  else if(r.kind==='lead'&&r.ref){try{openLead(parseInt(r.ref,10)||r.ref);}catch(e){switchModule('crm');}}
+  else if(r.kind==='task'){switchModule('tasks');}
+  else if(r.mod){switchModule(r.mod);}
+}
+function toggleRecentTray(){
+  var t=document.getElementById('recentTray');
+  if(!t)return;
+  if(t.style.display==='block'){t.style.display='none';}
+  else{_renderRecentTray();t.style.display='block';}
+}
+function closeRecentTray(){var t=document.getElementById('recentTray');if(t)t.style.display='none';}
+function _renderRecentTray(){
+  var t=document.getElementById('recentTray');
+  var b=document.getElementById('recentBadge');
+  var arr=window._recent||[];
+  if(b){b.style.display=arr.length?'inline':'none';b.textContent=arr.length;}
+  if(!t)return;
+  if(!arr.length){t.innerHTML='<div class="rt-empty">🕘<div style="margin-top:6px">No recent items yet</div><div style="font-size:9px;color:#aaa;margin-top:3px">Items you open appear here</div></div>';return;}
+  var html='<div class="rt-head"><span>🕘 Recent Items</span><span class="rt-clear" onclick="event.stopPropagation();clearRecent()">Clear all</span></div>';
+  arr.forEach(function(r,i){
+    html+='<div class="rt-item" onclick="event.stopPropagation();closeRecentTray();_recentGo(window._recent['+i+'])">'+
+      '<div class="rt-ico">'+_recKindIcon(r.kind)+'</div>'+
+      '<div class="rt-label" title="'+_esc(r.label)+'">'+_esc(r.label)+'</div>'+
+      '<div style="font-size:8px;color:#aaa;flex-shrink:0">'+_recKindLabel(r.kind)+'</div>'+
+      '<span class="rt-x" onclick="event.stopPropagation();_recentRemove('+i+')" title="Remove">×</span></div>';
+  });
+  t.innerHTML=html;
+}
+function _recentRemove(i){
+  var arr=(window._recent||[]).slice();
+  arr.splice(i,1);
+  window._recent=arr;
+  try{localStorage.setItem(_recentKey,JSON.stringify(arr));}catch(e){}
+  _renderRecentTray();
+}
+function clearRecent(){
+  window._recent=[];
+  try{localStorage.removeItem(_recentKey);}catch(e){}
+  _renderRecentTray();
+}
+// ── FEATURE C: Clickable Breadcrumb (group / module pickers) ──
+function _crumbMenuEl(){
+  var el=document.getElementById('crumbMenu');
+  if(!el){el=document.createElement('div');el.id='crumbMenu';document.body.appendChild(el);}
+  return el;
+}
+function _closeCrumbMenu(){var el=document.getElementById('crumbMenu');if(el)el.style.display='none';}
+function _positionCrumbMenu(el,anchor){
+  el.style.display='block';
+  var r=anchor?anchor.getBoundingClientRect():{bottom:28,left:20};
+  var top=r.bottom+4;
+  var left=Math.min(r.left,window.innerWidth-210);
+  el.style.top=Math.max(4,top)+'px';
+  el.style.left=Math.max(4,left)+'px';
+}
+function showGroupPicker(ev){
+  if(ev){ev.stopPropagation();}
+  var el=_crumbMenuEl();
+  var html='';
+  Object.keys(GROUPS).forEach(function(gid){
+    var g=GROUPS[gid];
+    var active=(gid===currentGroup)?' active':'';
+    html+='<div class="crumb-menu-item'+active+'" onclick="event.stopPropagation();_closeCrumbMenu();switchGroup(\''+gid+'\')"><span class="cm-ico">'+g.icon+'</span>'+g.label+'</div>';
+  });
+  el.innerHTML=html;
+  _positionCrumbMenu(el,ev&&ev.target);
+}
+function showModulePicker(ev){
+  if(ev){ev.stopPropagation();}
+  var el=_crumbMenuEl();
+  var grp=GROUPS[currentGroup];
+  var html='';
+  (grp?grp.mods:[]).forEach(function(m){
+    var active=(m.id===currentModule)?' active':'';
+    html+='<div class="crumb-menu-item'+active+'" onclick="event.stopPropagation();_closeCrumbMenu();switchModule(\''+m.id+'\')"><span class="cm-ico">'+(grp.icon||'📄')+'</span>'+m.label+'</div>';
+  });
+  el.innerHTML=html;
+  _positionCrumbMenu(el,ev&&ev.target);
+}
+// ── FEATURE D: Keyboard Shortcuts ──
+var _gPending=false, _gTime=0;
+var _G_KEYS={c:'customers',b:'bookings',p:'properties_units',f:'finance',l:'crm',h:'hr'};
+var _NEW_MAP={customers:'crudCustomer',bookings:'crudBooking',finance:'crudTransaction',tasks:'crudTask',hr:'crudEmployee',crm:'crudLead'};
+function _isTypingTarget(e){
+  var t=e.target;
+  if(!t)return false;
+  var tag=(t.tagName||'').toUpperCase();
+  return tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||t.isContentEditable;
+}
+function showShortcutsHelp(){
+  var rows=[
+    ['⌘K / Ctrl+K','Open command palette'],
+    ['/','Open command palette'],
+    ['g then c','Go to Customers'],
+    ['g then b','Go to Bookings'],
+    ['g then p','Go to Property & Units'],
+    ['g then f','Go to Finance'],
+    ['g then l','Go to CRM & Leads'],
+    ['g then h','Go to HR'],
+    ['n','New item for current module'],
+    ['?','Show this help'],
+    ['Esc','Close palette / tray / menus'],
+    ['Alt+N','Quick add (existing)']
+  ];
+  var body='<div style="font-size:11px;color:#666;line-height:1.9">'+rows.map(function(r){
+    return '<div style="display:flex;justify-content:space-between;gap:12px;padding:4px 2px;border-bottom:1px dashed #eee"><span style="font-weight:600;color:#2F80ED;white-space:nowrap">'+r[0]+'</span><span style="text-align:right;color:#555">'+r[1]+'</span></div>';
+  }).join('')+'</div>';
+  openModal('⌨ Keyboard Shortcuts', body, '<button class="drawer-btn primary" onclick="closeDrawer()">Close</button>');
+}
+document.addEventListener('keydown',function(e){
+  // ⌘K / Ctrl+K — works everywhere
+  if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')){
+    e.preventDefault();
+    toggleCommandPalette();
+    return;
+  }
+  // Esc — works everywhere
+  if(e.key==='Escape'){
+    var ov=document.getElementById('cpOverlay');
+    if(ov&&ov.classList.contains('active')){closeCommandPalette();e.preventDefault();return;}
+    if(document.getElementById('recentTray')&&document.getElementById('recentTray').style.display==='block'){closeRecentTray();e.preventDefault();return;}
+    if(document.getElementById('crumbMenu')&&document.getElementById('crumbMenu').style.display==='block'){_closeCrumbMenu();e.preventDefault();return;}
+    return;
+  }
+  if(_isTypingTarget(e))return;
+  if(e.key==='?'){e.preventDefault();showShortcutsHelp();return;}
+  if(e.key==='/'){e.preventDefault();openCommandPalette();return;}
+  if(e.key==='n'||e.key==='N'){
+    var fnName=_NEW_MAP[currentModule];
+    if(fnName&&typeof window[fnName]==='function'){
+      e.preventDefault();
+      try{window[fnName]();}catch(err){showToast('Could not open new-item form','error');}
+    }
+    return;
+  }
+  if(e.key==='g'||e.key==='G'){
+    _gPending=true; _gTime=Date.now();
+    e.preventDefault();
+    return;
+  }
+  if(_gPending){
+    var k=e.key.toLowerCase();
+    _gPending=false;
+    if(Date.now()-_gTime<=1000&&_G_KEYS[k]){e.preventDefault();switchModule(_G_KEYS[k]);}
+  }
+});
+// Close tray / crumb menu on outside click
+document.addEventListener('click',function(e){
+  var t=e.target;
+  var tray=document.getElementById('recentTray');
+  if(tray&&tray.style.display==='block'){
+    var btn=document.getElementById('recentBtn');
+    if((!btn||!btn.contains(t))&&!tray.contains(t))closeRecentTray();
+  }
+  var cm=document.getElementById('crumbMenu');
+  if(cm&&cm.style.display==='block'&&!cm.contains(t)){
+    if(!(t.classList&&t.classList.contains('crumb-part')))_closeCrumbMenu();
+  }
+});
+// ═══ PROJECT GANTT-LITE ═══
+function renderProjectGantt(){
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year=new Date().getFullYear();
+  var now=new Date();
+  var curMonth=(now.getFullYear()-year)*12+now.getMonth();
+  var todayPct=(curMonth>=0&&curMonth<12)?(((curMonth+now.getDate()/30.5)/12)*100):-1;
+  var statusColor={'In Progress':'#2F80ED','Planning':'#ff9800','Near Completion':'#2e7d32','Completed':'#2e7d32','On Hold':'#ff9800','Delayed':'#e53935','Cancelled':'#888'};
+  var rows=(window.mockProjects||[]).map(function(p){
+    var dur=Math.max(1,Math.min(12,Math.round((p.progress||0)/100*12)));
+    var startM=0;
+    if(p.start&&/^(\d{4})-Q([1-4])$/.test(p.start))startM=Math.min(11,(parseInt(p.start.slice(5),10)-1)*3);
+    var endM=Math.min(11,startM+dur-1);
+    return {p:p,startM:startM,endM:endM};
+  });
+  var html='<div class="card" style="grid-column:1/-1"><div class="card-header"><h3>📊 Project Timeline — '+year+'</h3><span style="font-size:9px;color:#888">Bar = duration derived from progress · dashed line = today</span></div><div class="card-body" style="padding:8px;overflow-x:auto">'+
+    '<div style="min-width:640px">'+
+    '<div style="display:flex;align-items:stretch;margin-bottom:2px">'+
+      '<div style="width:180px;flex-shrink:0;font-size:9px;font-weight:600;color:#888;padding:2px 6px">Project</div>'+
+      '<div style="position:relative;flex:1;height:18px">'+
+        months.map(function(m,i){return '<div style="position:absolute;left:'+(i/12*100)+'%;width:'+(100/12)+'%;font-size:8px;color:#999;padding-left:3px;border-left:1px solid rgba(128,128,128,.25);height:100%;overflow:hidden;white-space:nowrap">'+m+'</div>'}).join('')+
+        (todayPct>=0?'<div style="position:absolute;left:'+todayPct+'%;top:0;bottom:0;border-left:2px dashed var(--primary);z-index:5"></div><div style="position:absolute;left:'+todayPct+'%;top:-1px;font-size:7px;color:var(--primary);font-weight:700;transform:translateX(-50%);z-index:6">Today</div>':'')+
+      '</div>'+
+    '</div>'+
+    rows.map(function(r){
+      var left=r.startM/12*100;
+      var width=((r.endM-r.startM+1)/12*100);
+      var col=statusColor[r.p.status]||'#2F80ED';
+      var startLabel=months[r.startM]+' '+year;
+      var endLabel=months[r.endM]+' '+year;
+      var tip=r.p.name+' — '+startLabel+' → '+endLabel+' · '+r.p.progress+'% · '+(r.p.status||'');
+      return '<div style="display:flex;align-items:center;border-bottom:1px solid var(--table-border);padding:3px 0">'+
+        '<div style="width:180px;flex-shrink:0;font-size:10px;font-weight:500;padding:0 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+r.p.name+'">'+r.p.name+'</div>'+
+        '<div style="position:relative;flex:1;height:18px">'+
+          '<div style="position:absolute;left:0;right:0;top:0;bottom:0;background:repeating-linear-gradient(90deg,transparent 0,transparent calc('+(100/12)+'% - 1px),rgba(128,128,128,.15) calc('+(100/12)+'% - 1px),rgba(128,128,128,.15) '+(100/12)+'%)"></div>'+
+          '<div title="'+tip+'" style="position:absolute;left:'+left+'%;width:'+width+'%;top:3px;bottom:3px;background:'+col+';border-radius:3px;opacity:.85;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.15)"></div>'+
+          (todayPct>=0?'<div style="position:absolute;left:'+todayPct+'%;top:0;bottom:0;border-left:2px dashed var(--primary);opacity:.6"></div>':'')+
+        '</div>'+
+      '</div>';
+    }).join('')+
+    '</div></div></div>';
+  return html;
+}
+
+// ═══ PAYMENT HEATMAP ═══
+function renderPaymentHeatmap(el){
+  var today=new Date();today.setHours(0,0,0,0);
+  var end=new Date(today);
+  var start=new Date(today);start.setDate(start.getDate()-83);
+  var dow=(start.getDay()+6)%7;start.setDate(start.getDate()-dow); // align to Monday
+  function pad(n){return n<10?'0'+n:''+n;}
+  function dayKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  // Count payments per day within window
+  var counts={},receivedAmt=0,payCount=0;
+  (window.mockPayments||[]).forEach(function(p){
+    if(!p||!p.date)return;
+    var d=new Date(p.date);if(isNaN(d.getTime()))return;
+    if(d<start||d>end)return;
+    var k=dayKey(d);
+    counts[k]=(counts[k]||0)+1;
+    payCount++;
+    if(p.status==='Cleared')receivedAmt+=(p.amount||0);
+  });
+  // Overdue invoices → red markers on their dueDate day
+  var overdueDays={},overdueAmt=0,overdueCount=0;
+  (window.mockInvoices||[]).forEach(function(inv){
+    if(!inv||inv.status==='Paid'||!inv.dueDate)return;
+    var d=new Date(inv.dueDate);if(isNaN(d.getTime()))return;
+    if(d<today)overdueCount++;
+    if(d<start||d>end)return;
+    var k=dayKey(d);
+    overdueDays[k]=(overdueDays[k]||0)+1;
+    overdueAmt+=(inv.amount||0);
+  });
+  var totalDue=receivedAmt+overdueAmt;
+  var colRate=totalDue>0?Math.round(receivedAmt/totalDue*100):100;
+  function cellColor(c,od){
+    if(od>0)return od>=6?'#c62828':od>=3?'#ef5350':'#ffcdd2';
+    if(c===0)return 'var(--muted-bg)';
+    if(c<=2)return '#bbdefb';
+    if(c<=5)return '#64b5f6';
+    return '#1565c0';
+  }
+  var weeks=12,dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var html='<div class="fade-in">'+
+    '<div class="page-title">🔥 Payment Heatmap</div>'+
+    '<div class="page-subtitle">Last 12 weeks · '+payCount+' payments · '+overdueCount+' overdue</div>'+
+    '<div class="card"><div class="card-body" style="padding:10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">'+
+        '<div style="font-size:10px;color:#888">Payment activity by day — blue = payments received, red = overdue due dates. Hover a cell for details.</div>'+
+        '<div style="display:flex;align-items:center;gap:3px;font-size:8px;color:#888">Less'+
+          ['var(--muted-bg)','#bbdefb','#64b5f6','#1565c0'].map(function(c){return '<span style="width:11px;height:11px;border-radius:2px;background:'+c+';display:inline-block"></span>'}).join('')+
+          'More<span style="width:11px;height:11px;border-radius:2px;background:#ef5350;display:inline-block;margin-left:4px"></span>Overdue'+
+        '</div>'+
+      '</div>'+
+      '<div style="overflow-x:auto"><table style="border-collapse:collapse">';
+  // Month labels
+  html+='<tr><td style="width:34px"></td>';
+  for(var w=0;w<weeks;w++){
+    var wd=new Date(start);wd.setDate(start.getDate()+w*7+3);
+    var showLabel=(w===0)||wd.getMonth()!==new Date(start.getDate()+ (w-1)*7 +3).getMonth();
+    html+='<td style="width:15px;height:12px;font-size:7px;color:#999;text-align:center;vertical-align:bottom;white-space:nowrap;overflow:hidden;max-width:15px">'+(showLabel?monthNames[wd.getMonth()]:'')+'</td>';
+  }
+  html+='</tr>';
+  // Day rows
+  for(var r=0;r<7;r++){
+    html+='<tr><td style="font-size:8px;color:#999;padding-right:4px;height:15px;vertical-align:middle">'+dayNames[r]+'</td>';
+    for(var w2=0;w2<weeks;w2++){
+      var d2=new Date(start);d2.setDate(start.getDate()+w2*7+r);
+      var k2=dayKey(d2);
+      var c=counts[k2]||0,od=overdueDays[k2]||0;
+      var inRange=d2<=end;
+      var bg=inRange?cellColor(c,od):'transparent';
+      var tip=k2+': '+(od>0?od+' overdue due date(s)':c>0?c+' payment(s)':'no activity');
+      html+='<td style="padding:1px"><div title="'+tip+'" style="width:13px;height:13px;border-radius:2px;background:'+bg+';'+(inRange?'':'opacity:.25')+'"></div></td>';
+    }
+    html+='</tr>';
+  }
+  html+='</table></div>'+
+    '<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">'+
+      '<div class="stat-card" style="padding:6px 10px;flex:1;min-width:120px"><div class="label">Received (12 wks)</div><div class="value" style="font-size:15px;color:#2e7d32">\u09F3'+(receivedAmt/100000).toFixed(1)+'L</div></div>'+
+      '<div class="stat-card" style="padding:6px 10px;flex:1;min-width:120px"><div class="label">Overdue (12 wks)</div><div class="value" style="font-size:15px;color:#c62828">\u09F3'+(overdueAmt/100000).toFixed(1)+'L</div></div>'+
+      '<div class="stat-card" style="padding:6px 10px;flex:1;min-width:120px"><div class="label">Collection Rate</div><div class="value" style="font-size:15px;color:#1565c0">'+colRate+'%</div></div>'+
+    '</div>'+
+    '</div></div></div>';
+  el.innerHTML=html;
+}
+// Restore badge on load
+_renderRecentTray();
 </script>
 </body>
 </html>
