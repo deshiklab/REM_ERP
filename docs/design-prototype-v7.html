@@ -330,6 +330,15 @@
     html.dark .tbl-region .table-wrap thead th{box-shadow:0 1px 0 rgba(255,255,255,.08)}
     html.dark .tbl-region .pagination{background:var(--card-bg,#0e1626);border-top-color:rgba(255,255,255,.08);backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%)}
     html.dark .tbl-region table.has-row-menu th:last-child,html.dark .tbl-region table.has-row-menu .row-more-cell{background:var(--card-bg,#0e1626)!important}
+    /* Documents Vault list view (desktop): the table card sits inside .vault-wrap,
+       so extend the fixed-height scaffold chain — otherwise the table renders at
+       full content height and the pagination falls below the fold, under the footer. */
+    .content.table-view .vault-wrap{flex:1 1 auto!important;min-width:0!important;min-height:0!important;display:flex!important;align-items:stretch!important;overflow:hidden!important}
+    .content.table-view .vault-wrap>div[style]{flex:1!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important}
+    .content.table-view .vault-wrap .toolbar{flex-shrink:0!important}
+    .content.table-view .vault-wrap .card.tbl-region{flex:1!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+    .content.table-view .vault-wrap .card.tbl-region .card-body{flex:1!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+    .content.table-view .vault-wrap .table-wrap{flex:1!important;min-width:0!important;min-height:0!important}
     col.hidden{visibility:collapse}
     th.hidden{display:none}
     td.hidden{display:none}
