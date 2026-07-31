@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, hr_attendance:1, hr_timesheets:1, leave:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, hr_attendance:1, hr_timesheets:1, leave:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -2611,7 +2611,7 @@ function renderReports(el){
   var cutoff=_repCutoff();
   var projs=_repProjList();
   var periodName={all:'All Time','30d':'Last 30 Days','90d':'Last 90 Days',ytd:'Year To Date'}[_repPeriod];
-  var tabDefs=[['pipeline','📈 Sales Pipeline'],['collection','💰 Payment Collection'],['occupancy','🏢 Occupancy'],['revenue','📊 Revenue vs Expense']];
+  var tabDefs=[['pipeline','📈 Sales Pipeline'],['collection','💰 Payment Collection'],['occupancy','🏢 Occupancy'],['revenue','📊 Revenue vs Expense'],['export','📤 Bulk Export']];
   var tabs=tabDefs.map(function(t){return '<span class="qa-tab" style="padding:4px 12px;font-size:10px;font-weight:600;border-radius:6px;cursor:pointer;background:'+(_repTab===t[0]?'#2F80ED':'#f0f0f0')+';color:'+(_repTab===t[0]?'#fff':'#666')+';margin-right:4px" onclick="_repTab=\''+t[0]+'\';renderModule()">'+t[1]+'</span>';}).join('');
   var toolbar='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+tabs+
     '<div class="spacer"></div>'+
@@ -2629,8 +2629,10 @@ function renderReports(el){
   if(_repTab==='pipeline')_repPipeline(area,cutoff);
   else if(_repTab==='collection')_repCollection(area,cutoff);
   else if(_repTab==='occupancy')_repOccupancy(area);
+  else if(_repTab==='export')_repExport(area,cutoff);
   else _repRevenue(area,cutoff);
   setTimeout(function(){
+    if(_repTab==='export')return;
     if(_repTab==='pipeline')_repPipeChart();
     else if(_repTab==='collection')_repCollChart();
     else if(_repTab==='occupancy')_repOccChart();
@@ -2828,6 +2830,75 @@ function _repReportData(){
   var rows=[],cum=0;
   for(var m=0;m<12;m++){var d=new Date(yr,m,1);var key=yr+'-'+(m<9?'0':'')+(m+1);var rev=mockTransactions.filter(function(t){return t.type==='Inflow'&&t.date&&t.date.indexOf(key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);var exp=mockTransactions.filter(function(t){return t.type==='Outflow'&&t.date&&t.date.indexOf(key)===0&&_repProjOK(t.project);}).reduce(function(s,t){return s+(t.amount||0);},0);var net=rev-exp;cum+=net;rows.push([d.toLocaleString('en',{month:'long'})+' '+yr,rev,exp,net,cum]);}
   return {title:'Revenue vs Expense Report',subtitle:'REM ERP · FY '+yr+' · '+(_repProject==='all'?'All Projects':_repProject),headers:headers,rows:rows,numberCols:[1,2,3,4]};
+}
+var _bulkMod='invoices',_bulkFmt='pdf',_bulkFrom='',_bulkTo='';
+function _repBulkSource(mod){
+  if(mod==='invoices')return {rows:mockInvoices.map(function(i){return [i.id,i.client,i.project+' '+i.unit,i.amount,i.status,i.dueDate];}),headers:['ID','Client','Property/Unit','Amount','Status','Due Date'],numCols:[3],title:'Invoices Export'};
+  if(mod==='bookings')return {rows:mockBookings.map(function(b){return [b.id,b.client,b.property+' '+b.unit,b.price,b.advance,b.status,b.date];}),headers:['ID','Client','Property/Unit','Price','Advance','Status','Date'],numCols:[],title:'Bookings Export'};
+  if(mod==='leads')return {rows:mockLeads.map(function(l){return [l.id,l.name,l.phone,l.property,l.status,l.value,l.owner];}),headers:['ID','Name','Phone','Property','Status','Value','Owner'],numCols:[],title:'Leads Export'};
+  return {rows:mockTransactions.map(function(t){return [t.id,t.date,t.client||t.vendor||'—',t.project,t.category,t.amount,t.status];}),headers:['ID','Date','Party','Project','Category','Amount','Status'],numCols:[5],title:'Payments Export'};
+}
+function _repExport(area,cutoff){
+  area.innerHTML='<div class="fade-in">'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">'+
+      '<div class="card"><div class="card-header"><h3>⚙️ Export Settings</h3></div><div class="card-body" style="padding:10px">'+
+        '<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:600;color:#888;margin-bottom:3px">MODULE</div>'+
+        '<select id="bulkMod" onchange="_bulkMod=this.value" style="width:100%;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="invoices"'+( _bulkMod==='invoices'?' selected':'')+'>🧾 Invoices</option><option value="bookings"'+( _bulkMod==='bookings'?' selected':'')+'>📦 Bookings</option><option value="leads"'+( _bulkMod==='leads'?' selected':'')+'>🔥 Leads</option><option value="payments"'+( _bulkMod==='payments'?' selected':'')+'>💰 Payments</option></select></div>'+
+        '<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:600;color:#888;margin-bottom:3px">DATE RANGE (optional)</div><div style="display:flex;gap:6px"><input id="bulkFrom" type="date" value="'+(_bulkFrom||'')+'" onchange="_bulkFrom=this.value" style="flex:1;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/><input id="bulkTo" type="date" value="'+(_bulkTo||'')+'" onchange="_bulkTo=this.value" style="flex:1;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"/></div></div>'+
+        '<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:600;color:#888;margin-bottom:3px">FORMAT</div>'+
+        '<select id="bulkFmt" onchange="_bulkFmt=this.value" style="width:100%;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px"><option value="pdf"'+( _bulkFmt==='pdf'?' selected':'')+'>🖨 PDF (print / save as PDF)</option><option value="einvoice"'+( _bulkFmt==='einvoice'?' selected':'')+'>🧾 e-Invoice batch</option><option value="csv"'+( _bulkFmt==='csv'?' selected':'')+'>📄 CSV download</option></select></div>'+
+        '<button class="action-btn primary" onclick="_repBulkRun()" style="padding:5px 12px;font-size:10px;width:100%">⚡ Generate Export</button>'+
+      '</div></div>'+
+      '<div class="card"><div class="card-header"><h3>📄 Preview</h3></div><div class="card-body" style="padding:10px;min-height:150px;max-height:340px;overflow:auto" id="bulkPreview"><div style="font-size:10px;color:#aaa;text-align:center;padding:40px 0">Select settings and click Generate Export</div></div></div>'+
+    '</div>'+
+    '<div class="card"><div class="card-header"><h3>বাল্ক এক্সপোর্ট — Supported Modules</h3></div><div class="card-body" style="padding:10px;font-size:10px;color:#666;line-height:1.7">'+
+      '🧾 <b>Invoices</b> — '+mockInvoices.length+' records · 📦 <b>Bookings</b> — '+mockBookings.length+' records · 🔥 <b>Leads</b> — '+mockLeads.length+' records · 💰 <b>Payments</b> — '+mockTransactions.length+' records.<br/>'+
+      'Formats: <b>PDF</b> opens the system print dialog (Save as PDF) · <b>e-Invoice</b> renders a professional invoice layout per record · <b>CSV</b> downloads instantly.</div></div>'+
+  '</div>';
+}
+function _repBulkRun(){
+  var mod=_bulkMod,fmt=_bulkFmt,from=_bulkFrom,to=_bulkTo;
+  var src=_repBulkSource(mod);
+  var dateIdx=mod==='invoices'?5:mod==='payments'?1:-1;
+  var filtered=src.rows.filter(function(r){
+    if(dateIdx<0)return true;
+    var d=String(r[dateIdx]||'');
+    if(from&&d<from)return false;
+    if(to&&d>to)return false;
+    return true;
+  });
+  var tbl='<table style="font-size:10px;border-collapse:collapse;width:100%"><thead><tr>'+src.headers.map(function(h){return '<th style="text-align:left;padding:4px;border-bottom:1px solid #ddd;color:#888;font-size:9px">'+h+'</th>';}).join('')+'</tr></thead><tbody>'+
+    filtered.slice(0,20).map(function(r){return '<tr>'+r.map(function(v,i){var num=src.numCols&&src.numCols.indexOf(i)>=0;return '<td style="padding:3px 4px;border-bottom:1px solid #f0f0f0;font-size:10px;text-align:'+(num?'right':'left')+'">'+(num&&typeof v==='number'?'৳'+v.toLocaleString('en-IN'):v)+'</td>';}).join('')+'</tr>';}).join('')+
+    '</tbody></table>';
+  var pv=document.getElementById('bulkPreview');
+  if(pv)pv.innerHTML='<div style="font-size:10px;color:#888;margin-bottom:6px">'+src.title+' · '+filtered.length+' records'+(from||to?' · '+from+' → '+to:'')+'</div>'+tbl+(filtered.length>20?'<div style="font-size:9px;color:#aaa;text-align:center;padding:4px">… showing first 20 of '+filtered.length+'</div>':'');
+  if(fmt==='csv'){
+    var esc=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';};
+    var csv=src.headers.map(esc).join(',')+'\n'+filtered.map(function(r){return r.map(esc).join(',');}).join('\n');
+    _repDownload(mod+'-export.csv','﻿'+csv,'text/csv');
+    showToast('CSV exported ('+filtered.length+' rows)','success');
+  }else if(fmt==='einvoice'){
+    _repBulkPrint(src,filtered,true);
+  }else{
+    _repBulkPrint(src,filtered,false);
+  }
+}
+function _repBulkPrint(src,rows,isInvoice){
+  var pr=document.getElementById('printArea')||(function(){var x=document.createElement('div');x.id='printArea';document.body.appendChild(x);return x;})();
+  var now=new Date();
+  if(!isInvoice){
+    pr.innerHTML='<div style="text-align:center;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:12px"><div style="font-size:18px;font-weight:700">'+src.title+'</div><div style="font-size:11px;color:#555;margin-top:3px">'+rows.length+' records · Generated '+now.toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</div></div>'+
+      '<table style="border-collapse:collapse;width:100%"><thead><tr>'+src.headers.map(function(h){return '<th style="border:1px solid #999;background:#f0f0f0;padding:5px;font-size:10px;text-align:left">'+h+'</th>';}).join('')+'</tr></thead><tbody>'+
+      rows.map(function(r){return '<tr>'+r.map(function(v,i){var num=src.numCols&&src.numCols.indexOf(i)>=0;return '<td style="border:1px solid #ccc;padding:4px;font-size:10px;text-align:'+(num?'right':'left')+'">'+(num&&typeof v==='number'?'৳'+v.toLocaleString('en-IN'):v)+'</td>';}).join('')+'</tr>';}).join('')+
+      '</tbody></table>';
+  }else{
+    pr.innerHTML='<div style="text-align:center;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:12px"><div style="font-size:18px;font-weight:700">MARS CONSTRUCTIONS LTD</div><div style="font-size:11px;color:#555;margin-top:3px">E-Invoice Batch · '+rows.length+' invoices · Generated '+now.toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric'})+'</div></div>'+
+      rows.map(function(r){return '<div style="border:1px solid #999;border-radius:6px;padding:10px;margin-bottom:10px;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;border-bottom:1px solid #ddd;padding-bottom:5px;margin-bottom:5px"><span>'+src.headers[0]+': '+r[0]+'</span><span>'+r[1]+'</span></div>'+
+      src.headers.slice(2).map(function(h,i){var v=r[i+2];var num=src.numCols&&src.numCols.indexOf(i+2)>=0;return '<div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0"><span style="color:#888">'+h+'</span><span style="font-weight:500">'+(num&&typeof v==='number'?'৳'+v.toLocaleString('en-IN'):v)+'</span></div>';}).join('')+
+      '</div>';}).join('');
+  }
+  showToast('Opening print dialog…','info');
+  setTimeout(function(){window.print();},150);
 }
 function reportsExportExcel(){
   var d=_repReportData();
@@ -7996,13 +8067,85 @@ function biExportSingle(id){
 }
 
 function renderNotificationsPage(el){
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Notifications</div><div class="page-subtitle">System-wide activity feed</div>
-    <div class="card"><div class="card-body" style="padding:0"><div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#fff3e0;display:flex;align-items:center;justify-content:center">📋</div><div><div style="font-size:11px;font-weight:500">PO-24-089 Requires Approval</div><div style="font-size:9px;color:#888">Shah Cement • Tk 5,50,000 • 2 hours ago</div></div></div>
-    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#e8f5e9;display:flex;align-items:center;justify-content:center">💰</div><div><div style="font-size:11px;font-weight:500">Payment Received — Dr. Rubina Ali</div><div style="font-size:9px;color:#888">Tk 2,00,000 • Booking installment • 5h ago</div></div></div>
-    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#e3f2fd;display:flex;align-items:center;justify-content:center">🔥</div><div><div style="font-size:11px;font-weight:500">Lead Status Changed</div><div style="font-size:9px;color:#888">Syed Rahman → Hot • 1 day ago</div></div></div>
-    <div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#fce4ec;display:flex;align-items:center;justify-content:center">⚠️</div><div><div style="font-size:11px;font-weight:500">Stock Alert — Shah Cement</div><div style="font-size:9px;color:#888">150 Bags remaining • Reorder at 500 • 1 day ago</div></div></div>
-    <div style="padding:10px 12px;display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:6px;background:#f3e5f5;display:flex;align-items:center;justify-content:center">📅</div><div><div style="font-size:11px;font-weight:500">Site Visit Reminder</div><div style="font-size:9px;color:#888">Dr. Rubina Ali at Jolshiri • Tomorrow 11:00 AM</div></div></div>
-    </div></div></div>`;
+  var tab=_notifPageTab||'feed';
+  var tabs='<div class="tabs" style="margin-bottom:8px">'+[
+    ['feed','🔔 Feed'],['templates','📝 Templates']
+  ].map(function(t){return '<div class="tab '+(tab===t[0]?'active':'')+'" onclick="_notifPageTab=\''+t[0]+'\';renderModule()">'+t[1]+'</div>';}).join('')+'</div>';
+  var unread=mockNotifications.filter(function(n){return !n.read}).length;
+  if(tab==='templates'){
+    el.innerHTML='<div class="fade-in"><div class="page-title">Notifications</div><div class="page-subtitle">System-wide activity feed · Templates</div>'+tabs+renderNotifTemplates()+'</div>';
+  }else{
+    var feed=mockNotifications.slice(0,30).map(function(n){
+      var icon=notifIcons[n.type]||notifIcons['default'];
+      var bg=notifBg[n.type]||notifBg['default'];
+      return '<div style="padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px;'+(n.read?'':'background:#f5f9ff')+'">'+
+        '<div style="width:32px;height:32px;border-radius:6px;background:'+bg+';display:flex;align-items:center;justify-content:center">'+icon+'</div>'+
+        '<div><div style="font-size:11px;font-weight:500">'+n.title+'</div><div style="font-size:9px;color:#888">'+n.sub+' · '+timeAgo(n.time)+'</div></div></div>';
+    }).join('');
+    el.innerHTML='<div class="fade-in"><div class="page-title">Notifications</div><div class="page-subtitle">'+mockNotifications.length+' total · '+unread+' unread</div>'+tabs+
+      '<div class="card"><div class="card-body" style="padding:0">'+(feed||'<div style="padding:30px;text-align:center;color:#999;font-size:11px">No notifications yet</div>')+'</div></div>'+
+      '<div style="margin-top:8px;text-align:right"><button class="action-btn secondary" onclick="markAllNotifRead()" style="padding:4px 10px;font-size:10px">✓ Mark all read</button></div></div>';
+  }
+}
+function ntChanIcon(c){return c==='Email'?'✉️':c==='SMS'?'📱':'💬';}
+function renderNotifTemplates(){
+  var rows=mockNotifTemplates.map(function(t){
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+t.id+'</td><td style="font-weight:500">'+t.name+'</td><td>'+ntChanIcon(t.channel)+' '+t.channel+'</td><td style="font-size:9px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+(t.subject||'')+'">'+(t.subject||'—')+'</td><td style="font-size:9px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+t.body+'">'+t.body+'</td><td><span class="badge-status '+(t.active?'badge-active':'badge-closed')+'" style="cursor:pointer" onclick="ntToggleActive(\''+t.id+'\')">'+(t.active?'Active':'Inactive')+'</span></td><td style="white-space:nowrap">'+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" title="Test send" onclick="event.stopPropagation();ntTestSend(\''+t.id+'\')">▶</span> '+
+      '<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Preview" onclick="event.stopPropagation();ntPreview(\''+t.id+'\')">👁</span> '+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudNotifTemplate(mockNotifTemplates.find(function(x){return x.id===\''+t.id+'\'}))">✎</span> '+
+      '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\'Delete template?\')){var idx=mockNotifTemplates.findIndex(function(x){return x.id===\''+t.id+'\'});if(idx>=0)mockNotifTemplates.splice(idx,1);DB.save(\'notif_templates\');renderModule();showToast(\'Deleted\',\'info\')}">✕</span></td></tr>';
+  }).join('');
+  return '<div class="toolbar" style="margin-bottom:6px"><div style="font-size:10px;color:#888">'+mockNotifTemplates.length+' templates · shortcodes: {{customer_name}} {{amount}} {{property}} {{due_date}}</div><div class="spacer"></div>'+
+    '<button class="action-btn primary" onclick="crudNotifTemplate()" style="padding:3px 8px;font-size:10px">+ New Template</button></div>'+
+    '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Name</th><th>Channel</th><th>Subject</th><th>Body</th><th>Status</th><th></th></tr></thead><tbody>'+
+    (rows||'<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;font-size:11px">No templates yet</td></tr>')+
+    '</tbody></table></div></div></div>';
+}
+function ntResolve(t){
+  var sample={customer_name:'Dr. Rubina Ali',amount:'৳2,00,000',property:'Jolshiri - Apt 4B',due_date:'2026-08-15'};
+  var s=String(t.subject||'').replace(/\{\{(\w+)\}\}/g,function(m,k){return sample[k]!==undefined?sample[k]:m;});
+  var b=String(t.body||'').replace(/\{\{(\w+)\}\}/g,function(m,k){return sample[k]!==undefined?sample[k]:m;});
+  return {subject:s,body:b};
+}
+function ntTestSend(id){
+  var t=mockNotifTemplates.find(function(x){return x.id===id});if(!t)return;
+  var r=ntResolve(t);
+  showToast('📤 Test '+t.channel+' sent → '+(r.subject||r.body.slice(0,45))+'…','success');
+}
+function ntPreview(id){
+  var t=mockNotifTemplates.find(function(x){return x.id===id});if(!t)return;
+  var r=ntResolve(t);
+  openModal('Template Preview — '+t.name,
+    '<div style="font-size:10px;color:#888;margin-bottom:8px">'+ntChanIcon(t.channel)+' '+t.channel+(t.subject?' · Subject: <b style="color:#333">'+r.subject+'</b>':'')+'</div>'+
+    '<div style="background:#f8f9fa;border:1px solid #eee;border-radius:8px;padding:12px;font-size:11px;color:#444;line-height:1.6;white-space:pre-wrap">'+r.body+'</div>'+
+    '<div style="font-size:9px;color:#aaa;margin-top:8px">Shortcodes resolved with sample customer data</div>',
+    function(){closeDrawer();}
+  );
+}
+function ntToggleActive(id){
+  var t=mockNotifTemplates.find(function(x){return x.id===id});if(!t)return;
+  t.active=!t.active;DB.save('notif_templates');showToast(t.name+' '+(t.active?'activated':'deactivated'),'info');renderModule();
+}
+function crudNotifTemplate(item){
+  var n=!item;
+  var t=n?{id:'NT-'+String(mockNotifTemplates.length+1).padStart(3,'0'),name:'',channel:'Email',subject:'',body:'',active:true}:item;
+  window._formRules=[
+    {id:'ntf_name',fn:function(v){return String(v||'').trim()?'':'Template name is required';}},
+    {id:'ntf_body',fn:function(v){return String(v||'').trim()?'':'Template body is required';}}
+  ];
+  openModal(n?'New Notification Template':'Edit Notification Template',
+    formRow(inputField('Template Name','ntf_name',t.name,'',true),selectField('Channel','ntf_channel',t.channel,['Email','SMS','WhatsApp'],true))+
+    inputField('Subject (email only)','ntf_subject',t.subject||'')+
+    '<div style="margin-bottom:8px"><label style="display:block;font-size:9px;color:#888;margin-bottom:3px;font-weight:600">BODY * <span style="color:#aaa;font-weight:400">— {{customer_name}} {{amount}} {{property}} {{due_date}}</span></label><textarea id="ntf_body" style="width:100%;padding:6px 8px;font-size:11px;border:1px solid #e0e0e0;border-radius:6px;outline:none;min-height:70px;font-family:inherit">'+(t.body||'')+'</textarea></div>'+
+    formRow(selectField('Status','ntf_active',t.active?'Active':'Inactive',['Active','Inactive'],true),inputField('ID','ntf_id',t.id,'',true)),
+    function(){
+      var d={id:t.id,name:g('ntf_name'),channel:g('ntf_channel'),subject:g('ntf_subject'),body:g('ntf_body'),active:g('ntf_active')==='Active'};
+      if(n){mockNotifTemplates.push(d);DB.save('notif_templates');showToast('Template created','success');}
+      else{var idx=mockNotifTemplates.findIndex(function(x){return x.id===t.id});if(idx>=0){mockNotifTemplates[idx]=d;DB.save('notif_templates');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
 }
 
 function contactBadgeColor(v){return{Buyer:'#1565c0',Supplier:'#e65100',Contractor:'#2e7d32',Staff:'#2F80ED',Consultant:'#7b1fa2',Broker:'#00897b',Government:'#c62828',Others:'#555',Hot:'#c62828',High:'#e65100',Normal:'#888'}[v]||'#888'}
@@ -10634,6 +10777,15 @@ var mockNotifications = DB.init('notifications', (function(){
     {id:'n5',title:'Task Overdue',sub:'Review Jolshiri Foundation drawings',type:'task',time:now-30*60000,read:false}
   ];
 })());
+
+window.mockNotifTemplates = DB.init('notif_templates', [
+  {id:'NT-001',name:'Installment Due Reminder',channel:'Email',subject:'Installment Reminder — {{customer_name}}',body:'Dear {{customer_name}}, your installment of {{amount}} for {{property}} is due on {{due_date}}. Kindly pay on time to avoid late fees.',active:true},
+  {id:'NT-002',name:'Payment Confirmation',channel:'Email',subject:'Payment Received — {{amount}}',body:'Dear {{customer_name}}, we have received your payment of {{amount}} for {{property}} on {{due_date}}. Thank you for your trust!',active:true},
+  {id:'NT-003',name:'Booking Confirmation',channel:'WhatsApp',subject:'',body:'Congratulations {{customer_name}}! Your booking for {{property}} is confirmed. Total value {{amount}}. Our team will contact you for the agreement.',active:true},
+  {id:'NT-004',name:'Site Visit Reminder',channel:'SMS',subject:'',body:'Dear {{customer_name}}, your site visit at {{property}} is scheduled on {{due_date}}. Please confirm your attendance.',active:false},
+  {id:'NT-005',name:'Overdue Dues Warning',channel:'Email',subject:'Overdue Payment Notice — {{customer_name}}',body:'Dear {{customer_name}}, your payment of {{amount}} for {{property}} is overdue since {{due_date}}. Kindly settle at the earliest.',active:true},
+  {id:'NT-006',name:'Handover Invitation',channel:'Email',subject:'Unit Handover — {{property}}',body:'Dear {{customer_name}}, your unit at {{property}} is ready for handover. Please visit our head office with the agreement documents.',active:true}
+]);
 var notifIcons = {lead:'🔵',payment:'🟢',approval:'🟡',due:'🔴',task:'📋',add:'🟢',edit:'🔵',delete:'⛔',info:'ℹ️',success:'✅',warning:'⚠️',error:'🚫','default':'🔔'};
 var notifBg = {lead:'#e3f2fd',payment:'#e8f5e9',approval:'#fff8e1',due:'#ffebee',task:'#f3e5f5',add:'#e8f5e9',edit:'#e3f2fd',delete:'#ffebee',info:'#e8eaf6',success:'#e8f5e9',warning:'#fff8e1',error:'#ffebee','default':'#f5f5f5'};
 function addNotification(title,sub,type){
@@ -10651,6 +10803,7 @@ function updateNotifBadge(){
   badge.textContent=unread;
   badge.style.display=unread>0?'flex':'none';
 }
+var _notifPageTab='feed';
 var _notifFilter='all';
 var _NOTIF_TYPES=['all','lead','payment','due','task','approval'];
 function _notifLabel(t){return {all:'All',lead:'Lead',payment:'Payment',due:'Due',task:'Task',approval:'Approval'}[t]||t;}
