@@ -105,3 +105,13 @@ Turn the validated prototype into a real, deployable ERP. Keep the exact same UI
   - Engineering & Construction now 5 modules (Contractors, Variation Orders, Equipment, Labor Mgmt, Design Mgmt).
   - QA tabs now match actual item groups (Engineering & Construction, Admin & Operations, Docs tabs fixed/added); QA items moved with their modules.
   - GROUPS_LOOKUP + search dataset groups updated for all moved modules. Module count now 43.
+
+- **HEAD — Advanced HR module** (SW v8-v8):
+  - HR rebuilt as a 6-tab module: **📊 Dashboard / 👥 Employees / 📅 Attendance / 🏖 Leave / 💰 Payroll / 📢 Recruitment**.
+  - Employees enriched: email, joinDate, basic salary, status variants (active / on-leave / probation / terminated); richer table (avatar initials, filters by dept/status, search) + upgraded detail panel with 7-day attendance + pending-leave context; upgraded Add/Edit form.
+  - **Attendance**: last-7-day data (84 rows generated at seed), weekly dot grid per employee, today status badge, per-employee quick mark (P/L/A/LV), Mark-All-Present action, dept filter.
+  - **Leave**: 8 requests (Annual/Sick/Casual/Festival), approve/reject workflow, detail panel, full CRUD, filters.
+  - **Payroll**: monthly view (Jul 2026 seed, 12 payslips from salaries), basic/allowance/deduction/bonus/net columns, mark-paid action, ⚙ Generate Payslips for any month (creates entries from employee salaries), detail payslip panel, CRUD.
+  - **Recruitment**: 4 job openings + 8 applicants, pipeline stage advance (Applied→Screening→Interview→Offer→Hired), ratings, CRUD for jobs.
+  - HR data uses dedicated keys (`hr_attendance`, `hr_payroll`) — does NOT clobber the Labor Mgmt module's worker attendance/payroll data.
+  - Search def for employees fixed (fields `dept` not `department`); QA quick-add gained Leave; Bengali keys added (উপস্থিতি / ছুটি / বেতন / নিয়োগ).

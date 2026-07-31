@@ -1612,19 +1612,74 @@ window.mockDues = DB.init('dues', [
   {id:'BKG-025',customer:'Nazma Akhter',phone:'+880 1715 666666',project:'Jolshiri Abason',unit:'Apt 7A',totalPrice:4200000,paid:3500000,due:700000,dueDate:'2026-09-01',daysOverdue:-33,status:'Upcoming',bucket:'Future',lastFollowUp:'—',promises:[],lateFee:0,notes:'First installment due Sep 1, 2026.'}
 ]);
 window.mockEmployees = DB.init('employees', [
-  {id:1,name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',status:'active'},
-  {id:2,name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',status:'active'},
-  {id:3,name:'Nazma Akhter',designation:'Accountant',dept:'Finance',phone:'01755557777',status:'active'},
-  {id:4,name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',status:'active'},
-  {id:5,name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',status:'active'},
-  {id:6,name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',status:'active'}
-,
-  {id:7,name:'Nazmul Huda',designation:'Project Manager',dept:'Construction',phone:'01810112233',status:'active'},
-  {id:8,name:'Sultana Razia',designation:'HR Manager',dept:'HR',phone:'01710223344',status:'active'},
-  {id:9,name:'Jahir Uddin',designation:'Accountant',dept:'Finance',phone:'01910334455',status:'active'},
-  {id:10,name:'Faruk Hossain',designation:'Site Supervisor',dept:'Construction',phone:'01710445566',status:'active'},
-  {id:11,name:'Morshed Alam',designation:'Legal Officer',dept:'Management',phone:'01810556677',status:'active'},
-  {id:12,name:'Shahnaz Parvin',designation:'Marketing Executive',dept:'Sales',phone:'01710667788',status:'active'}
+  {id:1,name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',email:'rofiqul@mars.com',joinDate:'2022-03-01',salary:65000,status:'active'},
+  {id:2,name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',email:'shamim@mars.com',joinDate:'2021-06-15',salary:85000,status:'active'},
+  {id:3,name:'Nazma Akhter',designation:'Accountant',dept:'Finance',phone:'01755557777',email:'nazma@mars.com',joinDate:'2023-01-10',salary:55000,status:'active'},
+  {id:4,name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',email:'mizan@mars.com',joinDate:'2020-09-01',salary:120000,status:'active'},
+  {id:5,name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',email:'tanvir@mars.com',joinDate:'2022-07-20',salary:70000,status:'active'},
+  {id:6,name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',email:'shahana@mars.com',joinDate:'2024-02-01',salary:45000,status:'probation'},
+  {id:7,name:'Nazmul Huda',designation:'Project Manager',dept:'Construction',phone:'01810112233',email:'nazmul@mars.com',joinDate:'2021-11-05',salary:115000,status:'active'},
+  {id:8,name:'Sultana Razia',designation:'HR Manager',dept:'HR',phone:'01710223344',email:'sultana@mars.com',joinDate:'2019-04-22',salary:95000,status:'active'},
+  {id:9,name:'Jahir Uddin',designation:'Accountant',dept:'Finance',phone:'01910334455',email:'jahir@mars.com',joinDate:'2023-08-14',salary:52000,status:'active'},
+  {id:10,name:'Faruk Hossain',designation:'Site Supervisor',dept:'Construction',phone:'01710445566',email:'faruk@mars.com',joinDate:'2024-01-15',salary:42000,status:'active'},
+  {id:11,name:'Morshed Alam',designation:'Legal Officer',dept:'Management',phone:'01810556677',email:'morshed@mars.com',joinDate:'2022-05-30',salary:68000,status:'active'},
+  {id:12,name:'Shahnaz Parvin',designation:'Marketing Executive',dept:'Sales',phone:'01710667788',email:'shahnaz@mars.com',joinDate:'2024-03-10',salary:48000,status:'on-leave'}
+]);
+
+// ═══ HR DATA — ATTENDANCE / LEAVE / PAYROLL / RECRUITMENT ═══
+window.mockHRAttendance = DB.init('hr_attendance', (function(){
+  var rows=[];var days=[];var today=new Date();
+  for(var i=6;i>=0;i--){var d=new Date(today);d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+  var pool=['Present','Present','Present','Late','Absent','Leave','Present'];
+  mockEmployees.forEach(function(e){
+    days.forEach(function(dt,di){
+      var wd=new Date(dt+'T00:00:00').getDay();
+      if(wd===0||wd===6){rows.push({id:'ATN-'+e.id+'-'+dt,employeeId:e.id,date:dt,status:'Weekend'});return;}
+      if(e.status==='on-leave'||e.status==='terminated'){rows.push({id:'ATN-'+e.id+'-'+dt,employeeId:e.id,date:dt,status:'Leave'});return;}
+      rows.push({id:'ATN-'+e.id+'-'+dt,employeeId:e.id,date:dt,status:pool[(e.id*5+di*2)%pool.length]});
+    });
+  });
+  return rows;
+})());
+
+window.mockLeave = DB.init('leave', [
+  {id:'LV-001',employeeId:12,type:'Annual',from:'2026-07-28',to:'2026-07-30',days:3,status:'Approved',reason:'Family trip to Cox\'s Bazar'},
+  {id:'LV-002',employeeId:6,type:'Sick',from:'2026-07-27',to:'2026-07-28',days:2,status:'Pending',reason:'Viral fever — medical certificate attached'},
+  {id:'LV-003',employeeId:2,type:'Casual',from:'2026-08-02',to:'2026-08-02',days:1,status:'Pending',reason:'Personal work at bank'},
+  {id:'LV-004',employeeId:9,type:'Festival',from:'2026-07-30',to:'2026-08-01',days:3,status:'Approved',reason:'Eid-ul-Adha travel to hometown'},
+  {id:'LV-005',employeeId:5,type:'Annual',from:'2026-08-10',to:'2026-08-14',days:5,status:'Pending',reason:'Annual vacation — advance notice given'},
+  {id:'LV-006',employeeId:10,type:'Sick',from:'2026-07-25',to:'2026-07-26',days:2,status:'Rejected',reason:'No medical certificate — resubmit'},
+  {id:'LV-007',employeeId:3,type:'Casual',from:'2026-08-05',to:'2026-08-06',days:2,status:'Pending',reason:'Sister\'s wedding'},
+  {id:'LV-008',employeeId:7,type:'Annual',from:'2026-07-20',to:'2026-07-24',days:5,status:'Approved',reason:'Post-project break after Muktodhara handover'}
+]);
+
+window.mockHRPayroll = DB.init('hr_payroll', (function(){
+  var rows=[];
+  mockEmployees.forEach(function(e){
+    var basic=e.salary||0;
+    var allow=Math.round(basic*0.3)+7000;
+    var ded=Math.round(basic*0.15);
+    rows.push({id:'PR-202607-'+e.id,employeeId:e.id,month:'2026-07',basic:basic,allowance:allow,deduction:ded,bonus:0,net:Math.max(0,basic+allow-ded),status:e.id%3===0?'Paid':'Generated'});
+  });
+  return rows;
+})());
+
+window.mockJobOpenings = DB.init('jobOpenings', [
+  {id:'JOB-001',title:'Senior Site Engineer',dept:'Construction',openings:2,applicants:8,status:'Open',posted:'2026-06-20'},
+  {id:'JOB-002',title:'Accounts Executive',dept:'Finance',openings:1,applicants:5,status:'Open',posted:'2026-07-01'},
+  {id:'JOB-003',title:'Sales Executive',dept:'Sales',openings:3,applicants:12,status:'Open',posted:'2026-07-05'},
+  {id:'JOB-004',title:'Interior Designer',dept:'Design',openings:1,applicants:3,status:'On Hold',posted:'2026-05-15'}
+]);
+
+window.mockApplicants = DB.init('applicants', [
+  {id:'APP-001',jobId:'JOB-001',name:'Arif Chowdhury',phone:'01700000001',applied:'2026-06-25',stage:'Interview',rating:4.5,status:'Active'},
+  {id:'APP-002',jobId:'JOB-001',name:'Rashed Karim',phone:'01700000002',applied:'2026-06-28',stage:'Screening',rating:3.5,status:'Active'},
+  {id:'APP-003',jobId:'JOB-002',name:'Tania Sultana',phone:'01700000003',applied:'2026-07-03',stage:'Offer',rating:4.8,status:'Active'},
+  {id:'APP-004',jobId:'JOB-002',name:'Mehedi Hasan',phone:'01700000004',applied:'2026-07-05',stage:'Applied',rating:3.0,status:'Active'},
+  {id:'APP-005',jobId:'JOB-003',name:'Sumaiya Islam',phone:'01700000005',applied:'2026-07-08',stage:'Interview',rating:4.2,status:'Active'},
+  {id:'APP-006',jobId:'JOB-003',name:'Fahim Shahriar',phone:'01700000006',applied:'2026-07-10',stage:'Hired',rating:4.6,status:'Active'},
+  {id:'APP-007',jobId:'JOB-001',name:'Nusrat Jahan',phone:'01700000007',applied:'2026-07-02',stage:'Rejected',rating:2.5,status:'Inactive'},
+  {id:'APP-008',jobId:'JOB-004',name:'Rafi Ahmed',phone:'01700000008',applied:'2026-06-12',stage:'Applied',rating:3.8,status:'Active'}
 ]);
 window.mockUsers = DB.init('users', [
   {name:'MD Hasanul Banna',email:'banna@mars.com',role:'Super Admin',dept:'Management',status:'Active',initials:'HB'},
@@ -8129,11 +8184,380 @@ function openSupplier(id){
   );
 }
 
+// ═══ HR MODULE — ADVANCED (Dashboard / Employees / Attendance / Leave / Payroll / Recruitment) ═══
+var hrTab='dashboard';
+function hrEmpName(id){var e=mockEmployees.find(function(x){return x.id===id});return e?e.name:'Unknown';}
+function hrEmpDept(id){var e=mockEmployees.find(function(x){return x.id===id});return e?e.dept:'—';}
 function renderHR(el){
-  const pE=_pg('hr',mockEmployees);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Human Resources</div><div class="page-subtitle">${mockEmployees.length} employees</div>
-    <div class="toolbar" style="margin-bottom:6px"><div class="spacer"></div><button class="action-btn secondary" onclick="importData(mockEmployees,'Employees','employees',IMPORT_FIELDS.employees)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button><button class="action-btn primary" onclick="crudEmployee()">+ Add Employee</button></div data-perm="HR:Import">
-    <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Status</th></tr></thead><tbody>${pE.items.map(e=>`<tr style="cursor:pointer" onclick="openEmployee(${e.id})"><td style="font-weight:500">${e.name}</td><td>${e.designation}</td><td>${e.dept}</td><td>${e.phone}</td><td><span class="badge-status badge-active">${e.status}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('hr',pE.total,pE.page,pE.totalPages,pE.perPage)}</div></div></div></div>`;
+  hrTab=hrTab||'dashboard';
+  var total=mockEmployees.length;
+  var active=mockEmployees.filter(function(e){return e.status==='active'}).length;
+  var onLeave=mockEmployees.filter(function(e){return e.status==='on-leave'}).length;
+  var openJobs=mockJobOpenings.filter(function(j){return j.status==='Open'}).length;
+  el.innerHTML='<div class="fade-in">'+
+    '<div class="page-title">👥 Human Resources</div><div class="page-subtitle">'+total+' employees · '+active+' active · '+onLeave+' on leave · '+openJobs+' open positions</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[['dashboard','📊 Dashboard'],['employees','👥 Employees'],['attendance','📅 Attendance'],['leave','🏖 Leave'],['payroll','💰 Payroll'],['recruitment','📢 Recruitment']].map(function(t){return '<div class="tab '+(hrTab===t[0]?'active':'')+'" onclick="hrTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn primary" onclick="crudEmployee()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='employees'?'':'none')+'">+ Add Employee</button>'+
+      '<button class="action-btn primary" onclick="crudLeave()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='leave'?'':'none')+'">+ New Request</button>'+
+      '<button class="action-btn primary" onclick="crudPayroll()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='payroll'?'':'none')+'">+ Add Entry</button>'+
+      '<button class="action-btn primary" onclick="crudJobOpening()" data-perm="HR:Create" style="padding:3px 8px;font-size:10px;display:'+(hrTab==='recruitment'?'':'none')+'">+ Post Job</button>'+
+    '</div>'+
+    (hrTab==='dashboard'?renderHRDashboard():
+     hrTab==='employees'?renderHREmployees():
+     hrTab==='attendance'?renderHRAttendance():
+     hrTab==='leave'?renderHRLeave():
+     hrTab==='payroll'?renderHRPayroll():
+     hrTab==='recruitment'?renderHRRecruitment():'')+
+  '</div>';
+}
+function renderHRDashboard(){
+  var total=mockEmployees.length;
+  var active=mockEmployees.filter(function(e){return e.status==='active'}).length;
+  var onLeave=mockEmployees.filter(function(e){return e.status==='on-leave'}).length;
+  var prob=mockEmployees.filter(function(e){return e.status==='probation'}).length;
+  var today=(new Date()).toISOString().split('T')[0];
+  var att=mockHRAttendance.filter(function(a){return a.date===today});
+  var present=att.filter(function(a){return a.status==='Present'}).length;
+  var late=att.filter(function(a){return a.status==='Late'}).length;
+  var absent=att.filter(function(a){return a.status==='Absent'}).length;
+  var leave=att.filter(function(a){return a.status==='Leave'}).length;
+  var attPct=att.length?Math.round(present/att.length*100):0;
+  var payRows=mockHRPayroll.filter(function(p){return p.month==='2026-07'});
+  var payTotal=payRows.reduce(function(s,p){return s+p.net},0);
+  var pendingLeave=mockLeave.filter(function(l){return l.status==='Pending'}).length;
+  var depts={};mockEmployees.forEach(function(e){depts[e.dept]=(depts[e.dept]||0)+1});
+  var deptKeys=Object.keys(depts).sort(function(a,b){return depts[b]-depts[a]});
+  var recent=mockEmployees.slice().sort(function(a,b){return a.joinDate>b.joinDate?-1:a.joinDate<b.joinDate?1:0}).slice(0,5);
+  var openJobs=mockJobOpenings.filter(function(j){return j.status==='Open'}).length;
+  var pipeline=mockApplicants.filter(function(a){return a.status==='Active'}).length;
+  var deptColors={'Construction':'#1565c0','Sales':'#2e7d32','Finance':'#7b1fa2','Management':'#e65100','HR':'#00838f'};
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Total Employees',total,'#2F80ED'],
+    ['Active',active,'#2e7d32'],
+    ['On Leave',onLeave,onLeave>0?'#ff8f00':'#999'],
+    ['Probation',prob,prob>0?'#e65100':'#999'],
+    ['Attendance Today',attPct+'%','#1565c0'],
+    ['Payroll (Jul)','৳'+fmtNum(payTotal),'#7b1fa2'],
+    ['Open Positions',openJobs,'#c62828'],
+    ['Pending Leave',pendingLeave,pendingLeave>0?'#ff8f00':'#999']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>🏢 Headcount by Department</h3></div><div class="card-body" style="padding:10px">'+
+    deptKeys.map(function(d){var pct=Math.round(depts[d]/total*100);var col=deptColors[d]||'#888';return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:95px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+depts[d]+'</div></div>';}).join('')+
+    '</div></div>'+
+    '<div class="card"><div class="card-header"><h3>📅 Today\'s Attendance</h3></div><div class="card-body" style="padding:10px">'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+        '<div style="padding:10px;text-align:center;background:#e8f5e9;border-radius:8px"><div style="font-size:18px;font-weight:700;color:#2e7d32">'+present+'</div><div style="font-size:9px;color:#888">Present</div></div>'+
+        '<div style="padding:10px;text-align:center;background:#fff3e0;border-radius:8px"><div style="font-size:18px;font-weight:700;color:#e65100">'+late+'</div><div style="font-size:9px;color:#888">Late</div></div>'+
+        '<div style="padding:10px;text-align:center;background:#ffebee;border-radius:8px"><div style="font-size:18px;font-weight:700;color:#c62828">'+absent+'</div><div style="font-size:9px;color:#888">Absent</div></div>'+
+        '<div style="padding:10px;text-align:center;background:#e3f2fd;border-radius:8px"><div style="font-size:18px;font-weight:700;color:#1565c0">'+leave+'</div><div style="font-size:9px;color:#888">On Leave</div></div>'+
+      '</div>'+
+    '</div></div>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">'+
+    '<div class="card"><div class="card-header"><h3>🆕 Recent Hires</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Joined</th></tr></thead><tbody>'+
+    recent.map(function(e){return '<tr style="cursor:pointer" onclick="openEmployee('+e.id+')"><td style="font-weight:500">'+e.name+'</td><td>'+e.designation+'</td><td style="font-size:9px">'+e.dept+'</td><td style="font-size:9px;color:#888">'+e.joinDate+'</td></tr>';}).join('')+
+    '</tbody></table></div></div>'+
+    '<div class="card"><div class="card-header"><h3>🏖 Leave Overview</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Type</th><th class="num">Pending</th><th class="num">Approved</th></tr></thead><tbody>'+
+    ['Annual','Sick','Casual','Festival'].map(function(t){var p=mockLeave.filter(function(l){return l.type===t&&l.status==='Pending'}).length;var a=mockLeave.filter(function(l){return l.type===t&&l.status==='Approved'}).length;return '<tr><td style="font-weight:500">'+t+'</td><td class="num" style="color:'+(p>0?'#ff8f00':'#888')+'">'+p+'</td><td class="num" style="color:#2e7d32">'+a+'</td></tr>';}).join('')+
+    '</tbody></table></div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-header"><h3>🧑‍💼 Recruitment Pipeline</h3></div><div class="card-body" style="padding:0"><table style="font-size:10px"><thead><tr><th>Position</th><th class="num">Openings</th><th class="num">Applicants</th><th>Status</th></tr></thead><tbody>'+
+  mockJobOpenings.map(function(j){var sb=j.status==='Open'?'#e8f5e9;color:#2e7d32':'#fff8e1;color:#ff8f00';return '<tr><td style="font-weight:500">'+j.title+'</td><td class="num">'+j.openings+'</td><td class="num" style="color:#1565c0;font-weight:600">'+j.applicants+'</td><td><span class="badge-status" style="background:'+sb+'">'+j.status+'</span></td></tr>';}).join('')+
+  '</tbody></table></div></div>';
+}
+function renderHREmployees(){
+  var q=(document.getElementById('hrSearch')||{}).value||'';
+  var df=(document.getElementById('hrDept')||{}).value||'';
+  var sf=(document.getElementById('hrStatus')||{}).value||'';
+  var filtered=mockEmployees.filter(function(e){
+    if(df&&e.dept!==df)return false;
+    if(sf&&e.status!==sf)return false;
+    if(q&&!e.name.toLowerCase().includes(q.toLowerCase())&&!e.designation.toLowerCase().includes(q.toLowerCase())&&!e.phone.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  var pE=_pg('hr',filtered);
+  var depts=[];mockEmployees.forEach(function(e){if(depts.indexOf(e.dept)<0)depts.push(e.dept);});
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Total',mockEmployees.length,'#2F80ED'],
+    ['Active',mockEmployees.filter(function(e){return e.status==='active'}).length,'#2e7d32'],
+    ['On Leave',mockEmployees.filter(function(e){return e.status==='on-leave'}).length,'#ff8f00'],
+    ['Probation',mockEmployees.filter(function(e){return e.status==='probation'}).length,'#e65100'],
+    ['Departments',depts.length,'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="hrSearch" placeholder="Search employees..." oninput="_PG.hr={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:150px"/>'+
+    '<select id="hrDept" onchange="_PG.hr={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Depts</option>'+depts.map(function(d){return '<option'+(df===d?' selected':'')+'>'+d+'</option>';}).join('')+'</select>'+
+    '<select id="hrStatus" onchange="_PG.hr={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>active</option><option>on-leave</option><option>probation</option></select>'+
+    '<div class="spacer"></div>'+
+    '<button class="action-btn secondary" onclick="importData(mockEmployees,\'Employees\',\'employees\',IMPORT_FIELDS.employees)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Employee</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Email</th><th>Joined</th><th class="num">Basic</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (pE.items.length?pE.items.map(function(e){
+    var sb=e.status==='active'?'#e8f5e9;color:#2e7d32':e.status==='on-leave'?'#fff3e0;color:#e65100':e.status==='probation'?'#fff8e1;color:#ff8f00':'#f5f5f5;color:#888';
+    return '<tr style="cursor:pointer" onclick="openEmployee('+e.id+')"><td style="font-weight:500"><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-right:6px">'+leadGetInitials(e.name)+'</span>'+e.name+'</td><td>'+e.designation+'</td><td style="font-size:9px">'+e.dept+'</td><td style="font-size:9px">'+e.phone+'</td><td style="font-size:9px;color:#888">'+(e.email||'—')+'</td><td style="font-size:9px;color:#888">'+(e.joinDate||'—')+'</td><td class="num" style="font-weight:600">৳'+fmtNum(e.salary||0)+'</td><td><span class="badge-status" style="background:'+sb+'">'+e.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEmployee(mockEmployees.find(function(x){return x.id==='+e.id+'}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\'Delete employee?\')){var idx=mockEmployees.findIndex(function(x){return x.id==='+e.id+'});if(idx>=0)mockEmployees.splice(idx,1);DB.save(\'employees\');renderModule();showToast(\'Deleted\',\'info\')}" data-perm="HR:Delete">✕</span></td></tr>';
+  }).join(''):'<tr><td colspan="9" style="text-align:center;color:#999;padding:30px;font-size:11px">No employees match your filters</td></tr>')+
+  '</tbody></table>'+_pgHtml('hr',pE.total,pE.page,pE.totalPages,pE.perPage)+'</div></div></div>';
+}
+function renderHRAttendance(){
+  var df=(document.getElementById('attDept')||{}).value||'';
+  var today=new Date();today.setHours(0,0,0,0);
+  var days=[];var labels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  for(var i=6;i>=0;i--){var d=new Date(today);d.setDate(d.getDate()-i);days.push({iso:d.toISOString().split('T')[0],wd:d.getDay()});}
+  var weekDays=days.filter(function(d){return d.wd!==0&&d.wd!==6});
+  var todayIso=days[days.length-1].iso;
+  var todayAtt=mockHRAttendance.filter(function(a){return a.date===todayIso});
+  var present=todayAtt.filter(function(a){return a.status==='Present'}).length;
+  var late=todayAtt.filter(function(a){return a.status==='Late'}).length;
+  var absent=todayAtt.filter(function(a){return a.status==='Absent'}).length;
+  var leave=todayAtt.filter(function(a){return a.status==='Leave'}).length;
+  var employees=mockEmployees.filter(function(e){return !df||e.dept===df});
+  var depts=[];mockEmployees.forEach(function(e){if(depts.indexOf(e.dept)<0)depts.push(e.dept);});
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Present',present,'#2e7d32'],
+    ['Late',late,late>0?'#e65100':'#999'],
+    ['Absent',absent,absent>0?'#c62828':'#999'],
+    ['On Leave',leave,leave>0?'#1565c0':'#999'],
+    ['Rate',todayAtt.length?Math.round(present/todayAtt.length*100)+'%':'—','#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<select id="attDept" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Depts</option>'+depts.map(function(d){return '<option'+(df===d?' selected':'')+'>'+d+'</option>';}).join('')+'</select>'+
+    '<div class="spacer"></div>'+
+    '<button class="action-btn secondary" onclick="attendanceMarkAll(\'Present\')" style="padding:3px 7px;font-size:9px">✓ Mark All Present</button>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Employee</th><th>Dept</th><th>Today</th>'+weekDays.map(function(d){return '<th style="text-align:center">'+labels[d.wd]+'<div style="font-size:8px;color:#bbb;font-weight:400">'+d.iso.slice(5)+'</div></th>';}).join('')+'<th></th></tr></thead><tbody>'+
+  employees.map(function(e){
+    var ta=mockHRAttendance.find(function(a){return a.employeeId===e.id&&a.date===todayIso});
+    var todaySt=ta?ta.status:'—';
+    var bg=todaySt==='Present'?'#e8f5e9;color:#2e7d32':todaySt==='Late'?'#fff3e0;color:#e65100':todaySt==='Absent'?'#ffebee;color:#c62828':todaySt==='Leave'?'#e3f2fd;color:#1565c0':'#f5f5f5;color:#999';
+    var cells=weekDays.map(function(d){
+      var a=mockHRAttendance.find(function(x){return x.employeeId===e.id&&x.date===d.iso});
+      var s=a?a.status:'';
+      var dot=s==='Present'?'#2e7d32':s==='Late'?'#e65100':s==='Absent'?'#c62828':s==='Leave'?'#1565c0':'#e0e0e0';
+      return '<td style="text-align:center"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+dot+'"></span></td>';
+    }).join('');
+    var act='<select onchange="attendanceSet('+e.id+',this.value)" style="padding:2px 4px;font-size:8px;border:1px solid #e0e0e0;border-radius:4px"><option value="Present"'+(todaySt==='Present'?' selected':'')+'>P</option><option value="Late"'+(todaySt==='Late'?' selected':'')+'>L</option><option value="Absent"'+(todaySt==='Absent'?' selected':'')+'>A</option><option value="Leave"'+(todaySt==='Leave'?' selected':'')+'>LV</option></select>';
+    return '<tr><td style="font-weight:500">'+e.name+'</td><td style="font-size:9px">'+e.dept+'</td><td><span class="badge-status" style="background:'+bg+'">'+todaySt+'</span></td>'+cells+'<td>'+act+'</td></tr>';
+  }).join('')+
+  '</tbody></table></div></div></div>';
+}
+function renderHRLeave(){
+  var q=(document.getElementById('lvSearch')||{}).value||'';
+  var tf=(document.getElementById('lvType')||{}).value||'';
+  var sf=(document.getElementById('lvStatus')||{}).value||'';
+  var filtered=mockLeave.filter(function(l){
+    if(tf&&l.type!==tf)return false;
+    if(sf&&l.status!==sf)return false;
+    if(q&&!hrEmpName(l.employeeId).toLowerCase().includes(q.toLowerCase())&&!l.id.toLowerCase().includes(q.toLowerCase()))return false;
+    return true;
+  });
+  filtered.sort(function(a,b){return a.from>b.from?-1:a.from<b.from?1:0;});
+  var pL=_pg('leave',filtered);
+  var pending=mockLeave.filter(function(l){return l.status==='Pending'}).length;
+  var approved=mockLeave.filter(function(l){return l.status==='Approved'}).length;
+  var types=['Annual','Sick','Casual','Festival'];
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Pending',pending,pending>0?'#ff8f00':'#999'],
+    ['Approved',approved,'#2e7d32'],
+    ['Rejected',mockLeave.filter(function(l){return l.status==='Rejected'}).length,'#c62828'],
+    ['Annual Used',mockLeave.filter(function(l){return l.type==='Annual'&&l.status==='Approved'}).reduce(function(s,l){return s+l.days},0),'#1565c0'],
+    ['Sick Used',mockLeave.filter(function(l){return l.type==='Sick'&&l.status==='Approved'}).reduce(function(s,l){return s+l.days},0),'#7b1fa2']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<input id="lvSearch" placeholder="Search leave..." oninput="_PG.leave={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:140px"/>'+
+    '<select id="lvType" onchange="_PG.leave={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Types</option>'+types.map(function(t){return '<option'+(tf===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+    '<select id="lvStatus" onchange="_PG.leave={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Pending</option><option>Approved</option><option>Rejected</option></select>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Employee</th><th>Type</th><th>From</th><th>To</th><th class="num">Days</th><th>Reason</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (pL.items.length?pL.items.map(function(l){
+    var sb=l.status==='Approved'?'#e8f5e9;color:#2e7d32':l.status==='Pending'?'#fff8e1;color:#ff8f00':'#ffebee;color:#c62828';
+    return '<tr style="cursor:pointer" onclick="viewLeave(\''+l.id+'\')"><td style="font-family:monospace;font-size:9px;color:#888">'+l.id+'</td><td style="font-weight:500">'+hrEmpName(l.employeeId)+'</td><td style="font-size:9px">'+l.type+'</td><td style="font-size:9px">'+l.from+'</td><td style="font-size:9px">'+l.to+'</td><td class="num" style="font-weight:600">'+l.days+'</td><td style="font-size:9px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+l.reason+'">'+l.reason+'</td><td><span class="badge-status" style="background:'+sb+'">'+l.status+'</span></td><td style="white-space:nowrap">'+
+      (l.status==='Pending'?'<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Approve" onclick="event.stopPropagation();leaveStatus(\''+l.id+'\',\'Approved\')">✓</span> <span style="color:#c62828;cursor:pointer;font-size:10px" title="Reject" onclick="event.stopPropagation();leaveStatus(\''+l.id+'\',\'Rejected\')">✕</span> ':'')+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudLeave(mockLeave.find(function(x){return x.id===\''+l.id+'\'}))">✎</span></td></tr>';
+  }).join(''):'<tr><td colspan="9" style="text-align:center;color:#999;padding:30px;font-size:11px">No leave requests match your filters</td></tr>')+
+  '</tbody></table>'+_pgHtml('leave',pL.total,pL.page,pL.totalPages,pL.perPage)+'</div></div></div>';
+}
+function renderHRPayroll(){
+  var mf=(document.getElementById('payMonth')||{}).value||'2026-07';
+  var sf=(document.getElementById('payStatus')||{}).value||'';
+  var months=['2026-07','2026-06','2026-05','2026-04'];
+  var rows=mockHRPayroll.filter(function(p){return p.month===mf&&(!sf||p.status===sf)});
+  var allMonth=mockHRPayroll.filter(function(p){return p.month===mf});
+  var totalBasic=allMonth.reduce(function(s,p){return s+p.basic},0);
+  var totalAllow=allMonth.reduce(function(s,p){return s+p.allowance},0);
+  var totalDed=allMonth.reduce(function(s,p){return s+p.deduction},0);
+  var totalNet=allMonth.reduce(function(s,p){return s+p.net},0);
+  var paid=allMonth.filter(function(p){return p.status==='Paid'}).length;
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Net Payable','৳'+fmtNum(totalNet),'#2e7d32'],
+    ['Basic','৳'+fmtNum(totalBasic),'#1565c0'],
+    ['Allowances','৳'+fmtNum(totalAllow),'#7b1fa2'],
+    ['Deductions','৳'+fmtNum(totalDed),'#c62828'],
+    ['Paid',paid+'/'+allMonth.length,paid===allMonth.length&&allMonth.length?'#2e7d32':'#ff8f00']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px">'+
+    '<select id="payMonth" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px">'+months.map(function(m){return '<option'+(mf===m?' selected':'')+'>'+m+'</option>';}).join('')+'</select>'+
+    '<select id="payStatus" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Generated</option><option>Paid</option></select>'+
+    '<div class="spacer"></div>'+
+    '<button class="action-btn secondary" onclick="payrollGenerate(\''+mf+'\')" style="padding:3px 8px;font-size:10px">⚙ Generate Payslips</button>'+
+  '</div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Employee</th><th>Dept</th><th class="num">Basic</th><th class="num">Allowance</th><th class="num">Deduction</th><th class="num">Bonus</th><th class="num">Net</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (rows.length?rows.map(function(p){
+    return '<tr style="cursor:pointer" onclick="viewPayroll(\''+p.id+'\')"><td style="font-weight:500">'+hrEmpName(p.employeeId)+'</td><td style="font-size:9px">'+hrEmpDept(p.employeeId)+'</td><td class="num">৳'+fmtNum(p.basic)+'</td><td class="num" style="color:#7b1fa2">৳'+fmtNum(p.allowance)+'</td><td class="num" style="color:#c62828">৳'+fmtNum(p.deduction)+'</td><td class="num" style="color:#2e7d32">৳'+fmtNum(p.bonus||0)+'</td><td class="num" style="font-weight:700">৳'+fmtNum(p.net)+'</td><td><span class="badge-status" style="background:'+(p.status==='Paid'?'#e8f5e9;color:#2e7d32':'#fff8e1;color:#ff8f00')+'">'+p.status+'</span></td><td style="white-space:nowrap">'+
+      (p.status!=='Paid'?'<span style="color:#2e7d32;cursor:pointer;font-size:10px" title="Mark paid" onclick="event.stopPropagation();payrollMarkPaid(\''+p.id+'\')">✓</span> ':'')+
+      '<span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudPayroll(mockHRPayroll.find(function(x){return x.id===\''+p.id+'\'}))">✎</span></td></tr>';
+  }).join(''):'<tr><td colspan="9" style="text-align:center;color:#999;padding:30px;font-size:11px">No payroll entries for this month</td></tr>')+
+  '</tbody></table></div></div></div>';
+}
+function renderHRRecruitment(){
+  var open=mockJobOpenings.filter(function(j){return j.status==='Open'});
+  var activeApps=mockApplicants.filter(function(a){return a.status==='Active'});
+  var hired=mockApplicants.filter(function(a){return a.stage==='Hired'}).length;
+  var pipeline=activeApps.filter(function(a){return a.stage!=='Applied'&&a.stage!=='Rejected'}).length;
+  return '<div class="stats-row" style="margin-bottom:8px">'+[
+    ['Open Positions',open.length,'#2F80ED'],
+    ['Total Applicants',mockApplicants.length,'#7b1fa2'],
+    ['In Pipeline',pipeline,'#1565c0'],
+    ['Hired',hired,'#2e7d32'],
+    ['Rejected',mockApplicants.filter(function(a){return a.stage==='Rejected'}).length,'#c62828']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card" style="margin-bottom:8px"><div class="card-header"><h3>💼 Open Positions</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Position</th><th>Dept</th><th class="num">Openings</th><th class="num">Applicants</th><th>Posted</th><th>Status</th><th></th></tr></thead><tbody>'+
+  mockJobOpenings.map(function(j){
+    var sb=j.status==='Open'?'#e8f5e9;color:#2e7d32':j.status==='On Hold'?'#fff8e1;color:#ff8f00':'#f5f5f5;color:#888';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+j.id+'</td><td style="font-weight:500">'+j.title+'</td><td style="font-size:9px">'+j.dept+'</td><td class="num">'+j.openings+'</td><td class="num" style="color:#1565c0;font-weight:600">'+j.applicants+'</td><td style="font-size:9px;color:#888">'+j.posted+'</td><td><span class="badge-status" style="background:'+sb+'">'+j.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="crudJobOpening(mockJobOpenings.find(function(x){return x.id===\''+j.id+'\'}))">✎</span></td></tr>';
+  }).join('')+
+  '</tbody></table></div></div></div>'+
+  '<div class="card"><div class="card-header"><h3>🧑‍💼 Applicants Pipeline</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Applicant</th><th>Position</th><th>Applied</th><th class="num">Rating</th><th>Stage</th><th></th></tr></thead><tbody>'+
+  mockApplicants.map(function(a){
+    var pos=mockJobOpenings.find(function(j){return j.id===a.jobId});
+    var sb=a.stage==='Hired'?'#e8f5e9;color:#2e7d32':a.stage==='Offer'?'#e3f2fd;color:#1565c0':a.stage==='Interview'?'#f3e8ff;color:#7b1fa2':a.stage==='Rejected'?'#ffebee;color:#c62828':'#fff8e1;color:#ff8f00';
+    return '<tr><td style="font-family:monospace;font-size:9px;color:#888">'+a.id+'</td><td style="font-weight:500">'+a.name+'<div style="font-size:8px;color:#999">'+a.phone+'</div></td><td style="font-size:9px">'+(pos?pos.title:'—')+'</td><td style="font-size:9px;color:#888">'+a.applied+'</td><td class="num" style="font-weight:600;color:'+(a.rating>=4?'#2e7d32':a.rating>=3?'#e65100':'#c62828')+'">'+a.rating+'★</td><td><span class="badge-status" style="background:'+sb+'">'+a.stage+'</span></td><td style="white-space:nowrap">'+
+      (a.status==='Active'&&a.stage!=='Hired'&&a.stage!=='Rejected'?'<span style="color:#2F80ED;cursor:pointer;font-size:10px" title="Advance stage" onclick="event.stopPropagation();applicantAdvance(\''+a.id+'\')">▶</span> ':'')+
+      '<span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\'Remove applicant?\')){var idx=mockApplicants.findIndex(function(x){return x.id===\''+a.id+'\'});if(idx>=0)mockApplicants.splice(idx,1);DB.save(\'applicants\');renderModule();showToast(\'Removed\',\'info\')}" data-perm="HR:Delete">✕</span></td></tr>';
+  }).join('')+
+  '</tbody></table></div></div></div>';
+}
+function attendanceSet(empId,status){
+  var today=(new Date()).toISOString().split('T')[0];
+  var a=mockHRAttendance.find(function(x){return x.employeeId===empId&&x.date===today});
+  if(a){a.status=status;}
+  else{mockHRAttendance.push({id:'ATN-'+empId+'-'+today,employeeId:empId,date:today,status:status});}
+  DB.save('attendance');showToast(hrEmpName(empId)+' → '+status,'info');renderModule();
+}
+function attendanceMarkAll(status){
+  var today=(new Date()).toISOString().split('T')[0];
+  mockEmployees.forEach(function(e){
+    var a=mockHRAttendance.find(function(x){return x.employeeId===e.id&&x.date===today});
+    if(a){a.status=status;}else{mockHRAttendance.push({id:'ATN-'+e.id+'-'+today,employeeId:e.id,date:today,status:status});}
+  });
+  DB.save('attendance');showToast('All marked '+status,'success');renderModule();
+}
+function leaveStatus(id,status){
+  var l=mockLeave.find(function(x){return x.id===id});if(!l)return;
+  l.status=status;DB.save('leave');showToast(status==='Approved'?'Leave approved':'Leave rejected',status==='Approved'?'success':'info');renderModule();
+}
+function payrollMarkPaid(id){
+  var p=mockHRPayroll.find(function(x){return x.id===id});if(!p)return;
+  p.status='Paid';DB.save('payroll');showToast('Payslip marked paid','success');renderModule();
+}
+function payrollGenerate(month){
+  var made=0;
+  mockEmployees.forEach(function(e){
+    if(mockHRPayroll.find(function(p){return p.employeeId===e.id&&p.month===month}))return;
+    var basic=e.salary||0;
+    var allow=Math.round(basic*0.3)+7000;
+    var ded=Math.round(basic*0.15);
+    mockHRPayroll.push({id:'PR-'+month.replace('-','')+'-'+e.id,employeeId:e.id,month:month,basic:basic,allowance:allow,deduction:ded,bonus:0,net:Math.max(0,basic+allow-ded),status:'Generated'});
+    made++;
+  });
+  DB.save('payroll');showToast(made+' payslips generated','success');renderModule();
+}
+function applicantAdvance(id){
+  var a=mockApplicants.find(function(x){return x.id===id});if(!a)return;
+  var order=['Applied','Screening','Interview','Offer','Hired'];
+  var i=order.indexOf(a.stage);
+  if(i>=0&&i<order.length-1){a.stage=order[i+1];}
+  DB.save('applicants');showToast('Stage → '+a.stage,'info');renderModule();
+}
+function viewLeave(id){
+  var l=mockLeave.find(function(x){return x.id===String(id)});if(!l)return;
+  showDetailPanel('Leave '+l.id,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:40px;height:40px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">🏖</div>'+
+      '<div><div style="font-weight:600;font-size:13px">'+hrEmpName(l.employeeId)+' — '+l.type+' Leave</div><div style="font-size:9px;color:#888">'+l.id+' · <span class="badge-status" style="background:'+(l.status==='Approved'?'#e8f5e9;color:#2e7d32':l.status==='Pending'?'#fff8e1;color:#ff8f00':'#ffebee;color:#c62828')+'">'+l.status+'</span></div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+
+      ['From',l.from,'To',l.to,'Days',l.days,'Type',l.type].map(function(v,i,arr){return i%2===0?'<div style="padding:6px;border:1px solid #eee;border-radius:6px;font-size:9px;color:#888"><div style="font-weight:600;color:#555;margin-bottom:2px">'+v+'</div><div style="font-size:11px;color:#333">'+arr[i+1]+'</div></div>':'';}).join('')+
+    '</div>'+
+    '<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:600;color:#888;margin-bottom:4px">REASON</div><div style="font-size:11px;background:#f8f9fa;padding:10px;border-radius:6px;color:#444">'+(l.reason||'—')+'</div></div>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+      (l.status==='Pending'?'<button class="action-btn primary" onclick="leaveStatus(\''+l.id+'\',\'Approved\')" style="padding:4px 10px;font-size:10px">✓ Approve</button><button class="action-btn secondary" onclick="leaveStatus(\''+l.id+'\',\'Rejected\')" style="padding:4px 10px;font-size:10px">✕ Reject</button>':'')+
+      '<button class="action-btn secondary" onclick="closeLeadPanel();crudLeave(mockLeave.find(function(x){return x.id===\''+l.id+'\'}))" style="padding:4px 10px;font-size:10px">✎ Edit</button>'+
+    '</div>');
+}
+function viewPayroll(id){
+  var p=mockHRPayroll.find(function(x){return x.id===String(id)});if(!p)return;
+  showDetailPanel('Payslip '+p.id,
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div style="width:40px;height:40px;border-radius:10px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:18px">💰</div>'+
+      '<div><div style="font-weight:600;font-size:13px">'+hrEmpName(p.employeeId)+' — '+p.month+'</div><div style="font-size:9px;color:#888">'+p.id+' · <span class="badge-status" style="background:'+(p.status==='Paid'?'#e8f5e9;color:#2e7d32':'#fff8e1;color:#ff8f00')+'">'+p.status+'</span></div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">'+
+      ['Basic','৳'+fmtNum(p.basic),'Allowance','৳'+fmtNum(p.allowance),'Deduction','৳'+fmtNum(p.deduction),'Bonus','৳'+fmtNum(p.bonus||0)].map(function(v,i,arr){return i%2===0?'<div style="padding:6px;border:1px solid #eee;border-radius:6px;font-size:9px;color:#888"><div style="font-weight:600;color:#555;margin-bottom:2px">'+v+'</div><div style="font-size:11px;color:#333">'+arr[i+1]+'</div></div>':'';}).join('')+
+    '</div>'+
+    '<div style="padding:10px;background:#e8f5e9;border-radius:8px;text-align:center;margin-bottom:10px"><div style="font-size:9px;color:#2e7d32;font-weight:600">NET PAYABLE</div><div style="font-size:20px;font-weight:800;color:#2e7d32">৳'+fmtNum(p.net)+'</div></div>'+
+    (p.status!=='Paid'?'<button class="action-btn primary" onclick="payrollMarkPaid(\''+p.id+'\')" style="padding:4px 10px;font-size:10px;width:100%">✓ Mark as Paid</button>':''));
+}
+function crudLeave(item){
+  var n=!item;
+  var l=n?{id:'LV-'+String(mockLeave.length+1).padStart(3,'0'),employeeId:mockEmployees.length?mockEmployees[0].id:0,type:'Annual',from:new Date().toISOString().split('T')[0],to:new Date().toISOString().split('T')[0],days:1,status:'Pending',reason:''}:item;
+  openModal(n?'New Leave Request':'Edit Leave Request',
+    formRow(selectField('Employee','lf_emp',l.employeeId,mockEmployees.map(function(e){return e.id+'|'+e.name}),true),selectField('Type','lf_type',l.type,['Annual','Sick','Casual','Festival','Maternity','Paternity'],true))+
+    formRow(inputField('From','lf_from',l.from),inputField('To','lf_to',l.to))+
+    formRow(inputField('Days','lf_days',String(l.days),'',true),selectField('Status','lf_status',l.status,['Pending','Approved','Rejected'],true))+
+    inputField('Reason','lf_reason',l.reason),
+    function(){
+      var sel=g('lf_emp');var eid=parseInt(sel.split('|')[0])||0;
+      var d={id:l.id,employeeId:eid,type:g('lf_type'),from:g('lf_from'),to:g('lf_to'),days:parseInt(g('lf_days'))||1,status:g('lf_status'),reason:g('lf_reason')};
+      if(n){mockLeave.push(d);DB.save('leave');showToast('Leave request submitted','success');}
+      else{var idx=mockLeave.findIndex(function(x){return x.id===l.id});if(idx>=0){mockLeave[idx]=d;DB.save('leave');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudPayroll(item){
+  var n=!item;
+  var p=n?{id:'PR-'+String(Date.now()).slice(-6),employeeId:mockEmployees.length?mockEmployees[0].id:0,month:'2026-07',basic:0,allowance:0,deduction:0,bonus:0,net:0,status:'Generated'}:item;
+  openModal(n?'New Payroll Entry':'Edit Payroll Entry',
+    formRow(selectField('Employee','pf_emp',p.employeeId,mockEmployees.map(function(e){return e.id+'|'+e.name}),true),selectField('Month','pf_month',p.month,['2026-07','2026-06','2026-05','2026-04'],true))+
+    formRow(inputField('Basic (Tk)','pf_basic',String(p.basic),'',true),inputField('Allowance (Tk)','pf_allow',String(p.allowance),'',true))+
+    formRow(inputField('Deduction (Tk)','pf_ded',String(p.deduction),'',true),inputField('Bonus (Tk)','pf_bonus',String(p.bonus||0)))+
+    formRow(selectField('Status','pf_status',p.status,['Generated','Paid'],true),inputField('Net (auto)','pf_net','auto')),
+    function(){
+      var sel=g('pf_emp');var eid=parseInt(sel.split('|')[0])||0;
+      var basic=parseInt(g('pf_basic'))||0,allow=parseInt(g('pf_allow'))||0,ded=parseInt(g('pf_ded'))||0,bonus=parseInt(g('pf_bonus'))||0;
+      var d={id:p.id,employeeId:eid,month:g('pf_month'),basic:basic,allowance:allow,deduction:ded,bonus:bonus,net:Math.max(0,basic+allow-ded+bonus),status:g('pf_status')};
+      if(n){mockHRPayroll.push(d);DB.save('payroll');showToast('Payroll entry added','success');}
+      else{var idx=mockHRPayroll.findIndex(function(x){return x.id===p.id});if(idx>=0){mockHRPayroll[idx]=d;DB.save('payroll');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+function crudJobOpening(item){
+  var n=!item;
+  var j=n?{id:'JOB-'+String(mockJobOpenings.length+1).padStart(3,'0'),title:'',dept:'Construction',openings:1,applicants:0,status:'Open',posted:new Date().toISOString().split('T')[0]}:item;
+  openModal(n?'Post Job Opening':'Edit Job Opening',
+    formRow(inputField('Position Title','jf_title',j.title,'',true),selectField('Department','jf_dept',j.dept,['Construction','Sales','Finance','Management','HR','Design','IT'],true))+
+    formRow(inputField('Openings','jf_open',String(j.openings),'',true),selectField('Status','jf_status',j.status,['Open','On Hold','Closed'],true)),
+    function(){
+      var d={id:j.id,title:g('jf_title'),dept:g('jf_dept'),openings:parseInt(g('jf_open'))||1,applicants:j.applicants,status:g('jf_status'),posted:j.posted};
+      if(n){mockJobOpenings.push(d);DB.save('jobOpenings');showToast('Job posted','success');}
+      else{var idx=mockJobOpenings.findIndex(function(x){return x.id===j.id});if(idx>=0){mockJobOpenings[idx]=d;DB.save('jobOpenings');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
 }
 
 function tasksFilterSet(v){document.getElementById('tasksFilter').value=v;renderModule();}
@@ -8921,7 +9345,7 @@ var _sdDatasetDefs=[
   // Group: Legal & Compliance
   {g:'Legal & Compliance',arr:'mockLegalContracts',label:'Legal Contracts',icon:'📜',mod:'legal_contracts',fields:['title','party','type','status']},
   // Group: Admin & Operations
-  {g:'Admin & Operations',arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','department','designation']},
+  {g:'Admin & Operations',arr:'mockEmployees',label:'Employees',icon:'👤',mod:'hr',fields:['name','dept','designation']},
   {g:'Admin & Operations',arr:'mockDocuments',label:'Documents Vault',icon:'📁',mod:'documents',fields:['title','property','type']},
   {g:'Admin & Operations',arr:'mockKBArticles',label:'KB Articles',icon:'📚',mod:'knowledge_base',fields:['title','category']},
   // Group: Collaboration
@@ -9325,6 +9749,7 @@ var _qaItems = [
   {g:'Admin & Operations',icon:'📦',label:'Stock Item',fn:'crudStockItem',sub:'Inventory'},
   {g:'Admin & Operations',icon:'🏭',label:'Supplier',fn:'crudSupplier',sub:'Vendor'},
   {g:'Admin & Operations',icon:'📄',label:'Purchase Order',fn:'crudPO',sub:'Procurement'},
+  {g:'Admin & Operations',icon:'🏖',label:'Leave',fn:'crudLeave',sub:'Time off'},
   {g:'Customer',icon:'👥',label:'Customer',fn:'crudCustomer',sub:'Portal user'},
   {g:'Customer',icon:'🔑',label:'Handover',fn:'crudHandover',sub:'Unit handover'},
   {g:'Customer',icon:'🔧',label:'Snag',fn:'crudSnag',sub:'Issue report'},
@@ -10396,7 +10821,23 @@ function crudLead(item){
 }
 function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;openModal(n?'New Project':'Edit Project',formRow(inputField('Name','f_name',p.name,'',true),inputField('Location','f_loc',p.location,'',true))+formRow(selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed']),selectField('Type','f_type',p.type,['land','flat']))+formRow(inputField('Budget','f_budget',p.budget),inputField('Manager','f_mgr',p.manager))+inputField('Plots/Units','f_total',p.plots||p.units||''),function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land')d.plots=parseInt(g('f_total'))||0;else d.units=parseInt(g('f_total'))||0;n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')})}
 function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;openModal(n?'New Booking':'Edit Booking',formRow(inputField('Client','f_client',b.client,'',true),inputField('Property','f_prop',b.property,'',true))+formRow(inputField('Unit','f_unit',b.unit),inputField('Price','f_price',b.price,'',true))+formRow(inputField('Advance','f_adv',b.advance),selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed'])),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),price:g('f_price'),advance:g('f_adv'),status:g('f_status')};n?addItem(mockBookings,Object.assign({id:nextId(mockBookings),type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings'):updateItem(mockBookings,b.id,d,'bookings')})}
-function crudEmployee(item){const n=!item;const e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',status:'active'}:item;openModal(n?'New Employee':'Edit Employee',formRow(inputField('Name','f_name',e.name,'',true),inputField('Designation','f_desig',e.designation,'',true))+formRow(selectField('Dept','f_dept',e.dept,['Construction','Sales','Finance','Management','HR','IT']),inputField('Phone','f_phone',e.phone)),function(){const d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),status:'active'};n?addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees'):updateItem(mockEmployees,e.id,Object.assign({},d,{status:e.status}),'employees')})}
+function crudEmployee(item){
+  var n=!item;
+  var depts=['Construction','Sales','Finance','Management','HR','IT'];
+  var statuses=['active','on-leave','probation','terminated'];
+  var e=n?{id:nextId(mockEmployees),name:'',designation:'',dept:'Construction',phone:'',email:'',joinDate:new Date().toISOString().split('T')[0],salary:0,status:'active'}:item;
+  openModal(n?'New Employee':'Edit Employee',
+    formRow(inputField('Name','f_name',e.name,'',true),inputField('Designation','f_desig',e.designation,'',true))+
+    formRow(selectField('Dept','f_dept',e.dept,depts,true),inputField('Phone','f_phone',e.phone))+
+    formRow(inputField('Email','f_email',e.email),inputField('Join Date','f_join',e.joinDate))+
+    formRow(inputField('Basic Salary (Tk)','f_salary',String(e.salary||''),'',true),selectField('Status','f_status',e.status,statuses,true)),
+    function(){
+      var d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),email:g('f_email'),joinDate:g('f_join'),salary:parseInt(g('f_salary'))||0,status:g('f_status')};
+      if(n)addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees');
+      else updateItem(mockEmployees,e.id,d,'employees');
+    }
+  );
+}
 function crudStockItem(item){const n=!item;const i=n?{id:nextId(mockInventory),site:'Muktodhara',item:'',category:'Construction Material',qty:0,unit:'Pcs',price:0,value:0,status:'Adequate',reorder:0,supplier:'',lastReceived:'—'}:item;const cats=['Construction Material','Plumbing','Electrical','Finishes','Safety','Admin'];const sites=['Muktodhara','Jolshiri','Corporate'];const units=['Pcs','Bags','Tons','CFT','Boxes','Meters','Buckets','Sets'];openModal(n?'New Stock Item':'Edit Item','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Item Name','f_item',i.item,'',true)+selectField('Category','f_cat',i.category,cats)+selectField('Site','f_site',i.site,sites)+inputField('Quantity','f_qty',i.qty,'number',true)+selectField('Unit','f_unit',i.unit,units)+inputField('Unit Price','f_price',i.price,'number')+selectField('Status','f_stat',i.status,['Adequate','Warning','Critical'])+inputField('Reorder Level','f_reorder',i.reorder,'number')+inputField('Supplier','f_supplier',i.supplier)+inputField('Last Received','f_last',i.lastReceived)+'</div>',function(){const qty=parseInt(g('f_qty'))||0;const price=parseInt(g('f_price'))||0;const d={item:g('f_item'),category:g('f_cat'),site:g('f_site'),qty:qty,unit:g('f_unit'),price:price,value:qty*price,status:g('f_stat'),reorder:parseInt(g('f_reorder'))||0,supplier:g('f_supplier'),lastReceived:g('f_last')||'—'};n?addItem(mockInventory,Object.assign({id:nextId(mockInventory)},d),'inventory'):updateItem(mockInventory,i.id,d,'inventory')})}
 function crudTransaction(){openModal('New Transaction','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Description','f_desc','','',true)+selectField('Type','f_type','Inflow',['Inflow','Outflow'],true)+inputField('Amount','f_amt','','',true)+selectField('Category','f_cat','Booking',['Booking','Installment','Materials','Labor','Marketing','Admin','Legal','Professional Fees','Utilities','Tax'])+selectField('Status','f_stat','Received',['Received','Pending','Paid'])+inputField('Project','f_proj','')+'</div>',function(){const amt=parseInt(g('f_amt'))||0;const type=g('f_type');addItem(mockTransactions,{id:'TXN-'+(1000+mockTransactions.length+1),date:new Date().toISOString().slice(0,10),desc:g('f_desc'),type:type,category:g('f_cat'),amount:amt,status:g('f_stat'),project:g('f_proj')||'—',fmt:(type==='Inflow'?'+ \u09F3':'— \u09F3')+amt.toLocaleString('en-IN')},'transactions')})}
 function crudPO(item){const n=!item;const p=n?{id:null,vendor:'',items:'',amount:0,status:'Pending Approval',category:'Material',dueDate:'',approvedBy:'—'}:item;const cats=['Material','Finishes','Electrical','Plumbing','Safety'];openModal(n?'New PO':'Edit PO','<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+inputField('Vendor','f_vendor',p.vendor,'',true)+inputField('Items','f_items',p.items,'',true)+inputField('Amount (৳)','f_amt',p.amount,'number',true)+selectField('Category','f_cat',p.category,cats)+selectField('Status','f_stat',p.status,['Pending Approval','Approved','Delivered','Cancelled'])+inputField('Due Date','f_due',p.dueDate)+'</div>',function(){const amt=parseInt(g('f_amt'))||0;const d={vendor:g('f_vendor'),items:g('f_items'),amount:amt,fmt:'৳'+amt.toLocaleString('en-IN'),category:g('f_cat'),status:g('f_stat'),dueDate:g('f_due')||'—',approvedBy:n?'—':p.approvedBy,site:'Muktodhara',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};n?addItem(mockPOs,Object.assign({id:'PO-'+(24+Math.floor(Math.random()*900))},d),'pos'):updateItem(mockPOs,p.id,d,'pos')})}
@@ -10550,10 +10991,22 @@ function openPO(id){
 }
 function openEmployee(id){
   const e=mockEmployees.find(function(x){return x.id===id});if(!e)return;
+  var attCount=mockHRAttendance.filter(function(a){return a.employeeId===id&&a.status!=='Weekend'});
+  var present=attCount.filter(function(a){return a.status==='Present'}).length;
+  var late=attCount.filter(function(a){return a.status==='Late'}).length;
+  var absent=attCount.filter(function(a){return a.status==='Absent'}).length;
+  var leaveRecs=mockLeave.filter(function(l){return l.employeeId===id});
+  var pendingLv=leaveRecs.filter(function(l){return l.status==='Pending'}).length;
+  var sb=e.status==='active'?'#e8f5e9;color:#2e7d32':e.status==='on-leave'?'#fff3e0;color:#e65100':e.status==='probation'?'#fff8e1;color:#ff8f00':'#f5f5f5;color:#888';
   showDetailPanel(e.name,
-    '<div style="text-align:center;padding:18px"><div style="width:50px;height:50px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin:0 auto 10px">'+leadGetInitials(e.name)+'</div><div style="font-size:14px;font-weight:700">'+e.name+'</div><div style="font-size:11px;color:#2F80ED">'+e.designation+'</div></div>'+
-    detailStatRow([['Department',e.dept],['Phone',e.phone],['Email',e.email||'—'],['Status',e.status],['ID',e.id]])+
-    '<div style="margin-top:12px"><div class="verif-item" style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9"><span>✓ Active Employee</span><span style="font-size:9px;font-weight:600;cursor:pointer">View Profile</span></div></div>',
+    '<div style="text-align:center;padding:18px"><div style="width:50px;height:50px;border-radius:50%;background:#eef3ff;color:#2F80ED;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin:0 auto 10px">'+leadGetInitials(e.name)+'</div><div style="font-size:14px;font-weight:700">'+e.name+'</div><div style="font-size:11px;color:#2F80ED">'+e.designation+'</div><div style="margin-top:6px"><span class="badge-status" style="background:'+sb+'">'+e.status+'</span></div></div>'+
+    detailStatRow([['Department',e.dept],['Phone',e.phone],['Email',e.email||'—'],['Joined',e.joinDate||'—'],['Basic','৳'+fmtNum(e.salary||0)],['ID',e.id]])+
+    '<div style="display:flex;gap:8px;margin:10px 0">'+
+      '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:12px;font-weight:700;color:#2e7d32">'+present+'</div><div style="font-size:8px;color:#888">Present (7d)</div></div>'+
+      '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:12px;font-weight:700;color:#e65100">'+late+'</div><div style="font-size:8px;color:#888">Late (7d)</div></div>'+
+      '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:12px;font-weight:700;color:#c62828">'+absent+'</div><div style="font-size:8px;color:#888">Absent (7d)</div></div>'+
+      '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:12px;font-weight:700;color:'+(pendingLv>0?'#ff8f00':'#888')+'">'+pendingLv+'</div><div style="font-size:8px;color:#888">Leave Pending</div></div>'+
+    '</div>',
     '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudEmployee(mockEmployees.find(function(x){return x.id==='+e.id+'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
 }
@@ -13404,7 +13857,7 @@ html.dark .inv-preview{background:rgba(15,23,42,.5);border-color:#334155}
 // ── LANGUAGE TOGGLE (EN / বাংলা) ──
 var LANG='en';
 var _BN_DICT={
-'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Property & Unit Inventory':'সম্পত্তি ও ইউনিট ইনভেন্টরি','Plots & Layout':'প্লট ও লেআউট','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
+'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Property & Unit Inventory':'সম্পত্তি ও ইউনিট ইনভেন্টরি','Plots & Layout':'প্লট ও লেআউট','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Attendance':'উপস্থিতি','Leave':'ছুটি','Payroll':'বেতন','Recruitment':'নিয়োগ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
 'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Land & Projects':'জমি ও প্রকল্প','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Engineering & Construction':'প্রকৌশল ও নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Finance':'ফাইন্যান্স','Accounts & Finance':'অ্যাকাউন্টস ও ফাইন্যান্স','HR & Admin':'মানবসম্পদ ও প্রশাসন','Admin & Operations':'প্রশাসন ও কার্যক্রম','Legal & Compliance':'আইনি ও সম্মতি','Collaboration':'সহযোগিতা','System':'সিস্টেম',
 'Super Admin':'সুপার অ্যাডমিন','Sales Agent':'সেলস এজেন্ট','Site Engineer':'সাইট ইঞ্জিনিয়ার','Finance':'ফাইন্যান্স','Executive Group':'নির্বাহী গ্রুপ',
 'New Inquiry':'নতুন অনুসন্ধান','Contacted':'যোগাযোগ হয়েছে','Site Visit':'সাইট পরিদর্শন','Negotiation':'আলোচনা','Booking':'বুকিং','Downpayment':'ডাউন পেমেন্ট','Installments':'কিস্তি','Possession':'দখল','Handover':'হস্তান্তর','Lost':'হারানো','Junk':'অপ্রাসঙ্গিক',
