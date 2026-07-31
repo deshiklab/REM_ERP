@@ -115,3 +115,11 @@ Turn the validated prototype into a real, deployable ERP. Keep the exact same UI
   - **Recruitment**: 4 job openings + 8 applicants, pipeline stage advance (Applied→Screening→Interview→Offer→Hired), ratings, CRUD for jobs.
   - HR data uses dedicated keys (`hr_attendance`, `hr_payroll`) — does NOT clobber the Labor Mgmt module's worker attendance/payroll data.
   - Search def for employees fixed (fields `dept` not `department`); QA quick-add gained Leave; Bengali keys added (উপস্থিতি / ছুটি / বেতন / নিয়োগ).
+
+- **HEAD — Land & Projects module upgrades** (SW v8-v9):
+  - Renamed **Property & Unit Inventory → Flats & Units**; **Plots & Layout → Plots & Blocks** (GROUPS, permissions matrix, data-perm, Bengali dict, page titles).
+  - New **🧱 Layout & Unit Builder** sub-module (drag & drop): **Land / Plotting mode** — 8×6 canvas, drag 3/5/10 Katha plot sizes (2×1, 2×2, 4×2 spans), overlap prevention, click-to-edit label/status, delete, clear, auto-fill; **Buildings / Flats mode** — project picker + floors (3–10) × units-per-floor (2–6) sliders, drag 2BHK/3BHK/4BHK/Penthouse onto floor slots, overlap prevention, click-to-edit, auto-fill. Persisted via `mockLayouts` (localStorage key `layouts`).
+  - **💰 Pricing Matrix tab added to Plots & Blocks**: block rate card (৳/katha, corner %, road-facing %) × plot types matrix with computed base/corner/road/total prices + portfolio stats.
+  - **💰 Pricing Matrix tab added to Flats & Units**: floor × type avg-price matrix derived from live unit data, per-sqft rates, type summary (count/avg size/avg price/min/max).
+  - Fixed pre-existing bug in Flats & Units top stats row (`.map()` over flat arrays rendered 20 garbage stat cards → now 5 proper cards).
+  - `crudPlot` added for Plot inventory (Add/Edit); permissions now include `Layout & Unit Builder` (33→34 modules).

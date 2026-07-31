@@ -1055,7 +1055,7 @@
 const GROUPS = {
   executive:     { label:'Executive',     icon:'📊', mods:[{id:'dashboard',    label:'Dashboard'},{id:'analytics', label:'Analytics', badge:true},{id:'reports', label:'Reports', badge:true},{id:'bi_reports',label:'BI Reports',badge:true}] },
   sales_crm:     { label:'Sales & CRM',   icon:'🎯', mods:[{id:'customers',    label:'Customers'},{id:'crm',          label:'CRM & Leads'},{id:'proposals',label:'Proposals',badge:true},{id:'contacts',label:'Contact Book'},{id:'sales_marketing',label:'Sales & Marketing'}] },
-  land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Property & Units', badge:true},{id:'plots',label:'Plots & Layout'},{id:'projects',label:'Projects'}] },
+  land_projects: { label:'Land & Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Land Acquisition',badge:false},{id:'properties_units', label:'Flats & Units', badge:true},{id:'plots',label:'Plots & Blocks'},{id:'layout_builder',label:'Layout & Unit Builder',badge:true},{id:'projects',label:'Projects'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'},{id:'dues_recovery',label:'Dues & Recovery'},{id:'ticketing',label:'Ticketing & Issue',badge:true}] },
   construction:  { label:'Engineering & Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'designs',label:'Design Mgmt'}] },
   finance_admin: { label:'Accounts & Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'approvals',label:'Financial Approvals',badge:true},{id:'boq',label:'BOQ & Cost Control',badge:true}] },
@@ -1286,6 +1286,11 @@ window.mockPlots = DB.init('plots', [
   {id:'M-101',type:'3 Katha',status:'sold',block:'A'},{id:'M-102',type:'3 Katha',status:'available',block:'A'},{id:'M-103',type:'5 Katha',status:'reserved',block:'A'},{id:'M-104',type:'5 Katha',status:'not_acquired',block:'A'},
   {id:'M-105',type:'3 Katha',status:'sold',block:'B'},{id:'M-106',type:'10 Katha',status:'available',block:'B'},{id:'M-107',type:'5 Katha',status:'not_acquired',block:'B'},{id:'M-108',type:'3 Katha',status:'available',block:'B'}
 ]);
+window.mockPlotPricing = DB.init('plot_pricing', {
+  rates: { A: { katha: 1400000, cornerPct: 8, roadPct: 5 }, B: { katha: 1250000, cornerPct: 6, roadPct: 4 } },
+  types: [ { key:'3K', label:'3 Katha', size:3 }, { key:'5K', label:'5 Katha', size:5 }, { key:'10K', label:'10 Katha', size:10 } ],
+  premiums: [ { key:'base', label:'Base Rate' }, { key:'corner', label:'Corner Premium' }, { key:'road', label:'Road-Facing Premium' } ]
+});
 window.mockBookings = DB.init('bookings', [
   {id:'BKG-101',client:'Kamrul Hasan',date:'Sep 20, 2024',property:'Jolshiri Abason',unit:'Apt 9A',price:'৳1.8 Cr',advance:'৳10,00,000',status:'Confirmed',type:'Flat'},
   {id:'BKG-102',client:'Dr. Rubina Ali',date:'Oct 15, 2024',property:'Jolshiri Abason',unit:'Apt 4B',price:'৳2.2 Cr',advance:'৳2,00,000',status:'Pending Review',type:'Flat'},
@@ -2281,6 +2286,7 @@ function switchModule(mod,skipSkel) {
       case 'contacts': renderContacts(el); break;
       case 'land_mgmt': renderLandMgmt(el); break;
       case 'plots': renderPlots(el); break;
+      case 'layout_builder': renderLayoutBuilder(el); break;
       case 'properties_units': renderPropertiesUnits(el); break;
       case 'projects': renderProjects(el); break;
       case 'compliance': renderCompliance(el); break;
@@ -4213,10 +4219,23 @@ function openDuesDetail(id){
   );
 }
 
+var plotsTab='layout';
 function renderPlots(el){
+  plotsTab=plotsTab||'layout';
   const pP2=_pg('plots',mockPlots);
-  el.innerHTML=`<div class="fade-in"><div class="page-title">Plots & Layout</div><div class="page-subtitle">Land / Plotting layout management</div>
-    <div class="stats-row" style="margin-bottom:10px">${[
+  el.innerHTML=`<div class="fade-in"><div class="page-title">🏞 Plots & Blocks</div><div class="page-subtitle">Land / Plotting layout management · blocks, inventory & pricing</div>
+    <div class="toolbar" style="margin-bottom:6px">
+      <div class="tabs">${[['layout','📊 Layout'],['inventory','📋 Inventory'],['pricing','💰 Pricing Matrix']].map(function(t){return '<div class="tab '+(plotsTab===t[0]?'active':'')+'" onclick="plotsTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')}</div>
+      <div class="spacer"></div>
+      <button class="action-btn primary" onclick="crudPlot()" data-perm="Plots & Blocks:Create" style="padding:3px 8px;font-size:10px;display:'+(plotsTab==='inventory'?'':'none')+'">+ Add Plot</button>
+    </div>
+    ${plotsTab==='layout'?renderPlotsLayout():
+      plotsTab==='inventory'?renderPlotsInventory(pP2):
+      plotsTab==='pricing'?renderPlotsPricing():''}
+  </div>`;
+}
+function renderPlotsLayout(){
+  return `<div class="stats-row" style="margin-bottom:10px">${[
       ['Available',mockPlots.filter(p=>p.status==='available').length,'#4caf50'],['Sold',mockPlots.filter(p=>p.status==='sold').length,'#e53935'],
       ['Reserved',mockPlots.filter(p=>p.status==='reserved').length,'#1e88e5'],['Not Acquired',mockPlots.filter(p=>p.status==='not_acquired').length,'#999']
     ].map(([l,v,c])=>`<div class="stat-card"><div class="label">${l}</div><div class="value" style="color:${c}">${v}</div></div>`).join('')}</div>
@@ -4226,9 +4245,215 @@ function renderPlots(el){
         ['Not Acquired','repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)']
       ].map(([l,b])=>`<span><span style="display:inline-block;width:10px;height:10px;background:${b};border-radius:2px;vertical-align:middle;margin-right:3px${l==='Not Acquired'?';border:1px dashed #ccc':''}"></span>${l}</span>`).join('')}</div>
       <div class="plot-grid">${mockPlots.map(p=>{const c=p.status==='available'?'plot-available':p.status==='sold'?'plot-sold':p.status==='reserved'?'plot-reserved':'plot-not-acquired';return `<div class="plot-cell ${c}" title="${p.id}: ${p.status}">${p.id.split('-')[1]}</div>`}).join('')}</div>
-    </div></div>
-    <div class="card" style="margin-top:10px"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${pP2.items.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages,pP2.perPage)}</div></div></div></div>`;
-;
+    </div></div>`;
+}
+function renderPlotsInventory(pP2){
+  return `<div class="card"><div class="card-header"><h3>Plot Inventory</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th></tr></thead><tbody>${pP2.items.map(p=>`<tr><td style="font-weight:500">${p.id}</td><td>${p.block}</td><td>${p.type}</td><td><span class="badge-status ${p.status==='available'?'badge-active':p.status==='sold'?'badge-sold':p.status==='reserved'?'badge-reserved':'badge-closed'}">${p.status.replace('_',' ')}</span></td></tr>`).join('')}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages,pP2.perPage)}</div></div></div>`;
+}
+function renderPlotsPricing(){
+  var P=mockPlotPricing;
+  var blocks=Object.keys(P.rates);
+  var rows=[];
+  blocks.forEach(function(b){
+    P.types.forEach(function(t){
+      var base=P.rates[b].katha*t.size;
+      var corner=Math.round(base*P.rates[b].cornerPct/100);
+      var road=Math.round(base*P.rates[b].roadPct/100);
+      rows.push({block:b,label:t.label,size:t.size,base:base,corner:corner,road:road,total:base+corner+road});
+    });
+  });
+  var totalVal=rows.reduce(function(s,r){return s+r.total},0);
+  return `<div class="stats-row" style="margin-bottom:8px">${[
+      ['Blocks',blocks.length,'#2F80ED'],['Plot Types',P.types.length,'#7b1fa2'],
+      ['Min Price','৳'+fmtNum(rows.reduce(function(m,r){return Math.min(m,r.base)},Infinity)),'#2e7d32'],
+      ['Max Price','৳'+fmtNum(rows.reduce(function(m,r){return Math.max(m,r.total)},0)),'#c62828'],
+      ['Portfolio Value','৳'+fmtNum(totalVal),'#1565c0']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')}</div>
+    <div class="card" style="margin-bottom:8px"><div class="card-header"><h3>💰 Plot Pricing Matrix</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Block</th><th>Type</th><th class="num">Size</th><th class="num">Base Rate / Katha</th><th class="num">Base Price</th><th class="num">+ Corner</th><th class="num">+ Road-Facing</th><th class="num">Total</th></tr></thead><tbody>${rows.map(function(r){return `<tr><td style="font-weight:600">Block ${r.block}</td><td>${r.label}</td><td class="num">${r.size} katha</td><td class="num">৳${fmtNum(P.rates[r.block].katha)}</td><td class="num">৳${fmtNum(r.base)}</td><td class="num" style="color:#e65100">+৳${fmtNum(r.corner)}</td><td class="num" style="color:#7b1fa2">+৳${fmtNum(r.road)}</td><td class="num" style="font-weight:700;color:#2e7d32">৳${fmtNum(r.total)}</td></tr>`;}).join('')}</tbody></table></div></div></div>
+    <div class="card"><div class="card-header"><h3>📐 Rate Card by Block</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Block</th><th class="num">Rate / Katha</th><th class="num">Corner Premium</th><th class="num">Road-Facing Premium</th><th class="num">3 Katha</th><th class="num">5 Katha</th><th class="num">10 Katha</th></tr></thead><tbody>${blocks.map(function(b){return `<tr><td style="font-weight:600">Block ${b}</td><td class="num">৳${fmtNum(P.rates[b].katha)}</td><td class="num">${P.rates[b].cornerPct}%</td><td class="num">${P.rates[b].roadPct}%</td>${P.types.map(function(t){var v=P.rates[b].katha*t.size;return '<td class="num" style="font-weight:600">৳'+fmtNum(v)+'</td>';}).join('')}</tr>`;}).join('')}</tbody></table></div></div></div>`;
+}
+function crudPlot(item){
+  var n=!item;
+  var p=n?{id:'M-'+String(100+Math.floor(Math.random()*900)),type:'3 Katha',status:'available',block:'A'}:item;
+  openModal(n?'Add Plot':'Edit Plot',
+    formRow(inputField('Plot ID','pf_id',p.id),selectField('Block','pf_block',p.block,['A','B','C'],true))+
+    formRow(selectField('Type','pf_type',p.type,['3 Katha','5 Katha','10 Katha'],true),selectField('Status','pf_status',p.status,['available','sold','reserved','not_acquired'],true)),
+    function(){
+      var d={id:g('pf_id')||p.id,block:g('pf_block'),type:g('pf_type'),status:g('pf_status')};
+      if(n){mockPlots.push(d);DB.save('plots');showToast('Plot added','success');}
+      else{var idx=mockPlots.findIndex(function(x){return x.id===p.id});if(idx>=0){mockPlots[idx]=d;DB.save('plots');showToast('Updated','info');}}
+      renderModule();
+    }
+  );
+}
+
+// ═══ LAYOUT & UNIT BUILDER (Drag & Drop) ═══
+var lbTab='land';
+window.mockLayouts = DB.init('layouts', {
+  land:{cols:8,rows:6,items:[]},
+  building:{projectId:'PROJ-001',floors:5,perFloor:4,items:[]}
+});
+var _lbDrag=null;
+var _LB_LAND_DEFS={'3K':{w:2,h:1,label:'3 Katha',type:'3 Katha'},'5K':{w:2,h:2,label:'5 Katha',type:'5 Katha'},'10K':{w:4,h:2,label:'10 Katha',type:'10 Katha'}};
+function renderLayoutBuilder(el){
+  lbTab=lbTab||'land';
+  el.innerHTML='<div class="fade-in">'+
+    '<div class="page-title">🧱 Layout & Unit Builder</div><div class="page-subtitle">Drag & drop layout builder for land / plotting and building / flats projects</div>'+
+    '<div class="toolbar" style="margin-bottom:6px">'+
+      '<div class="tabs">'+[['land','🏞 Land / Plotting'],['building','🏢 Buildings / Flats']].map(function(t){return '<div class="tab '+(lbTab===t[0]?'active':'')+'" onclick="lbTab=\''+t[0]+'\';renderModule()">'+t[1]+'</div>';}).join('')+'</div>'+
+      '<div class="spacer"></div>'+
+      '<button class="action-btn secondary" onclick="lbClear(\''+(lbTab==='land'?'land':'building')+'\')" style="padding:3px 8px;font-size:10px">🗑 Clear</button>'+
+      '<button class="action-btn primary" onclick="lbAutoFill()" style="padding:3px 8px;font-size:10px">⚡ Auto-Fill</button>'+
+    '</div>'+
+    (lbTab==='land'?renderLandBuilder():renderBuildingBuilder())+
+  '</div>';
+}
+function renderLandBuilder(){
+  var L=mockLayouts.land;
+  var palette=[{k:'3K',label:'3 Katha',c:'#a5d6a7'},{k:'5K',label:'5 Katha',c:'#90caf9'},{k:'10K',label:'10 Katha',c:'#ffcc80'}];
+  var occupied={};
+  L.items.forEach(function(it){for(var rr=it.row;rr<it.row+it.h;rr++){for(var cc=it.col;cc<it.col+it.w;cc++){occupied[rr+'-'+cc]=it.id;}}});
+  var cells='';
+  for(var r=0;r<L.rows;r++){
+    for(var c=0;c<L.cols;c++){
+      var o=occupied[r+'-'+c];
+      if(o){
+        var it=L.items.find(function(x){return x.id===o});
+        if(it.row===r&&it.col===c){
+          var clr=it.status==='available'?'#a5d6a7':it.status==='sold'?'#ef9a9a':it.status==='reserved'?'#ffe082':'#e0e0e0';
+          cells+='<div onclick="lbEditItem(\''+it.id+'\',\'land\')" style="grid-column:'+(c+1)+' / span '+it.w+';grid-row:'+(r+1)+' / span '+it.h+';background:'+clr+';border-radius:6px;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;border:1px solid rgba(0,0,0,.1);box-shadow:0 1px 2px rgba(0,0,0,.08)">'+
+            '<div style="font-size:11px;font-weight:700;color:#333">'+it.label+'</div><div style="font-size:8px;color:#555">'+it.type+' · '+it.status+'</div>'+
+          '</div>';
+        }
+      }else{
+        cells+='<div ondragover="lbDragOver(event)" ondrop="lbDropLand(event,'+r+','+c+')" style="border:1px dashed #d0d5dd;border-radius:4px;background:#fff"></div>';
+      }
+    }
+  }
+  return '<div style="display:flex;gap:12px;flex-wrap:wrap">'+
+    '<div style="width:170px;flex-shrink:0"><div class="card"><div class="card-header"><h3>📦 Plot Sizes</h3></div><div class="card-body" style="padding:8px">'+
+      palette.map(function(p){return '<div draggable="true" ondragstart="lbDragStart(event,\''+p.k+'\')" style="padding:7px;margin-bottom:6px;background:'+p.c+';border-radius:6px;font-size:10px;font-weight:600;cursor:grab;text-align:center;color:#333;border:1px solid rgba(0,0,0,.08)">'+p.label+'<div style="font-size:8px;font-weight:400;opacity:.7">drag to canvas</div></div>';}).join('')+
+      '<div style="font-size:8px;color:#999;margin-top:6px;line-height:1.4">Drop a plot size onto the canvas. Click a placed plot to edit / delete.</div>'+
+    '</div></div></div>'+
+    '<div style="flex:1;min-width:280px"><div class="card"><div class="card-header"><h3>🛖 Layout Canvas — '+L.cols+'×'+L.rows+' grid</h3></div><div class="card-body" style="padding:10px">'+
+      '<div style="display:grid;grid-template-columns:repeat('+L.cols+',1fr);grid-auto-rows:44px;gap:4px;background:#f8f9fa;padding:6px;border-radius:8px;border:1px solid #e8e8e8">'+cells+'</div>'+
+    '</div></div></div>'+
+    '<div style="width:190px;flex-shrink:0"><div class="card"><div class="card-header"><h3>📋 Placed Plots</h3></div><div class="card-body" style="padding:0">'+
+      (L.items.length?'<table style="font-size:9px;width:100%"><thead><tr><th>Label</th><th>Type</th><th>Status</th></tr></thead><tbody>'+L.items.map(function(it){return '<tr style="cursor:pointer" onclick="lbEditItem(\''+it.id+'\',\'land\')"><td style="font-weight:600">'+it.label+'</td><td>'+it.type+'</td><td style="color:#888">'+it.status+'</td></tr>';}).join('')+'</tbody></table>':'<div style="padding:16px;text-align:center;color:#999;font-size:10px">No plots placed yet</div>')+
+    '</div></div></div>'+
+  '</div>';
+}
+function renderBuildingBuilder(){
+  var B=mockLayouts.building;
+  var projects=mockProperties.map(function(p){return p.id+'|'+p.name;});
+  var types=['2BHK','3BHK','4BHK','Penthouse'];
+  var typeColors={'2BHK':'#a5d6a7','3BHK':'#90caf9','4BHK':'#ffcc80','Penthouse':'#ce93d8'};
+  var floorsHtml='';
+  for(var f=1;f<=B.floors;f++){
+    var slots='';
+    for(var s=0;s<B.perFloor;s++){
+      var it=B.items.find(function(x){return x.floor===f&&x.slot===s;});
+      if(it){
+        var cl=it.status==='available'?'#a5d6a7':it.status==='booked'?'#ffe082':it.status==='sold'?'#ef9a9a':'#e0e0e0';
+        slots+='<div onclick="lbEditItem(\''+it.id+'\',\'building\')" style="padding:6px 4px;background:'+cl+';border-radius:5px;text-align:center;cursor:pointer;border:1px solid rgba(0,0,0,.1)"><div style="font-size:9px;font-weight:700;color:#333">'+it.type+'</div><div style="font-size:7px;color:#555">'+it.status+'</div></div>';
+      }else{
+        slots+='<div ondragover="lbDragOver(event)" ondrop="lbDropBuilding(event,'+f+','+s+')" style="border:1px dashed #d0d5dd;border-radius:5px;min-height:34px;background:#fff"></div>';
+      }
+    }
+    floorsHtml+='<div style="display:flex;gap:4px;align-items:center"><div style="width:44px;font-size:9px;font-weight:600;color:#888">Floor '+f+'</div><div style="flex:1;display:grid;grid-template-columns:repeat('+B.perFloor+',1fr);gap:4px">'+slots+'</div></div>';
+  }
+  return '<div style="display:flex;gap:12px;flex-wrap:wrap">'+
+    '<div style="width:170px;flex-shrink:0"><div class="card"><div class="card-header"><h3>🏠 Unit Types</h3></div><div class="card-body" style="padding:8px">'+
+      types.map(function(t){return '<div draggable="true" ondragstart="lbDragStart(event,\''+t+'\')" style="padding:7px;margin-bottom:6px;background:'+typeColors[t]+';border-radius:6px;font-size:10px;font-weight:600;cursor:grab;text-align:center;color:#333;border:1px solid rgba(0,0,0,.08)">'+t+'<div style="font-size:8px;font-weight:400;opacity:.7">drag to floor</div></div>';}).join('')+
+      '<div style="font-size:8px;color:#999;margin-top:6px;line-height:1.4">Drop a unit type onto a floor slot. Click a placed unit to edit / delete.</div>'+
+    '</div></div></div>'+
+    '<div style="flex:1;min-width:280px"><div class="card"><div class="card-header"><h3>🏢 Floor Plan — <select onchange="lbSetProject(this.value)" style="font-size:10px;font-weight:600;border:1px solid #e0e0e0;border-radius:4px;padding:2px 4px">'+projects.map(function(p){var id=p.split('|')[0];return '<option value="'+id+'"'+(B.projectId===id?' selected':'')+'>'+p.split('|')[1]+'</option>';}).join('')+'</select></h3></div><div class="card-body" style="padding:10px">'+
+      '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;font-size:9px;color:#888;flex-wrap:wrap">'+
+        '<span>Floors:</span><input type="range" min="3" max="10" value="'+B.floors+'" onchange="lbSetFloors(this.value)" style="flex:1;max-width:120px"> <b>'+B.floors+'</b>'+
+        '<span style="margin-left:10px">Units/floor:</span><input type="range" min="2" max="6" value="'+B.perFloor+'" onchange="lbSetPerFloor(this.value)" style="flex:1;max-width:120px"> <b>'+B.perFloor+'</b>'+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column-reverse;gap:6px">'+floorsHtml+'</div>'+
+    '</div></div></div>'+
+    '<div style="width:190px;flex-shrink:0"><div class="card"><div class="card-header"><h3>📋 Placed Units</h3></div><div class="card-body" style="padding:0">'+
+      (B.items.length?'<table style="font-size:9px;width:100%"><thead><tr><th>Unit</th><th>Type</th><th>Status</th></tr></thead><tbody>'+B.items.slice().sort(function(a,b){return b.floor-a.floor;}).map(function(it){return '<tr style="cursor:pointer" onclick="lbEditItem(\''+it.id+'\',\'building\')"><td style="font-weight:600">F'+it.floor+'-'+(it.slot+1)+'</td><td>'+it.type+'</td><td style="color:#888">'+it.status+'</td></tr>';}).join('')+'</tbody></table>':'<div style="padding:16px;text-align:center;color:#999;font-size:10px">No units placed yet</div>')+
+    '</div></div></div>'+
+  '</div>';
+}
+function lbDragStart(ev,k){ev.dataTransfer.setData('text/plain',k);_lbDrag=k;}
+function lbDragOver(ev){ev.preventDefault();}
+function lbDropLand(ev,r,c){
+  ev.preventDefault();
+  var k=_lbDrag||ev.dataTransfer.getData('text/plain');_lbDrag=null;
+  var d=_LB_LAND_DEFS[k];if(!d)return;
+  var L=mockLayouts.land;
+  if(r+d.h>L.rows||c+d.w>L.cols){showToast('Not enough space here','error');return;}
+  for(var rr=r;rr<r+d.h;rr++){for(var cc=c;cc<c+d.w;cc++){if(L.items.some(function(it){return rr>=it.row&&rr<it.row+it.h&&cc>=it.col&&cc<it.col+it.w;})){showToast('Overlaps existing plot','error');return;}}}
+  var n=1;while(L.items.some(function(x){return x.label==='P-'+n;}))n++;
+  L.items.push({id:'LT-'+String(Date.now()).slice(-5),label:'P-'+n,type:d.type,row:r,col:c,w:d.w,h:d.h,status:'available'});
+  DB.save('layouts');renderModule();showToast('Plot P-'+n+' placed','success');
+}
+function lbDropBuilding(ev,f,s){
+  ev.preventDefault();
+  var k=_lbDrag||ev.dataTransfer.getData('text/plain');_lbDrag=null;
+  if(['2BHK','3BHK','4BHK','Penthouse'].indexOf(k)<0)return;
+  var B=mockLayouts.building;
+  if(B.items.some(function(x){return x.floor===f&&x.slot===s;})){showToast('Slot occupied','error');return;}
+  B.items.push({id:'BT-'+String(Date.now()).slice(-5),floor:f,slot:s,type:k,status:'available'});
+  DB.save('layouts');renderModule();showToast(k+' placed on Floor '+f,'success');
+}
+function lbClear(mode){
+  mockLayouts[mode].items=[];
+  DB.save('layouts');renderModule();showToast(mode==='land'?'Land layout cleared':'Building layout cleared','info');
+}
+function lbAutoFill(){
+  if(lbTab==='land'){
+    var L=mockLayouts.land;L.items=[];
+    var seq=0;
+    for(var r=0;r<L.rows;r+=2){
+      for(var c=0;c<L.cols;c+=4){
+        if(r+2<=L.rows&&c+2<=L.cols){
+          seq++;
+          L.items.push({id:'LT-auto-'+seq,label:'P-'+seq,type:'5 Katha',row:r,col:c,w:2,h:2,status:seq%4===0?'reserved':'available'});
+        }
+      }
+    }
+    DB.save('layouts');renderModule();showToast('Auto-filled '+seq+' plots','success');
+  }else{
+    var B=mockLayouts.building;B.items=[];
+    var types=['2BHK','3BHK','3BHK','4BHK','Penthouse'];
+    var cnt=0;
+    for(var f=1;f<=B.floors;f++){
+      for(var s=0;s<B.perFloor;s++){
+        var t=types[(f+s)%types.length];
+        B.items.push({id:'BT-auto-'+f+'-'+s,floor:f,slot:s,type:t,status:(f===B.floors&&s===0)?'booked':'available'});
+        cnt++;
+      }
+    }
+    DB.save('layouts');renderModule();showToast('Auto-filled '+cnt+' units','success');
+  }
+}
+function lbSetProject(id){mockLayouts.building.projectId=id;DB.save('layouts');renderModule();}
+function lbSetFloors(v){mockLayouts.building.floors=parseInt(v)||5;mockLayouts.building.items=[];DB.save('layouts');renderModule();}
+function lbSetPerFloor(v){mockLayouts.building.perFloor=parseInt(v)||4;mockLayouts.building.items=[];DB.save('layouts');renderModule();}
+function lbEditItem(id,mode){
+  var arr=mode==='land'?mockLayouts.land.items:mockLayouts.building.items;
+  var it=arr.find(function(x){return x.id===id});if(!it)return;
+  var statuses=['available','reserved','sold','booked','not_acquired'];
+  openModal(mode==='land'?'Plot '+it.label:'Unit F'+it.floor+'-'+(it.slot+1),
+    formRow(inputField('Label','lb_label',it.label||'',mode==='land'),selectField('Status','lb_status',it.status,statuses,true))+
+    '<div style="font-size:10px;color:#888;margin-bottom:6px">'+(mode==='land'?'Position: Row '+(it.row+1)+', Col '+(it.col+1)+' · Size '+it.type:'Floor '+it.floor+' · Slot '+(it.slot+1)+' · '+it.type)+'</div>'+
+    '<div><button class="action-btn secondary" onclick="lbDeleteItem(\''+id+'\',\''+mode+'\')" style="color:#c62828;padding:4px 10px;font-size:10px">🗑 Delete</button></div>',
+    function(){
+      it.label=g('lb_label')||it.label;it.status=g('lb_status');
+      DB.save('layouts');renderModule();showToast('Updated','info');
+    }
+  );
+}
+function lbDeleteItem(id,mode){
+  var arr=mode==='land'?mockLayouts.land.items:mockLayouts.building.items;
+  var idx=arr.findIndex(function(x){return x.id===id});
+  if(idx>=0){arr.splice(idx,1);DB.save('layouts');renderModule();showToast('Removed','info');}
+  closeDrawer();
 }
 
 // ═══ PROPERTY & UNIT INVENTORY ═══
@@ -4247,22 +4472,10 @@ function renderPropertiesUnits(el) {
   }, 0);
 
   el.innerHTML = '<div class="fade-in">' +
-    '<div class="page-title">🏢 Property & Unit Inventory</div>' +
+    '<div class="page-title">🏢 Flats & Units</div>' +
     '<div class="page-subtitle">' + totalProps + ' projects · ' + totalUnits + ' units · ৳' + (totalValue / 10000000).toFixed(1) + 'Cr total value</div>' +
     '<div class="stats-row" style="margin-bottom:8px">' +
-      ['Available', availUnits, '#4caf50', '🟢'].map(function(s) {
-        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
-      }).join('') +
-      ['Booked', bookedUnits, '#2196f3', '🔵'].map(function(s) {
-        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
-      }).join('') +
-      ['Reserved', reservedUnits, '#ff9800', '🟡'].map(function(s) {
-        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
-      }).join('') +
-      ['Sold', soldUnits, '#e53935', '🔴'].map(function(s) {
-        return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
-      }).join('') +
-      ['Total Units', totalUnits, '#2F80ED', '📊'].map(function(s) {
+      [['Available', availUnits, '#4caf50', '🟢'], ['Booked', bookedUnits, '#2196f3', '🔵'], ['Reserved', reservedUnits, '#ff9800', '🟡'], ['Sold', soldUnits, '#e53935', '🔴'], ['Total Units', totalUnits, '#2F80ED', '📊']].map(function(s) {
         return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
       }).join('') +
     '</div>' +
@@ -4272,14 +4485,16 @@ function renderPropertiesUnits(el) {
         '<div class="tab ' + (propUnitTab === 'grid' ? 'active' : '') + '" onclick="propUnitTab=\'grid\';renderModule()">📐 Unit Grid</div>' +
         '<div class="tab ' + (propUnitTab === 'floorplan' ? 'active' : '') + '" onclick="propUnitTab=\'floorplan\';renderModule()">🏗 Floor Plan</div>' +
         '<div class="tab ' + (propUnitTab === 'projects' ? 'active' : '') + '" onclick="propUnitTab=\'projects\';renderModule()">🏗 Projects</div>' +
+        '<div class="tab ' + (propUnitTab === 'pricing' ? 'active' : '') + '" onclick="propUnitTab=\'pricing\';renderModule()">💰 Pricing Matrix</div>' +
       '</div>' +
       '<div class="spacer"></div>' +
-      '<button class="action-btn primary" onclick="crudProperty()" data-perm="Property & Units:Create">+ New Property</button>' +
+      '<button class="action-btn primary" onclick="crudProperty()" data-perm="Flats & Units:Create">+ New Property</button>' +
     '</div>' +
     (propUnitTab === 'dashboard' ? renderPropDashboard() : '') +
     (propUnitTab === 'grid' ? renderPropGrid() : '') +
     (propUnitTab === 'floorplan' ? renderPropFloorPlan() : '') +
     (propUnitTab === 'projects' ? renderPropProjects() : '') +
+    (propUnitTab === 'pricing' ? renderPropPricing() : '') +
   '</div>';
   // Handle cross-module navigation: auto-select unit or property
   setTimeout(function() {
@@ -4311,6 +4526,45 @@ function renderPropertiesUnits(el) {
   }, 50);
 }
 
+function renderPropPricing(){
+  var types=['2BHK','3BHK','4BHK','Penthouse'];
+  var all=[];mockProperties.forEach(function(p){p.units.forEach(function(u){all.push(u);});});
+  var maxFloor=0;all.forEach(function(u){if((u.floor||0)>maxFloor)maxFloor=u.floor;});
+  var stat={};types.forEach(function(t){stat[t]={n:0,sum:0,sizeSum:0};});
+  all.forEach(function(u){if(stat[u.type]){stat[u.type].n++;stat[u.type].sum+=u.price;var sz=parseInt(String(u.size).replace(/[^0-9]/g,''))||0;stat[u.type].sizeSum+=sz;}});
+  var cell={};all.forEach(function(u){var f=u.floor||0;if(!cell[f])cell[f]={};if(!cell[f][u.type])cell[f][u.type]={n:0,sum:0};cell[f][u.type].n++;cell[f][u.type].sum+=u.price;});
+  var totalVal=all.reduce(function(s,u){return s+u.price},0);
+  var avgSft=all.length?Math.round(all.reduce(function(s,u){var sz=parseInt(String(u.size).replace(/[^0-9]/g,''))||0;return s+sz},0)/all.length):0;
+  var usedTypes=types.filter(function(t){return stat[t].n>0});
+  var floorList=[];for(var f=1;f<=maxFloor;f++)floorList.push(f);
+  return '<div class="stats-row" style="margin-bottom:8px">' + [
+    ['Units',all.length,'#2F80ED'],
+    ['Total Value','৳'+fmtNum(totalVal),'#1565c0'],
+    ['Avg / Unit','৳'+fmtNum(all.length?Math.round(totalVal/all.length):0),'#7b1fa2'],
+    ['Avg Size',avgSft+' sqft','#e65100'],
+    ['Unit Types',usedTypes.length,'#2e7d32']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('') + '</div>' +
+  '<div class="card" style="margin-bottom:8px"><div class="card-header"><h3>💰 Unit Pricing Matrix — Floor × Type (avg price)</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Type</th>'+floorList.map(function(f){return '<th class="num">Floor '+f+'</th>';}).join('')+'<th class="num">Avg Price</th><th class="num">Per Sqft</th></tr></thead><tbody>'+
+  usedTypes.map(function(t){
+    var avg=stat[t].n?Math.round(stat[t].sum/stat[t].n):0;
+    var avgSize=stat[t].n?Math.round(stat[t].sizeSum/stat[t].n):0;
+    var perSft=avgSize?Math.round(avg/avgSize):0;
+    return '<tr><td style="font-weight:600">'+t+'</td>'+
+      floorList.map(function(f){var c=cell[f]&&cell[f][t];if(!c)return '<td class="num" style="color:#ccc">—</td>';return '<td class="num" style="font-weight:600">৳'+fmtNum(Math.round(c.sum/c.n))+'</td>';}).join('')+
+      '<td class="num" style="font-weight:700;color:#1565c0">৳'+fmtNum(avg)+'</td><td class="num" style="color:#2e7d32;font-weight:600">৳'+fmtNum(perSft)+'</td></tr>';
+  }).join('')+
+  '</tbody></table></div></div></div>' +
+  '<div class="card"><div class="card-header"><h3>📐 Type Summary</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Type</th><th class="num">Units</th><th class="num">Avg Size</th><th class="num">Avg Price</th><th class="num">Rate / Sqft</th><th class="num">Min</th><th class="num">Max</th></tr></thead><tbody>'+
+  usedTypes.map(function(t){
+    var un=all.filter(function(u){return u.type===t;});
+    var prices=un.map(function(u){return u.price;});
+    var mn=Math.min.apply(null,prices),mx=Math.max.apply(null,prices);
+    var avg=stat[t].n?Math.round(stat[t].sum/stat[t].n):0;
+    var avgSize=stat[t].n?Math.round(stat[t].sizeSum/stat[t].n):0;
+    return '<tr><td style="font-weight:600">'+t+'</td><td class="num">'+stat[t].n+'</td><td class="num">'+avgSize+' sqft</td><td class="num" style="font-weight:600">৳'+fmtNum(avg)+'</td><td class="num" style="color:#2e7d32">৳'+fmtNum(avgSize?Math.round(avg/avgSize):0)+'</td><td class="num" style="color:#c62828">৳'+fmtNum(mn)+'</td><td class="num" style="color:#2e7d32">৳'+fmtNum(mx)+'</td></tr>';
+  }).join('')+
+  '</tbody></table></div></div></div>';
+}
 function countUnitsByStatus(status) {
   return mockProperties.reduce(function(s, p) {
     return s + p.units.filter(function(u) { return u.status === status; }).length;
@@ -4417,8 +4671,8 @@ function renderPropProjects() {
         '<td>' + p.units.length + '</td>' +
         '<td><span class="badge-status badge-active" style="background:' + statusColor + '">' + p.status + '</span></td>' +
         '<td style="font-size:9px;color:#888">' + p.startDate + ' — ' + p.endDate + '</td>' +
-        '<td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudProperty(mockProperties.find(function(x){return x.id===\\x27' + p.id + '\\x27}))" data-perm="Property & Units:Edit">✎</span>' +
-        ' <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteProperty(\'' + p.id + '\')" data-perm="Property & Units:Delete">✕</span></td></tr>';
+        '<td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:11px" onclick="event.stopPropagation();crudProperty(mockProperties.find(function(x){return x.id===\\x27' + p.id + '\\x27}))" data-perm="Flats & Units:Edit">✎</span>' +
+        ' <span style="color:#e53935;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteProperty(\'' + p.id + '\')" data-perm="Flats & Units:Delete">✕</span></td></tr>';
     }).join('') +
     '</tbody></table>' + _pgHtml('prop_inv', pP.total, pP.page, pP.totalPages, pP.perPage) + '</div></div></div>';
 }
@@ -8836,7 +9090,7 @@ window.mockCOA = DB.init('coa', [
 window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
   {'Lead Sources':['Website','Facebook','Referral','Walk-in','Agent','Billboard','Newspaper','Radio','YouTube','Trade Show','Broker','Corporate'],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha','2 Katha','4 Katha','6 Katha'],'Property Types':['Land','Apartment','Commercial','Penthouse','Duplex','Townhouse'],'Payment Methods':['Check','Bank Transfer','Bkash','Nagad','Cash','Online Banking'],'Project Stages':['Land Acquisition','Planning','Approvals','Site Development','Construction','Completion','Handover'],'Contractor Types':['Civil Works','MEP','Finishing','Structural','Electrical','Plumbing','Roofing','Glass & Aluminum','Painting','Landscaping']}
 ],'Plot Sizes':['3 Katha','5 Katha','8 Katha','10 Katha','1 Bigha'],'Property Types':['Land','Apartment','Commercial'],'Payment Modes':['Cash','Bank Transfer','Cheque','bKash','Nagad','Card']});
-const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Layout','Projects','Property & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts'];
+const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Land Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
 const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
@@ -8850,14 +9104,14 @@ const MOCK_PERMISSIONS = {
     m==='Tasks'?['✓','✓','✓','✓','','','']:
     m==='Documents Vault'?['✓','✓','✓','','','','']:
     m==='Finance'?['✓','','','','✓','','']:
-    m==='Property & Units'?['✓','✓','✓','✓','✓','','']:
+    m==='Flats & Units'?['✓','✓','✓','✓','✓','','']:
     ['✓','','','','','','']
   ),
   'Sales Rep':PERMISSION_MODULES.map(m=>
     ['CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Bookings'].indexOf(m)>=0?['✓','✓','✓','','✓','','']:
     ['Dashboard','Customer Portal'].indexOf(m)>=0?['✓','','','','','','']:
     m==='Tasks'?['✓','✓','','','','','']:
-    m==='Property & Units'?['✓','✓','✓','','','','']:
+    m==='Flats & Units'?['✓','✓','✓','','','','']:
     ['✓','','','','','','']
   ),
   'Accounts':PERMISSION_MODULES.map(m=>
@@ -10694,7 +10948,7 @@ function filterLeads(){
     return true;
   });
 }
-const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',bi_reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',contacts:'sales_crm',proposals:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',projects:'land_projects',compliance:'legal_compliance',legal_contracts:'legal_compliance',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',dues_recovery:'bookings_customer',ticketing:'bookings_customer',contractors:'construction',boq:'finance_admin',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'legal_compliance',designs:'construction',stock:'hr_admin',finance:'finance_admin',approvals:'finance_admin',payment_reminders:'bookings_customer',hr:'hr_admin',documents:'hr_admin',knowledge_base:'hr_admin',tasks:'collaboration',workspace:'collaboration',notifications_page:'collaboration',settings:'system'};
+const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',bi_reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',contacts:'sales_crm',proposals:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',layout_builder:'land_projects',projects:'land_projects',compliance:'legal_compliance',legal_contracts:'legal_compliance',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',dues_recovery:'bookings_customer',ticketing:'bookings_customer',contractors:'construction',boq:'finance_admin',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'legal_compliance',designs:'construction',stock:'hr_admin',finance:'finance_admin',approvals:'finance_admin',payment_reminders:'bookings_customer',hr:'hr_admin',documents:'hr_admin',knowledge_base:'hr_admin',tasks:'collaboration',workspace:'collaboration',notifications_page:'collaboration',settings:'system'};
 
 // ═══ CRUD ═══
 function openModal(title,body,onSave){
@@ -10749,7 +11003,7 @@ function nextId(a){var m=0;a.forEach(function(i){var v=parseInt(i.id)||0;if(v>m)
 function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');logActivity('Created',k||'Unknown',k,i.id);renderModule()}
 function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');logActivity('Updated',k||'Unknown',k,id,JSON.stringify(u));renderModule()}}
 function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){const _item=JSON.parse(JSON.stringify(a[i]));a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info',function(){a.splice(Math.min(i,a.length),0,_item);if(k)DB.save(k);renderModule();showToast('Restored','info');});logActivity('Deleted',k||'Unknown',k,id,l);renderModule()}}
-// showModal: button-array based modal (used by Property & Units module)
+// showModal: button-array based modal (used by Flats & Units module)
 function showModal(title, body, buttons) {
   var footerHtml = buttons.map(function(b) {
     var cls = b.secondary ? 'drawer-btn secondary' : 'drawer-btn primary';
@@ -13857,7 +14111,7 @@ html.dark .inv-preview{background:rgba(15,23,42,.5);border-color:#334155}
 // ── LANGUAGE TOGGLE (EN / বাংলা) ──
 var LANG='en';
 var _BN_DICT={
-'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Property & Unit Inventory':'সম্পত্তি ও ইউনিট ইনভেন্টরি','Plots & Layout':'প্লট ও লেআউট','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Attendance':'উপস্থিতি','Leave':'ছুটি','Payroll':'বেতন','Recruitment':'নিয়োগ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
+'Dashboard':'ড্যাশবোর্ড','Analytics':'অ্যানালিটিক্স','Reports':'রিপোর্ট','Customers':'গ্রাহক','CRM & Leads':'CRM ও লিড','Proposals & Quotations':'প্রস্তাব ও উদ্ধৃতি','Proposals':'প্রস্তাব','Sales & Marketing':'বিক্রয় ও মার্কেটিং','Dues & Recovery':'বকেয়া ও আদায়','Land Acquisition':'জমি অধিগ্রহণ','Flats & Units':'ফ্ল্যাট ও ইউনিট','Plots & Blocks':'প্লট ও ব্লক','Layout & Unit Builder':'লেআউট ও ইউনিট বিল্ডার','Pricing Matrix':'মূল্য ম্যাট্রিক্স','Projects':'প্রকল্প','Regulatory Compliance':'নিয়ন্ত্রক সম্মতি','Compliance':'সম্মতি','Bookings':'বুকিং','Customer Portal':'গ্রাহক পোর্টাল','Handover & Post-Sales':'হস্তান্তর ও বিক্রয়োত্তর','Dues & Recovery':'বকেয়া ও আদায়','Ticketing & Issue':'টিকিট ও সমস্যা','Contractor Management':'কন্ট্রাক্টর ব্যবস্থাপনা','BOQ & Cost Control':'BOQ ও খরচ নিয়ন্ত্রণ','Variation Orders':'পরিবর্তন আদেশ','Equipment & Machinery':'যন্ত্রপাতি','Labor Management':'শ্রম ব্যবস্থাপনা','QC & Inspection':'QC ও পরিদর্শন','Design Management':'ডিজাইন ব্যবস্থাপনা','Finance Dashboard':'ফাইন্যান্স ড্যাশবোর্ড','Financial Approvals':'আর্থিক অনুমোদন','Legal Contracts':'আইনি চুক্তি','Payment Reminders':'পেমেন্ট রিমাইন্ডার','Payment Heatmap':'পেমেন্ট হিটম্যাপ','Stock & Procurement':'স্টক ও ক্রয়','Human Resources':'মানবসম্পদ','Attendance':'উপস্থিতি','Leave':'ছুটি','Payroll':'বেতন','Recruitment':'নিয়োগ','Documents Vault':'ডকুমেন্ট ভল্ট','Knowledge Base':'নলেজ বেস','Task Management':'কাজ ব্যবস্থাপনা','Team Workspace':'টিম ওয়ার্কস্পেস','BI & Reports':'BI ও রিপোর্ট','Activity Log':'অ্যাক্টিভিটি লগ','Permissions Manager':'অনুমতি ব্যবস্থাপক','Backup & Restore':'ব্যাকআপ ও পুনরুদ্ধার','CSV Data Import':'CSV ডেটা ইমপোর্ট','System Manual':'সিস্টেম ম্যানুয়াল','Settings':'সেটিংস','Notifications':'বিজ্ঞপ্তি',
 'Executive':'নির্বাহী','Sales & CRM':'বিক্রয় ও CRM','Land & Projects':'জমি ও প্রকল্প','Bookings & Customer':'বুকিং ও গ্রাহক','Construction':'নির্মাণ','Engineering & Construction':'প্রকৌশল ও নির্মাণ','Finance & Admin':'অর্থ ও প্রশাসন','Finance':'ফাইন্যান্স','Accounts & Finance':'অ্যাকাউন্টস ও ফাইন্যান্স','HR & Admin':'মানবসম্পদ ও প্রশাসন','Admin & Operations':'প্রশাসন ও কার্যক্রম','Legal & Compliance':'আইনি ও সম্মতি','Collaboration':'সহযোগিতা','System':'সিস্টেম',
 'Super Admin':'সুপার অ্যাডমিন','Sales Agent':'সেলস এজেন্ট','Site Engineer':'সাইট ইঞ্জিনিয়ার','Finance':'ফাইন্যান্স','Executive Group':'নির্বাহী গ্রুপ',
 'New Inquiry':'নতুন অনুসন্ধান','Contacted':'যোগাযোগ হয়েছে','Site Visit':'সাইট পরিদর্শন','Negotiation':'আলোচনা','Booking':'বুকিং','Downpayment':'ডাউন পেমেন্ট','Installments':'কিস্তি','Possession':'দখল','Handover':'হস্তান্তর','Lost':'হারানো','Junk':'অপ্রাসঙ্গিক',
@@ -14273,7 +14527,7 @@ function showShortcutsHelp(){
     ['/','Open command palette'],
     ['g then c','Go to Customers'],
     ['g then b','Go to Bookings'],
-    ['g then p','Go to Property & Units'],
+    ['g then p','Go to Flats & Units'],
     ['g then f','Go to Finance'],
     ['g then l','Go to CRM & Leads'],
     ['g then h','Go to HR'],
