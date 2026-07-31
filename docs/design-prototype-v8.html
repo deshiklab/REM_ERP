@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:2, bookings:2, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:1, hr_shifts:1, employees:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -1734,18 +1734,18 @@ window.mockDues = DB.init('dues', [
   {id:'BKG-025',customer:'Nazma Akhter',phone:'+880 1715 666666',project:'Jolshiri Abason',unit:'Apt 7A',totalPrice:4200000,paid:3500000,due:700000,dueDate:'2026-09-01',daysOverdue:-33,status:'Upcoming',bucket:'Future',lastFollowUp:'—',promises:[],lateFee:0,notes:'First installment due Sep 1, 2026.'}
 ]);
 window.mockEmployees = DB.init('employees', [
-  {id:1,name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',email:'rofiqul@mars.com',joinDate:'2022-03-01',salary:65000,status:'active'},
-  {id:2,name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',email:'shamim@mars.com',joinDate:'2021-06-15',salary:85000,status:'active'},
-  {id:3,name:'Nazma Akhter',designation:'Accountant',dept:'Finance',phone:'01755557777',email:'nazma@mars.com',joinDate:'2023-01-10',salary:55000,status:'active'},
-  {id:4,name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',email:'mizan@mars.com',joinDate:'2020-09-01',salary:120000,status:'active'},
-  {id:5,name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',email:'tanvir@mars.com',joinDate:'2022-07-20',salary:70000,status:'active'},
-  {id:6,name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',email:'shahana@mars.com',joinDate:'2024-02-01',salary:45000,status:'probation'},
-  {id:7,name:'Nazmul Huda',designation:'Project Manager',dept:'Construction',phone:'01810112233',email:'nazmul@mars.com',joinDate:'2021-11-05',salary:115000,status:'active'},
-  {id:8,name:'Sultana Razia',designation:'HR Manager',dept:'HR',phone:'01710223344',email:'sultana@mars.com',joinDate:'2019-04-22',salary:95000,status:'active'},
-  {id:9,name:'Jahir Uddin',designation:'Accountant',dept:'Finance',phone:'01910334455',email:'jahir@mars.com',joinDate:'2023-08-14',salary:52000,status:'active'},
-  {id:10,name:'Faruk Hossain',designation:'Site Supervisor',dept:'Construction',phone:'01710445566',email:'faruk@mars.com',joinDate:'2024-01-15',salary:42000,status:'active'},
-  {id:11,name:'Morshed Alam',designation:'Legal Officer',dept:'Management',phone:'01810556677',email:'morshed@mars.com',joinDate:'2022-05-30',salary:68000,status:'active'},
-  {id:12,name:'Shahnaz Parvin',designation:'Marketing Executive',dept:'Sales',phone:'01710667788',email:'shahnaz@mars.com',joinDate:'2024-03-10',salary:48000,status:'on-leave'}
+  {id:1,name:'Rofiqul Islam',designation:'Site Engineer',dept:'Construction',phone:'01711112222',email:'rofiqul@mars.com',joinDate:'2022-03-01',salary:65000,status:'active',contract:{type:'Permanent',start:'2022-03-01',end:'2027-02-28',noticePeriod:30,salaryClause:'Monthly basic + site allowance'},insurance:{provider:'Green Delta Insurance',policyNo:'GD-EMP-1001',coverage:1000000,expiry:'2027-03-01'}},
+  {id:2,name:'Shamim Reza',designation:'Sales Manager',dept:'Sales',phone:'01733335555',email:'shamim@mars.com',joinDate:'2021-06-15',salary:85000,status:'active',contract:{type:'Permanent',start:'2021-06-15',end:'2026-12-31',noticePeriod:60,salaryClause:'Sales target bonus clause'},insurance:{provider:'Green Delta Insurance',policyNo:'GD-EMP-1002',coverage:1500000,expiry:'2026-07-10'}},
+  {id:3,name:'Nazma Akhter',designation:'Accountant',dept:'Finance',phone:'01755557777',email:'nazma@mars.com',joinDate:'2023-01-10',salary:55000,status:'active',contract:{type:'Permanent',start:'2023-01-10',end:'2028-01-09',noticePeriod:30,salaryClause:'Standard grade-4'},insurance:{provider:'Pragati Life',policyNo:'PL-EMP-2033',coverage:800000,expiry:'2026-12-15'}},
+  {id:4,name:'Mizanur Rahman',designation:'Project Manager',dept:'Management',phone:'01777779999',email:'mizan@mars.com',joinDate:'2020-09-01',salary:120000,status:'active',contract:{type:'Permanent',start:'2020-09-01',end:'2026-07-05',noticePeriod:90,salaryClause:'Executive compensation package'},insurance:{provider:'Green Delta Insurance',policyNo:'GD-EMP-1004',coverage:2500000,expiry:'2026-08-01'}},
+  {id:5,name:'Tanvir Ahmed',designation:'Civil Engineer',dept:'Construction',phone:'01799991111',email:'tanvir@mars.com',joinDate:'2022-07-20',salary:70000,status:'active',contract:{type:'Permanent',start:'2022-07-20',end:'2027-07-19',noticePeriod:30,salaryClause:'Monthly basic + OT'},insurance:{provider:'Pragati Life',policyNo:'PL-EMP-2035',coverage:1000000,expiry:'2026-09-30'}},
+  {id:6,name:'Shahana Parvin',designation:'HR Executive',dept:'HR',phone:'01744446666',email:'shahana@mars.com',joinDate:'2024-02-01',salary:45000,status:'probation',contract:{type:'Contractual',start:'2024-02-01',end:'2026-08-01',noticePeriod:15,salaryClause:'Probation review at 6 months'},insurance:{provider:'Pragati Life',policyNo:'PL-EMP-2036',coverage:500000,expiry:'2026-08-01'}},
+  {id:7,name:'Nazmul Huda',designation:'Project Manager',dept:'Construction',phone:'01810112233',email:'nazmul@mars.com',joinDate:'2021-11-05',salary:115000,status:'active',contract:{type:'Permanent',start:'2021-11-05',end:'2028-11-04',noticePeriod:90,salaryClause:'Executive compensation package'},insurance:{provider:'Green Delta Insurance',policyNo:'GD-EMP-1007',coverage:2000000,expiry:'2027-01-15'}},
+  {id:8,name:'Sultana Razia',designation:'HR Manager',dept:'HR',phone:'01710223344',email:'sultana@mars.com',joinDate:'2019-04-22',salary:95000,status:'active',contract:{type:'Permanent',start:'2019-04-22',end:'2027-04-21',noticePeriod:60,salaryClause:'Grade-2 management'},insurance:{provider:'Green Delta Insurance',policyNo:'GD-EMP-1008',coverage:1800000,expiry:'2026-11-30'}},
+  {id:9,name:'Jahir Uddin',designation:'Accountant',dept:'Finance',phone:'01910334455',email:'jahir@mars.com',joinDate:'2023-08-14',salary:52000,status:'active',contract:{type:'Permanent',start:'2023-08-14',end:'2026-12-31',noticePeriod:30,salaryClause:'Standard grade-5'},insurance:{provider:'Pragati Life',policyNo:'PL-EMP-2039',coverage:700000,expiry:'2026-10-31'}},
+  {id:10,name:'Faruk Hossain',designation:'Site Supervisor',dept:'Construction',phone:'01710445566',email:'faruk@mars.com',joinDate:'2024-01-15',salary:42000,status:'active',contract:{type:'Contractual',start:'2024-01-15',end:'2026-12-31',noticePeriod:15,salaryClause:'Site allowance included'},insurance:{provider:'Pragati Life',policyNo:'PL-EMP-2040',coverage:500000,expiry:'2026-07-08'}},
+  {id:11,name:'Morshed Alam',designation:'Legal Officer',dept:'Management',phone:'01810556677',email:'morshed@mars.com',joinDate:'2022-05-30',salary:68000,status:'active',contract:{type:'Permanent',start:'2022-05-30',end:'2027-05-29',noticePeriod:60,salaryClause:'Standard grade-4'},insurance:{provider:'Green Delta Insurance',policyNo:'GD-EMP-1011',coverage:1200000,expiry:'2026-09-15'}},
+  {id:12,name:'Shahnaz Parvin',designation:'Marketing Executive',dept:'Sales',phone:'01710667788',email:'shahnaz@mars.com',joinDate:'2024-03-10',salary:48000,status:'on-leave',contract:{type:'Contractual',start:'2024-03-10',end:'2026-06-30',noticePeriod:15,salaryClause:'3-month extendable'},insurance:{provider:'Pragati Life',policyNo:'PL-EMP-2042',coverage:500000,expiry:'2026-06-25'}}
 ]);
 window.mockHRShifts = DB.init('hr_shifts', {
   types: [
@@ -9477,6 +9477,7 @@ function renderHRDashboard(){
     ['Open Positions',openJobs,'#c62828'],
     ['Pending Leave',pendingLeave,pendingLeave>0?'#ff8f00':'#999']
   ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  renderExpiryReminders()+
   '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-bottom:8px">'+
     '<div class="card"><div class="card-header"><h3>🏢 Headcount by Department</h3></div><div class="card-body" style="padding:10px">'+
     deptKeys.map(function(d){var pct=Math.round(depts[d]/total*100);var col=deptColors[d]||'#888';return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><div style="font-size:9px;width:95px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d+'</div><div style="flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:4px"></div></div><div style="font-size:9px;font-weight:600;width:30px;text-align:right">'+depts[d]+'</div></div>';}).join('')+
@@ -9528,11 +9529,11 @@ function renderHREmployees(){
     '<div class="spacer"></div>'+
     '<button class="action-btn secondary" onclick="importData(mockEmployees,\'Employees\',\'employees\',IMPORT_FIELDS.employees)" style="padding:3px 7px;font-size:9px" title="Import CSV">📥</button>'+
   '</div>'+
-  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Employee</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Email</th><th>Joined</th><th class="num">Basic</th><th>Status</th><th></th></tr></thead><tbody>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Employee</th><th>Designation</th><th>Dept</th><th>Phone</th><th>Email</th><th>Joined</th><th class="num">Basic</th><th>Contract</th><th>Ins Expiry</th><th>Status</th><th></th></tr></thead><tbody>'+
   (pE.items.length?pE.items.map(function(e){
     var sb=e.status==='active'?'#e8f5e9;color:#2e7d32':e.status==='on-leave'?'#fff3e0;color:#e65100':e.status==='probation'?'#fff8e1;color:#ff8f00':'#f5f5f5;color:#888';
-    return '<tr style="cursor:pointer" onclick="openEmployee('+e.id+')"><td style="font-weight:500"><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-right:6px">'+leadGetInitials(e.name)+'</span>'+e.name+'</td><td>'+e.designation+'</td><td style="font-size:9px">'+e.dept+'</td><td style="font-size:9px">'+e.phone+'</td><td style="font-size:9px;color:#888">'+(e.email||'—')+'</td><td style="font-size:9px;color:#888">'+(e.joinDate||'—')+'</td><td class="num" style="font-weight:600">৳'+fmtNum(e.salary||0)+'</td><td><span class="badge-status" style="background:'+sb+'">'+e.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEmployee(mockEmployees.find(function(x){return x.id==='+e.id+'}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\'Delete employee?\')){var idx=mockEmployees.findIndex(function(x){return x.id==='+e.id+'});if(idx>=0)mockEmployees.splice(idx,1);DB.save(\'employees\');renderModule();showToast(\'Deleted\',\'info\')}" data-perm="HR:Delete">✕</span></td></tr>';
-  }).join(''):'<tr><td colspan="9" style="text-align:center;color:#999;padding:30px;font-size:11px">No employees match your filters</td></tr>')+
+    return '<tr style="cursor:pointer" onclick="openEmployee('+e.id+')"><td style="font-weight:500"><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:#eef3ff;color:#2F80ED;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-right:6px">'+leadGetInitials(e.name)+'</span>'+e.name+'</td><td>'+e.designation+'</td><td style="font-size:9px">'+e.dept+'</td><td style="font-size:9px">'+e.phone+'</td><td style="font-size:9px;color:#888">'+(e.email||'—')+'</td><td style="font-size:9px;color:#888">'+(e.joinDate||'—')+'</td><td class="num" style="font-weight:600">৳'+fmtNum(e.salary||0)+'</td>'+(e.contract&&e.contract.type?'<span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+(e.contract.type==='Permanent'?'#2e7d32':'#e65100')+'">'+e.contract.type+'</span>':'—')+'</td><td>'+(e.insurance&&e.insurance.expiry?function(){var dd=daysUntil(e.insurance.expiry);return '<span style="color:'+(dd!==null&&dd<=30?(dd<0?'#c62828':'#e65100'):'#555')+';font-weight:'+(dd!==null&&dd<=30?'600':'400')+'">'+e.insurance.expiry+(dd!==null&&dd<=30?' ⚠':'')+'</span>';}():'—')+'</td><td><span class="badge-status" style="background:'+sb+'">'+e.status+'</span></td><td style="white-space:nowrap"><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();crudEmployee(mockEmployees.find(function(x){return x.id==='+e.id+'}))">✎</span> <span style="color:#e53935;cursor:pointer;font-size:10px" onclick="event.stopPropagation();if(confirm(\'Delete employee?\')){var idx=mockEmployees.findIndex(function(x){return x.id==='+e.id+'});if(idx>=0)mockEmployees.splice(idx,1);DB.save(\'employees\');renderModule();showToast(\'Deleted\',\'info\')}" data-perm="HR:Delete">✕</span></td></tr>';
+  }).join(''):'<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;font-size:11px">No employees match your filters</td></tr>')+
   '</tbody></table>'+_pgHtml('hr',pE.total,pE.page,pE.totalPages,pE.perPage)+'</div></div></div>';
 }
 function renderHRAttendance(){
@@ -12597,9 +12598,11 @@ function crudEmployee(item){
     formRow(inputField('Name','f_name',e.name,'',true),inputField('Designation','f_desig',e.designation,'',true))+
     formRow(selectField('Dept','f_dept',e.dept,depts,true),inputField('Phone','f_phone',e.phone))+
     formRow(inputField('Email','f_email',e.email),inputField('Join Date','f_join',e.joinDate))+
-    formRow(inputField('Basic Salary (Tk)','f_salary',String(e.salary||''),'',true),selectField('Status','f_status',e.status,statuses,true)),
+    formRow(inputField('Basic Salary (Tk)','f_salary',String(e.salary||''),'',true),selectField('Status','f_status',e.status,statuses,true))+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:8px 0 4px;padding:2px 6px;background:#eef3ff;border-radius:4px">📄 Contract</div>'+formRow(selectField('Type','f_ctype',(e.contract||{}).type||'Permanent',['Permanent','Contractual','Probationary']),inputField('Start','f_cstart',(e.contract||{}).start||''))+formRow(inputField('End','f_cend',(e.contract||{}).end||''),inputField('Notice (days)','f_cnotice',String((e.contract||{}).noticePeriod||'')))+inputField('Salary Clause','f_csalary',(e.contract||{}).salaryClause||'')+'<div style="font-size:10px;font-weight:600;color:#2F80ED;margin:8px 0 4px;padding:2px 6px;background:#eef3ff;border-radius:4px">🛡 Insurance</div>'+formRow(inputField('Provider','f_iprov',(e.insurance||{}).provider||''),inputField('Policy No','f_ipolicy',(e.insurance||{}).policyNo||''))+formRow(inputField('Coverage (৳)','f_icov',String((e.insurance||{}).coverage||'')),inputField('Expiry','f_iexp',(e.insurance||{}).expiry||'')),
     function(){
       var d={name:g('f_name'),designation:g('f_desig'),dept:g('f_dept'),phone:g('f_phone'),email:g('f_email'),joinDate:g('f_join'),salary:parseInt(g('f_salary'))||0,status:g('f_status')};
+      d.contract=(g('f_cstart')||g('f_cend')||g('f_csalary'))?{type:g('f_ctype')||'Permanent',start:g('f_cstart'),end:g('f_cend'),noticePeriod:parseInt(g('f_cnotice'))||0,salaryClause:g('f_csalary')||''}:null;
+      d.insurance=(g('f_iprov')||g('f_ipolicy'))?{provider:g('f_iprov'),policyNo:g('f_ipolicy'),coverage:parseInt(g('f_icov'))||0,expiry:g('f_iexp')||''}:null;
       if(n)addItem(mockEmployees,Object.assign({id:nextId(mockEmployees)},d),'employees');
       else updateItem(mockEmployees,e.id,d,'employees');
     }
@@ -13052,6 +13055,30 @@ function crudRoster(item){
 }
 function deleteRoster(id){if(!confirm('Remove roster assignment?'))return;mockHRShifts.roster=mockHRShifts.roster.filter(function(r){return r.id!==id;});DB.save('hr_shifts');showToast('Deleted');renderModule();}
 
+// ── Phase 4.2 Contracts & Insurance ────────────────────────────────
+function daysUntil(dateStr){
+  if(!dateStr)return null;
+  var d=new Date(dateStr);d.setHours(0,0,0,0);
+  var t=new Date();t.setHours(0,0,0,0);
+  return Math.round((d-t)/86400000);
+}
+function renderExpiryReminders(){
+  var items=[];
+  mockEmployees.forEach(function(e){
+    var c=e.contract||{};var ins=e.insurance||{};
+    if(c.end){var d=daysUntil(c.end);if(d!==null&&d<=30)items.push({emp:e,label:'Contract ends',date:c.end,days:d});}
+    if(ins.expiry){var d2=daysUntil(ins.expiry);if(d2!==null&&d2<=30)items.push({emp:e,label:'Insurance expires',date:ins.expiry,days:d2});}
+  });
+  items.sort(function(a,b){return a.days-b.days;});
+  if(!items.length)return '';
+  return '<div class="card" style="margin-bottom:8px;border-color:#ffcdd2"><div class="card-header"><h3>⚠ Contracts &amp; Insurance — expiring soon (30-day reminder)</h3></div><div class="card-body" style="padding:8px 10px">'+
+    items.map(function(it){
+      var c=it.days<0?'#c62828':it.days<=7?'#e65100':'#ff8f00';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f5f5f5"><div style="font-size:10px"><span style="font-weight:600">'+it.emp.name+'</span> <span style="color:#888">· '+it.label+' · '+it.date+'</span></div><span class="badge-status badge-sold" style="font-size:8px;background:'+c+'">'+(it.days<0?'Expired '+(-it.days)+'d ago':it.days===0?'Today':it.days+'d left')+'</span></div>';
+    }).join('')+
+  '</div></div>';
+}
+
 function openEmployee(id){
   const e=mockEmployees.find(function(x){return x.id===id});if(!e)return;
   var attCount=mockHRAttendance.filter(function(a){return a.employeeId===id&&a.status!=='Weekend'});
@@ -13069,6 +13096,10 @@ function openEmployee(id){
       '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:12px;font-weight:700;color:#e65100">'+late+'</div><div style="font-size:8px;color:#888">Late (7d)</div></div>'+
       '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:12px;font-weight:700;color:#c62828">'+absent+'</div><div style="font-size:8px;color:#888">Absent (7d)</div></div>'+
       '<div style="flex:1;padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;text-align:center"><div style="font-size:12px;font-weight:700;color:'+(pendingLv>0?'#ff8f00':'#888')+'">'+pendingLv+'</div><div style="font-size:8px;color:#888">Leave Pending</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">'+
+      '<div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px"><div style="font-size:9px;font-weight:700;color:#2F80ED;margin-bottom:4px">📄 Contract</div>'+((e.contract)?'<div style="font-size:9px;color:#555">'+e.contract.type+' · '+e.contract.start+' → '+(e.contract.end||'—')+'</div><div style="font-size:9px;color:#555">Notice: '+(e.contract.noticePeriod||0)+'d'+(e.contract.salaryClause?' · '+e.contract.salaryClause:'')+'</div>':'<div style="font-size:9px;color:#999">No contract on file</div>')+'</div>'+
+      '<div style="padding:8px;background:#fff;border:1px solid #e8e8e8;border-radius:6px"><div style="font-size:9px;font-weight:700;color:#2F80ED;margin-bottom:4px">🛡 Insurance</div>'+((e.insurance&&e.insurance.provider)?'<div style="font-size:9px;color:#555">'+e.insurance.provider+' · '+e.insurance.policyNo+'</div><div style="font-size:9px;color:#555">Coverage: ৳'+((e.insurance.coverage||0)/100000).toFixed(1)+'L · Exp: <span style="color:'+(function(){var dd=daysUntil(e.insurance.expiry);return dd!==null&&dd<=30?(dd<0?'#c62828':'#e65100'):'#555';})()+'">'+e.insurance.expiry+'</span></div>':'<div style="font-size:9px;color:#999">No insurance on file</div>')+'</div>'+
     '</div>',
     '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudEmployee(mockEmployees.find(function(x){return x.id==='+e.id+'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel()">Close</button></div>'
   );
