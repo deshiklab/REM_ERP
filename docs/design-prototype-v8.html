@@ -1070,7 +1070,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:2, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:1, bookings:1, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, settings:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -1161,7 +1161,7 @@ window.mockProperties = DB.init('properties', [
      {id:'U-101', number:'101', floor:1, type:'3BHK', size:'1350 sqft',
       price:22000000, facing:'South', status:'Sold', customer:'Dr. Rubina Ali', bookingId:'BKG-102'},
      {id:'U-102', number:'102', floor:1, type:'2BHK', size:'1100 sqft',
-      price:18000000, facing:'East', status:'Booked', customer:'Tariqul Islam', bookingId:'BKG-103'},
+      price:18000000, facing:'East', status:'Under Payment', customer:'Tariqul Islam', bookingId:'BKG-103'},
      {id:'U-103', number:'103', floor:1, type:'2BHK', size:'1100 sqft',
       price:17500000, facing:'West', status:'Available'},
      {id:'U-104', number:'104', floor:1, type:'3BHK', size:'1350 sqft',
@@ -1179,7 +1179,7 @@ window.mockProperties = DB.init('properties', [
      {id:'U-302', number:'302', floor:3, type:'3BHK', size:'1500 sqft',
       price:25000000, facing:'East', status:'Sold', customer:'Kamrul Hasan', bookingId:'BKG-101'},
      {id:'U-303', number:'303', floor:3, type:'3BHK', size:'1350 sqft',
-      price:22000000, facing:'West', status:'Booked', customer:'Jahanara Begum'},
+      price:22000000, facing:'West', status:'Under Payment', customer:'Jahanara Begum'},
      {id:'U-304', number:'304', floor:3, type:'3BHK', size:'1350 sqft',
       price:21500000, facing:'North', status:'Available'},
      {id:'U-401', number:'401', floor:4, type:'4BHK', size:'2000 sqft',
@@ -1208,7 +1208,7 @@ window.mockProperties = DB.init('properties', [
      {id:'P-02', number:'2', floor:1, type:'Plot', size:'1800 sqft',
       price:15000000, facing:'East', status:'Sold', customer:'Syed Rahman'},
      {id:'P-03', number:'3', floor:1, type:'Plot', size:'1080 sqft',
-      price:9500000, facing:'West', status:'Booked', customer:'Laily Akhter'},
+      price:9500000, facing:'West', status:'Under Payment', customer:'Laily Akhter'},
      {id:'P-04', number:'4', floor:1, type:'Plot', size:'1080 sqft',
       price:9500000, facing:'North', status:'Available'},
      {id:'P-05', number:'5', floor:1, type:'Plot', size:'1800 sqft',
@@ -2500,7 +2500,7 @@ function renderAnalytics(el){
   if(window._anCharts)window._anCharts.forEach(function(c){c.destroy()});
   window._anCharts=[];
   var totalUnits=0,avail=0,sold=0,booked=0,reserved=0;
-  mockProperties.forEach(function(p){p.units.forEach(function(u){totalUnits++;if(u.status==='Available')avail++;else if(u.status==='Sold')sold++;else if(u.status==='Booked')booked++;else if(u.status==='Reserved')reserved++;});});
+  mockProperties.forEach(function(p){p.units.forEach(function(u){totalUnits++;if(u.status==='Available')avail++;else if(u.status==='Sold')sold++;else if(u.status==='Booked')booked++;else if(u.status==='Under Payment')booked++;else if(u.status==='Reserved')reserved++;});});
   var totalRevenue=mockTransactions.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
   var totalPmts=mockPayments.length;
   var clrPmts=mockPayments.filter(function(p){return p.status==='Cleared'}).length;
@@ -2717,7 +2717,7 @@ function _repOccupancy(area){
   var reserved=rows.reduce(function(s,r){return s+r.reserved;},0);
   var occ=total?Math.round((sold+booked)/total*100):0;
   var valTotal=0, valOcc=0;
-  props.forEach(function(p){p.units.forEach(function(u){valTotal+=(u.price||0);if(u.status==='Sold'||u.status==='Booked')valOcc+=(u.price||0);});});
+  props.forEach(function(p){p.units.forEach(function(u){valTotal+=(u.price||0);if(u.status==='Sold'||u.status==='Booked'||u.status==='Under Payment')valOcc+=(u.price||0);});});
   area.innerHTML=
     '<div class="stats-row" style="margin-bottom:8px">'+
     '<div class="stat-card"><div class="label">Total Units</div><div class="value" style="color:#2F80ED">'+total+'</div></div>'+
@@ -4306,13 +4306,14 @@ function renderPlots(el){
   const pP2=_pg('plots',mockPlots);
   el.innerHTML=`<div class="fade-in"><div class="page-title">🏞 Plots & Blocks</div><div class="page-subtitle">Land / Plotting layout management · blocks, inventory & pricing</div>
     <div class="toolbar" style="margin-bottom:6px">
-      <div class="tabs">${[['layout','📊 Layout'],['inventory','📋 Inventory'],['pricing','💰 Pricing Matrix']].map(function(t){return '<div class="tab '+(plotsTab===t[0]?'active':'')+'" onclick="plotsTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')}</div>
+      <div class="tabs">${[['layout','📊 Layout'],['inventory','📋 Inventory'],['pricing','💰 Pricing Matrix'],['open','📦 Open Inventory']].map(function(t){return '<div class="tab '+(plotsTab===t[0]?'active':'')+'" onclick="plotsTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';}).join('')}</div>
       <div class="spacer"></div>
-      <button class="action-btn primary" onclick="crudPlot()" data-perm="Plots & Blocks:Create" style="padding:3px 8px;font-size:10px;display:'+(plotsTab==='inventory'?'':'none')+'">+ Add Plot</button>
+      <button class="action-btn primary" onclick="crudPlot()" data-perm="Plots & Blocks:Create" style="padding:3px 8px;font-size:10px;display:'+(plotsTab==='inventory'||plotsTab==='open'?'':'none')+'">+ Add Plot</button>
     </div>
     ${plotsTab==='layout'?renderPlotsLayout():
       plotsTab==='inventory'?renderPlotsInventory(pP2):
-      plotsTab==='pricing'?renderPlotsPricing():''}
+      plotsTab==='pricing'?renderPlotsPricing():
+      plotsTab==='open'?renderPlotsOpen():''}
   </div>`;
 }
 function renderPlotsLayout(){
@@ -4351,6 +4352,30 @@ function renderPlotsInventory(pP2){
     <div class="spacer"></div>
   </div>
   <div class="card"><div class="card-header"><h3>Plot Inventory (${rows.length} shown)</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>ID</th><th>Block</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody>${rows.length?rows.map(p=>`<tr style="cursor:pointer" onclick="crudPlot(mockPlots.find(x=>x.id==='${p.id}'))"><td style="font-weight:500">${p.id}</td><td>Block ${p.block}</td><td>${p.type}</td><td><span class="badge-status ${stCol[p.status]}">${p.status.replace('_',' ')}</span></td><td style="text-align:right;color:#2F80ED;font-size:11px">✎</td></tr>`).join(''):`<tr><td colspan="5" style="text-align:center;color:#999;padding:14px">No plots match the current filter</td></tr>`}</tbody></table>${_pgHtml('plots',pP2.total,pP2.page,pP2.totalPages,pP2.perPage)}</div></div></div>`;
+}
+function renderPlotsOpen(){
+  var P=mockPlotPricing;
+  var blocks=Object.keys(P.rates);
+  var sizeOf={};P.types.forEach(function(t){sizeOf[t.label]=t.size;});
+  var blocksData=blocks.map(function(b){
+    var av=mockPlots.filter(function(p){return p.block===b&&p.status==='available';});
+    var rs=mockPlots.filter(function(p){return p.block===b&&p.status==='reserved';});
+    var sl=mockPlots.filter(function(p){return p.block===b&&p.status==='sold';});
+    var na=mockPlots.filter(function(p){return p.block===b&&p.status==='not_acquired';});
+    var openV=av.concat(rs).reduce(function(s,p){return s+(P.rates[b].katha*(sizeOf[p.type]||0));},0);
+    return {b:b,av:av.length,rs:rs.length,sl:sl.length,na:na.length,total:av.length+rs.length+sl.length+na.length,openV:openV};
+  });
+  var totAv=blocksData.reduce(function(s,x){return s+x.av;},0);
+  var totRs=blocksData.reduce(function(s,x){return s+x.rs;},0);
+  var totOpenV=blocksData.reduce(function(s,x){return s+x.openV;},0);
+  var totAll=blocksData.reduce(function(s,x){return s+x.total;},0);
+  return `<div class="stats-row" style="margin-bottom:8px">${[
+      ['Open Plots',totAv+totRs,'#4caf50'],['Available',totAv,'#2e7d32'],['Reserved',totRs,'#1e88e5'],
+      ['Open Value','৳'+fmtNum(totOpenV),'#1565c0'],['Availability',totAll?Math.round((totAv+totRs)/totAll*100)+'%':'0%','#7b1fa2']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')}</div>
+  <div class="card"><div class="card-header"><h3>📦 Open Inventory — Plots still on market (by block)</h3><div style="font-size:9px;color:#888">Open = Available + Reserved · Value = block rate/katha × plot size</div></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Block</th><th class="num">Available</th><th class="num">Reserved</th><th class="num">Sold</th><th class="num">Not Acquired</th><th class="num">Total</th><th class="num">Open Value</th><th class="num">Availability</th></tr></thead><tbody>${blocksData.map(function(x){
+    var pct=x.total?Math.round((x.av+x.rs)/x.total*100):0;
+    return `<tr><td style="font-weight:600">Block ${x.b}</td><td class="num" style="color:#2e7d32;font-weight:700">${x.av}</td><td class="num" style="color:#1e88e5">${x.rs}</td><td class="num" style="color:#c62828">${x.sl}</td><td class="num" style="color:#999">${x.na}</td><td class="num">${x.total}</td><td class="num" style="font-weight:600">৳${fmtNum(x.openV)}</td><td class="num"><div style="display:inline-flex;align-items:center;gap:4px"><div class="progress-bar" style="width:60px"><div class="fill" style="width:${pct}%;background:${pct>60?'#4caf50':pct>30?'#ff9800':'#e53935'}"></div></div><span style="font-size:9px;color:#666">${pct}%</span></div></td></tr>`;}).join('')}</tbody></table></div></div></div>`;
 }
 function renderPlotsPricing(){
   var P=mockPlotPricing;
@@ -4587,6 +4612,7 @@ function renderPropertiesUnits(el) {
   var availUnits = countUnitsByStatus('Available');
   var soldUnits = countUnitsByStatus('Sold');
   var bookedUnits = countUnitsByStatus('Booked');
+  var underPayUnits = countUnitsByStatus('Under Payment');
   var reservedUnits = countUnitsByStatus('Reserved');
   var totalValue = mockProperties.reduce(function(s, p) {
     return s + p.units.reduce(function(s2, u) { return s2 + u.price; }, 0);
@@ -4596,7 +4622,7 @@ function renderPropertiesUnits(el) {
     '<div class="page-title">🏢 Flats & Units</div>' +
     '<div class="page-subtitle">' + totalProps + ' projects · ' + totalUnits + ' units · ৳' + (totalValue / 10000000).toFixed(1) + 'Cr total value</div>' +
     '<div class="stats-row" style="margin-bottom:8px">' +
-      [['Available', availUnits, '#4caf50', '🟢'], ['Booked', bookedUnits, '#2196f3', '🔵'], ['Reserved', reservedUnits, '#ff9800', '🟡'], ['Sold', soldUnits, '#e53935', '🔴'], ['Total Units', totalUnits, '#2F80ED', '📊']].map(function(s) {
+      [['Available', availUnits, '#4caf50', '🟢'], ['Booked', bookedUnits, '#2196f3', '🔵'], ['Under Payment', underPayUnits, '#9c27b0', '🟣'], ['Reserved', reservedUnits, '#ff9800', '🟡'], ['Sold', soldUnits, '#e53935', '🔴'], ['Total Units', totalUnits, '#2F80ED', '📊']].map(function(s) {
         return '<div class="stat-card"><div class="label">' + s[3] + ' ' + s[0] + '</div><div class="value" style="color:' + s[2] + '">' + s[1] + '</div></div>';
       }).join('') +
     '</div>' +
@@ -4607,6 +4633,7 @@ function renderPropertiesUnits(el) {
         '<div class="tab ' + (propUnitTab === 'floorplan' ? 'active' : '') + '" onclick="propUnitTab=\'floorplan\';renderModule()">🏗 Floor Plan</div>' +
         '<div class="tab ' + (propUnitTab === 'projects' ? 'active' : '') + '" onclick="propUnitTab=\'projects\';renderModule()">🏗 Projects</div>' +
         '<div class="tab ' + (propUnitTab === 'pricing' ? 'active' : '') + '" onclick="propUnitTab=\'pricing\';renderModule()">💰 Pricing Matrix</div>' +
+        '<div class="tab ' + (propUnitTab === 'openinv' ? 'active' : '') + '" onclick="propUnitTab=\'openinv\';renderModule()">📦 Open Inventory</div>' +
       '</div>' +
       '<div class="spacer"></div>' +
       '<button class="action-btn primary" onclick="crudProperty()" data-perm="Flats & Units:Create">+ New Property</button>' +
@@ -4616,6 +4643,7 @@ function renderPropertiesUnits(el) {
     (propUnitTab === 'floorplan' ? renderPropFloorPlan() : '') +
     (propUnitTab === 'projects' ? renderPropProjects() : '') +
     (propUnitTab === 'pricing' ? renderPropPricing() : '') +
+    (propUnitTab === 'openinv' ? renderPropOpenInventory() : '') +
   '</div>';
   // Handle cross-module navigation: auto-select unit or property
   setTimeout(function() {
@@ -4692,21 +4720,53 @@ function countUnitsByStatus(status) {
   }, 0);
 }
 
+function renderPropOpenInventory() {
+  var all = [];
+  mockProperties.forEach(function(p){ p.units.forEach(function(u){ u._proj = p.name; all.push(u); }); });
+  var open = all.filter(function(u){ return u.status==='Available' || u.status==='Reserved'; });
+  var committed = all.filter(function(u){ return u.status==='Sold' || u.status==='Booked' || u.status==='Under Payment'; });
+  var openVal = open.reduce(function(s,u){ return s+(u.price||0); }, 0);
+  var soldVal = committed.reduce(function(s,u){ return s+(u.price||0); }, 0);
+  var availPct = all.length ? Math.round(open.length/all.length*100) : 0;
+  var rows = mockProperties.map(function(p){
+    var uu = p.units;
+    var s = uu.filter(function(u){return u.status==='Sold';}).length;
+    var c = uu.filter(function(u){return u.status==='Booked'||u.status==='Under Payment';}).length;
+    var o = uu.filter(function(u){return u.status==='Available'||u.status==='Reserved';}).length;
+    var ov = uu.filter(function(u){return u.status==='Available'||u.status==='Reserved';}).reduce(function(x,u){return x+(u.price||0);},0);
+    return {p:p, s:s, c:c, o:o, ov:ov};
+  });
+  return '<div class="stats-row" style="margin-bottom:8px">' + [
+    ['Open Units', open.length, '#4caf50'],
+    ['Committed', committed.length, '#e53935'],
+    ['Open Value', '৳'+fmtNum(openVal), '#2e7d32'],
+    ['Sold Value', '৳'+fmtNum(soldVal), '#1565c0'],
+    ['Availability', availPct+'%', '#7b1fa2']
+  ].map(function(s){ return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="color:'+s[2]+'">'+s[1]+'</div></div>'; }).join('') + '</div>' +
+  '<div class="card"><div class="card-header"><h3>📦 Open Inventory — Units still on market</h3><div style="font-size:9px;color:#888">Open = Available + Reserved · Committed = Sold + Booked + Under Payment</div></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Project</th><th class="num">Total Units</th><th class="num">Sold</th><th class="num">Committed</th><th class="num">Open</th><th class="num">Open Value</th><th class="num">Availability</th></tr></thead><tbody>' +
+  rows.map(function(r){
+    var pct = r.p.units.length ? Math.round(r.o/r.p.units.length*100) : 0;
+    return '<tr><td style="font-weight:600">'+r.p.name+'</td><td class="num">'+r.p.units.length+'</td><td class="num" style="color:#c62828">'+r.s+'</td><td class="num" style="color:#e65100">'+r.c+'</td><td class="num" style="color:#2e7d32;font-weight:700">'+r.o+'</td><td class="num" style="font-weight:600">৳'+fmtNum(r.ov)+'</td><td class="num"><div style="display:inline-flex;align-items:center;gap:4px"><div class="progress-bar" style="width:60px"><div class="fill" style="width:'+pct+'%;background:'+(pct>60?'#4caf50':pct>30?'#ff9800':'#e53935')+'"></div></div><span style="font-size:9px;color:#666">'+pct+'%</span></div></td></tr>';
+  }).join('') +
+  '</tbody></table></div></div></div>';
+}
+
 function renderPropDashboard() {
   var projectCards = mockProperties.map(function(p) {
     var statusColor = { 'Active': '#4caf50', 'Planning': '#ff9800', 'Completed': '#2196f3' }[p.status] || '#888';
     var unitAvail = p.units.filter(function(u) { return u.status === 'Available'; }).length;
     var unitSold = p.units.filter(function(u) { return u.status === 'Sold'; }).length;
     var unitBooked = p.units.filter(function(u) { return u.status === 'Booked'; }).length;
+    var unitUnder = p.units.filter(function(u) { return u.status === 'Under Payment'; }).length;
     var unitReserved = p.units.filter(function(u) { return u.status === 'Reserved'; }).length;
-    var progPct = p.units.length > 0 ? Math.round((unitSold + unitBooked) / p.units.length * 100) : 0;
+    var progPct = p.units.length > 0 ? Math.round((unitSold + unitBooked + unitUnder) / p.units.length * 100) : 0;
     return '<div class="card" style="cursor:pointer" onclick="propUnitTab=\'grid\';renderModule()">' +
       '<div class="card-body">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
       '<div><div style="font-size:13px;font-weight:600">' + p.name + '</div><div style="font-size:10px;color:#888">' + p.location + ' · ' + p.type + '</div></div>' +
       '<span class="badge-status badge-active" style="background:' + statusColor + '">' + p.status + '</span></div>' +
       '<div style="display:flex;gap:10px;margin-bottom:4px;font-size:10px">' +
-      '<span>🟢 ' + unitAvail + ' avail</span><span>🔵 ' + unitBooked + ' booked</span><span>🟡 ' + unitReserved + ' reserved</span><span>🔴 ' + unitSold + ' sold</span>' +
+      '<span>🟢 ' + unitAvail + ' avail</span><span>🔵 ' + unitBooked + ' booked</span><span>🟣 ' + unitUnder + ' under payment</span><span>🟡 ' + unitReserved + ' reserved</span><span>🔴 ' + unitSold + ' sold</span>' +
       '</div>' +
       '<div style="margin-bottom:3px"><div style="display:flex;justify-content:space-between;font-size:9px"><span>Occupancy</span><span>' + progPct + '%</span></div>' +
       '<div class="progress-bar"><div class="fill" style="width:' + progPct + '%;background:' + (progPct > 60 ? '#4caf50' : progPct > 30 ? '#ff9800' : '#2196f3') + '"></div></div></div>' +
@@ -4732,6 +4792,7 @@ function renderPropGrid() {
     '<span style="font-size:9px;color:#888">' +
     '<span style="display:inline-block;width:8px;height:8px;background:#4caf50;border-radius:2px;margin:0 2px 0 6px"></span> Available' +
     '<span style="display:inline-block;width:8px;height:8px;background:#2196f3;border-radius:2px;margin:0 2px 0 6px"></span> Booked' +
+    '<span style="display:inline-block;width:8px;height:8px;background:#9c27b0;border-radius:2px;margin:0 2px 0 6px"></span> Under Payment' +
     '<span style="display:inline-block;width:8px;height:8px;background:#ff9800;border-radius:2px;margin:0 2px 0 6px"></span> Reserved' +
     '<span style="display:inline-block;width:8px;height:8px;background:#e53935;border-radius:2px;margin:0 2px 0 6px"></span> Sold' +
     '</span>' +
@@ -4756,6 +4817,7 @@ function renderUnitGrid(project) {
   var statusColors = {
     'Available': '#4caf50',
     'Booked': '#2196f3',
+    'Under Payment': '#9c27b0',
     'Reserved': '#ff9800',
     'Sold': '#e53935'
   };
@@ -4771,7 +4833,7 @@ function renderUnitGrid(project) {
           '<div style="font-size:10px;font-weight:700;color:' + color + '">' + u.number + '</div>' +
           '<div style="font-size:7px;color:#888;margin-top:1px;white-space:nowrap;overflow:hidden">' + u.type + '</div>' +
           '<div style="font-size:7px;color:#888;white-space:nowrap;overflow:hidden">' + u.size.split(' ')[0] + '</div>' +
-          '<div style="font-size:6px;font-weight:600;color:' + color + ';margin-top:1px;text-transform:uppercase">' + u.status.slice(0, 4) + '</div>' +
+          '<div style="font-size:6px;font-weight:600;color:' + color + ';margin-top:1px;text-transform:uppercase">' + ({'Available':'AVL','Booked':'BKD','Under Payment':'UND','Reserved':'RSV','Sold':'SLD'}[u.status]||'---') + '</div>' +
           '</div>';
       }).join('') +
       '</div></div>';
@@ -4799,7 +4861,7 @@ function renderPropProjects() {
 }
 
 function renderPropFloorPlan() {
-  var statusColors = { 'Available': '#4caf50', 'Booked': '#2196f3', 'Reserved': '#ff9800', 'Sold': '#e53935' };
+  var statusColors = { 'Available': '#4caf50', 'Booked': '#2196f3', 'Under Payment': '#9c27b0', 'Reserved': '#ff9800', 'Sold': '#e53935' };
   var projects = mockProperties;
   if (propFilter !== 'all') { projects = projects.filter(function(p) { return p.id === propFilter; }); }
 
@@ -4812,6 +4874,7 @@ function renderPropFloorPlan() {
     '<span style="font-size:9px;color:#888;display:flex;align-items:center;gap:4px">' +
     '<span style="display:inline-block;width:10px;height:10px;background:#4caf50;border-radius:2px"></span> Available' +
     '<span style="display:inline-block;width:10px;height:10px;background:#2196f3;border-radius:2px;margin-left:6px"></span> Booked' +
+    '<span style="display:inline-block;width:10px;height:10px;background:#9c27b0;border-radius:2px;margin-left:6px"></span> Under Payment' +
     '<span style="display:inline-block;width:10px;height:10px;background:#ff9800;border-radius:2px;margin-left:6px"></span> Reserved' +
     '<span style="display:inline-block;width:10px;height:10px;background:#e53935;border-radius:2px;margin-left:6px"></span> Sold' +
     '</span>' +
@@ -4940,7 +5003,7 @@ function openUnitDetail(projId, unitId) {
   var unit = proj.units.find(function(u) { return u.id === unitId; });
   if (!unit) return;
 
-  var col = { 'Available': '#4caf50', 'Booked': '#2196f3', 'Reserved': '#ff9800', 'Sold': '#e53935' }[unit.status] || '#888';
+  var col = { 'Available': '#4caf50', 'Booked': '#2196f3', 'Under Payment': '#9c27b0', 'Reserved': '#ff9800', 'Sold': '#e53935' }[unit.status] || '#888';
   var details = [
     ['Unit No', unit.number], ['Type', unit.type], ['Size', unit.size],
     ['Facing', unit.facing], ['Price', '৳' + (unit.price / 100000).toFixed(1) + 'L'],
@@ -5010,7 +5073,7 @@ function editUnitStatus(projId, unitId) {
   var unit = proj.units.find(function(u) { return u.id === unitId; });
   if (!unit) return;
 
-  var statuses = ['Available', 'Booked', 'Reserved', 'Sold'];
+  var statuses = ['Available', 'Booked', 'Under Payment', 'Reserved', 'Sold'];
   showModal('Change Status — Unit ' + unit.number,
     '<div style="padding:8px"><label style="font-size:11px;font-weight:500;display:block;margin-bottom:4px">New Status</label>' +
     '<select id="f_status" style="width:100%;padding:6px;font-size:11px;border:1px solid #e0e0e0;border-radius:4px">' +
@@ -11237,7 +11300,7 @@ function unitAvailabilityCheck(unit,excludeBookingId){
     for(var j=0;j<p.units.length;j++){
       var un=p.units[j];
       if(String(un.number)===u||String(un.id)===u){
-        if(un.status==='Sold'||un.status==='Booked')return 'Unit '+u+' is already '+(un.status==='Sold'?'sold':'booked')+' ('+p.name+')';
+        if(un.status==='Sold'||un.status==='Booked'||un.status==='Under Payment')return 'Unit '+u+' is already '+({Sold:'sold',Booked:'booked','Under Payment':'under payment'}[un.status])+' ('+p.name+')';
       }
     }
   }
