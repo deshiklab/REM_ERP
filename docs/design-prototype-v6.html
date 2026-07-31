@@ -12102,8 +12102,10 @@ function _crumbMenuEl(){
 function _closeCrumbMenu(){var el=document.getElementById('crumbMenu');if(el)el.style.display='none';}
 function _positionCrumbMenu(el,anchor){
   el.style.display='block';
-  var r=anchor?anchor.getBoundingClientRect():{bottom:28,left:20};
-  var top=r.bottom+4;
+  var r=anchor?anchor.getBoundingClientRect():{top:0,bottom:28,left:20};
+  var mh=el.offsetHeight||0;
+  var top=r.top-mh-4;                 // open upward — menu sits above the crumb
+  if(top<4)top=r.bottom+4;            // not enough room above → fall back below
   var left=Math.min(r.left,window.innerWidth-210);
   el.style.top=Math.max(4,top)+'px';
   el.style.left=Math.max(4,left)+'px';
