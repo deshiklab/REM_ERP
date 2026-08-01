@@ -2439,6 +2439,8 @@ function switchModule(mod,skipSkel) {
   // Fast redirect cases — run synchronously BEFORE any skeleton logic
   if(mod==='invoices_view'){crmSubView='invoices';crmInvTab='all';switchModule('crm');return;}
   if(mod==='payments_view'){crmSubView='payments';switchModule('crm');return;}
+  // Role-based access gate (after redirect shims so they resolve first)
+  if(!canAccess(mod)){showToast('🔒 '+modLabel(mod)+' is not available for '+currentRole,'info');return;}
   // Render
   const el = document.getElementById('mainContent');
   // Shimmer skeleton on heavy module switches (skipped for same-module re-renders via renderModule)
@@ -2643,7 +2645,7 @@ function renderDashFinance(el){
   var recentTx=mockTransactions.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))}).slice(0,6);
   el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Finance · Cash Position &amp; Receivables</div>'
     +dashStats([['Bank Balance','৳'+(bankTotal/10000000).toFixed(2)+' Cr','#1565c0',''],['Cash Inflow','৳'+(inflow/100000).toFixed(1)+' L','#2e7d32',''],['Cash Outflow','৳'+(outflow/100000).toFixed(1)+' L','#c62828',''],['Receivables','৳'+(receiv/100000).toFixed(1)+' L','#e65100',''],['Overdue Invoices',overInv,'#c62828',''],['Dues Accounts',duesActive+' active','#e65100','']])
-    +dashQuick([['Finance',mockTransactions.length+' txns','finance','#fce4ec','#c62828'],['Invoices',mockInvoices.length+' total','invoices_view','#e8f5e9','#2e7d32'],['Payments',mockPayments.length+' rec','payments_view','#e0f7fa','#00838f'],['Dues & Recovery',mockDues.length+' accts','dues_recovery','#fff3e0','#e65100'],['Investment & Loans','6 inv · 5 loans','investment_loans','#ede7f6','#5e35b1']])
+    +dashQuick([['Finance',mockTransactions.length+' txns','finance','#fce4ec','#c62828'],['Bookings',mockBookings.length+' active','bookings','#e8f5e9','#2e7d32'],['Dues & Recovery',mockDues.length+' accts','dues_recovery','#fff3e0','#e65100'],['Investment & Loans','6 inv · 5 loans','investment_loans','#ede7f6','#5e35b1'],['Customers',mockCustomers.length+' clients','customers','#e0f7fa','#00838f']])
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
     +'<div class="card"><div class="card-header"><h3>&#128200; Monthly Cash Flow (&#2547;L)</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="finCashChart"></canvas></div></div>'
     +'<div class="card"><div class="card-header"><h3>&#127974; Bank Balances</h3></div><div class="card-body" style="padding:10px">'+mockBankAccounts.map(function(b){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f5f5f5"><div><div style="font-size:11px;font-weight:600">'+b.name+'</div><div style="font-size:9px;color:#888">'+b.account+' · '+b.type+'</div></div><div style="font-size:12px;font-weight:700;color:#1565c0">'+b.balance+'</div></div>';}).join('')+'</div></div>'
@@ -10323,7 +10325,7 @@ window.mockMasterLists = DB.init('master_lists', {'Lead Sources':[
 const PERMISSION_MODULES = ['Dashboard','CRM & Leads','Sales & Marketing','Dues & Recovery','Contacts','Project Acquisition','Plots & Blocks','Projects','Flats & Units','Compliance','Bookings','Customer Portal','Handover','Ticketing & Issue','Contractors','BOQ & Cost Control','Variation Orders','Equipment','Labor','QC & Inspection','Design Mgmt','Accounts & Finance','Stock & Procurement','HR','Documents Vault','Knowledge Base','Tasks','Workspace','Permissions','System Manual','Backup','Financial Approvals','Legal Contracts','Layout & Unit Builder','Calendar','Announcements','WhatsApp Engine','Internal Chat','AI Copilot','Investment & Loans'];
 const PERMISSION_ACTIONS = ['View','Create','Edit','Delete','Export','Import','Approve'];
 const PERMISSION_LABELS = {'View':'👁','Create':'➕','Edit':'✎','Delete':'🗑','Export':'📤','Import':'📥','Approve':'✅'};
-const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer'];
+const ROLES = ['Super Admin','Admin','Manager','Sales Rep','Accounts','Viewer','Sales Agent','Site Engineer','Finance'];
 const MOCK_PERMISSIONS = {
   'Super Admin':PERMISSION_MODULES.map(()=>['✓','✓','✓','✓','✓','✓','✓']),
   'Admin':PERMISSION_MODULES.map((m,i)=>i<8?['✓','✓','✓','✓','✓','✓','✓']:['✓','✓','✓','✓','✓','','']),
@@ -10531,6 +10533,7 @@ function savePermissions(){
 function resetPermissions(){
   if(!confirm('Reset permissions for all roles to defaults?'))return;
   _rolePerms={};
+  ['Sales Agent','Site Engineer','Finance'].forEach(function(r){_rolePerms[r]=buildRolePermMatrix(r);localStorage.removeItem('rem_perms_'+r);});
   for(var r in MOCK_PERMISSIONS){localStorage.removeItem('rem_perms_'+r);}
   showToast('Permissions reset to defaults','info');
   renderModule();
@@ -10744,7 +10747,8 @@ function applyMenuConfig(){
   try{
     GROUP_ORDER.forEach(function(g){
       var el=document.getElementById('s_'+g);
-      if(el)el.style.display=menuGroupVisible(g)?'':'none';
+      var roleOk = currentRole==='Super Admin' ? true : (GROUPS[g] ? GROUPS[g].mods.some(function(m){return canAccess(m.id);}) : true);
+      if(el)el.style.display=(menuGroupVisible(g)&&roleOk)?'':'none';
     });
     // Reorder search dropdown groups to match menu order
     try{
@@ -11273,6 +11277,37 @@ function toggleRoleMenu(){document.getElementById('roleMenuPanel').classList.tog
 function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remove('active')}
 // ═══ ROLE-BASED ACCESS CONTROL ═══
 var _rolePerms = {};
+// Role → module access map for the demo role menu (Super Admin has everything).
+var ROLE_MODULES = {
+  'Sales Agent': ['dashboard','customers','crm','proposals','contacts','sales_marketing','bookings','customer_portal','dues_recovery','handover','ticketing','properties_units','tasks','calendar','announcements','whatsapp','chat'],
+  'Site Engineer': ['dashboard','projects','plots','properties_units','contractors','variation_orders','equipment','labor','designs','compliance','qc','boq','stock','knowledge_base','tasks','calendar','chat'],
+  'Finance': ['dashboard','finance','payment_heatmap','approvals','investment_loans','boq','bookings','dues_recovery','stock','customers','tasks','calendar','announcements','chat']
+};
+// label ↔ module id maps (Permissions-matrix labels vs module ids)
+var _permLabelToMod = {}, _permModToLabel = {};
+Object.keys(GROUPS).forEach(function(g){
+  GROUPS[g].mods.forEach(function(m){
+    _permLabelToMod[m.label] = m.id;
+    _permModToLabel[m.id] = m.label;
+  });
+});
+// Build a full permission matrix for a menu role from its module list.
+function buildRolePermMatrix(role){
+  var ids = ROLE_MODULES[role] || [];
+  return PERMISSION_MODULES.map(function(label){
+    var mid = _permLabelToMod[label];
+    if(mid && ids.indexOf(mid) >= 0){
+      if(role==='Finance' && (label==='Accounts & Finance'||label==='Dues & Recovery'||label==='Financial Approvals')) return ['✓','✓','✓','✓','✓','✓','✓'];
+      return ['✓','✓','✓','✓','✓','',''];
+    }
+    return ['','','','','','',''];
+  });
+}
+// Seed matrices for the demo menu roles so hasPerm/canAccess work immediately
+// (they are overwritten once the admin edits & saves them in Permissions).
+['Sales Agent','Site Engineer','Finance'].forEach(function(r){
+  if(!_rolePerms[r]){ _rolePerms[r] = buildRolePermMatrix(r); }
+});
 function permBtn(mod,action,html){
   return hasPerm(mod,action)?html:'';
 }
@@ -11290,13 +11325,22 @@ ROLES.forEach(function(r){
   var saved=localStorage.getItem('rem_perms_'+r);
   if(saved){try{_rolePerms[r]=JSON.parse(saved);}catch(e){}}
 });
-function hasModuleAccess(mod){return mod==='permissions'?currentRole==='Super Admin':true;}
+function hasModuleAccess(mod){return canAccess(mod);}
 function canAccess(mod){
   if(currentRole==='Super Admin')return true;
   if(mod==='permissions')return false;
+  var list=ROLE_MODULES[currentRole];
+  if(!list||list.indexOf(mod)<0)return false;
+  // Honor a saved permission matrix: revoking View hides the module from nav too.
   var p=_rolePerms[currentRole];
-  if(!p||!p.modules)return false;
-  return p.modules.indexOf(mod)>=0;
+  if(Array.isArray(p)){
+    var label=_permModToLabel[mod];
+    if(label){
+      var idx=PERMISSION_MODULES.indexOf(label);
+      if(idx>=0&&p[idx]&&p[idx][0]!=='✓')return false;
+    }
+  }
+  return true;
 }
 function canEdit(){
   if(currentRole==='Super Admin')return true;
@@ -11337,21 +11381,8 @@ function setRole(role){
     el.style.display=visible?'flex':'none';
   });
   toggleRoleMenu();
-  var currentGrp=GROUPS[currentGroup];
-  if(currentGrp){
-    var accessible=currentGrp.mods.filter(function(m){return hasModuleAccess(m.id);});
-    if(accessible.length===0){
-      for(var gk in GROUPS){
-        var g=GROUPS[gk];
-        var acc=g.mods.filter(function(m){return hasModuleAccess(m.id);});
-        if(acc.length>0){switchGroup(gk);return}
-      }
-    }else if(!hasModuleAccess(currentModule)){
-      switchModule(accessible[0].id);return;
-    }
-  }
   showToast('Switched to '+role,'info');
-  renderModule();
+  switchGroup('executive');
 }
 // ═══ NOTIFICATION SYSTEM ═══
 var mockNotifications = DB.init('notifications', (function(){
@@ -12854,10 +12885,11 @@ function crudLead(item){
 function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;window._formRules=[
     {id:'f_name',fn:function(v){return V.req(v,'Project name is required');}},
     {id:'f_loc',fn:function(v){return V.req(v,'Location is required');}},
-    {id:'f_budget',fn:function(v){if(!String(v).trim())return null;return V.pos(V.num(v),'Budget must be greater than 0');}},
+    {id:'f_budget',fn:function(v){if(!String(v).trim())return null;return V.pos(parsePriceStr(v),'Budget must be greater than 0');}},
+    {id:'f_progress',fn:function(v){if(!String(v).trim())return null;var n=V.num(v);return (isNaN(n)||n<0||n>100)?'Progress must be between 0 and 100':null;}},
     {id:'f_total',fn:function(v){var t=(document.getElementById('f_type')||{}).value;var el=document.getElementById(t==='land'?'f_plots':'f_units');if(!el)return null;var n=V.num(el.value);return (isNaN(n)||Math.floor(n)!==n||n<0)?'Plots/units must be a non-negative whole number':null;}}
   ];
-  openModal(n?'New Project':'Edit Project',formRow(inputField('Name','f_name',p.name,'',true),inputField('Location','f_loc',p.location,'',true))+formRow(selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed']),selectField('Type','f_type',p.type,[{v:'',l:'-- Select type --'},{v:'land',l:'Land'},{v:'flat',l:'Flat'}],true,'toggleProjectTypeFields()'))+formRow(inputField('Budget','f_budget',p.budget),inputField('Manager','f_mgr',p.manager))+'<div id="f_plotsRow">'+inputField('Number of Plots','f_plots',p.plots||'')+'</div><div id="f_unitsRow" style="display:none">'+inputField('Number of Units','f_units',p.units||'')+'</div>',function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type')});if(d.type==='land'){d.plots=parseInt(g('f_plots'))||0;d.units=0;}else{d.units=parseInt(g('f_units'))||0;d.plots=0;}n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')});toggleProjectTypeFields();}
+  openModal(n?'New Project':'Edit Project',formRow(inputField('Name','f_name',p.name,'',true),inputField('Location','f_loc',p.location,'',true))+formRow(selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed']),selectField('Type','f_type',p.type,[{v:'',l:'-- Select type --'},{v:'land',l:'Land'},{v:'flat',l:'Flat'}],true,'toggleProjectTypeFields()'))+formRow(inputField('Budget','f_budget',p.budget),inputField('Manager','f_mgr',p.manager))+formRow(inputField('Progress (%)','f_progress',p.progress||''),'')+'<div id="f_plotsRow">'+inputField('Number of Plots','f_plots',p.plots||'')+'</div><div id="f_unitsRow" style="display:none">'+inputField('Number of Units','f_units',p.units||'')+'</div>',function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type'),progress:Math.min(100,Math.max(0,parseInt(g('f_progress'))||0))});if(d.type==='land'){d.plots=parseInt(g('f_plots'))||0;d.units=0;}else{d.units=parseInt(g('f_units'))||0;d.plots=0;}n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')});toggleProjectTypeFields();}
 function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;window._formRules=[
     {id:'f_price',fn:function(v){return V.pos(V.num(v),'Price must be greater than 0');}},
     {id:'f_adv',fn:function(v){if(!String(v).trim())return null;var a=V.num(v);if(a<0)return 'Advance cannot be negative';var pr=V.num(document.getElementById('f_price').value);return (!isNaN(pr)&&a>pr)?'Advance cannot exceed price ('+pr.toLocaleString('en-IN')+')':null;}},
@@ -13023,7 +13055,7 @@ function openProject(id){
     '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Progress</h3><div class="progress-bar" style="height:8px"><div class="fill" style="width:'+p.progress+'%;background:'+pctCol+';height:8px;border-radius:4px"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:3px"><span>'+p.progress+'% complete</span><span style="color:'+pctCol+';font-weight:600">'+(p.progress>60?'On Track':p.progress>30?'Needs Attention':'At Risk')+'</span></div></div>'+
     '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Unit Status</h3>'+detailStatRow([['Sold',p.stats.sold],['Reserved',p.stats.reserved],['Available',p.stats.available],['Total',p.plots||p.units||0]])+'</div>'+
     '<div style="margin-top:10px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Milestones ('+(p.milestones||[]).length+')</h3>'+(milestones||'<div style="color:#999;font-size:10px">No milestones yet</div>')+'</div>',
-    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudProject(mockProjects.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn" onclick="closeLeadPanel();switchModule(\'bookings\')">📋 View Bookings</button></div>'
+    '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudProject(mockProjects.find(function(x){return x.id===\''+p.id+'\'}));closeLeadPanel()">✎ Edit</button>'+(canAccess('bookings')?'<button class="lead-foot-btn" onclick="closeLeadPanel();switchModule(\'bookings\')">📋 View Bookings</button>':'')+'</div>'
   );
 }
 function openBooking(id){
