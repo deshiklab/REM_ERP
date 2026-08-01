@@ -12402,7 +12402,7 @@ function convertLeadToBooking(id){
       if(isNaN(price)||price<=0){showToast('Enter a valid price','error');return;}
       var adv=V.num(g('f_adv'))||0;
       var nid=nextId(mockBookings);
-      var bk={id:nid,client:l.name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:u.proj,unit:'Unit '+u.number,price:'৳'+price.toLocaleString('en-IN'),advance:adv>0?'৳'+adv.toLocaleString('en-IN'):'—',status:adv>0?'Confirmed':'Pending Review',type:u.type,terms:g('f_terms'),schedStart:g('f_schedStart')};
+      var bk={id:nid,client:l.name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:u.proj,unit:'Unit '+u.number,price:'৳'+price.toLocaleString('en-IN'),advance:adv>0?'৳'+adv.toLocaleString('en-IN'):'—',status:adv>0?'Confirmed':'Pending Review',type:normType(u.type),terms:g('f_terms'),schedStart:g('f_schedStart')};
       mockBookings.push(bk);DB.save('bookings');
       (mockProperties||[]).forEach(function(p){
         (p.units||[]).forEach(function(un){
@@ -12682,8 +12682,8 @@ function formRow(a,b){return '<div style="display:grid;grid-template-columns:1fr
 function projectOpts(){return [''].concat(mockProjects.map(function(p){return p.name}));}
 function projectOptsByType(t){t=normType(t);if(!t)return projectOpts();var wantLand=(t==='Land');return [''].concat(mockProjects.filter(function(p){return p.type===(wantLand?'land':'flat')}).map(function(p){return p.name}));}
 function normType(t){if(!t)return'';t=String(t).trim();if(t==='Plot'||t==='land'||t==='Land')return'Land';if(t==='Flat'||t==='flat'||t==='2BHK'||t==='3BHK'||t==='4BHK'||t==='Studio'||t==='Commercial')return'Flat';return t;}
-function repopulateSelect(el,opts,keepVal){var cur=keepVal?el.value:'';el.innerHTML=opts.map(function(o){return '<option value="'+o+'">'+o+'</option>';}).join('');if(!cur)return;el.value=cur;if(el.value!==cur){var op=document.createElement('option');op.value=cur;op.textContent=cur;el.appendChild(op);el.value=cur;}}
-function customerOpts(){return [''].concat(mockCustomers.map(function(c){return c.name}));}
+function repopulateSelect(el,opts,keepLegacy){var cur=el.value;el.innerHTML=opts.map(function(o){return '<option value="'+o+'">'+o+'</option>';}).join('');if(!cur){el.value='';return;}var has=false;for(var i=0;i<el.options.length;i++){if(el.options[i].value===cur){has=true;break;}}if(has){el.value=cur;return;}if(keepLegacy){var op=document.createElement('option');op.value=cur;op.textContent=cur;el.appendChild(op);el.value=cur;}}
+function customerOpts(){var seen={},arr=[];mockCustomers.forEach(function(c){if(c.name&&!seen[c.name]){seen[c.name]=1;arr.push(c.name);}});(window.mockEntities||[]).forEach(function(e){if((e.roles||[]).indexOf('customer')>=0&&e.name&&!seen[e.name]){seen[e.name]=1;arr.push(e.name);}});return [''].concat(arr);}
 function supplierOpts(){return [''].concat(mockSuppliers.map(function(s){return s.name}));}
 function handoverUnitOpts(){var seen={},arr=[];mockHandover.forEach(function(h){if(h.unit&&!seen[h.unit]){seen[h.unit]=1;arr.push(h.unit);}});return [''].concat(arr);}
 function toggleProjectTypeFields(){
