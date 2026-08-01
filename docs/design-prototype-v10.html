@@ -145,6 +145,12 @@
     .toolbar .search-box input{border:none;outline:none;font-size:11px;padding:5px 6px;width:100%;background:transparent}
     .toolbar .search-box input::placeholder{color:#999}
     .toolbar .search-box svg{width:13px;height:13px}
+    .flt-bar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 6px;padding:4px 6px;background:#f8faff;border:1px solid #e3ecff;border-radius:6px;min-height:24px}
+    .flt-count{font-size:9px;color:#555;font-weight:600;margin-right:2px;white-space:nowrap}
+    .flt-chip{display:inline-flex;align-items:center;gap:4px;background:#eef3ff;border:1px solid #cfe0ff;color:#1565c0;font-size:9px;font-weight:600;padding:2px 6px;border-radius:10px;white-space:nowrap}
+    .flt-x{cursor:pointer;color:#7b9ee0;font-weight:700;font-size:10px;padding:0 1px}
+    .flt-x:hover{color:#c62828}
+    .flt-chip.on{background:#2F80ED;border-color:#2F80ED;color:#fff}
     .toolbar .spacer{flex:1}
     .action-btn{display:inline-flex;align-items:center;gap:3px;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap;font-weight:500;font-size:11px;padding:5px 12px}
     .action-btn.primary{background:#2F80ED;color:#fff;border:none}
@@ -3594,6 +3600,12 @@ function renderCRM(el){
   const AVGSCORE=mockLeads.length>0?Math.round(mockLeads.reduce(function(s,l){return s+calcLeadScore(l)},0)/mockLeads.length):0;
   var owners=[...new Set(mockLeads.map(function(l){return l.owner}).filter(Boolean))];
   var bc=bulkSelectedCount();
+  var cnt=_leadFacetCounts(f);
+  var payF=(document.getElementById('paySearch')||{}).value||'';
+  var payM=(document.getElementById('payMethod')||{}).value||'';
+  var payS=(document.getElementById('payStatus')||{}).value||'';
+  var payBase=mockPayments.filter(function(p){return !payF||String(p.client).toLowerCase().indexOf(payF.toLowerCase())>=0||String(p.id).toLowerCase().indexOf(payF.toLowerCase())>=0;});
+  var payCntM=_fltCounts(payBase,'method'),payCntS=_fltCounts(payBase,'status');
   const pcrm=_pg('crm',filtered);
   const pbro=_pg('brokers',mockBrokers);
   const pcomp=_pg('complaints',mockComplaints);
@@ -3608,18 +3620,18 @@ function renderCRM(el){
       <div class="tabs"><div class="tab ${crmSubView==='leads'?'active':''}" onclick="crmSubView='leads';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Leads</div><div class="tab ${crmSubView==='pipeline'?'active':''}" onclick="crmSubView='pipeline';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">📋 Kanban</div><div class="tab ${crmSubView==='brokers'?'active':''}" onclick="crmSubView='brokers';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Brokers</div><div class="tab ${crmSubView==='complaints'?'active':''}" onclick="crmSubView='complaints';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Complaints</div><div class="tab ${crmSubView==='invoices'?'active':''}" onclick="crmSubView='invoices';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Invoices</div><div class="tab ${crmSubView==='payments'?'active':''}" onclick="crmSubView='payments';_PG['crm']={page:1,perPage:_pgPerPage};_PG['brokers']={page:1,perPage:_pgPerPage};_PG['complaints']={page:1,perPage:_pgPerPage};_PG['invoices']={page:1,perPage:_pgPerPage};_PG['payments']={page:1,perPage:_pgPerPage};renderModule()">Payments</div><div class="tab ${crmSubView==='reports'?'active':''}" onclick="crmSubView='reports';renderModule()">Reports</div><div class="tab ${crmSubView==='activities'?'active':''}" onclick="crmSubView='activities';renderModule()">Activities</div><div class="tab ${crmSubView==='config'?'active':''}" onclick="crmSubView='config';renderModule()">⚙ Config</div></div>
       ${crmSubView==='leads'||crmSubView==='pipeline'?`
       <input id="crmSearch" placeholder="Search name/phone/property..." oninput="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
-      <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${LEAD_STAGES.map(function(s){return '<option value="'+s+'"'+(f.sf===s?' selected':'')+'>'+s+'</option>'}).join('')}<option value="Lost"${f.sf==='Lost'?' selected':''}>Lost</option><option value="Junk"${f.sf==='Junk'?' selected':''}>Junk</option></select>
-      <select id="crmFPriority" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Priority</option><option value="High"${f.pf==='High'?' selected':''}>High</option><option value="Medium"${f.pf==='Medium'?' selected':''}>Medium</option><option value="Low"${f.pf==='Low'?' selected':''}>Low</option></select>
-      <select id="crmFType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Type</option><option value="Local"${f.tf==='Local'?' selected':''}>Local</option><option value="NRB"${f.tf==='NRB'?' selected':''}>NRB</option></select>
-      <select id="crmFValRange" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Value</option><option value="low"${f.vf==='low'?' selected':''}>Below 1Cr</option><option value="mid"${f.vf==='mid'?' selected':''}>1-5 Cr</option><option value="high"${f.vf==='high'?' selected':''}>5Cr+</option></select>
-      <select id="crmFScore" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Score</option><option value="hot"${f.scf==='hot'?' selected':''}>🔥 Hot</option><option value="warm"${f.scf==='warm'?' selected':''}>⭐ Warm</option><option value="cold"${f.scf==='cold'?' selected':''}>💤 Cold</option></select>
-      <select id="crmFOwner" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Owner</option><option value="_unassigned"${f.of==='_unassigned'?' selected':''}>🚫 Unassigned</option>${owners.map(function(o){return '<option value="'+o+'"'+(f.of===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
-      <select id="crmFTerr" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Territory</option>${terrNames().map(function(o){return '<option value="'+o+'"'+(f.tf2===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
-      <select id="crmFSource" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Source</option>${LEAD_SOURCES.map(function(o){return '<option value="'+o+'"'+(f.srcf===o?' selected':'')+'>'+o+'</option>'}).join('')}</select>
-      <select id="crmFFlatType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Project Type</option><option value="Land"${f.ff==='Land'?' selected':''}>Land</option><option value="Flat"${f.ff==='Flat'?' selected':''}>Flat</option></select>
-      <select id="crmFFacing" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Facing</option><option value="South"${f.fdf==='South'?' selected':''}>South</option><option value="East"${f.fdf==='East'?' selected':''}>East</option><option value="West"${f.fdf==='West'?' selected':''}>West</option><option value="North"${f.fdf==='North'?' selected':''}>North</option></select>
-      <select id="crmFPlan" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Plan</option><option value="Construction Link"${f.ppf==='Construction Link'?' selected':''}>Construction Link</option><option value="Bank Loan"${f.ppf==='Bank Loan'?' selected':''}>Bank Loan</option><option value="Full Payment"${f.ppf==='Full Payment'?' selected':''}>Full Payment</option><option value="3-Year Installment"${f.ppf==='3-Year Installment'?' selected':''}>3-Yr Install</option><option value="5-Year Installment"${f.ppf==='5-Year Installment'?' selected':''}>5-Yr Install</option></select>
-      <select id="crmFCity" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">City</option>${cities.map(function(c){return '<option value="'+c+'"'+(f.cf===c?' selected':'')+'>'+c+'</option>'}).join('')}</select>
+      <select id="crmFStatus" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Stages</option>${_fopts(LEAD_STAGES.concat(['Lost','Junk']),cnt.status,f.sf)}</select>
+      <select id="crmFPriority" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Priority</option>${_fopts(['High','Medium','Low'],cnt.priority,f.pf)}</select>
+      <select id="crmFType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Type</option>${_fopts(['Local','NRB'],cnt.type,f.tf)}</select>
+      <select id="crmFValRange" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Value</option>${_fopts(['low','mid','high'],cnt.vf,f.vf,function(v){return {low:'Below 1Cr',mid:'1-5 Cr',high:'5Cr+'}[v]})}</select>
+      <select id="crmFScore" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Score</option>${_fopts(['hot','warm','cold'],cnt.scf,f.scf,function(v){return {hot:'🔥 Hot',warm:'⭐ Warm',cold:'💤 Cold'}[v]})}</select>
+      <select id="crmFOwner" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Owner</option><option value="_unassigned"${f.of==='_unassigned'?' selected':''}>🚫 Unassigned (${cnt.owner._unassigned||0})</option>${_fopts(owners,cnt.owner,f.of)}</select>
+      <select id="crmFTerr" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Territory</option>${_fopts(terrNames(),cnt.territory,f.tf2)}</select>
+      <select id="crmFSource" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Source</option>${_fopts(LEAD_SOURCES,cnt.source,f.srcf)}</select>
+      <select id="crmFFlatType" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Project Type</option>${_fopts(['Land','Flat'],cnt.flatType,f.ff)}</select>
+      <select id="crmFFacing" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Facing</option>${_fopts(['South','East','West','North'],cnt.facingDir,f.fdf)}</select>
+      <select id="crmFPlan" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Plan</option>${_fopts(['Construction Link','Bank Loan','Full Payment','3-Year Installment','5-Year Installment'],cnt.paymentPlan,f.ppf)}</select>
+      <select id="crmFCity" onchange="_PG['crm']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">City</option>${_fopts(cities,cnt.city,f.cf)}</select>
       <div class="spacer"></div>
       ${bc>0?'<span style="font-size:9px;color:#2F80ED;font-weight:600;padding:0 4px">'+bc+' selected</span><button class="action-btn secondary" onclick="bulkActionStatus(\'Negotiation\')" style="padding:2px 6px;font-size:8px">Advance</button><button class="action-btn secondary" onclick="bulkActionAssign()" style="padding:2px 6px;font-size:8px">Assign</button><button class="action-btn secondary" onclick="bulkActionPriority(\'High\')" style="padding:2px 6px;font-size:8px">🔥 Priority</button><button class="action-btn secondary" onclick="bulkActionFollowUp()" style="padding:2px 6px;font-size:8px" title="Set follow-up date">📅 F/U</button><button class="action-btn secondary" onclick="bulkExportLeads()" style="padding:2px 6px;font-size:8px" title="Export selected leads as CSV">📥 Export</button><button class="action-btn secondary" onclick="bulkSetStatusLeads()" style="padding:2px 6px;font-size:8px" title="Set stage for selected leads">🔁 Set Status</button><button class="action-btn secondary" onclick="bulkActionDelete()" style="padding:2px 6px;font-size:8px;color:#e53935">Delete</button><button class="action-btn" onclick="_bulkSel={};renderModule()" style="padding:2px 6px;font-size:8px">Clear</button>':''}
       <button class="action-btn secondary" onclick="importData(mockLeads,'Leads','leads',IMPORT_FIELDS.leads)" style="padding:3px 7px;font-size:9px" title="Import CSV" data-perm="CRM & Leads:Import">📥</button>
@@ -3642,12 +3654,13 @@ function renderCRM(el){
       <button class="action-btn secondary" onclick="openInvoiceTemplates()" style="padding:3px 7px;font-size:9px" title="Branded invoice templates" data-perm="CRM & Leads:Edit">🧾 Templates</button><button class="action-btn primary" onclick="crudInvoice()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ New Invoice</button>
       `:crmSubView==='payments'?`
       <input id="paySearch" placeholder="Search client/payment..." oninput="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 8px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;flex:0 0 180px"/>
-      <select id="payMethod" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Method</option><option value="Bank Transfer">Bank Transfer</option><option value="Cheque">Cheque</option><option value="Cash">Cash</option><option value="Online">Online</option></select>
-      <select id="payStatus" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Status</option><option value="Cleared">Cleared</option><option value="Pending">Pending</option></select>
+      <select id="payMethod" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Method</option>${_fopts(['Bank Transfer','Cheque','Cash','Online'],payCntM,payM)}</select>
+      <select id="payStatus" onchange="_PG['payments']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">Status</option>${_fopts(['Cleared','Pending'],payCntS,payS)}</select>
       <div class="spacer"></div>
       <button class="action-btn primary" onclick="crudPayment()" style="padding:3px 8px;font-size:10px" data-perm="CRM & Leads:Create">+ Record Payment</button>
       `:''}
     </div>
+    ${crmSubView==='leads'||crmSubView==='pipeline'?renderFltChips('crm',f,{sq:'Search',sf:'Stage',pf:'Priority',tf:'Type',vf:'Value',scf:'Score',of:'Owner',srcf:'Source',ff:'Project Type',fdf:'Facing',ppf:'Plan',cf:'City',tf2:'Territory'},mockLeads.length,filtered.length):crmSubView==='payments'?renderFltChips('payments',{search:payF,method:payM,status:payS},{search:'Search',method:'Method',status:'Status'},mockPayments.length,payBase.length):''}
     ${crmSubView==='leads'?renderCRMList(filtered,pcrm):crmSubView==='pipeline'?renderCRMKanban():crmSubView==='brokers'?renderBrokersList(pbro):crmSubView==='complaints'?renderComplaints(pcomp):crmSubView==='invoices'?renderInvoices(filtered):crmSubView==='payments'?renderPayments():crmSubView==='reports'?renderCRMReports():crmSubView==='activities'?renderCRMActivities():crmSubView==='config'?renderSalesConfig():''}
   </div>`;
 }
@@ -6851,6 +6864,8 @@ function renderBookings(el){
     if(bq&&String(b.client).toLowerCase().indexOf(bq.toLowerCase())<0&&String(b.property).toLowerCase().indexOf(bq.toLowerCase())<0&&String(b.id).toLowerCase().indexOf(bq.toLowerCase())<0)return false;
     return true;
   });
+  var bBase=mockBookings.filter(function(b){return !bq||String(b.client).toLowerCase().indexOf(bq.toLowerCase())>=0||String(b.property).toLowerCase().indexOf(bq.toLowerCase())>=0||String(b.id).toLowerCase().indexOf(bq.toLowerCase())>=0;});
+  var bcnt=_fltCounts(bBase,'status');
   const pB=_pg('bookings',filtered);
   // 2A: column definitions for the Bookings table
   var COLS=[{k:'sel',l:''},{k:'id',l:'ID'},{k:'client',l:'Client'},{k:'property',l:'Property'},{k:'unit',l:'Unit'},{k:'price',l:'Price'},{k:'advance',l:'Advance'},{k:'invoices',l:'Invoices'},{k:'payments',l:'Payments'},{k:'status',l:'Status'},{k:'activity',l:'Activity'}];
@@ -6862,7 +6877,8 @@ function renderBookings(el){
     return '<th'+(c.k==='price'||c.k==='advance'?' class="num"':'')+'>'+c.l+'</th>';
   }).join('');
   el.innerHTML=`<div class="fade-in"><div class="page-title">Bookings</div><div class="page-subtitle">${mockBookings.length} bookings \u00b7 ${mockBookings.filter(b=>b.status==='Confirmed').length} confirmed \u00b7 ${mockInvoices.filter(function(i){return mockBookings.some(function(b){return b.client===i.client})}).length} invoiced</div>
-    <div class="toolbar" style="margin-bottom:6px"><input id="bkgSearch" placeholder="Search client/property/ID..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/><select id="bkgStatus" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option><option>Pending Review</option><option>Confirmed</option><option>Cancelled</option><option>Completed</option></select><div class="spacer"></div>${bulkBar('bookings')}<button class="action-btn secondary" onclick="saveView('bookings')" style="padding:3px 8px;font-size:10px" title="Save current filters as a view">💾 Save View</button><button class="action-btn primary" onclick="crudBooking()" data-perm="Bookings:Create">+ New Booking</button></div>
+    <div class="toolbar" style="margin-bottom:6px"><input id="bkgSearch" placeholder="Search client/property/ID..." oninput="renderModule()" style="padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;outline:none;width:160px"/><select id="bkgStatus" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option>${_fopts(['Pending Review','Confirmed','Cancelled','Completed'],bcnt,bs)}</select><div class="spacer"></div>${bulkBar('bookings')}<button class="action-btn secondary" onclick="saveView('bookings')" style="padding:3px 8px;font-size:10px" title="Save current filters as a view">💾 Save View</button><button class="action-btn primary" onclick="crudBooking()" data-perm="Bookings:Create">+ New Booking</button></div>
+    ${renderFltChips('bookings',{search:bq,status:bs},{search:'Search',status:'Status'},mockBookings.length,filtered.length)}
     ${renderViewChips('bookings')}
     <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table data-mod="bookings"><thead><tr>${COLHEAD}</tr></thead><tbody>${pB.items.length?pB.items.map(function(b,bi){
       var bInvs=mockInvoices.filter(function(i){return i.client===b.client});
@@ -13430,22 +13446,7 @@ function getSmartFilters(){
 }
 function filterLeads(){
   var f=getSmartFilters();
-  return mockLeads.filter(function(l){
-    if(f.sq&&l.name.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.phone.indexOf(f.sq)===-1&&l.property.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.source.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.email.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.facingDir.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.floorPref.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.flatType.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.sizeSqFt||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.paymentPlan.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.city||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.state||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1)return false;
-    if(f.sf&&l.status!==f.sf)return false;
-    if(f.pf&&l.priority!==f.pf)return false;
-    if(f.tf&&l.type!==f.tf)return false;
-    if(f.of==='_unassigned'&&l.owner!=='Unassigned')return false;else if(f.of&&f.of!=='_unassigned'&&l.owner!==f.of)return false;
-    if(f.srcf&&l.source!==f.srcf)return false;
-    if(f.ff&&l.flatType!==f.ff)return false;
-    if(f.fdf&&l.facingDir!==f.fdf)return false;
-    if(f.ppf&&l.paymentPlan!==f.ppf)return false;
-    if(f.cf&&(l.city||'')!==f.cf)return false;
-    if(f.tf2&&(l.territory||'')!==f.tf2)return false;
-    if(f.vf){var val=parseInt(String(l.value).replace(/[^\d]/g,''))||0;if(f.vf==='low'&&val>=10000000)return false;if(f.vf==='mid'&&(val<10000000||val>50000000))return false;if(f.vf==='high'&&val<=50000000)return false;}
-    if(f.scf){var sc=calcLeadScore(l);if(f.scf==='hot'&&sc<80)return false;if(f.scf==='warm'&&(sc<60||sc>=80))return false;if(f.scf==='cold'&&sc>=60)return false;}
-    return true;
-  });
+  return mockLeads.filter(function(l){return _leadMatches(l,f);});
 }
 const GROUPS_LOOKUP = {dashboard:'executive',analytics:'executive',reports:'executive',bi_reports:'executive',customers:'sales_crm',crm:'sales_crm',sales_marketing:'sales_crm',contacts:'sales_crm',proposals:'sales_crm',land_mgmt:'land_projects',plots:'land_projects',layout_builder:'land_projects',projects:'land_projects',compliance:'legal_compliance',legal_contracts:'legal_compliance',bookings:'bookings_customer',customer_portal:'bookings_customer',handover:'bookings_customer',dues_recovery:'bookings_customer',ticketing:'bookings_customer',contractors:'construction',boq:'finance_admin',variation_orders:'construction',equipment:'construction',labor:'construction',qc:'legal_compliance',designs:'construction',stock:'hr_admin',finance:'finance_admin',approvals:'finance_admin',payment_reminders:'bookings_customer',hr:'hr_admin',documents:'hr_admin',knowledge_base:'hr_admin',tasks:'collaboration',workspace:'collaboration',calendar:'collaboration',announcements:'collaboration',notifications_page:'collaboration',settings:'system'};
 
@@ -14575,6 +14576,84 @@ function captureFilters(modId){
     }
   }
   return f;
+}
+// ---- Faceted filter bar (shared) ----
+var _FLT_IDS={
+  crm:{sq:'crmSearch',sf:'crmFStatus',pf:'crmFPriority',tf:'crmFType',vf:'crmFValRange',scf:'crmFScore',of:'crmFOwner',srcf:'crmFSource',ff:'crmFFlatType',fdf:'crmFFacing',ppf:'crmFPlan',cf:'crmFCity',tf2:'crmFTerr'},
+  bookings:{search:'bkgSearch',status:'bkgStatus'},
+  payments:{search:'paySearch',method:'payMethod',status:'payStatus'}
+};
+function _fltClearOne(modId,key){
+  var ids=_FLT_IDS[modId]||{};var id=ids[key];
+  if(id){var el=document.getElementById(id);if(el)el.value='';}
+  if(_PG[modId])_PG[modId]={page:1,perPage:_pgPerPage};
+  renderModule();
+}
+function _fltClear(modId){
+  var ids=_FLT_IDS[modId]||{};
+  Object.keys(ids).forEach(function(k){var el=document.getElementById(ids[k]);if(el)el.value='';});
+  if(_PG[modId])_PG[modId]={page:1,perPage:_pgPerPage};
+  renderModule();
+}
+function renderFltChips(modId,f,labels,total,shown){
+  var chips=[];
+  Object.keys(labels).forEach(function(k){
+    var v=f[k];
+    if(v){chips.push('<span class="flt-chip">'+_esc(labels[k]+': '+v)+'<span class="flt-x" onclick="event.stopPropagation();_fltClearOne(\''+modId+'\',\''+k+'\')" title="Remove filter">✕</span></span>');}
+  });
+  if(chips.length){
+    return '<div class="flt-bar"><span class="flt-count">'+shown+' of '+total+'</span>'+chips.join('')+'<button class="action-btn secondary" onclick="_fltClear(\''+modId+'\')" style="padding:2px 6px;font-size:8px;margin-left:2px">✕ Clear all</button></div>';
+  }
+  return '<div class="flt-bar" style="justify-content:flex-end"><span class="flt-count">'+total+' records</span></div>';
+}
+function _fopts(opts,counts,cur,labelFn){
+  return opts.map(function(o){
+    var val=(typeof o==='object')?o.v:o;
+    var lab=(typeof o==='object')?o.l:o;
+    if(labelFn)lab=labelFn(val,lab);
+    var n=(counts&&counts[val]!==undefined)?counts[val]:0;
+    return '<option value="'+val+'"'+(cur===val?' selected':'')+'>'+lab+' ('+n+')</option>';
+  }).join('');
+}
+function _fltCounts(base,field){
+  var c={};
+  base.forEach(function(r){var v=r[field]||'';c[v]=(c[v]||0)+1;});
+  return c;
+}
+// Lead matcher (shared by filterLeads + facet counts)
+function _leadMatches(l,f){
+  if(f.sq&&l.name.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.phone.indexOf(f.sq)===-1&&l.property.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.source.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.email.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.facingDir.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.floorPref.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.flatType.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.sizeSqFt||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1&&l.paymentPlan.toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.city||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1&&(l.state||'').toLowerCase().indexOf(f.sq.toLowerCase())===-1)return false;
+  if(f.sf&&l.status!==f.sf)return false;
+  if(f.pf&&l.priority!==f.pf)return false;
+  if(f.tf&&l.type!==f.tf)return false;
+  if(f.of==='_unassigned'&&l.owner!=='Unassigned')return false;else if(f.of&&f.of!=='_unassigned'&&l.owner!==f.of)return false;
+  if(f.srcf&&l.source!==f.srcf)return false;
+  if(f.ff&&l.flatType!==f.ff)return false;
+  if(f.fdf&&l.facingDir!==f.fdf)return false;
+  if(f.ppf&&l.paymentPlan!==f.ppf)return false;
+  if(f.cf&&(l.city||'')!==f.cf)return false;
+  if(f.tf2&&(l.territory||'')!==f.tf2)return false;
+  if(f.vf){var val=parseInt(String(l.value).replace(/[^\d]/g,''))||0;if(f.vf==='low'&&val>=10000000)return false;if(f.vf==='mid'&&(val<10000000||val>50000000))return false;if(f.vf==='high'&&val<=50000000)return false;}
+  if(f.scf){var sc=calcLeadScore(l);if(f.scf==='hot'&&sc<80)return false;if(f.scf==='warm'&&(sc<60||sc>=80))return false;if(f.scf==='cold'&&sc>=60)return false;}
+  return true;
+}
+function _leadFacetCounts(f){
+  var cnt={};
+  ['status','priority','type','source','flatType','facingDir','paymentPlan','city','territory','owner'].forEach(function(k){
+    var counts={};
+    mockLeads.forEach(function(l){
+      var ff={};for(var x in f)ff[x]=f[x];ff[k]='';
+      if(_leadMatches(l,ff)){var v=l[k]||'';if(k==='owner'&&(!v||v==='Unassigned'))v='_unassigned';counts[v]=(counts[v]||0)+1;}
+    });
+    cnt[k]=counts;
+  });
+  var lc={low:0,mid:0,high:0};
+  mockLeads.forEach(function(l){var ff={};for(var x in f)ff[x]=f[x];ff.vf='';if(!_leadMatches(l,ff))return;var val=parseInt(String(l.value).replace(/[^\d]/g,''))||0;if(val<10000000)lc.low++;else if(val<=50000000)lc.mid++;else lc.high++;});
+  cnt.vf=lc;
+  var sc={hot:0,warm:0,cold:0};
+  mockLeads.forEach(function(l){var ff={};for(var x in f)ff[x]=f[x];ff.scf='';if(!_leadMatches(l,ff))return;var s=calcLeadScore(l);if(s>=80)sc.hot++;else if(s>=60)sc.warm++;else sc.cold++;});
+  cnt.scf=sc;
+  return cnt;
 }
 function applyFilters(modId,f){
   if(!f)return;
