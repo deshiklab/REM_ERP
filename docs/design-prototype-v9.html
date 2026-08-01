@@ -977,7 +977,7 @@
       <div class="top-actions" style="position:relative">
         <div id="mobileNavBtn" onclick="openMobileNav()" title="Modules"><span class="mn-label" id="mobileNavBtnLabel">Dashboard</span><span style="font-size:8px">▾</span></div>
         <div id="searchWrap">
-          <div id="searchBar" tabindex="-1" onclick="openCommandPalette()" title="Search anything (Ctrl+K)" style="cursor:pointer">
+          <div id="searchBar" tabindex="-1" onclick="openSearchDropdown()" title="Search anything (Ctrl+K)" style="cursor:pointer">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="gsInput" placeholder="Search anything..." oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
             <span class="kbd">⌘K</span>
@@ -9464,6 +9464,24 @@ function crudReceivePayment(){
         type:'Inflow',category:document.getElementById('rp_cat').value,status:document.getElementById('rp_stat').value,amount:amt,
         fmt:'+ \u09F3'+amt.toLocaleString('en-IN')
       },'transactions');
+      // A2 mirror: auto-adjust linked invoice + customer dues ledger
+      var cli=document.getElementById('rp_client').value;
+      var descTxt=document.getElementById('rp_desc').value||'Payment from '+cli;
+      var invR=mockInvoices.find(function(x){return String(x.client)===cli&&x.status!=='Paid';});
+      if(invR&&amt>0){
+        mockPayments.push({id:'PAY-'+(100+Math.floor(Math.random()*900)),invoiceId:invR.id,leadId:null,client:cli,amount:amt,date:new Date().toISOString().slice(0,10),method:'Bank Transfer',reference:descTxt,status:'Cleared',notes:''});
+        var paidR=mockPayments.filter(function(p){return p.invoiceId===invR.id;}).reduce(function(s,p){return s+(p.amount||0);},0);
+        invR.status=(paidR>=invR.amount)?'Paid':(invR.status==='Paid'?'Paid':'Partial');
+        DB.save('payments');DB.save('invoices');
+      }
+      var dueR=mockDues.find(function(x){return String(x.customer)===cli;});
+      if(dueR&&amt>0){
+        dueR.paid=(dueR.paid||0)+amt;
+        dueR.due=Math.max(0,(dueR.due||0)-amt);
+        if(dueR.due<=0){dueR.due=0;dueR.status='Paid';dueR.bucket='Cleared';dueR.daysOverdue=0;}
+        else{dueR.status='Upcoming';dueR.bucket='On Track';dueR.daysOverdue=0;}
+        DB.save('dues');
+      }
       showToast('Payment recorded!','success');renderModule();
     }
   );
@@ -11117,6 +11135,7 @@ function _sdSaveRecent(q){
   localStorage.setItem('sd_recent',JSON.stringify(_sdRecent));
 }
 function openSearchDropdown(){
+  if(typeof closeCommandPalette==='function')closeCommandPalette();
   document.getElementById('searchDropdown').classList.add('active');
   var inp=document.getElementById('sdInput');
   var gs=document.getElementById('gsInput');
@@ -16783,7 +16802,7 @@ function _isTypingTarget(e){
 }
 function showShortcutsHelp(){
   var rows=[
-    ['⌘K / Ctrl+K','Open command palette'],
+    ['⌘K / Ctrl+K','Open global search'],
     ['/','Open command palette'],
     ['g then c','Go to Customers'],
     ['g then b','Go to Bookings'],
@@ -16802,12 +16821,6 @@ function showShortcutsHelp(){
   openModal('⌨ Keyboard Shortcuts', body, '<button class="drawer-btn primary" onclick="closeDrawer()">Close</button>');
 }
 document.addEventListener('keydown',function(e){
-  // ⌘K / Ctrl+K — works everywhere
-  if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')){
-    e.preventDefault();
-    toggleCommandPalette();
-    return;
-  }
   // Esc — works everywhere
   if(e.key==='Escape'){
     var ov=document.getElementById('cpOverlay');

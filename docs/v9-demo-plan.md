@@ -1,6 +1,6 @@
 # V9 Next Phase — MARS Client Demo Run-Through (Demo-Ready Polish)
 
-**Status:** Phase A ✅ DONE (SW v9-v5) · Phase B ✅ DONE (SW v9-v5) · Phase C ⏳ QUEUED · Phase D ⏳ QUEUED
+**Status:** Phase A ✅ DONE (SW v9-v5) · Phase B ✅ DONE (SW v9-v5) · Phase C ✅ DONE (SW v9-v5) · Phase D ✅ DONE (SW v9-v5)
 **Base:** af2ad06 (SW v9-v4, RBAC complete) · **Target:** SW v9-v5
 **Why this phase:** "Client demo polish — run through the flow as if presenting to MARS" was
 user-selected earlier but never delivered. Role dashboards (v9-v2) + role-based access (v9-v4)
@@ -83,6 +83,8 @@ Include a **demo cheat sheet**: keyboard shortcuts, exact records to create, num
 - Offline (SW `rem-erp-v9-v5`) still serves after changes.
 - Pristine counts verified before presenting.
 - Refresh `/tmp/REM-ERP-v9-latest.html`; commit + push `master`.
+
+**Results (2026-08-01):** All 9 script steps PASS against live build — Step 1 SW/offline (cache holds current HTML incl. fixes), Step 2 exec + Ctrl+K global search (fixed double-handler conflict → data search only, palette on `/`), Step 3 projects/inventory (12/৳626 Cr, P-101 65%, stock Critical 3/Warning 2), Step 4 full sales cycle (lead → Contacted/Site Visit/Negotiation → convert → BKG-118, Jolshiri-only picker, 19-installment schedule), Step 5 Finance receive (INV-002 → Partial, dues 10L→5L Upcoming, PAY + inflow — `crudReceivePayment` now mirrors A2; button only existed in CRM before), Step 6 Engineer (P-101 65→72%, stock alerts), Step 7 Permissions (9-role matrix, CRM Create off → + Add Lead gone; on → back), Step 8 Portal (Rubina login → dues ৳5L reflects Step 5 payment live), Step 9 Print Report (clean exec report). Console: 0 app JS errors (2 empty exceptions were test-stub artifacts, not reproducible with error hooks). Pristine restored 25/17/12/12/20. Committed + pushed.
 
 ---
 
