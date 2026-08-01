@@ -5,4 +5,5 @@ venv/
 node_modules/
 dist/
 *.db
+!backend/rem_erp.db
 .DS_Store
