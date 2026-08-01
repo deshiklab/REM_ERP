@@ -1063,7 +1063,7 @@ const GROUPS = {
   land_projects: { label:'Projects',icon:'🏗️',mods:[{id:'land_mgmt',    label:'Project Acquisition',badge:false},{id:'properties_units', label:'Flats & Units', badge:true},{id:'plots',label:'Plots & Blocks'},{id:'layout_builder',label:'Layout & Unit Builder',badge:true},{id:'projects',label:'Projects'}] },
   bookings_customer:{label:'Bookings & Customer',icon:'📋',mods:[{id:'bookings',label:'Bookings'},{id:'customer_portal',label:'Customer Portal'},{id:'handover',label:'Handover & Post-Sales'},{id:'dues_recovery',label:'Dues & Recovery'},{id:'ticketing',label:'Ticketing & Issue',badge:true}] },
   construction:  { label:'Engineering & Construction',  icon:'🔧', mods:[{id:'contractors',  label:'Contractors'},{id:'variation_orders',label:'Variation Orders',badge:true},{id:'equipment',label:'Equipment'},{id:'labor',label:'Labor Mgmt'},{id:'designs',label:'Design Mgmt'}] },
-  finance_admin: { label:'Accounts & Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'approvals',label:'Financial Approvals',badge:true},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'investment_loans',label:'Investment & Loans'}] },
+  finance_admin: { label:'Accounts & Finance',icon:'💰',mods:[{id:'finance',      label:'Finance'},{id:'party_ledger',label:'Party Ledger'},{id:'payment_heatmap',label:'Payment Heatmap',badge:true},{id:'approvals',label:'Financial Approvals',badge:true},{id:'boq',label:'BOQ & Cost Control',badge:true},{id:'investment_loans',label:'Investment & Loans'}] },
   hr_admin:      { label:'Admin & Operations',icon:'💼',mods:[{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'},{id:'stock',label:'Stock & Procurement'}] },
   legal_compliance:{label:'Legal & Compliance',icon:'⚖️',mods:[{id:'compliance',label:'Compliance',badge:true},{id:'legal_contracts',label:'Legal Contracts',badge:true},{id:'qc',label:'QC & Inspection'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'calendar',label:'Calendar',badge:true},{id:'announcements',label:'Announcements',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
@@ -2477,6 +2477,7 @@ function switchModule(mod,skipSkel) {
       case 'qc': renderQC(el); break;
       case 'designs': renderDesigns(el); break;
       case 'finance': renderFinance(el); break;
+      case 'party_ledger': renderPartyLedger(el); break;
       case 'approvals': renderApprovals(el); break;
       case 'legal_contracts': renderLegalContracts(el); break;
       case 'stock': renderStock(el); break;
@@ -3911,7 +3912,7 @@ function openInvoice(id){
           return '<div class="installment-item"><div><div style="font-size:10px;font-weight:500">'+p.id+'</div><div style="font-size:9px;color:#888">'+p.date+' · '+p.method+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div><span style="font-size:8px;color:'+(p.status==='Cleared'?'#2e7d32':'#e65100')+'">'+p.status+'</span></div></div>';
         }).join(''):'')+
     '</div>',
-    actions+'<button class="action-btn secondary" onclick="printInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
+    actions+'<button class="action-btn primary" onclick="closeModal();openClientCollect(\''+String(inv.client||'').replace(/'/g,"\'")+'\')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">💳 Collect</button> <button class="action-btn secondary" onclick="printInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
   );
 }
 function markInvoicePaid(id){
@@ -4139,44 +4140,309 @@ function crudPayment(item){
     function(){
       var d={id:pymt.id,invoiceId:document.getElementById('f_payInv').value||null,leadId:pymt.leadId,client:g('f_payClient'),amount:parseInt(g('f_payAmt'))||0,date:g('f_payDate'),method:g('f_payMethod'),reference:g('f_payRef')||'',status:g('f_payStatus')||'Pending',notes:g('f_payNotes')||''};
       if(n)d.id=nextId(mockPayments,'PAY-');
-      var amt=d.amount||0;
-      var delta=amt-(n?0:(pymt.amount||0));
-      var oldInvId=!n?(pymt.invoiceId||null):null;
       n?addItem(mockPayments,d,'payments'):updateItem(mockPayments,pymt.id,d,'payments');
-      // A2: auto-adjust linked invoice + customer dues + cash-flow transaction (+ booking schedule)
-      if(d.invoiceId&&amt>0){
-        var inv=mockInvoices.find(function(x){return x.id===d.invoiceId;});
-        if(inv){
-          var paid=mockPayments.filter(function(p){return p.invoiceId===inv.id&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
-          inv.status=(paid>=inv.amount)?'Paid':(inv.status==='Paid'?'Paid':'Partial');
-          DB.save('invoices');
-        }
-      }
-      if(!n&&oldInvId&&oldInvId!==d.invoiceId){
-        var invOld=mockInvoices.find(function(x){return x.id===oldInvId;});
-        if(invOld){
-          var paidOld=mockPayments.filter(function(p){return p.invoiceId===invOld.id&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
-          invOld.status=(paidOld>=invOld.amount)?'Paid':(paidOld>0?'Partial':(invOld.status==='Overdue'?'Overdue':'Sent'));
-          DB.save('invoices');
-        }
-      }
-      if(d.client&&delta!==0){
-        var due=mockDues.find(function(x){return String(x.customer)===String(d.client);});
-        if(due){
-          due.paid=Math.max(0,(due.paid||0)+delta);
-          due.due=Math.max(0,(due.due||0)-delta);
-          if(due.due<=0){due.due=0;due.status='Paid';due.bucket='Cleared';due.daysOverdue=0;}
-          else{due.status='Upcoming';due.bucket='On Track';due.daysOverdue=0;}
-          DB.save('dues');
-        }
-      }
-      if(n&&amt>0){
-        mockTransactions.unshift({id:'RCP-'+Math.floor(1000+Math.random()*9000),date:d.date||new Date().toISOString().slice(0,10),desc:'Payment - '+(d.client||''),client:d.client||'',project:'',type:'Inflow',category:'Payment Received',status:'Received',amount:amt,fmt:'+ \u09F3'+amt.toLocaleString('en-IN')});
-        DB.save('transactions');
-      }
-      if(amt>0)applyPaymentToSchedule(d.client,amt);
+      applyPaymentRipple(d,n?null:pymt);
     }
   );
+}
+// ═══ PAYMENT / INVOICE RIPPLE HELPERS (shared by collect, approve, reconcile) ═══
+function invoiceOutstanding(invId){
+  var inv=mockInvoices.find(function(x){return x.id===invId;});if(!inv)return 0;
+  var paid=mockPayments.filter(function(p){return p.invoiceId===invId&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
+  return Math.max(0,(inv.amount||0)-paid);
+}
+function recomputeInvoiceStatus(invId){
+  var inv=mockInvoices.find(function(x){return x.id===invId;});if(!inv)return;
+  var paid=mockPayments.filter(function(p){return p.invoiceId===invId&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
+  if(paid>=inv.amount){inv.status='Paid';}
+  else if(paid>0){inv.status=(inv.status==='Paid'?'Paid':'Partial');}
+  else{inv.status=(inv.status==='Overdue'||inv.status==='Draft'?inv.status:'Sent');}
+  DB.save('invoices');
+}
+// Full ripple for a payment record: Cleared payments move invoice status, customer dues,
+// cash-flow transactions and the booking installment schedule. Pending payments stay inert
+// until approved (approval = flip to Cleared and ripple).
+function applyPaymentRipple(d,prev){
+  var amt=d.amount||0;
+  var wasCleared=prev?(prev.status==='Cleared'):false;
+  var isCleared=d.status==='Cleared';
+  var delta=(isCleared?amt:0)-(wasCleared?(prev.amount||0):0);
+  var oldInvId=prev?(prev.invoiceId||null):null;
+  if(d.invoiceId&&isCleared&&amt>0)recomputeInvoiceStatus(d.invoiceId);
+  if(prev&&oldInvId&&oldInvId!==d.invoiceId)recomputeInvoiceStatus(oldInvId);
+  if(d.client&&delta!==0){
+    var due=mockDues.find(function(x){return String(x.customer)===String(d.client);});
+    if(due){
+      due.paid=Math.max(0,(due.paid||0)+delta);
+      due.due=Math.max(0,(due.due||0)-delta);
+      if(due.due<=0){due.due=0;due.status='Paid';due.bucket='Cleared';due.daysOverdue=0;}
+      else{due.status='Upcoming';due.bucket='On Track';due.daysOverdue=0;}
+      DB.save('dues');
+    }
+  }
+  if(isCleared&&!wasCleared&&amt>0){
+    mockTransactions.unshift({id:'RCP-'+Math.floor(1000+Math.random()*9000),date:d.date||new Date().toISOString().slice(0,10),desc:'Payment - '+(d.client||''),client:d.client||'',project:'',type:'Inflow',category:'Payment Received',status:'Received',amount:amt,fmt:'+ \u09F3'+amt.toLocaleString('en-IN')});
+    DB.save('transactions');
+    applyPaymentToSchedule(d.client,amt);
+  }
+}
+function unpaidInvoicesFor(client){
+  return mockInvoices.filter(function(i){
+    if(i.type==='Purchase')return false;
+    var c=String(i.client||'');
+    if(client&&c!==String(client))return false;
+    return i.status!=='Paid'&&invoiceOutstanding(i.id)>0;
+  });
+}
+
+// ═══ PARTY LEDGER (customers · suppliers · brokers · employees) ═══
+var partyTab='parties';
+function partyOutstanding(type,name){
+  if(type==='Customer'){
+    var d=mockDues.find(function(x){return String(x.customer)===String(name);});
+    if(d)return d.due||0;
+    var c=mockCustomers.find(function(x){return x.name===name;});
+    return c?(c.duesNum||0):0;
+  }
+  if(type==='Supplier'){
+    return mockInvoices.filter(function(i){return i.type==='Purchase'&&String(i.supplier)===String(name)&&i.status!=='Paid';}).reduce(function(s,i){return s+invoiceOutstanding(i.id);},0);
+  }
+  if(type==='Broker'){
+    var b=mockBrokers.find(function(x){return x.name===name;});
+    return b?(parseInt(String(b.commissionPaid||'0').replace(/[^0-9]/g,''))||0):0;
+  }
+  return 0;
+}
+function partyRows(){
+  var out=[];
+  mockCustomers.forEach(function(c){out.push({name:c.name,type:'Customer',phone:c.phone||'',email:c.email||'',out:partyOutstanding('Customer',c.name),status:c.status||'Active',company:c.entityType==='company'?'Company':'Individual'});});
+  mockSuppliers.forEach(function(s){out.push({name:s.name,type:'Supplier',phone:s.phone||'',email:s.email||'',out:partyOutstanding('Supplier',s.name),status:s.status||'Active',company:s.type||''});});
+  mockBrokers.forEach(function(b){out.push({name:b.name,type:'Broker',phone:b.phone||'',email:b.email||'',out:partyOutstanding('Broker',b.name),status:b.status||'Active',company:b.tier||''});});
+  mockEmployees.forEach(function(e){out.push({name:e.name,type:'Employee',phone:e.phone||'',email:e.email||'',out:0,status:e.status||'active',company:e.dept||''});});
+  return out;
+}
+function renderPartyLedger(el){
+  var rows=partyRows();
+  var recv=rows.filter(function(r){return r.type==='Customer';}).reduce(function(s,r){return s+r.out;},0);
+  var pay=rows.filter(function(r){return r.type==='Supplier';}).reduce(function(s,r){return s+r.out;},0);
+  var pend=mockPayments.filter(function(p){return p.status==='Pending';}).length;
+  var unpaid=unpaidInvoicesFor(null).length;
+  el.innerHTML='<div class="fade-in"><div class="page-title">Party Ledger</div><div class="page-subtitle">'+rows.length+' parties · Receivable \u09F3'+(recv/100000).toFixed(1)+'L · Payable \u09F3'+(pay/100000).toFixed(1)+'L · '+pend+' pending approval</div>'+
+    '<div class="toolbar" style="margin-bottom:6px"><div class="tabs">'+
+    [['parties','👥 Parties'],['unpaid','🧾 Unpaid Invoices'+(unpaid?' · '+unpaid:'')],['approvals','✅ Approvals'+(pend?' · '+pend:'')]].map(function(t){
+      return '<div class="tab '+(partyTab===t[0]?'active':'')+'" onclick="partyTab=\''+t[0]+'\';_PG={};renderModule()">'+t[1]+'</div>';
+    }).join('')+'</div></div>'+
+    (partyTab==='parties'?renderPartyParties(rows):partyTab==='unpaid'?renderPartyUnpaid():renderPartyApprovals())+
+  '</div>';
+}
+function renderPartyParties(rows){
+  var tf=(document.getElementById('partyType')||{}).value||'All';
+  var f=rows.filter(function(r){return tf==='All'||r.type===tf;});
+  var recv=f.filter(function(r){return r.type==='Customer';}).reduce(function(s,r){return s+r.out;},0);
+  var pay=f.filter(function(r){return r.type==='Supplier';}).reduce(function(s,r){return s+r.out;},0);
+  return '<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(110px,1fr))">'+[
+    ['Parties',f.length,'#1565c0'],['Receivable','\u09F3'+(recv/100000).toFixed(1)+'L','#c62828'],['Payable','\u09F3'+(pay/100000).toFixed(1)+'L','#e65100'],
+    ['Customers',f.filter(function(r){return r.type==='Customer';}).length,'#2e7d32'],['Suppliers',f.filter(function(r){return r.type==='Supplier';}).length,'#7b1fa2'],
+    ['Brokers',f.filter(function(r){return r.type==='Broker';}).length,'#00838f'],['Employees',f.filter(function(r){return r.type==='Employee';}).length,'#555']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="font-size:14px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px"><select id="partyType" onchange="renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="All">All Parties</option>'+['Customer','Supplier','Broker','Employee'].map(function(t){return '<option value="'+t+'"'+(tf===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select><div class="spacer"></div>'+
+    '<button class="action-btn primary" onclick="showToast(\'Parties are managed from Customers / Suppliers / Brokers / HR modules\',\'info\')" style="padding:3px 8px;font-size:10px">+ Add Party</button></div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Party</th><th>Type</th><th>Contact</th><th>Category</th><th class="num">Outstanding</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (f.length?f.map(function(r){
+    var stc=r.out>0?(r.type==='Customer'?'#c62828':'#e65100'):'#2e7d32';
+    return '<tr style="cursor:pointer" onclick="openPartyDetail(\''+String(r.name).replace(/'/g,"\'")+'\',\''+r.type+'\')">'+
+      '<td style="font-weight:600">'+r.name+'</td><td><span class="badge-status '+(r.type==='Customer'?'badge-active':r.type==='Supplier'?'badge-pending':r.type==='Broker'?'badge-reserved':'')+'" style="font-size:8px">'+r.type+'</span></td>'+
+      '<td style="font-size:9px;color:#555">'+r.phone+'<br><span style="font-size:8px;color:#888">'+r.email+'</span></td><td style="font-size:9px">'+r.company+'</td>'+
+      '<td class="num" style="font-weight:600;color:'+stc+'">'+(r.out>0?'\u09F3'+r.out.toLocaleString('en-IN'):'—')+'</td>'+
+      '<td><span class="badge-status '+(r.status==='Active'||r.status==='active'?'badge-active':r.status==='Overdue'||r.status==='Delinquent'?'badge-sold':'badge-pending')+'" style="font-size:8px">'+r.status+'</span></td>'+
+      '<td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openPartyDetail(\''+String(r.name).replace(/'/g,"\'")+'\',\''+r.type+'\')">\uD83D\uDC41</span></td></tr>';
+  }).join(''):'<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;font-size:11px">No parties match</td></tr>')+
+  '</tbody></table></div></div></div>';
+}
+function openPartyDetail(name,type){
+  var recs=[];
+  mockInvoices.forEach(function(i){
+    var pn=(i.type==='Purchase'?i.supplier:i.client)||'';
+    if(String(pn)!==String(name))return;
+    recs.push({kind:i.type==='Purchase'?'p-inv':'inv',id:i.id,date:i.issuedDate||i.dueDate,label:i.type==='Purchase'?'Purchase '+i.id:'Invoice '+i.id,amt:(i.type==='Purchase'?-1:1)*(i.amount||0),status:i.status});
+  });
+  mockPayments.forEach(function(p){
+    if(String(p.client)!==String(name))return;
+    recs.push({kind:'pay',id:p.id,date:p.date,label:'Payment '+p.id,amt:(p.amount||0),status:p.status});
+  });
+  recs.sort(function(a,b){return String(a.date).localeCompare(String(b.date));});
+  var bal=0;
+  var rows=recs.map(function(r){
+    bal+=r.amt;
+    return '<tr><td style="font-size:9px;color:#888">'+r.date+'</td><td style="font-weight:500;font-size:10px;color:'+(r.kind==='p-inv'?'#e65100':r.kind==='pay'?'#2e7d32':'#2F80ED')+'">'+r.label+'</td><td class="num" style="font-size:10px;font-weight:600;color:'+(r.amt>=0?'#2e7d32':'#c62828')+'">'+(r.amt>=0?'+':'−')+'\u09F3'+Math.abs(r.amt).toLocaleString('en-IN')+'</td><td class="num" style="font-size:10px;font-weight:700">\u09F3'+bal.toLocaleString('en-IN')+'</td></tr>';
+  }).join('');
+  var isCust=type==='Customer';
+  openModal('📒 '+name+' — '+type+' Ledger',
+    '<div style="max-height:55vh;overflow-y:auto">'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">'+[
+      ['Party',name],['Type',type],['Outstanding',partyOutstanding(type,name)>0?'\u09F3'+partyOutstanding(type,name).toLocaleString('en-IN'):'—'],['Running Balance',recs.length?'\u09F3'+bal.toLocaleString('en-IN'):'No ledger activity']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div style="font-size:11px;font-weight:600">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<table style="width:100%;font-size:10px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px;color:#888">Date</th><th style="text-align:left;padding:4px;color:#888">Entry</th><th class="num" style="padding:4px;color:#888">Amount</th><th class="num" style="padding:4px;color:#888">Balance</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4" style="text-align:center;color:#999;padding:20px">No ledger entries</td></tr>')+'</tbody></table>'+
+    (isCust?'<div style="margin-top:10px;padding:8px;background:#eef3ff;border-radius:6px;font-size:9px;color:#2F80ED">💡 Customer payments are processed against their unpaid / overdue invoices from the Collect screen.</div>':'')+
+    '</div>',
+    (isCust?'<button class="drawer-btn secondary" onclick="closeDrawer()">Close</button><button class="drawer-btn primary" onclick="closeDrawer();openClientCollect(\''+String(name).replace(/'/g,"\'")+'\')">💳 Collect Payment</button>':'<button class="drawer-btn primary" onclick="closeDrawer()">Close</button>')
+  );
+}
+
+// ═══ CLIENT COLLECT FLOW (unpaid / overdue invoice list → single or batch payment) ═══
+function openClientCollect(client){
+  var invs=unpaidInvoicesFor(client);
+  if(!invs.length){showToast(client+' has no unpaid invoices','info');return;}
+  window._collectClient=client;
+  var total=invs.reduce(function(s,i){return s+invoiceOutstanding(i.id);},0);
+  var body='<div style="font-size:10px;color:#555;padding:6px 8px;background:#eef3ff;border-radius:6px;margin-bottom:8px">💰 '+client+' — '+invs.length+' unpaid invoice(s) · Outstanding <b style="color:#c62828">\u09F3'+total.toLocaleString('en-IN')+'</b></div>'+
+    '<div style="max-height:42vh;overflow-y:auto;padding-right:2px">'+
+    invs.map(function(inv){
+      var out=invoiceOutstanding(inv.id);
+      var st=inv.status==='Overdue'?'<span style="color:#c62828;font-weight:700">OVERDUE</span>':'<span style="color:#e65100;font-weight:700">UNPAID</span>';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #eee;border-radius:6px;margin-bottom:6px;background:#fff">'+
+        '<input type="checkbox" class="cl-inv" value="'+inv.id+'" checked onchange="collectSelUpdate()">'+
+        '<div style="flex:1">'+
+        '<div style="font-size:10px;font-weight:600">'+inv.id+' '+st+'</div>'+
+        '<div style="font-size:8px;color:#888">'+(inv.desc||'')+' · Due '+inv.dueDate+'</div>'+
+        '<div style="font-size:9px;margin-top:2px">Outstanding <b style="color:#c62828">\u09F3'+out.toLocaleString('en-IN')+'</b> of \u09F3'+(inv.amount||0).toLocaleString('en-IN')+'</div>'+
+        '</div>'+
+        '<div style="text-align:right"><div style="font-size:8px;color:#888">Amount (\u09F3)</div><input type="number" class="cl-amt" data-id="'+inv.id+'" value="'+out+'" min="1" max="'+out+'" onchange="collectSelUpdate()" style="width:118px;padding:4px 6px;font-size:10px;border:1px solid #e0e0e0;border-radius:4px;text-align:right"></div>'+
+        '</div>';
+    }).join('')+'</div>'+
+    formRow(selectField('Method','cl_method','Bank Transfer',['Bank Transfer','Cheque','Cash','Online']),inputField('Date','cl_date',new Date().toISOString().slice(0,10)))+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px"><span style="font-size:10px;color:#555" id="clTotal">Selected: \u09F3'+total.toLocaleString('en-IN')+'</span>'+
+    '<span style="font-size:8px;color:#999">💡 Partial amounts allowed — enter less than the outstanding</span></div>';
+  openModal('💰 Collect Payment — '+client, body,
+    '<button class="drawer-btn secondary" onclick="closeDrawer()">Cancel</button>'+
+    '<button class="drawer-btn secondary" onclick="collectSelAll(true)" style="margin-right:4px">All</button>'+
+    '<button class="drawer-btn secondary" onclick="collectSelAll(false)" style="margin-right:4px">None</button>'+
+    '<button class="drawer-btn primary" onclick="collectClientSubmit(\'Cleared\')">💳 Collect Selected</button>'+
+    '<button class="drawer-btn" onclick="collectClientSubmit(\'Pending\')" style="background:#fff;color:#e65100;border:1px solid #ffcc80">📋 Queue for Approval</button>');
+}
+function collectSelUpdate(){
+  var sel=0;
+  document.querySelectorAll('.cl-inv:checked').forEach(function(cb){
+    var amt=parseInt(document.querySelector('.cl-amt[data-id="'+cb.value+'"]').value)||0;
+    sel+=amt;
+  });
+  var el=document.getElementById('clTotal');if(el)el.textContent='Selected: \u09F3'+sel.toLocaleString('en-IN');
+}
+function collectSelAll(on){
+  document.querySelectorAll('.cl-inv').forEach(function(cb){cb.checked=on;});
+  collectSelUpdate();
+}
+function collectClientSubmit(status){
+  var made=0,skipped=0;
+  document.querySelectorAll('.cl-inv:checked').forEach(function(cb){
+    var invId=cb.value;
+    var amt=parseInt(document.querySelector('.cl-amt[data-id="'+invId+'"]').value)||0;
+    var out=invoiceOutstanding(invId);
+    if(amt<=0||amt>out){skipped++;return;}
+    var d={id:nextId(mockPayments,'PAY-'),invoiceId:invId,leadId:null,client:window._collectClient,amount:amt,date:g('cl_date')||new Date().toISOString().slice(0,10),method:g('cl_method')||'Bank Transfer',reference:'Collect - '+invId,status:status,notes:''};
+    mockPayments.push(d);DB.save('payments');
+    applyPaymentRipple(d,null);
+    made++;
+  });
+  closeDrawer();
+  if(made){showToast(made+' payment(s) '+(status==='Cleared'?'collected':'queued for approval')+' ✅','success');renderModule();}
+  else showToast(skipped?'Amounts exceed outstanding or are invalid':'Nothing selected','error');
+}
+
+// ═══ UNPAID INVOICE REGISTER + BATCH PAYMENT PROCESS ═══
+function renderPartyUnpaid(){
+  var invs=unpaidInvoicesFor(null);
+  var tot=invs.reduce(function(s,i){return s+invoiceOutstanding(i.id);},0);
+  return '<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">'+[
+    ['Unpaid Invoices',invs.length,'#e65100'],['Outstanding','\u09F3'+(tot/100000).toFixed(1)+'L','#c62828'],
+    ['Overdue',invs.filter(function(i){return i.status==='Overdue';}).length,'#c62828'],['Partial',invs.filter(function(i){return i.status==='Partial';}).length,'#1565c0']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="font-size:14px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="toolbar" style="margin-bottom:6px"><span style="font-size:9px;color:#888">Tick invoices to batch-process into the approval queue, or open a client to collect directly.</span><div class="spacer"></div>'+
+  '<button class="action-btn primary" onclick="batchQueueSelected()" style="padding:3px 8px;font-size:10px">📋 Batch to Approval</button></div>'+
+  '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th></th><th>Invoice</th><th>Client</th><th>Description</th><th class="num">Amount</th><th class="num">Outstanding</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>'+
+  (invs.length?invs.map(function(inv){
+    var out=invoiceOutstanding(inv.id);
+    var stc={Overdue:'#c62828',Partial:'#1565c0',Sent:'#e65100',Draft:'#888'}[inv.status]||'#e65100';
+    return '<tr>'+
+      '<td><input type="checkbox" class="un-inv" value="'+inv.id+'"></td>'+
+      '<td style="font-weight:600;color:#2F80ED;cursor:pointer" onclick="openInvoice(\''+inv.id+'\')">'+inv.id+'</td>'+
+      '<td style="font-weight:500">'+inv.client+'</td><td style="font-size:9px;color:#888;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(inv.desc||'—')+'</td>'+
+      '<td class="num">\u09F3'+(inv.amount/100000).toFixed(1)+'L</td>'+
+      '<td class="num" style="font-weight:600;color:#c62828">\u09F3'+out.toLocaleString('en-IN')+'</td>'+
+      '<td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td>'+
+      '<td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:#fff;background:'+stc+'">'+inv.status+'</span></td>'+
+      '<td><button class="action-btn secondary" onclick="openClientCollect(\''+String(inv.client).replace(/'/g,"\'")+'\')" style="padding:2px 7px;font-size:8px">💳 Collect</button></td></tr>';
+  }).join(''):'<tr><td colspan="9" style="text-align:center;color:#999;padding:30px;font-size:11px">🎉 All invoices are paid</td></tr>')+
+  '</tbody></table></div></div></div>';
+}
+function batchQueueSelected(){
+  var ids=[];
+  document.querySelectorAll('.un-inv:checked').forEach(function(cb){ids.push(cb.value);});
+  if(!ids.length){showToast('Select at least one invoice','error');return;}
+  ids.forEach(function(invId){
+    var inv=mockInvoices.find(function(x){return x.id===invId;});if(!inv)return;
+    var amt=invoiceOutstanding(invId);
+    mockPayments.push({id:nextId(mockPayments,'PAY-'),invoiceId:invId,leadId:inv.leadId||null,client:inv.client,amount:amt,date:new Date().toISOString().slice(0,10),method:'Bank Transfer',reference:'Batch - '+invId,status:'Pending',notes:'Queued for approval (batch)'});
+  });
+  DB.save('payments');
+  showToast(ids.length+' payment(s) queued for approval — approve in the Approvals tab','success');
+  partyTab='approvals';renderModule();
+}
+
+// ═══ PAYMENT APPROVALS + RECONCILIATION ═══
+function renderPartyApprovals(){
+  var pend=mockPayments.filter(function(p){return p.status==='Pending';});
+  var unlinked=mockPayments.filter(function(p){return p.status==='Cleared'&&!p.invoiceId;});
+  var pendAmt=pend.reduce(function(s,p){return s+(p.amount||0);},0);
+  return '<div class="stats-row" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">'+[
+    ['Pending',pend.length,'#e65100'],['Pending Amount','\u09F3'+(pendAmt/100000).toFixed(1)+'L','#e65100'],
+    ['Unmatched Payments',unlinked.length,'#1565c0'],['Reconciled',mockPayments.filter(function(p){return p.status==='Cleared'&&p.invoiceId;}).length,'#2e7d32']
+  ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="font-size:14px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+  '<div class="card" style="margin-bottom:8px"><div class="card-header"><h3>✅ Pending Payment Approvals</h3><button class="action-btn primary" onclick="approveSelectedPayments()" style="padding:3px 8px;font-size:10px">✓ Approve Selected</button></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th></th><th>Payment</th><th>Client</th><th>Invoice</th><th class="num">Amount</th><th>Date</th><th>Reference</th><th></th></tr></thead><tbody>'+
+  (pend.length?pend.map(function(p){
+    return '<tr><td><input type="checkbox" class="ap-pay" value="'+p.id+'"></td>'+
+      '<td style="font-weight:600;color:#2F80ED">'+p.id+'</td><td style="font-weight:500">'+p.client+'</td>'+
+      '<td style="font-size:9px;color:#2F80ED">'+(p.invoiceId||'—')+'</td>'+
+      '<td class="num" style="font-weight:600;color:#e65100">\u09F3'+(p.amount||0).toLocaleString('en-IN')+'</td>'+
+      '<td style="font-size:9px">'+p.date+'</td><td style="font-size:9px;color:#888">'+(p.reference||'—')+'</td>'+
+      '<td style="white-space:nowrap"><button class="action-btn primary" onclick="approvePayment(\''+p.id+'\')" style="padding:2px 7px;font-size:8px">✓ Approve</button> <button class="action-btn secondary" onclick="rejectPayment(\''+p.id+'\')" style="padding:2px 7px;font-size:8px">✕ Reject</button></td></tr>';
+  }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px;font-size:10px">No payments awaiting approval</td></tr>')+
+  '</tbody></table></div></div></div>'+
+  '<div class="card"><div class="card-header"><h3>🔗 Payment Reconciliation — unmatched Cleared payments</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Payment</th><th>Client</th><th class="num">Amount</th><th>Date</th><th>Match to Invoice</th><th></th></tr></thead><tbody>'+
+  (unlinked.length?unlinked.map(function(p){
+    var opts=mockInvoices.filter(function(i){return (!i.type||i.type!=='Purchase')&&String(i.client)===String(p.client);}).map(function(i){return '<option value="'+i.id+'">'+i.id+' (outstanding \u09F3'+invoiceOutstanding(i.id).toLocaleString('en-IN')+')</option>';}).join('');
+    return '<tr><td style="font-weight:600;color:#2F80ED">'+p.id+'</td><td style="font-weight:500">'+p.client+'</td><td class="num" style="font-weight:600;color:#2e7d32">\u09F3'+(p.amount||0).toLocaleString('en-IN')+'</td><td style="font-size:9px">'+p.date+'</td>'+
+      '<td><select id="rcInv_'+p.id+'" style="padding:3px 5px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px;max-width:200px"><option value="">— select invoice —</option>'+opts+'</select></td>'+
+      '<td><button class="action-btn primary" onclick="reconcilePayment(\''+p.id+'\')" style="padding:2px 7px;font-size:8px">🔗 Match</button></td></tr>';
+  }).join(''):'<tr><td colspan="6" style="text-align:center;color:#999;padding:24px;font-size:10px">All Cleared payments are already matched to invoices</td></tr>')+
+  '</tbody></table></div></div></div>';
+}
+function approvePayment(id){
+  var p=mockPayments.find(function(x){return x.id===id;});if(!p)return;
+  var prev={status:p.status,amount:p.amount,invoiceId:p.invoiceId,client:p.client};
+  p.status='Cleared';DB.save('payments');
+  applyPaymentRipple(p,prev);
+  showToast(p.id+' approved — money received','success');renderModule();
+}
+function approveSelectedPayments(){
+  var ids=[];document.querySelectorAll('.ap-pay:checked').forEach(function(cb){ids.push(cb.value);});
+  if(!ids.length){showToast('Select payments to approve','error');return;}
+  ids.forEach(function(id){approvePayment(id);});
+  showToast(ids.length+' payment(s) approved ✅','success');
+}
+function rejectPayment(id){
+  var p=mockPayments.find(function(x){return x.id===id;});if(!p)return;
+  mockPayments=mockPayments.filter(function(x){return x.id!==id;});DB.save('payments');
+  if(p.invoiceId)recomputeInvoiceStatus(p.invoiceId);
+  showToast(p.id+' rejected and removed','info');renderModule();
+}
+function reconcilePayment(payId){
+  var p=mockPayments.find(function(x){return x.id===payId;});if(!p)return;
+  var sel=document.getElementById('rcInv_'+payId);
+  if(!sel||!sel.value){showToast('Select an invoice to match','error');return;}
+  p.invoiceId=sel.value;DB.save('payments');
+  recomputeInvoiceStatus(sel.value);
+  showToast(payId+' matched to '+sel.value+' ✅','success');renderModule();
 }
 
 
@@ -4622,10 +4888,10 @@ function renderDuesList(){
     <div class="spacer"></div>
     <button class="action-btn primary" onclick="recordDuesPayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button>
   </div>
-  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Contact</th><th>Project/Unit</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Promises</th><th>Status</th></tr></thead><tbody>${
+  <div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Contact</th><th>Project/Unit</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Due</th><th>Due Date</th><th>Overdue</th><th>Bucket</th><th>Promises</th><th>Status</th><th></th></tr></thead><tbody>${
     pD.items.map(function(d){
       const pCount=(d.promises||[]).filter(x=>x.kept===null).length;
-      return '<tr style="cursor:pointer" onclick="openDuesDetail(\''+d.id+'\')"><td style="font-weight:500">'+d.customer+'<div style="font-size:8px;color:#888">'+d.id+'</div></td><td style="font-size:9px;color:#555">'+d.phone+'</td><td>'+d.project+'<br><span style="font-size:8px;color:#888">'+d.unit+'</span></td><td class="num">\u09F3 '+d.totalPrice.toLocaleString('en-IN')+'</td><td class="num" style="color:#2e7d32">\u09F3 '+d.paid.toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:'+(d.status==='Critical'||d.status==='Overdue'?'#c62828':'#1565c0')+'">\u09F3 '+d.due.toLocaleString('en-IN')+'</td><td style="font-size:9px">'+d.dueDate+'</td><td style="font-weight:600;color:'+(d.daysOverdue>0?'#c62828':'#2e7d32')+'">'+(d.daysOverdue>0?d.daysOverdue+'d':'On track')+'</td><td><span class="badge-status '+(d.bucket==='60+ Days'?'badge-sold':d.bucket==='30 Days'||d.bucket==='15 Days'?'badge-pending':'badge-active')+'" style="font-size:8px">'+d.bucket+'</span></td><td style="text-align:center">'+(pCount>0?'<span style="background:#e8f5e9;color:#2e7d32;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">'+pCount+'</span>':'\u2014')+'</td><td><span class="badge-status '+(d.status==='Critical'?'badge-sold':d.status==='Overdue'?'badge-pending':'badge-active')+'">'+d.status+'</span></td></tr>';
+      return '<tr style="cursor:pointer" onclick="openDuesDetail(\''+d.id+'\')"><td style="font-weight:500">'+d.customer+'<div style="font-size:8px;color:#888">'+d.id+'</div></td><td style="font-size:9px;color:#555">'+d.phone+'</td><td>'+d.project+'<br><span style="font-size:8px;color:#888">'+d.unit+'</span></td><td class="num">৳ '+d.totalPrice.toLocaleString('en-IN')+'</td><td class="num" style="color:#2e7d32">৳ '+d.paid.toLocaleString('en-IN')+'</td><td class="num" style="font-weight:600;color:'+(d.status==='Critical'||d.status==='Overdue'?'#c62828':'#1565c0')+'">৳ '+d.due.toLocaleString('en-IN')+'</td><td style="font-size:9px">'+d.dueDate+'</td><td style="font-weight:600;color:'+(d.daysOverdue>0?'#c62828':'#2e7d32')+'">'+(d.daysOverdue>0?d.daysOverdue+'d':'On track')+'</td><td><span class="badge-status '+(d.bucket==='60+ Days'?'badge-sold':d.bucket==='30 Days'||d.bucket==='15 Days'?'badge-pending':'badge-active')+'" style="font-size:8px">'+d.bucket+'</span></td><td style="text-align:center">'+(pCount>0?'<span style="background:#e8f5e9;color:#2e7d32;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">'+pCount+'</span>':'—')+'</td><td><span class="badge-status '+(d.status==='Critical'?'badge-sold':d.status==='Overdue'?'badge-pending':'badge-active')+'">'+d.status+'</span></td><td><button class="action-btn secondary" onclick="event.stopPropagation();openClientCollect(\''+String(d.customer).replace(/'/g,"\'")+'\')" style="padding:2px 7px;font-size:8px" title="Collect payment">💳</button></td></tr>';
     }).join('')
   }</tbody></table>${_pgHtml('dues',pD.total,pD.page,pD.totalPages,pD.perPage)}</div></div></div>`;
 }
@@ -5450,7 +5716,7 @@ function openUnitDetail(projId, unitId) {
     ['Floor', 'Floor ' + unit.floor], ['Project', proj.name],
     ['Location', proj.location]
   ];
-  if (unit.customer) details.push(['Customer', '<span style="color:#2F80ED;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();findAndOpenCustomer(\'' + unit.customer.replace(/'/g, "\\'") + '\')">' + unit.customer + ' \u279c</span>']);
+  if (unit.customer) details.push(['Customer', '<span style="color:#2F80ED;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();findAndOpenCustomer(\'' + unit.customer.replace(/'/g, "\'") + '\')">' + unit.customer + ' \u279c</span>']);
   if (unit.bookingId) details.push(['Booking', '<span style="color:#2F80ED;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();openBookingByRef(\'' + unit.bookingId + '\')">' + unit.bookingId + ' \u279c</span>']);
 
   var footerBtns = '';
@@ -9427,7 +9693,7 @@ function renderFinanceInvoices(){
     var stBg={Draft:'#f5f5f5',Sent:'#fff3e0',Paid:'#e8f5e9',Overdue:'#ffebee',Unpaid:'#fff3e0'}[inv.status]||'#f5f5f5';
     var isP=inv.type==='Purchase';
     var vatTds=isP?' · VAT '+inv.vat+'% · TDS '+inv.tds+'%':'';
-    return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td>'+(isP?'<span class="badge-status badge-reserved" style="font-size:8px">📦</span>':'<span class="badge-status" style="background:#e3f2fd;color:#1565c0;font-size:8px">🧾</span>')+'</td><td style="font-weight:600;color:#2F80ED">'+inv.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+String(inv.client||inv.supplier||'').replace(/'/g,"\\'")+'\')">'+(isP?inv.supplier:inv.client)+'</td><td style="font-size:9px">'+(isP?('<span class="badge-status badge-reserved" style="font-size:8px">PO '+inv.poRef+'</span>'+vatTds):'—')+'</td><td style="font-weight:600;color:#2e7d32">\u09F3'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')">\uD83D\uDC41</span></td></tr>';
+    return '<tr style="cursor:pointer" onclick="openInvoice(\''+inv.id+'\')"><td>'+(isP?'<span class="badge-status badge-reserved" style="font-size:8px">📦</span>':'<span class="badge-status" style="background:#e3f2fd;color:#1565c0;font-size:8px">🧾</span>')+'</td><td style="font-weight:600;color:#2F80ED">'+inv.id+'</td><td style="color:#2F80ED;cursor:pointer" onclick="event.stopPropagation();openCrmCustomer(\''+String(inv.client||inv.supplier||'').replace(/'/g,"\'")+'\')">'+(isP?inv.supplier:inv.client)+'</td><td style="font-size:9px">'+(isP?('<span class="badge-status badge-reserved" style="font-size:8px">PO '+inv.poRef+'</span>'+vatTds):'—')+'</td><td style="font-weight:600;color:#2e7d32">\u09F3'+(inv.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:'+(inv.status==='Overdue'?'#c62828':'#555')+'">'+inv.dueDate+'</td><td><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:600;color:'+stCol+';background:'+stBg+'">'+inv.status+'</span></td><td><span style="color:#2F80ED;cursor:pointer;font-size:10px" onclick="event.stopPropagation();openInvoice(\''+inv.id+'\')">\uD83D\uDC41</span></td></tr>';
   }).join(''):'<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;font-size:11px">No invoices match the type filter</td></tr>')+
   '</tbody></table></div></div></div>';
 }
@@ -11441,7 +11707,7 @@ var _rolePerms = {};
 var ROLE_MODULES = {
   'Sales Agent': ['dashboard','customers','crm','proposals','contacts','sales_marketing','bookings','customer_portal','dues_recovery','handover','ticketing','properties_units','tasks','calendar','announcements','whatsapp','chat'],
   'Site Engineer': ['dashboard','projects','plots','properties_units','contractors','variation_orders','equipment','labor','designs','compliance','qc','boq','stock','knowledge_base','tasks','calendar','chat'],
-  'Finance': ['dashboard','finance','payment_heatmap','approvals','investment_loans','boq','bookings','dues_recovery','stock','customers','tasks','calendar','announcements','chat']
+  'Finance': ['dashboard','finance','party_ledger','payment_heatmap','approvals','investment_loans','boq','bookings','dues_recovery','stock','customers','tasks','calendar','announcements','chat']
 };
 // label ↔ module id maps (Permissions-matrix labels vs module ids)
 var _permLabelToMod = {}, _permModToLabel = {};
@@ -13647,7 +13913,7 @@ window._colFields={
   tasks:{id:'id',title:'title',priority:'priority',status:'status',project:'project',assignee:'assignee',deadline:'deadline'},
   stock:{item:'item',category:'category',site:'site',qty:'qty',unit:'unit',price:'price',value:'value',status:'status',supplier:'supplier',last:'lastReceived'}
 };
-function _q(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function _q(s){return String(s==null?'':s).replace(/\\/g,'\\\').replace(/'/g,"\'");}
 function modLabel(id){for(var gk in GROUPS){var arr=GROUPS[gk].mods;for(var i=0;i<arr.length;i++){if(arr[i].id===id)return arr[i].label;}}return id;}
 
 // ---- 2A Column manager ----
@@ -15507,7 +15773,7 @@ function renderPaymentReminders(el) {
           '<h3>👤 '+g.client+'</h3>'+
           '<div style="display:flex;gap:8px;align-items:center">'+
             '<span style="font-size:11px;color:#888">'+g.invoices.length+' invoice'+(g.invoices.length>1?'s':'')+' · ৳'+g.totalOverdue.toLocaleString('en-IN')+' overdue</span>'+
-            '<button class="action-btn primary" onclick="openReminderModal(\''+g.client.replace(/'/g,"\\'")+'\')" style="padding:4px 10px;font-size:10px">📧 Send Reminder</button>'+
+            '<button class="action-btn primary" onclick="openReminderModal(\''+g.client.replace(/'/g,"\'")+'\')" style="padding:4px 10px;font-size:10px">📧 Send Reminder</button>'+
           '</div>'+
         '</div>'+
         '<div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Invoice ID</th><th class="num">Amount Due</th><th>Due Date</th><th class="num">Days Overdue</th><th>Status</th></tr></thead><tbody>';
@@ -18017,7 +18283,7 @@ function renderClientDashboard(s){
   return '<div class="card" style="margin-bottom:8px"><div class="card-body" style="padding:10px;display:flex;justify-content:space-between;align-items:center">'+
     '<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:50%;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:15px">👤</div>'+
     '<div><div style="font-size:12px;font-weight:700">'+s.customerName+'</div><div style="font-size:9px;color:#888">'+s.email+' · signed in '+s.lastLogin+'</div></div></div>'+
-    '<button class="action-btn secondary" onclick="portalLogout()" style="padding:3px 10px;font-size:9px">Sign out</button></div></div>'+
+    '<button class="action-btn primary" onclick="openClientCollect(\''+String(s.customerName).replace(/'/g,"\'")+'\')" style="padding:3px 10px;font-size:9px">💳 Make Payment</button> <button class="action-btn secondary" onclick="portalLogout()" style="padding:3px 10px;font-size:9px">Sign out</button></div></div>'+
   '<div class="stats-row" style="margin-bottom:8px">'+[
     ['My Bookings',bk.length,'#2F80ED'],
     ['Dues Outstanding','৳'+Math.round(dueTot).toLocaleString('en-IN'),dueTot>0?'#c62828':'#2e7d32'],

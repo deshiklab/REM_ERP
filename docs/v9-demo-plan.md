@@ -80,7 +80,7 @@ Include a **demo cheat sheet**: keyboard shortcuts, exact records to create, num
 
 - Rehearse every script step against the live build; log pass/fail; fix any break.
 - Zero JS errors across the entire walkthrough (console watch).
-- Offline (SW `rem-erp-v9-v7`) still serves after changes.
+- Offline (SW `rem-erp-v9-v8`) still serves after changes.
 - Pristine counts verified before presenting.
 - Refresh `/tmp/REM-ERP-v9-latest.html`; commit + push `master`.
 
