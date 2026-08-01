@@ -74,6 +74,19 @@ CREATE TABLE IF NOT EXISTS doc_store(
 CREATE TABLE IF NOT EXISTS api_tokens(
   token TEXT PRIMARY KEY, user_id INTEGER NOT NULL, created_at TEXT
 );
+CREATE TABLE IF NOT EXISTS portal_users(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL, phone TEXT DEFAULT '', password_hash TEXT NOT NULL,
+  enabled INTEGER DEFAULT 1, last_login TEXT
+);
+CREATE TABLE IF NOT EXISTS portal_tokens(
+  token TEXT PRIMARY KEY, email TEXT NOT NULL, created_at TEXT
+);
+CREATE TABLE IF NOT EXISTS payment_intents(
+  token TEXT PRIMARY KEY, email TEXT NOT NULL, invoice_id TEXT,
+  amount INTEGER DEFAULT 0, method TEXT DEFAULT 'bKash',
+  status TEXT DEFAULT 'pending', gateway_ref TEXT DEFAULT '', created_at TEXT, completed_at TEXT
+);
 """
 
 def get_db():

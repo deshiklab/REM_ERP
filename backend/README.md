@@ -62,3 +62,9 @@ curl -H 'Authorization: Bearer <token>' http://localhost:5001/api/leads         
 - Phase 4 — PDF/Excel reports (DONE, see above)
 - Phase 5 — gunicorn + systemd on AWS Lightsail, Cloudflare tunnel, SQLite dumps → S3
 - Phase 6 — PWA manifest + customer portal + payment gateway hooks (bKash/Nagad sandbox)
+
+## Phase 6 — Customer Portal + Payment Gateway (2026-08)
+- **Portal**: mobile-first single-file page at `GET /portal` (backend/portal.html). Customer login with email + password (`portal123` for seeded customers). Dashboard: dues, invoices (with outstanding + Pay button), payment history.
+- **Portal API** (Bearer portal token, separate from staff auth): `/api/portal/login`, `/api/portal/me`, `/api/portal/pay` (create intent), `/api/portal/pay/<token>` (status), `/api/portal/checkout/<token>/callback` (gateway webhook → Cleared payment + full ripple via shared `_apply_payment_ripple`).
+- **Gateways**: bKash (tokenized checkout) + Nagad adapters. `PAYMENT_MODE=sandbox` (default) → local sandbox checkout page that simulates the callback; set `PAYMENT_MODE=live` + merchant env vars (BKASH_APP_KEY/SECRET or NAGAD_MERCHANT_ID etc.) to hit real APIs.
+- Tables: `portal_users`, `portal_tokens`, `payment_intents`.

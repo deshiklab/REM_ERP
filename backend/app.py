@@ -1,9 +1,9 @@
 """REM ERP Backend — Flask app: auth (session + RBAC), REST APIs mirroring the V10 prototype."""
-import json, re, io, csv, uuid
+import json, re, io, csv, uuid, os, secrets, urllib.request, urllib.parse
 from datetime import datetime, date
 from functools import wraps
-from flask import Flask, jsonify, request, session, Response
-from werkzeug.security import check_password_hash
+from flask import Flask, jsonify, request, session, Response, send_file
+from werkzeug.security import check_password_hash, generate_password_hash
 from db import get_db, rows_to_dicts, row_to_dict, log_activity
 
 app = Flask(__name__)
@@ -273,22 +273,15 @@ def _recompute_invoice(conn, inv_id):
     status = 'Paid' if paid >= net else ('Partial' if paid > 0 else ('Overdue' if row['status'] == 'Overdue' else ('Draft' if row['status'] == 'Draft' else 'Sent')))
     conn.execute("UPDATE invoices SET status=? WHERE id=?", (status, inv_id))
 
-@app.post('/api/payments')
-@require_module('payments')
-def create_payment():
-    d = request.get_json(force=True, silent=True) or {}
-    amount = int(d.get('amount') or 0)
-    conn = get_db()
+def _apply_payment_ripple(conn, client, amount, inv_id, method='Bank Transfer', reference='', notes='', date_iso=None):
+    """Create a Cleared payment + full ripple (invoice status, dues ledger, cash txn). Returns payment id."""
     mx = conn.execute("SELECT MAX(CAST(REPLACE(id,'PAY-','') AS INTEGER)) FROM payments").fetchone()[0] or 0
     pid = f"PAY-{int(mx)+1:03d}"
-    inv_id = d.get('invoice_id') or None
+    date_iso = date_iso or datetime.utcnow().date().isoformat()
     conn.execute("INSERT INTO payments(id,invoice_id,client,amount,date,method,reference,status,notes) VALUES(?,?,?,?,?,?,?,?,?)",
-                 (pid, inv_id, d.get('client',''), amount, d.get('date', datetime.utcnow().date().isoformat()),
-                  d.get('method','Bank Transfer'), d.get('reference',''), d.get('status','Cleared'), d.get('notes','')))
+                 (pid, inv_id, client, amount, date_iso, method, reference, 'Cleared', notes))
     if inv_id and amount > 0:
         _recompute_invoice(conn, inv_id)
-        # dues ripple
-        client = d.get('client','')
         if client:
             due = conn.execute("SELECT * FROM dues WHERE customer=?", (client,)).fetchone()
             if due:
@@ -297,10 +290,20 @@ def create_payment():
                 bucket = 'Cleared' if new_due <= 0 else 'On Track'
                 conn.execute("UPDATE dues SET paid=paid+?, due=?, status=?, bucket=?, days_overdue=0 WHERE id=?",
                              (amount, new_due, status, bucket, due['id']))
-        # cash-flow transaction
         conn.execute("INSERT INTO transactions(id,date,desc,client,project,type,category,status,amount) VALUES(?,?,?,?,?,?,?,?,?)",
-                     (f"RCP-{1000+int(mx)+1}", d.get('date', datetime.utcnow().date().isoformat()),
-                      f"Payment - {d.get('client','')}", d.get('client',''), '', 'Inflow', 'Payment Received', 'Received', amount))
+                     (f"RCP-{1000+int(mx)+1}", date_iso,
+                      f"Payment - {client}", client, '', 'Inflow', 'Payment Received', 'Received', amount))
+    return pid
+
+@app.post('/api/payments')
+@require_module('payments')
+def create_payment():
+    d = request.get_json(force=True, silent=True) or {}
+    amount = int(d.get('amount') or 0)
+    conn = get_db()
+    pid = _apply_payment_ripple(conn, d.get('client',''), amount, d.get('invoice_id') or None,
+                                d.get('method','Bank Transfer'), d.get('reference',''), d.get('notes',''),
+                                d.get('date') or None)
     conn.commit(); conn.close()
     _audit('Created', 'payments', 'payments', pid, f"amount={amount}")
     return jsonify({'ok': True, 'id': pid}), 201
@@ -594,6 +597,185 @@ def collection_xlsx(collection):
     wb.save(buf)
     return Response(buf.getvalue(), mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     headers={'Content-Disposition': f'attachment; filename={collection}.xlsx'})
+
+# ── CUSTOMER PORTAL + PAYMENT GATEWAY (Phase 6) ───────────────────────
+PORTAL_HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'portal.html')
+
+def _portal_user(email):
+    conn = get_db()
+    u = conn.execute("SELECT * FROM portal_users WHERE email=? AND enabled=1", (email,)).fetchone()
+    conn.close()
+    return row_to_dict(u)
+
+def _portal_email():
+    auth = request.headers.get('Authorization', '')
+    token = auth[7:] if auth.startswith('Bearer ') else ''
+    if not token: return None
+    conn = get_db()
+    r = conn.execute("SELECT email FROM portal_tokens WHERE token=?", (token,)).fetchone()
+    conn.close()
+    return r['email'] if r else None
+
+def _portal_customer(email):
+    """Customer info (name/phone) for a portal user + their dues/invoices/payments."""
+    u = _portal_user(email)
+    if not u: return None
+    name = u['name']
+    conn = get_db()
+    dues = conn.execute("SELECT * FROM dues WHERE customer=? ORDER BY due_date", (name,)).fetchall()
+    invoices = conn.execute("SELECT * FROM invoices WHERE client=? ORDER BY issued_date DESC", (name,)).fetchall()
+    payments = conn.execute("SELECT * FROM payments WHERE client=? ORDER BY date DESC", (name,)).fetchall()
+    conn.close()
+    invs = []
+    for inv in invoices:
+        paid = sum(p['amount'] for p in payments if p['invoice_id'] == inv['id'] and p['status'] == 'Cleared')
+        invs.append({**dict(inv), 'paid': paid, 'outstanding': max(0, (inv['net'] or inv['amount']) - paid)})
+    total_due = sum(d['due'] for d in dues)
+    return {'user': {'name': name, 'email': email, 'phone': u['phone']},
+            'dues': rows_to_dicts(dues), 'invoices': invs,
+            'payments': [dict(p) for p in payments],
+            'total_due': total_due}
+
+@app.post('/api/portal/login')
+def portal_login():
+    d = request.get_json(force=True, silent=True) or {}
+    email = (d.get('email') or '').strip().lower()
+    pwd = d.get('password') or ''
+    u = _portal_user(email)
+    if not u or not check_password_hash(u['password_hash'], pwd):
+        return jsonify({'error': 'Invalid email or password'}), 401
+    token = secrets.token_urlsafe(32)
+    conn = get_db()
+    conn.execute("INSERT INTO portal_tokens(token,email,created_at) VALUES(?,?,?)",
+                 (token, email, datetime.utcnow().isoformat() + 'Z'))
+    conn.execute("UPDATE portal_users SET last_login=? WHERE email=?", (datetime.utcnow().isoformat() + 'Z', email))
+    conn.commit(); conn.close()
+    _audit('Portal login', 'portal', 'portal', email)
+    return jsonify({'ok': True, 'token': token, 'user': {'name': u['name'], 'email': email, 'phone': u['phone']}})
+
+@app.get('/api/portal/me')
+def portal_me():
+    email = _portal_email()
+    if not email: return jsonify({'error': 'Portal auth required'}), 401
+    data = _portal_customer(email)
+    if not data: return jsonify({'error': 'Account disabled'}), 403
+    return jsonify(data)
+
+# ── Payment gateway (bKash / Nagad) ───────────────────────────────────
+# Live mode activates when merchant env vars are present; otherwise sandbox
+# mode returns a local checkout page that simulates the gateway callback.
+# bKash: BKASH_APP_KEY, BKASH_APP_SECRET, BKASH_USERNAME, BKASH_PASSWORD
+# Nagad: NAGAD_MERCHANT_ID, NAGAD_MERCHANT_NUMBER, NAGAD_PUB_KEY, NAGAD_PRIV_KEY
+PAYMENT_MODE = os.environ.get('PAYMENT_MODE', 'sandbox')  # sandbox | live
+
+def _bkash_create(amount, ref):
+    """Create bKash tokenized-checkout payment. Returns (mode, checkout_url, gateway_ref)."""
+    if PAYMENT_MODE != 'live':
+        return ('sandbox', f'/portal/checkout/{ref}', f'BKTEST-{ref[:8].upper()}')
+    base = os.environ.get('BKASH_BASE', 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout')
+    try:
+        req = urllib.request.Request(base + '/token/grant', data=json.dumps({
+            'app_key': os.environ['BKASH_APP_KEY'], 'app_secret': os.environ['BKASH_APP_SECRET']}).encode(),
+            headers={'Content-Type': 'application/json'})
+        tok = json.loads(urllib.request.urlopen(req, timeout=15).read())['id_token']
+        req = urllib.request.Request(base + '/create', data=json.dumps({
+            'mode': '0011', 'payerReference': ref, 'callbackURL': f"https://{request.host}/api/portal/checkout/{ref}/callback",
+            'amount': str(amount), 'currency': 'BDT', 'intent': 'sale', 'merchantInvoiceNumber': ref}).encode(),
+            headers={'Content-Type': 'application/json', 'Authorization': tok})
+        r = json.loads(urllib.request.urlopen(req, timeout=15).read())
+        return ('live', r.get('bkashURL', ''), r.get('paymentID', f'BK-{ref[:8]}'))
+    except Exception as e:
+        return ('error', '', f'bkash_error:{e}')
+
+def _nagad_create(amount, ref):
+    """Create Nagad checkout payment. Returns (mode, checkout_url, gateway_ref)."""
+    if PAYMENT_MODE != 'live':
+        return ('sandbox', f'/portal/checkout/{ref}', f'NGDTEST-{ref[:8].upper()}')
+    base = os.environ.get('NAGAD_BASE', 'https://sandbox.mynagad.com/api/dfs/check-out/initialize')
+    try:
+        merchant = os.environ['NAGAD_MERCHANT_ID']
+        order_id = ref
+        payload = {
+            'merchantId': merchant, 'orderId': order_id,
+            'amount': str(amount), 'currencyCode': '050', 'merchantCallbackURL': f"https://{request.host}/api/portal/checkout/{ref}/callback",
+            'paymentType': 'NAGAD', 'expiresIn': 600,
+        }
+        req = urllib.request.Request(base + f'/{merchant}/{order_id}', data=json.dumps(payload).encode(),
+            headers={'Content-Type': 'application/json', 'X-KM-IP-V4': request.remote_addr or '0.0.0.0',
+                     'X-KM-Client-Type': 'PC_WEB', 'X-KM-Api-Version': 'v-0.2.0', 'X-KM-Device-Type': 'WEB'})
+        r = json.loads(urllib.request.urlopen(req, timeout=15).read())
+        return ('live', r.get('callBackUrl', ''), r.get('issuerPaymentRefNo', f'NG-{ref[:8]}'))
+    except Exception as e:
+        return ('error', '', f'nagad_error:{e}')
+
+@app.post('/api/portal/pay')
+def portal_pay():
+    """Create a payment intent against an invoice. Body: {invoice_id, method: bKash|Nagad}."""
+    email = _portal_email()
+    if not email: return jsonify({'error': 'Portal auth required'}), 401
+    d = request.get_json(force=True, silent=True) or {}
+    inv_id = d.get('invoice_id') or ''
+    method = d.get('method') or 'bKash'
+    data = _portal_customer(email)
+    if not data: return jsonify({'error': 'Account disabled'}), 403
+    inv = next((i for i in data['invoices'] if i['id'] == inv_id), None)
+    if not inv: return jsonify({'error': 'Invoice not found'}), 404
+    if inv['outstanding'] <= 0: return jsonify({'error': 'Invoice already paid'}), 400
+    token = secrets.token_urlsafe(16)
+    ref = f"PY{datetime.utcnow().strftime('%y%m%d')}-{token[:6].upper()}"
+    if method == 'Nagad':
+        mode, url, gref = _nagad_create(inv['outstanding'], ref)
+    else:
+        method = 'bKash'
+        mode, url, gref = _bkash_create(inv['outstanding'], ref)
+    if mode == 'error':
+        return jsonify({'error': 'Gateway error — check merchant credentials', 'detail': gref}), 502
+    conn = get_db()
+    conn.execute("INSERT INTO payment_intents(token,email,invoice_id,amount,method,status,gateway_ref,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                 (token, email, inv_id, inv['outstanding'], method, 'pending', gref, datetime.utcnow().isoformat() + 'Z'))
+    conn.commit(); conn.close()
+    _audit('Portal pay intent', 'portal', 'invoices', inv_id, f"{method} {inv['outstanding']}")
+    return jsonify({'ok': True, 'token': token, 'checkout_url': url, 'mode': mode,
+                    'amount': inv['outstanding'], 'invoice_id': inv_id, 'gateway_ref': gref, 'method': method})
+
+@app.get('/api/portal/pay/<token>')
+def portal_pay_status(token):
+    email = _portal_email()
+    if not email: return jsonify({'error': 'Portal auth required'}), 401
+    conn = get_db()
+    it = conn.execute("SELECT * FROM payment_intents WHERE token=? AND email=?", (token, email)).fetchone()
+    conn.close()
+    if not it: return jsonify({'error': 'Intent not found'}), 404
+    return jsonify({'token': token, 'status': it['status'], 'amount': it['amount'],
+                    'method': it['method'], 'invoice_id': it['invoice_id'], 'gateway_ref': it['gateway_ref']})
+
+@app.post('/api/portal/checkout/<token>/callback')
+def portal_pay_callback(token):
+    """Gateway webhook (sandbox simulate + live callback). Marks the intent paid and runs the ripple."""
+    conn = get_db()
+    it = conn.execute("SELECT * FROM payment_intents WHERE token=?", (token,)).fetchone()
+    if not it: return jsonify({'error': 'Intent not found'}), 404
+    if it['status'] == 'completed':
+        return jsonify({'ok': True, 'already': True})
+    u = _portal_user(it['email'])
+    if not u:
+        conn.close(); return jsonify({'error': 'Account disabled'}), 403
+    pid = _apply_payment_ripple(conn, u['name'], it['amount'], it['invoice_id'],
+                                method=it['method'], reference=it['gateway_ref'],
+                                notes=f'Portal {it["method"]} payment', date_iso=datetime.utcnow().date().isoformat())
+    conn.execute("UPDATE payment_intents SET status='completed', completed_at=? WHERE token=?", (datetime.utcnow().isoformat() + 'Z', token))
+    conn.commit(); conn.close()
+    _audit('Portal payment completed', 'payments', 'payments', pid, f"{it['method']} {it['amount']}")
+    return jsonify({'ok': True, 'payment_id': pid})
+
+# ── Portal page (mobile-first single file) ────────────────────────────
+@app.get('/portal')
+@app.get('/portal/')
+@app.get('/portal/checkout/<token>')
+def portal_page(token=None):
+    if not os.path.exists(PORTAL_HTML):
+        return jsonify({'error': 'portal.html missing on server'}), 500
+    return send_file(PORTAL_HTML)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REM ERP — Customer Portal</title>
+<style>
+  :root{--blue:#2F80ED;--blue-d:#1f5fc4;--bg:#f4f7fb;--card:#fff;--ink:#1a2333;--muted:#6b7686;--line:#e3e9f2;--green:#27ae60;--red:#eb5757;--amber:#f2994a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .top{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;padding:18px 16px 20px}
+  .top .brand{font-size:18px;font-weight:700;letter-spacing:.3px}
+  .top .brand span{opacity:.85;font-weight:400;font-size:12px;display:block;margin-top:2px}
+  .top .hi{font-size:15px;margin-top:12px}
+  .top .hi b{font-size:17px}
+  .logout{float:right;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer}
+  .wrap{max-width:640px;margin:0 auto;padding:14px 12px 40px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(20,40,80,.04)}
+  .card h3{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
+  .kpi .v{font-size:17px;font-weight:700}
+  .kpi .l{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+  .kpi.alert .v{color:var(--red)}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;gap:8px}
+  .row:last-child{border-bottom:0}
+  .row .amt{font-weight:700;white-space:nowrap}
+  .badge{display:inline-block;font-size:10px;font-weight:600;border-radius:20px;padding:2px 8px;text-transform:uppercase;letter-spacing:.3px}
+  .b-green{background:#e6f7ee;color:var(--green)} .b-red{background:#fdeaea;color:var(--red)}
+  .b-amber{background:#fef3e6;color:var(--amber)} .b-gray{background:#eef1f6;color:var(--muted)} .b-blue{background:#e8f0fe;color:var(--blue)}
+  .btn{display:block;width:100%;border:0;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.secondary{background:#eef1f6;color:var(--ink)}
+  .btn.green{background:var(--green);color:#fff}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  input{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px;margin-bottom:10px;outline:none}
+  input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,128,237,.12)}
+  .muted{color:var(--muted);font-size:12px}
+  .pay-btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .pay-btn:disabled{background:#c9d6e8;cursor:not-allowed}
+  /* Login */
+  .login-box{max-width:360px;margin:60px auto 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 22px;box-shadow:0 8px 30px rgba(20,40,80,.08)}
+  .login-box .logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 14px}
+  .login-box h1{font-size:17px;text-align:center;margin-bottom:4px}
+  .login-box p{text-align:center;font-size:12px;color:var(--muted);margin-bottom:18px}
+  .err{background:#fdeaea;color:var(--red);border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:10px;display:none}
+  /* Checkout */
+  .ck{max-width:420px;margin:40px auto 0}
+  .ck .gw{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0;font-weight:700;font-size:16px}
+  .ck .gw .dot{width:30px;height:30px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+  .ck .gw.bkash .dot{background:#e2136e}
+  .ck .gw.nagad .dot{background:#f6921e}
+  .ck .amt{text-align:center;font-size:34px;font-weight:800;margin:10px 0 2px}
+  .ck .for{text-align:center;color:var(--muted);font-size:13px;margin-bottom:18px}
+  .ck .steps{font-size:12px;color:var(--muted);background:#f8fafd;border:1px dashed var(--line);border-radius:10px;padding:12px;margin-bottom:16px;line-height:1.7}
+  .paying{text-align:center;color:var(--green);font-weight:600;font-size:13px;margin-top:12px;display:none}
+  .success{text-align:center;padding:10px 0}
+  .success .icon{font-size:48px}
+  .success h2{color:var(--green);margin:8px 0 4px}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1a2333;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;z-index:99;display:none;max-width:90vw;text-align:center}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;color:var(--muted);font-weight:600;padding:6px 4px;border-bottom:1px solid var(--line);text-transform:uppercase;font-size:10px;letter-spacing:.4px}
+  td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .sect{font-size:12px;color:var(--muted);margin:16px 0 6px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/api/portal';
+let TOKEN = localStorage.getItem('rem_portal_token') || '';
+let ME = null;
+
+const $ = s => document.querySelector(s);
+const fmt = n => '৳' + Number(n||0).toLocaleString('en-IN');
+const toast = m => { const t = $('#toast'); t.textContent = m; t.style.display='block'; setTimeout(()=>t.style.display='none',2600); };
+
+async function api(path, opts={}) {
+  const h = {'Content-Type':'application/json'};
+  if (TOKEN) h['Authorization'] = 'Bearer ' + TOKEN;
+  const r = await fetch(API + path, {headers:h, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined});
+  const d = await r.json().catch(()=>({}));
+  if (r.status === 401 && path !== '/login') { localStorage.removeItem('rem_portal_token'); TOKEN=''; renderLogin(); }
+  return d;
+}
+
+/* ── LOGIN ── */
+function renderLogin(){
+  document.title = 'REM ERP — Portal Login';
+  $('#app').innerHTML = `
+  <div class="login-box">
+    <div class="logo">🏢</div>
+    <h1>REM ERP Customer Portal</h1>
+    <p>Sign in to view your bookings, dues &amp; invoices and pay online.</p>
+    <div class="err" id="err"></div>
+    <input id="em" type="email" placeholder="Email address" autocomplete="username">
+    <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+    <button class="btn primary" onclick="doLogin()">Sign in</button>
+    <p class="muted" style="text-align:center;margin-top:14px">Demo: use your customer email · password <b>portal123</b></p>
+  </div>`;
+}
+
+async function doLogin(){
+  const em = $('#em').value.trim(), pw = $('#pw').value;
+  const err = $('#err');
+  if(!em || !pw){ err.style.display='block'; err.textContent='Enter your email and password.'; return; }
+  const d = await api('/login', {method:'POST', body:{email:em, password:pw}});
+  if(d.error){ err.style.display='block'; err.textContent = d.error; return; }
+  TOKEN = d.token; localStorage.setItem('rem_portal_token', TOKEN);
+  loadMe();
+}
+
+/* ── DASHBOARD ── */
+function renderDash(){
+  document.title = 'REM ERP — Customer Portal';
+  const u = ME.user;
+  const dues = ME.dues || [], invs = ME.invoices || [], pays = ME.payments || [];
+  const totalDue = ME.total_due || 0;
+  const overdue = dues.filter(d=>d.status==='Overdue').reduce((s,d)=>s+d.due,0);
+  const paid = pays.filter(p=>p.status==='Cleared').reduce((s,p)=>s+p.amount,0);
+  const openInvs = invs.filter(i=>i.outstanding>0).length;
+
+  let rows = '';
+  (dues.length ? dues : []).forEach(d=>{
+    const b = d.status==='Overdue' ? 'b-red' : (d.bucket==='On Track' ? 'b-green' : 'b-gray');
+    rows += `<div class="row"><div><div>${d.project||d.unit||'—'}</div><div class="muted">${d.status}${d.days_overdue?' · '+d.days_overdue+'d overdue':''}</div></div><div class="amt">${fmt(d.due)}</div></div>`;
+  });
+  if(!rows) rows = `<div class="muted" style="padding:6px 0">No outstanding dues 🎉</div>`;
+
+  let invRows = '';
+  invs.forEach(i=>{
+    const st = i.status || 'Draft';
+    const b = st==='Paid' ? 'b-green' : (i.outstanding>0 ? 'b-red' : 'b-gray');
+    invRows += `<div class="row">
+      <div><div>${i.id} <span class="badge ${b}">${st}</span></div><div class="muted">${i.desc || i.project || ''} · due ${i.due_date||'—'}</div></div>
+      <div style="text-align:right"><div class="amt">${fmt(i.net||i.amount)}</div>
+      ${i.outstanding>0 ? `<button class="pay-btn" onclick="startPay('${i.id}')">Pay ${fmt(i.outstanding)}</button>` : `<div class="muted">paid</div>`}</div>
+    </div>`;
+  });
+  if(!invRows) invRows = '<div class="muted">No invoices yet.</div>';
+
+  let payRows = '';
+  pays.slice(0,8).forEach(p=>{
+    const b = p.status==='Cleared' ? 'b-green' : 'b-amber';
+    payRows += `<div class="row"><div><div>${p.id} <span class="badge ${b}">${p.status}</span></div><div class="muted">${p.method||''} ${p.reference?'· '+p.reference:''} · ${p.date}</div></div><div class="amt">${fmt(p.amount)}</div></div>`;
+  });
+  if(!payRows) payRows = '<div class="muted">No payments yet.</div>';
+
+  $('#app').innerHTML = `
+  <div class="top">
+    <button class="logout" onclick="logout()">Logout</button>
+    <div class="brand">REM ERP <span>MARS Construction Ltd — Customer Portal</span></div>
+    <div class="hi">Assalamu alaikum, <b>${u.name}</b> 👋</div>
+  </div>
+  <div class="wrap">
+    <div class="kpis">
+      <div class="kpi"><div class="v">${fmt(totalDue)}</div><div class="l">Total Due</div></div>
+      <div class="kpi ${overdue>0?'alert':''}"><div class="v">${fmt(overdue)}</div><div class="l">Overdue</div></div>
+      <div class="kpi"><div class="v">${openInvs}</div><div class="l">Open Invoices</div></div>
+    </div>
+    <div class="card"><h3>💳 My Dues</h3>${rows}</div>
+    <div class="card"><h3>🧾 My Invoices</h3>${invRows}</div>
+    <div class="card"><h3>🕓 Payment History</h3>${payRows}</div>
+    <p class="muted" style="text-align:center;margin-top:8px">Payments via bKash / Nagad are recorded instantly in your account.</p>
+  </div>`;
+}
+
+async function loadMe(){
+  const d = await api('/me');
+  if(d.error){ renderLogin(); return; }
+  ME = d;
+  renderDash();
+}
+
+async function startPay(invoiceId){
+  const inv = ME.invoices.find(i=>i.id===invoiceId) || {};
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,25,45,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML = `
+    <div style="background:#fff;border-radius:16px;max-width:340px;width:100%;padding:22px;text-align:center">
+      <h3 style="margin:0 0 6px;font-size:16px">Pay ${inv.id}</h3>
+      <p class="muted" style="margin:0 0 16px">Amount due: <b style="font-size:18px;color:var(--ink)">${fmt(inv.outstanding)}</b><br>Choose a payment method</p>
+      <button class="btn primary" style="margin-bottom:10px" onclick="doPay('${invoiceId}','bKash')">📱 Pay with bKash</button>
+      <button class="btn green" onclick="doPay('${invoiceId}','Nagad')">🟠 Pay with Nagad</button>
+      <p class="muted" style="margin:14px 0 0"><a href="javascript:document.body.lastChild.remove()" style="color:var(--blue)">Cancel</a></p>
+    </div>`;
+  document.body.appendChild(ov);
+  window._payOverlay = ov;
+}
+
+async function doPay(invoiceId, method){
+  const ov = window._payOverlay; if (ov) ov.remove();
+  const d = await api('/pay', {method:'POST', body:{invoice_id:invoiceId, method}});
+  if(d.error){ toast(d.error); return; }
+  renderCheckout(d);
+}
+
+/* ── CHECKOUT (sandbox gateway page) ── */
+function renderCheckout(pay){
+  const isBkash = pay.method === 'bKash' || (pay.gateway_ref||'').startsWith('BKTEST');
+  document.title = (isBkash?'bKash':'Nagad') + ' Checkout — REM ERP';
+  $('#app').innerHTML = `
+  <div class="ck">
+    <div class="card">
+      <div class="gw ${isBkash?'bkash':'nagad'}"><span class="dot">${isBkash?'bK':'Ng'}</span> ${isBkash?'bKash':'Nagad'} Checkout</div>
+      <div class="amt">${fmt(pay.amount)}</div>
+      <div class="for">Invoice ${pay.invoice_id} · Reference ${pay.gateway_ref}</div>
+      <div class="steps">🔒 <b>Sandbox gateway</b> — no real money moves. In production this page is replaced by the ${isBkash?'bKash':'Nagad'} payment window.<br>👇 Tap Pay to simulate a successful ${isBkash?'bKash':'Nagad'} payment.</div>
+      <button class="btn ${isBkash?'primary':'green'}" id="paygo" onclick="confirmPay('${pay.token}')">Pay ${fmt(pay.amount)}</button>
+      <div class="paying" id="paying">Processing payment…</div>
+      <p class="muted" style="text-align:center;margin-top:12px"><a href="javascript:loadMe()" style="color:var(--blue)">← Back to dashboard</a></p>
+    </div>
+  </div>`;
+  window._lastPay = pay;
+}
+
+async function confirmPay(token){
+  const btn = $('#paygo'); btn.disabled = true;
+  $('#paying').style.display = 'block';
+  const d = await api(`/checkout/${token}/callback`, {method:'POST', body:{}});
+  if(d.ok){
+    $('#app').innerHTML = `
+    <div class="ck"><div class="card"><div class="success">
+      <div class="icon">✅</div>
+      <h2>Payment Successful!</h2>
+      <p style="font-size:13px;color:var(--muted)">Payment ID: <b>${d.payment_id}</b></p>
+      <p style="font-size:13px;color:var(--muted)">Your invoice and dues have been updated.</p>
+      <div style="margin-top:18px"><button class="btn primary" onclick="loadMe()">Back to Dashboard</button></div>
+    </div></div></div>`;
+  } else {
+    toast(d.error || 'Payment failed');
+    btn.disabled = false; $('#paying').style.display='none';
+  }
+}
+
+function logout(){
+  api('/logout', {method:'POST'}).catch(()=>{});
+  localStorage.removeItem('rem_portal_token'); TOKEN=''; ME=null;
+  renderLogin();
+}
+
+/* ── BOOT ── */
+(function boot(){
+  // checkout deep-link handled in-dashboard; always land on login or dashboard
+  if (TOKEN) loadMe(); else renderLogin();
+})();
+</script>
+</body>
+</html>

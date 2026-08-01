@@ -59,6 +59,11 @@ def seed():
     for cus in customers:
         c.execute("INSERT INTO customers(name,phone,email,property,type,status,dues_num,project) VALUES(?,?,?,?,?,?,?,?)", cus)
 
+    # portal users (customer portal login; password: portal123 for all)
+    for cus in customers:
+        c.execute("INSERT OR IGNORE INTO portal_users(email,name,phone,password_hash) VALUES(?,?,?,?)",
+                  (cus[2], cus[0], cus[1], generate_password_hash('portal123')))
+
     projects = [
         ('P-101','Jolshiri Abason','Purbachal','In Progress',65,6260000000,'Hasanul Banna','flat',0,70),
         ('P-102','Muktodhara','Savar','In Progress',58,7200000000,'Iftekhar Ahmad','land',40,0),
