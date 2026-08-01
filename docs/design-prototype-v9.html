@@ -3916,7 +3916,25 @@ function openInvoice(id){
 }
 function markInvoicePaid(id){
   var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
-  inv.status='Paid';DB.save('invoices');showToast(inv.id+' marked Paid ✅','success');closeModal();renderModule();
+  var paidNow=mockPayments.filter(function(p){return p.invoiceId===id&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
+  var remain=Math.max(0,(inv.amount||0)-paidNow);
+  inv.status='Paid';DB.save('invoices');
+  if(remain>0){
+    mockPayments.push({id:nextId(mockPayments,'PAY-'),invoiceId:id,leadId:inv.leadId||null,client:inv.client,amount:remain,date:new Date().toISOString().slice(0,10),method:'Bank Transfer',reference:'Marked paid in full',status:'Cleared',notes:'Auto-recorded on Mark Paid'});
+    DB.save('payments');
+    var due=mockDues.find(function(x){return String(x.customer)===String(inv.client);});
+    if(due){
+      due.paid=(due.paid||0)+remain;
+      due.due=Math.max(0,(due.due||0)-remain);
+      if(due.due<=0){due.due=0;due.status='Paid';due.bucket='Cleared';due.daysOverdue=0;}
+      else{due.status='Upcoming';due.bucket='On Track';due.daysOverdue=0;}
+      DB.save('dues');
+    }
+    mockTransactions.unshift({id:'RCP-'+Math.floor(1000+Math.random()*9000),date:new Date().toISOString().slice(0,10),desc:'Invoice '+inv.id+' marked paid - '+(inv.client||''),client:inv.client||'',project:inv.project||'',type:'Inflow',category:'Payment Received',status:'Received',amount:remain,fmt:'+ \u09F3'+remain.toLocaleString('en-IN')});
+    DB.save('transactions');
+    applyPaymentToSchedule(inv.client,remain);
+  }
+  showToast(inv.id+' marked Paid ✅','success');closeModal();renderModule();
   if(typeof celebrate==='function')celebrate();
 }
 function markInvoiceOverdue(id){
@@ -4120,33 +4138,43 @@ function crudPayment(item){
     '</div>',
     function(){
       var d={id:pymt.id,invoiceId:document.getElementById('f_payInv').value||null,leadId:pymt.leadId,client:g('f_payClient'),amount:parseInt(g('f_payAmt'))||0,date:g('f_payDate'),method:g('f_payMethod'),reference:g('f_payRef')||'',status:g('f_payStatus')||'Pending',notes:g('f_payNotes')||''};
+      if(n)d.id=nextId(mockPayments,'PAY-');
+      var amt=d.amount||0;
+      var delta=amt-(n?0:(pymt.amount||0));
+      var oldInvId=!n?(pymt.invoiceId||null):null;
       n?addItem(mockPayments,d,'payments'):updateItem(mockPayments,pymt.id,d,'payments');
-      // A2: on create, auto-adjust linked invoice + customer dues + cash-flow transaction
-      if(n){
-        var amt=d.amount||0;
-        if(d.invoiceId&&amt>0){
-          var inv=mockInvoices.find(function(x){return x.id===d.invoiceId;});
-          if(inv){
-            var paid=mockPayments.filter(function(p){return p.invoiceId===inv.id;}).reduce(function(s,p){return s+(p.amount||0);},0);
-            inv.status=(paid>=inv.amount)?'Paid':(inv.status==='Paid'?'Paid':'Partial');
-            DB.save('invoices');
-          }
-        }
-        if(d.client&&amt>0){
-          var due=mockDues.find(function(x){return String(x.customer)===String(d.client);});
-          if(due){
-            due.paid=(due.paid||0)+amt;
-            due.due=Math.max(0,(due.due||0)-amt);
-            if(due.due<=0){due.due=0;due.status='Paid';due.bucket='Cleared';due.daysOverdue=0;}
-            else{due.status='Upcoming';due.bucket='On Track';due.daysOverdue=0;}
-            DB.save('dues');
-          }
-        }
-        if(amt>0){
-          mockTransactions.unshift({id:'RCP-'+Math.floor(1000+Math.random()*9000),date:d.date||new Date().toISOString().slice(0,10),desc:'Payment - '+(d.client||''),client:d.client||'',project:'',type:'Inflow',category:'Payment Received',status:'Received',amount:amt,fmt:'+ \u09F3'+amt.toLocaleString('en-IN')});
-          DB.save('transactions');
+      // A2: auto-adjust linked invoice + customer dues + cash-flow transaction (+ booking schedule)
+      if(d.invoiceId&&amt>0){
+        var inv=mockInvoices.find(function(x){return x.id===d.invoiceId;});
+        if(inv){
+          var paid=mockPayments.filter(function(p){return p.invoiceId===inv.id&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
+          inv.status=(paid>=inv.amount)?'Paid':(inv.status==='Paid'?'Paid':'Partial');
+          DB.save('invoices');
         }
       }
+      if(!n&&oldInvId&&oldInvId!==d.invoiceId){
+        var invOld=mockInvoices.find(function(x){return x.id===oldInvId;});
+        if(invOld){
+          var paidOld=mockPayments.filter(function(p){return p.invoiceId===invOld.id&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
+          invOld.status=(paidOld>=invOld.amount)?'Paid':(paidOld>0?'Partial':(invOld.status==='Overdue'?'Overdue':'Sent'));
+          DB.save('invoices');
+        }
+      }
+      if(d.client&&delta!==0){
+        var due=mockDues.find(function(x){return String(x.customer)===String(d.client);});
+        if(due){
+          due.paid=Math.max(0,(due.paid||0)+delta);
+          due.due=Math.max(0,(due.due||0)-delta);
+          if(due.due<=0){due.due=0;due.status='Paid';due.bucket='Cleared';due.daysOverdue=0;}
+          else{due.status='Upcoming';due.bucket='On Track';due.daysOverdue=0;}
+          DB.save('dues');
+        }
+      }
+      if(n&&amt>0){
+        mockTransactions.unshift({id:'RCP-'+Math.floor(1000+Math.random()*9000),date:d.date||new Date().toISOString().slice(0,10),desc:'Payment - '+(d.client||''),client:d.client||'',project:'',type:'Inflow',category:'Payment Received',status:'Received',amount:amt,fmt:'+ \u09F3'+amt.toLocaleString('en-IN')});
+        DB.save('transactions');
+      }
+      if(amt>0)applyPaymentToSchedule(d.client,amt);
     }
   );
 }
@@ -9491,8 +9519,8 @@ function crudReceivePayment(){
       var descTxt=document.getElementById('rp_desc').value||'Payment from '+cli;
       var invR=mockInvoices.find(function(x){return String(x.client)===cli&&x.status!=='Paid';});
       if(invR&&amt>0){
-        mockPayments.push({id:'PAY-'+(100+Math.floor(Math.random()*900)),invoiceId:invR.id,leadId:null,client:cli,amount:amt,date:new Date().toISOString().slice(0,10),method:'Bank Transfer',reference:descTxt,status:'Cleared',notes:''});
-        var paidR=mockPayments.filter(function(p){return p.invoiceId===invR.id;}).reduce(function(s,p){return s+(p.amount||0);},0);
+        mockPayments.push({id:nextId(mockPayments,'PAY-'),invoiceId:invR.id,leadId:null,client:cli,amount:amt,date:new Date().toISOString().slice(0,10),method:'Bank Transfer',reference:descTxt,status:'Cleared',notes:''});
+        var paidR=mockPayments.filter(function(p){return p.invoiceId===invR.id&&p.status==='Cleared';}).reduce(function(s,p){return s+(p.amount||0);},0);
         invR.status=(paidR>=invR.amount)?'Paid':(invR.status==='Paid'?'Paid':'Partial');
         DB.save('payments');DB.save('invoices');
       }
@@ -9504,6 +9532,7 @@ function crudReceivePayment(){
         else{dueR.status='Upcoming';dueR.bucket='On Track';dueR.daysOverdue=0;}
         DB.save('dues');
       }
+      applyPaymentToSchedule(cli,amt);
       showToast('Payment recorded!','success');renderModule();
     }
   );
@@ -12575,7 +12604,7 @@ function convertLeadToBooking(id){
           if(String(un.id)===String(u.id)){un.status=adv>0?'Booked':'Under Payment';un.customer=l.name;un.bookingId=bk.id;}
         });
       });DB.save('properties');
-      generateBookingSchedule(nid,price,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10));
+      generateBookingSchedule(nid,price,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10),adv);
       l.status='Booking';l.nextFollowUp='—';l.linkedEntityId=l.linkedEntityId||nid;
       if(!l.activities)l.activities=[];
       l.activities.unshift({type:'Note',user:'System',date:'Just now',text:'📋 Converted to booking '+bk.id+' — '+u.proj+' Unit '+u.number+' (৳'+price.toLocaleString('en-IN')+', '+bk.terms+')'});
@@ -12932,6 +12961,8 @@ function leaveBalanceLeft(empId,type,excludeId){
   return (caps[type]||14)-used;
 }
 function outstandingDuesFor(client){
+  var d=mockDues.find(function(x){return String(x.customer)===String(client);});
+  if(d)return d.due||0;
   var c=mockCustomers.find(function(x){return x.name===client;});
   return c?(c.duesNum||0):0;
 }
@@ -13030,7 +13061,7 @@ function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings,'BKG-
     {id:'f_adv',fn:function(v){if(!String(v).trim())return null;var a=V.num(v);if(a<0)return 'Advance cannot be negative';var pr=V.num(document.getElementById('f_price').value);return (!isNaN(pr)&&a>pr)?'Advance cannot exceed price ('+pr.toLocaleString('en-IN')+')':null;}},
     {id:'f_unit',fn:function(v){return unitAvailabilityCheck(v,n?null:b.id);}}
   ];
-  openModal(n?'New Booking':'Edit Booking',formRow(selectField('Client','f_client',b.client,customerOpts(),true),selectField('Type','f_btype',normType(b.type||''),['','Land','Flat'],true,'toggleBookingTypeFields()'))+formRow(selectField('Project','f_prop',b.property,projectOptsByType(b.type||''),true),'<div id="f_bunitRow">'+inputField('Unit','f_unit',b.unit)+'</div>')+'<div id="f_bfloorRow">'+inputField('Floor','f_floor',b.floor||'')+'</div>'+formRow(inputField('Price','f_price',b.price,'',true),inputField('Advance','f_adv',b.advance))+formRow(selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),selectField('Payment Terms','f_terms',b.terms||'',BOOKING_TERMS))+formRow(inputField('Schedule Start','f_schedStart',b.schedStart||''),''),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),floor:g('f_floor'),price:g('f_price'),advance:g('f_adv'),status:g('f_status'),terms:g('f_terms'),schedStart:g('f_schedStart'),type:g('f_btype')||''};var _proj=mockProjects.find(function(x){return x.name===d.property;});d.type=normType(d.type||(_proj?(_proj.type==='land'?'Land':'Flat'):b.type));if(d.type==='Land')d.floor='';var nid;if(n){nid=nextId(mockBookings,'BKG-');addItem(mockBookings,Object.assign({id:nid,type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings');}else{nid=b.id;updateItem(mockBookings,b.id,d,'bookings');}var pr=parsePriceStr(g('f_price'));if(pr>0&&g('f_terms')){var old=bookingScheduleFor(nid);if(old)mockBookingSchedules=mockBookingSchedules.filter(function(x){return String(x.bookingId)!==String(nid);});generateBookingSchedule(nid,pr,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10));}else if(!bookingScheduleFor(nid)){showToast('No schedule — set terms & numeric price','info');}});toggleBookingTypeFields();}
+  openModal(n?'New Booking':'Edit Booking',formRow(selectField('Client','f_client',b.client,customerOpts(),true),selectField('Type','f_btype',normType(b.type||''),['','Land','Flat'],true,'toggleBookingTypeFields()'))+formRow(selectField('Project','f_prop',b.property,projectOptsByType(b.type||''),true),'<div id="f_bunitRow">'+inputField('Unit','f_unit',b.unit)+'</div>')+'<div id="f_bfloorRow">'+inputField('Floor','f_floor',b.floor||'')+'</div>'+formRow(inputField('Price','f_price',b.price,'',true),inputField('Advance','f_adv',b.advance))+formRow(selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),selectField('Payment Terms','f_terms',b.terms||'',BOOKING_TERMS))+formRow(inputField('Schedule Start','f_schedStart',b.schedStart||''),''),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),floor:g('f_floor'),price:g('f_price'),advance:g('f_adv'),status:g('f_status'),terms:g('f_terms'),schedStart:g('f_schedStart'),type:g('f_btype')||''};var _proj=mockProjects.find(function(x){return x.name===d.property;});d.type=normType(d.type||(_proj?(_proj.type==='land'?'Land':'Flat'):b.type));if(d.type==='Land')d.floor='';var nid;if(n){nid=nextId(mockBookings,'BKG-');addItem(mockBookings,Object.assign({id:nid,type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings');}else{nid=b.id;updateItem(mockBookings,b.id,d,'bookings');}var pr=parsePriceStr(g('f_price'));if(pr>0&&g('f_terms')){var old=bookingScheduleFor(nid);if(old)mockBookingSchedules=mockBookingSchedules.filter(function(x){return String(x.bookingId)!==String(nid);});generateBookingSchedule(nid,pr,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10),parsePriceStr(g('f_adv')));}else if(!bookingScheduleFor(nid)){showToast('No schedule — set terms & numeric price','info');}});toggleBookingTypeFields();}
 function crudEmployee(item){
   var n=!item;
   var depts=['Construction','Sales','Finance','Management','HR','IT'];
@@ -13197,7 +13228,7 @@ function openBooking(id){
   const b=mockBookings.find(function(x){return x.id===id});if(!b)return;
   showDetailPanel('Booking: '+b.id,
     detailStatRow([['Client',b.client],['Property',b.property],['Unit',b.unit],['Date',b.date],['Type',b.type],['Status',b.status]])+
-    '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Summary</h3>'+detailStatRow([['Total Price',b.price],['Advance Paid',b.advance],['Due',b.price+' - '+b.advance]])+'</div>'+
+    '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Summary</h3>'+detailStatRow([['Total Price',b.price],['Advance Paid',b.advance],['Due',fmtDue(b.price,b.advance)]])+'</div>'+
     '<div style="margin-top:12px"><h3 style="font-size:11px;font-weight:600;color:#555;margin-bottom:6px">Payment Schedule (পেমেন্ট শিডিউল)</h3><div style="padding:10px;background:#fff;border:1px solid #e8e8e8;border-radius:6px">'+renderBookingScheduleHTML(bookingScheduleFor(b.id))+'</div></div>',
     '<div class="lead-footer"><button class="lead-foot-btn primary" onclick="crudBooking(mockBookings.find(function(x){return x.id===\''+b.id+'\'}));closeLeadPanel()">✎ Edit</button><button class="lead-foot-btn success">📄 Receipt</button></div>'
   );
@@ -13287,6 +13318,26 @@ function parsePriceStr(s){
   return Math.round(n);
 }
 function bookingScheduleFor(bid){return mockBookingSchedules.find(function(x){return String(x.bookingId)===String(bid);})||null;}
+function fmtDue(price,adv){
+  var p=parsePriceStr(price),a=parsePriceStr(adv);
+  if(p>0)return '৳'+Math.max(0,p-a).toLocaleString('en-IN');
+  return (price||'—')+' - '+(adv||'—');
+}
+function applyPaymentToSchedule(client,amt){
+  if(!client||!amt)return;
+  var bk=mockBookings.find(function(b){return String(b.client)===String(client);});
+  if(!bk)return;
+  var s=bookingScheduleFor(bk.id);
+  if(!s||!s.installments||!s.installments.length)return;
+  var rem=amt;
+  for(var j=0;j<s.installments.length&&rem>0;j++){
+    var it=s.installments[j];
+    if(it.status==='Paid')continue;
+    if(rem>=it.amount){it.status='Paid';rem-=it.amount;}
+    else{rem=0;}
+  }
+  DB.save('booking_schedules');
+}
 function renderBookingScheduleHTML(s){
   if(!s)return '<div style="text-align:center;color:#999;font-size:10px;padding:6px">No schedule yet — edit the booking to set payment terms.</div>';
   var today=new Date().toISOString().slice(0,10);
@@ -13303,8 +13354,9 @@ function renderBookingScheduleHTML(s){
   '<div style="height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:#2e7d32;border-radius:3px;transition:width .3s"></div></div>'+
   '<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:3px;color:#888;font-size:8px">#</th><th style="text-align:left;padding:3px;color:#888;font-size:8px">Due Date</th><th style="text-align:right;padding:3px;color:#888;font-size:8px">Amount</th><th style="text-align:left;padding:3px;color:#888;font-size:8px">Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
-function generateBookingSchedule(bookingId, priceNum, terms, startISO){
+function generateBookingSchedule(bookingId, priceNum, terms, startISO, advance){
   priceNum=parseInt(priceNum)||0;
+  advance=parseInt(advance)||0;
   if(!priceNum||!terms)return null;
   var s=startISO?new Date(startISO):new Date();
   var inst=[];
@@ -13321,6 +13373,15 @@ function generateBookingSchedule(bookingId, priceNum, terms, startISO){
   var rem=priceNum-down;
   if(parts>1){var base=Math.floor(rem/parts);for(var i=0;i<parts-1;i++){addAt(step*(i+1),base);}addAt(step*parts,rem-base*(parts-1));}
   else if(parts===1&&downPct===0){addAt(0,priceNum,'Due');}
+  // If an advance/downpayment was actually collected, mark schedule installments Paid from the front (only fully-covered ones)
+  if(advance>0){
+    var remA=advance;
+    for(var j=0;j<inst.length&&remA>0;j++){
+      if(inst[j].status==='Paid')continue;
+      if(remA>=inst[j].amount){inst[j].status='Paid';remA-=inst[j].amount;}
+      else{remA=0;}
+    }
+  }
   var sched={id:nextId(mockBookingSchedules),bookingId:bookingId,terms:terms,total:priceNum,down:down,installments:inst};
   mockBookingSchedules.push(sched);DB.save('booking_schedules');
   return sched;
