@@ -92,3 +92,13 @@ Two reasons: (a) the contracted scope's remaining items are mostly finance/compl
 3. Functional backup/restore + audit export + GDPR.
 4. MMC license tracker + implementation checklist + automated dues notifications.
 5. Extended demo script + dry-run PASS; live tunnel at presentation state.
+
+---
+
+## Status (2026-08) — COMPLETE ✅
+
+- **Phase A** (`d0b42d8`, SW v10-v2): e-Invoice/VAT engine — VAT/TDS/AIT on invoices (Net = Amount + VAT − TDS − AIT, `invNet()` drives outstanding/due everywhere), NBR numbering (`INV-2026-0001` + challan), VAT Register card, supplier Payable Aging in Party Ledger, Credit Notes wired from invoice modal + Applied ripple (dues + reversal txn), new **Fixed Assets** module (8 assets, depreciation, SFP NBV line). Verified: net math, register, CN 10L→8L, aging; 0 JS errors.
+- **Phase B** (`1a5598d`, SW v10-v3): functional Backup & Restore (103-collection JSON export/import), Activity Log CSV export + invoice version history (🕓), GDPR Export/Erase in party detail, Unsold Balance Ledger in Projects, segmentation verified. Verified: erase 11→10, ledger rows; 0 errors.
+- **Phase C** (`aebfa88`, SW v10-v4): new **License & SLA** module (7-installment Work Order tracker ৳8L, checklist w/ owners, Grace/Suspended simulation + read-only banner), automated dues reminders (WhatsApp templates → whatsapp_log + notifications), bulk invoice print pack + table CSV export, demo-script.md v2. Verified: license sim, reminders 7→15, fns; 0 errors.
+- **Phase D**: dry-run PASS — all new modules render, pristine 25/17/12/12/8, zero console errors; release SW v10-v5.
+- **Now 53 modules / 11 groups.** `docs/demo-script.md` updated for V10.
