@@ -112,5 +112,5 @@ Two reasons: (a) the contracted scope's remaining items are mostly finance/compl
 - **Phase 1 — Auth & RBAC:** session login (Werkzeug password hashes), `ROLE_MODULES` server-side guards (403 on cross-role access), activity audit log.
 - **Phase 2 — Core APIs:** REST CRUD for leads/customers/projects/dues/assets, bookings (BKG-XXX ids), invoices (NBR `INV-2026-XXXX` + VAT/TDS/AIT net computation), payments with the full ripple (Cleared → invoice status + dues ledger + cash-flow txn), license (7-installment tracker), unpaid-invoices report.
 - **Verified live:** admin/finance login, bad-password 401, Finance→leads 403 / Finance→invoices 200, VAT invoice INV-2026-0001 net ৳10.5M, payment PAY-013 → INV-002 Overdue→Partial + Rubina dues 10L→8L, license status toggle, report outstanding.
-- **Remaining:** Phase 3 UI rewiring (prototype `DB.init`/localStorage → `fetch()`), Phase 4 PDF/Excel reports, Phase 5 deploy (gunicorn + Lightsail + tunnel), Phase 6 portal + payment gateway.
+- **Remaining:** Phase 5 deploy (gunicorn + Lightsail + tunnel), Phase 6 portal + payment gateway. (Phases 3–4 shipped 2026-08: Server Sync + PDF/Excel reports — see backend/README.md.)
 - Run: `cd backend && venv/bin/python seed.py && venv/bin/python app.py` (port 5001). README in `backend/`.
