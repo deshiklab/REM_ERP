@@ -2544,6 +2544,9 @@ function _pgHtml(id,total,page,tp,perPage){
 }
 function renderModule() { switchModule(currentModule,true); }// ═══ RENDER FUNCTIONS ═══
 function renderDashboard(el){
+  if(currentRole==='Sales Agent')return renderDashSales(el);
+  if(currentRole==='Finance')return renderDashFinance(el);
+  if(currentRole==='Site Engineer')return renderDashEngineer(el);
   const pDbB=_pg('db_bookings',mockBookings);
   var dbLeadsSorted = mockLeads.slice().sort(function(a,b){var p={High:0,Medium:1,Low:2};return (p[a.priority]||9)-(p[b.priority]||9)});
   var dbLeadsTop = dbLeadsSorted.slice(0,4);
@@ -2587,6 +2590,116 @@ function renderDashboardCharts(){
   var lCtx=document.getElementById('leadChart');if(lCtx)try{window._dbCharts.push(new Chart(lCtx,{type:'line',data:{labels:months.slice(0,9),datasets:[{label:'Inquiries',data:[8,12,9,15,11,18,14,20,16],borderColor:'#1565c0',backgroundColor:'rgba(21,101,192,.1)',fill:true,tension:.35,pointRadius:3},{label:'Conversions',data:[2,3,4,5,4,7,6,8,7],borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.1)',fill:true,tension:.35,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}}));}catch(e){}
 }
 
+// ═══ ROLE-BASED DASHBOARDS (V9) ═══
+function dashStats(rows){var h='<div class="stats-row" style="margin-bottom:12px">';rows.forEach(function(s){h+='<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value"'+(s[2]?' style="color:'+s[2]+'"':'')+'>'+s[1]+'</div>'+(s[3]?'<div class="trend">'+s[3]+'</div>':'')+'</div>';});return h+'</div>';}
+function dashQuick(cards){var h='<div class="dashboard-quick" style="margin-bottom:12px">';cards.forEach(function(c){h+='<div class="quick-card" onclick="switchModule(\''+c[3]+'\')"><div class="icon" style="background:'+c[1]+';color:'+c[2]+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div class="info"><div class="title">'+c[0]+'</div><div class="count">'+c[4]+'</div></div></div>';});return h+'</div>';}
+function renderDashSales(el){
+  var pipeVal=mockLeads.reduce(function(s,l){return s+parsePriceStr(l.value)},0);
+  var hot=mockLeads.filter(function(l){return l.priority==='High'}).length;
+  var openSt=['Negotiation','Booking','Downpayment','Installments','Site Visit'];
+  var openDeals=mockLeads.filter(function(l){return openSt.indexOf(l.status)>=0}).length;
+  var sale26=mockBookings.filter(function(b){return String(b.date||'').indexOf('2026')>=0}).reduce(function(s,b){return s+parsePriceStr(b.price)},0);
+  var booked=mockBookings.filter(function(b){return b.status==='Confirmed'}).length;
+  var conv=mockLeads.length?Math.round(mockBookings.length/mockLeads.length*100):0;
+  var stCount={};mockLeads.forEach(function(l){stCount[l.status]=(stCount[l.status]||0)+1;});
+  var stages=LEAD_STAGES.slice();var maxC=0;stages.forEach(function(s){if((stCount[s]||0)>maxC)maxC=stCount[s];});
+  var hotLeads=mockLeads.slice().sort(function(a,b){var p={High:0,Medium:1,Low:2};return (p[a.priority]||9)-(p[b.priority]||9)}).slice(0,6);
+  var recentB=mockBookings.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))}).slice(0,6);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Sales Agent · Pipeline &amp; Performance</div>'
+    +dashStats([['Pipeline Value','৳'+(pipeVal/10000000).toFixed(1)+' Cr','#2e7d32',''],['Hot Leads',hot,'#c62828',''],['Open Deals',openDeals,'#1565c0',''],['Sales YTD 2026','৳'+(sale26/10000000).toFixed(1)+' Cr','#2F80ED',''],['Confirmed Bookings',booked,'#00838f',''],['Conversion',conv+'%','#7b1fa2','']])
+    +dashQuick([['CRM & Leads',mockLeads.length+' leads','crm','#fff3e0','#e65100'],['Bookings',mockBookings.length+' active','bookings','#e3f2fd','#1565c0'],['Proposals',(window.mockProposals||[]).length+' total','proposals','#ede7f6','#5e35b1'],['Dues & Recovery',mockDues.length+' accts','dues_recovery','#fce4ec','#c62828'],['Customers',mockCustomers.length+' clients','customers','#e0f2f1','#00695c']])
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#127919; Sales Pipeline by Stage</h3></div><div class="card-body" style="padding:10px">'+stages.map(function(s){var c=stCount[s]||0;var w=maxC?Math.round(c/maxC*100):0;return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span>'+s+'</span><span style="font-weight:600">'+c+'</span></div><div class="progress-bar"><div class="fill" style="width:'+w+'%;background:'+(s==='Booking'?'#2e7d32':s==='Negotiation'?'#e65100':s==='New Inquiry'?'#2F80ED':'#888')+'"></div></div></div>';}).join('')+'</div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#128293; Hot Leads <span style="font-size:9px;font-weight:400;color:#888">priority order</span></h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Lead</th><th>Property</th><th>Value</th><th>Follow-up</th></tr></thead><tbody>'+hotLeads.map(function(l){return '<tr style="cursor:pointer" onclick="openLead('+l.id+')"><td style="font-weight:500">'+l.name+'</td><td style="font-size:9px;color:#888">'+l.property+'</td><td class="num">'+l.value+'</td><td style="font-size:9px;color:'+(String(l.nextFollowUp).indexOf('Overdue')>=0?'#c62828':'#888')+'">'+l.nextFollowUp+'</td></tr>';}).join('')+'</tbody></table></div></div></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#128202; Lead Sources</h3></div><div class="card-body" style="padding:8px;height:190px"><canvas id="salesSrcChart"></canvas></div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#128200; Lead Conversion Trend</h3></div><div class="card-body" style="padding:8px;height:190px"><canvas id="salesTrendChart"></canvas></div></div>'
+    +'</div>'
+    +'<div class="card" style="margin-top:10px"><div class="card-header"><h3>&#128203; Recent Bookings</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Property</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>'+recentB.map(function(b){return '<tr style="cursor:pointer" onclick="openBooking(\''+b.id+'\')"><td style="font-weight:500">'+b.id+'</td><td>'+b.client+'</td><td>'+b.property+'</td><td class="num">'+b.price+'</td><td><span class="badge-status '+(b.status==='Confirmed'?'badge-active':'badge-pending')+'">'+b.status+'</span></td></tr>';}).join('')+'</tbody></table></div></div></div>'
+    +'</div>';
+  setTimeout(function(){renderDashSalesCharts();},100);
+}
+function renderDashSalesCharts(){
+  if(window._dbCharts)window._dbCharts.forEach(function(c){c.destroy()});
+  window._dbCharts=[];
+  var srcCount={};mockLeads.forEach(function(l){srcCount[l.source]=(srcCount[l.source]||0)+1;});
+  var srcs=Object.keys(srcCount).slice(0,6);
+  var sCtx=document.getElementById('salesSrcChart');
+  if(sCtx)try{window._dbCharts.push(new Chart(sCtx,{type:'doughnut',data:{labels:srcs,datasets:[{data:srcs.map(function(s){return srcCount[s]}),backgroundColor:['#1565c0','#e65100','#2e7d32','#7b1fa2','#00897b','#888'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var tCtx=document.getElementById('salesTrendChart');
+  if(tCtx)try{window._dbCharts.push(new Chart(tCtx,{type:'line',data:{labels:months.slice(0,9),datasets:[{label:'Inquiries',data:[8,12,9,15,11,18,14,20,16],borderColor:'#1565c0',backgroundColor:'rgba(21,101,192,.1)',fill:true,tension:.35,pointRadius:3},{label:'Conversions',data:[2,3,4,5,4,7,6,8,7],borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.1)',fill:true,tension:.35,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}}));}catch(e){}
+}
+function renderDashFinance(el){
+  var bankTotal=mockBankAccounts.reduce(function(s,b){return s+parsePriceStr(b.balance)},0);
+  var inflow=mockTransactions.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
+  var outflow=mockTransactions.filter(function(t){return t.type==='Outflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
+  var receiv=mockDues.reduce(function(s,d){return s+(d.due||0)},0);
+  var overInv=mockInvoices.filter(function(i){return i.status==='Overdue'}).length;
+  var duesActive=mockDues.filter(function(d){return d.status==='Overdue'||d.status==='Critical'}).length;
+  var overInvs=mockInvoices.filter(function(i){return i.status==='Overdue'}).slice(0,6);
+  var topDues=mockDues.slice().sort(function(a,b){return (b.due||0)-(a.due||0)}).slice(0,6);
+  var recentTx=mockTransactions.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))}).slice(0,6);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Finance · Cash Position &amp; Receivables</div>'
+    +dashStats([['Bank Balance','৳'+(bankTotal/10000000).toFixed(2)+' Cr','#1565c0',''],['Cash Inflow','৳'+(inflow/100000).toFixed(1)+' L','#2e7d32',''],['Cash Outflow','৳'+(outflow/100000).toFixed(1)+' L','#c62828',''],['Receivables','৳'+(receiv/100000).toFixed(1)+' L','#e65100',''],['Overdue Invoices',overInv,'#c62828',''],['Dues Accounts',duesActive+' active','#e65100','']])
+    +dashQuick([['Finance',mockTransactions.length+' txns','finance','#fce4ec','#c62828'],['Invoices',mockInvoices.length+' total','invoices_view','#e8f5e9','#2e7d32'],['Payments',mockPayments.length+' rec','payments_view','#e0f7fa','#00838f'],['Dues & Recovery',mockDues.length+' accts','dues_recovery','#fff3e0','#e65100'],['Investment & Loans','6 inv · 5 loans','investment_loans','#ede7f6','#5e35b1']])
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#128200; Monthly Cash Flow (&#2547;L)</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="finCashChart"></canvas></div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#127974; Bank Balances</h3></div><div class="card-body" style="padding:10px">'+mockBankAccounts.map(function(b){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f5f5f5"><div><div style="font-size:11px;font-weight:600">'+b.name+'</div><div style="font-size:9px;color:#888">'+b.account+' · '+b.type+'</div></div><div style="font-size:12px;font-weight:700;color:#1565c0">'+b.balance+'</div></div>';}).join('')+'</div></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#9888; Overdue Invoices</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Client</th><th class="num">Amount</th><th>Due</th></tr></thead><tbody>'+(overInvs.length?overInvs.map(function(i){return '<tr style="cursor:pointer" onclick="openInvoiceRef(\''+i.id+'\')"><td style="font-weight:500">'+i.id+'</td><td>'+i.client+'</td><td class="num">৳'+(i.amount/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#c62828">'+i.dueDate+'</td></tr>';}).join(''):'<tr><td colspan="4" style="text-align:center;color:#999;padding:14px;font-size:11px">No overdue invoices &#127881;</td></tr>')+'</tbody></table></div></div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#128176; Top Dues</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Customer</th><th class="num">Due</th><th>Status</th></tr></thead><tbody>'+topDues.map(function(d){return '<tr style="cursor:pointer" onclick="switchModule(\'dues_recovery\')"><td style="font-weight:500">'+d.customer+'</td><td class="num">৳'+(d.due/100000).toFixed(1)+'L</td><td><span class="badge-status '+(d.status==='Critical'||d.status==='Overdue'?'badge-pending':'badge-reserved')+'">'+d.status+'</span></td></tr>';}).join('')+'</tbody></table></div></div></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#129534; Recent Transactions</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Desc</th><th class="num">Amount</th></tr></thead><tbody>'+recentTx.map(function(t){return '<tr><td style="font-weight:500;font-size:9px">'+t.id+'</td><td style="font-size:10px">'+t.desc+'</td><td class="num" style="color:'+(t.type==='Inflow'?'#2e7d32':'#c62828')+'">'+(t.fmt||'')+'</td></tr>';}).join('')+'</tbody></table></div></div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#129519; Expense Breakdown</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="finExpChart"></canvas></div></div>'
+    +'</div>'
+    +'</div>';
+  setTimeout(function(){renderDashFinanceCharts();},100);
+}
+function renderDashFinanceCharts(){
+  if(window._dbCharts)window._dbCharts.forEach(function(c){c.destroy()});
+  window._dbCharts=[];
+  var cCtx=document.getElementById('finCashChart');
+  if(cCtx)try{var _in={},_out={};mockTransactions.forEach(function(t){var k=String(t.date||'').slice(0,7);if(t.type==='Inflow')_in[k]=(_in[k]||0)+(t.amount||0);else _out[k]=(_out[k]||0)+(t.amount||0);});var ks=Object.keys(_in).concat(Object.keys(_out)).filter(function(v,i,a){return a.indexOf(v)===i}).sort();var inD=ks.map(function(k){return Math.round((_in[k]||0)/100000*10)/10;});var outD=ks.map(function(k){return Math.round((_out[k]||0)/100000*10)/10;});window._dbCharts.push(new Chart(cCtx,{type:'bar',data:{labels:ks,datasets:[{label:'Inflow',data:inD,backgroundColor:'rgba(46,125,50,.7)',borderColor:'#2e7d32',borderWidth:1,borderRadius:4},{label:'Outflow',data:outD,backgroundColor:'rgba(198,40,40,.6)',borderColor:'#c62828',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:function(v){return'৳'+v+'L'}}}}}}));}catch(e){}
+  var eCtx=document.getElementById('finExpChart');
+  if(eCtx)try{var cat={};mockTransactions.forEach(function(t){if(t.type==='Outflow')cat[t.category]=(cat[t.category]||0)+(t.amount||0);});var cats=Object.keys(cat);window._dbCharts.push(new Chart(eCtx,{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(function(c){return cat[c]}),backgroundColor:['#1565c0','#e65100','#2e7d32','#7b1fa2','#00897b','#888','#f9a825','#c62828'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
+}
+function renderDashEngineer(el){
+  var actP=mockProjects.filter(function(p){return p.status==='In Progress'||p.status==='Near Completion'}).length;
+  var avgProg=mockProjects.length?Math.round(mockProjects.reduce(function(s,p){return s+(p.progress||0)},0)/mockProjects.length):0;
+  var uA=0,uS=0;mockProperties.forEach(function(p){(p.units||[]).forEach(function(u){if(u.status==='Available')uA++;else if(u.status==='Sold')uS++;});});
+  var pA=mockPlots.filter(function(p){return p.status==='available'}).length;
+  var lowInv=mockInventory.filter(function(i){return i.status!=='Adequate'||(i.reorder&&i.qty<=i.reorder);});
+  var unitsByProj=mockProperties.slice().sort(function(a,b){return (b.units||[]).length-(a.units||[]).length}).slice(0,5);
+  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Site Engineer · Projects &amp; Construction</div>'
+    +dashStats([['Active Projects',actP,'#2e7d32',''],['Avg Progress',avgProg+'%','#2F80ED',''],['Units Sold',uS,'#c62828',''],['Units Available',uA,'#2e7d32',''],['Plots Available',pA,'#4caf50',''],['Stock Alerts',lowInv.length,'#e65100','']])
+    +dashQuick([['Projects',mockProjects.length+' active','projects','#e0f2f1','#00695c'],['Flats & Units',mockProperties.length+' props','properties_units','#e3f2fd','#1565c0'],['Plots & Blocks',mockPlots.length+' plots','plots','#e8f5e9','#2e7d32'],['Stock & Procurement',mockInventory.length+' items','stock','#fff3e0','#e65100'],['Contractors',mockContractors.length+' vendors','contractors','#fce4ec','#c62828']])
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#127963; Project Progress</h3></div><div class="card-body" style="padding:10px">'+mockProjects.slice().sort(function(a,b){return (b.progress||0)-(a.progress||0)}).map(function(p){return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:500">'+p.name+'</span><span>'+p.progress+'%</span></div><div class="progress-bar"><div class="fill" style="width:'+p.progress+'%;background:'+(p.progress>60?'#4caf50':p.progress>30?'#ff9800':'#e53935')+'"></div></div><div style="font-size:9px;color:#888">'+p.status+' · '+(p.plots?p.plots+' plots':(p.units||0)+' units')+'</div></div>';}).join('')+'</div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#127968; Unit Availability by Property</h3></div><div class="card-body" style="padding:10px">'+unitsByProj.map(function(p){var u=p.units||[];var av=u.filter(function(x){return x.status==='Available'}).length;var sd=u.filter(function(x){return x.status==='Sold'}).length;var tot=u.length||1;return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span>'+p.name+'</span><span style="color:#888">'+av+' avail · '+sd+' sold</span></div><div class="progress-bar" style="height:6px"><div class="fill" style="width:'+Math.round(av/tot*100)+'%;background:#4caf50"></div></div></div>';}).join('')+'</div></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#9888; Inventory Alerts</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Site</th><th class="num">Qty</th><th>Status</th></tr></thead><tbody>'+(lowInv.length?lowInv.slice(0,6).map(function(i){return '<tr style="cursor:pointer" onclick="switchModule(\'stock\')"><td style="font-weight:500">'+i.item+'</td><td style="font-size:9px;color:#888">'+i.site+'</td><td class="num">'+i.qty+' '+i.unit+'</td><td><span class="badge-status badge-pending">'+i.status+'</span></td></tr>';}).join(''):'<tr><td colspan="4" style="text-align:center;color:#999;padding:14px;font-size:11px">All stock levels healthy &#127881;</td></tr>')+'</tbody></table></div></div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#128203; Open Tasks</h3></div><div class="card-body" style="padding:6px 10px">'+(function(){var tasks=mockTasks.filter(function(t){return t.status!=='Done'}).slice(0,6);if(!tasks.length)return '<div style="padding:10px;text-align:center;color:#999;font-size:11px">All tasks completed!</div>';return tasks.map(function(t){return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:11px"><span style="width:6px;height:6px;border-radius:50%;background:'+(t.priority==='High'?'#e53935':t.priority==='Medium'?'#ff9800':'#999')+';flex-shrink:0"></span><span style="flex:1;color:#333">'+t.title+'</span><span style="font-size:9px;color:#888">'+t.status+'</span></div>';}).join('')})()+'</div></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'
+    +'<div class="card"><div class="card-header"><h3>&#127383; Plot Availability</h3></div><div class="card-body" style="padding:8px;height:190px"><canvas id="engPlotChart"></canvas></div></div>'
+    +'<div class="card"><div class="card-header"><h3>&#128668; Equipment Status</h3></div><div class="card-body" style="padding:8px;height:190px"><canvas id="engEquipChart"></canvas></div></div>'
+    +'</div>'
+    +'</div>';
+  setTimeout(function(){renderDashEngineerCharts();},100);
+}
+function renderDashEngineerCharts(){
+  if(window._dbCharts)window._dbCharts.forEach(function(c){c.destroy()});
+  window._dbCharts=[];
+  var pCtx=document.getElementById('engPlotChart');
+  if(pCtx)try{var pc={available:0,sold:0,reserved:0,not_acquired:0};mockPlots.forEach(function(p){pc[p.status]=(pc[p.status]||0)+1;});var pl=['available','sold','reserved','not_acquired'];window._dbCharts.push(new Chart(pCtx,{type:'doughnut',data:{labels:['Available','Sold','Reserved','Not Acquired'],datasets:[{data:pl.map(function(k){return pc[k]||0}),backgroundColor:['#4caf50','#e53935','#1e88e5','#bdbdbd'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
+  var eCtx=document.getElementById('engEquipChart');
+  if(eCtx)try{var ec={};mockEquipment.forEach(function(x){ec[x.status]=(ec[x.status]||0)+1;});var es=Object.keys(ec);window._dbCharts.push(new Chart(eCtx,{type:'doughnut',data:{labels:es,datasets:[{data:es.map(function(k){return ec[k]}),backgroundColor:['#2e7d32','#e65100','#c62828','#888'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
+}
 // ═══ ACTIVITY LOG HELPER ═══
 function logActivity(action, module, entity, entityId, details) {
   if (!window.mockActivityLog) window.mockActivityLog = [];
