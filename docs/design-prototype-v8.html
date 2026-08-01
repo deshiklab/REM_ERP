@@ -2539,10 +2539,12 @@ function renderDashboard(el){
   var dbLeadsSorted = mockLeads.slice().sort(function(a,b){var p={High:0,Medium:1,Low:2};return (p[a.priority]||9)-(p[b.priority]||9)});
   var dbLeadsTop = dbLeadsSorted.slice(0,4);
   const a=mockPlots.filter(p=>p.status==='available').length, s=mockPlots.filter(p=>p.status==='sold').length, r=mockPlots.filter(p=>p.status==='reserved').length;
+  const _saleVal=mockBookings.reduce((s,b)=>s+parseMoneyStr(b.price),0);
+  const _sale26=mockBookings.filter(b=>String(b.date||'').indexOf('2026')>=0).reduce((s,b)=>s+parseMoneyStr(b.price),0);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v8 · Role: ${currentRole} · ${Object.keys(GROUPS).reduce(function(s,g){return s+GROUPS[g].mods.length},0)} Modules</div>
     <div class="stats-row" style="margin-bottom:12px">${[
       ['Available Plots',a,'#4caf50','+2 this month'],['Sold Plots',s,'#e53935',''],['Reserved',r,'#1e88e5',''],
-      ['Revenue','৳12.5Cr','','+18%'],['Active Bookings',mockBookings.filter(b=>b.status==='Confirmed').length,'',''],['Hot Leads',mockLeads.filter(l=>l.priority==='High').length,'','+3 this week']
+      ['Sales Value','৳'+(_saleVal/10000000).toFixed(1)+' Cr','#2e7d32','৳'+(_sale26/10000000).toFixed(1)+' Cr YTD'],['Active Bookings',mockBookings.filter(b=>b.status==='Confirmed').length,'',''],['Hot Leads',mockLeads.filter(l=>l.priority==='High').length,'','+3 this week']
     ].map(([l,v,c,t])=>`<div class="stat-card"><div class="label">${l}</div><div class="value"${c?` style="color:${c}"`:''}>${v}</div>${t?`<div class="trend">${t}</div>`:''}</div>`).join('')}</div>
     <div class="dashboard-quick" style="margin-bottom:12px">${[
       ['CRM & Leads',`${mockLeads.length} leads`,'crm','#fff3e0','#e65100'],
@@ -2558,7 +2560,7 @@ function renderDashboard(el){
       <div class="card"><div class="card-header"><h3>Hot Leads</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Property</th><th>Source</th><th>Status</th></tr></thead><tbody>${dbLeadsTop.map(l=>`<tr style="cursor:pointer" onclick="openLead(${l.id})"><td style="font-weight:500">${l.name}</td><td>${l.property}</td><td>${l.source}</td><td><span class="badge-status ${l.status==='Booking'?'badge-active':l.status==='New Inquiry'?'badge-pending':'badge-reserved'}">${l.status}</span></td></tr>`).join('')}</tbody></table></div></div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
-      <div class="card"><div class="card-header"><h3>&#128200; Revenue vs Expense</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="revChart"></canvas></div></div>
+      <div class="card"><div class="card-header"><h3>&#128200; Sales vs Expenses (&#2547;Cr)</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="revChart"></canvas></div></div>
       <div class="card"><div class="card-header"><h3>&#129519; Expense Breakdown</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="expChart"></canvas></div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
@@ -2571,7 +2573,7 @@ function renderDashboardCharts(){
   if(window._dbCharts)window._dbCharts.forEach(function(c){c.destroy()});
   window._dbCharts=[];
   var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var rCtx=document.getElementById('revChart');if(rCtx)try{window._dbCharts.push(new Chart(rCtx,{type:'bar',data:{labels:months,datasets:[{label:'Income',data:[32,28,41,38,45,52,48,55,62,58,68,72],backgroundColor:'rgba(46,125,50,.7)',borderColor:'#2e7d32',borderWidth:1,borderRadius:4},{label:'Expense',data:[18,15,22,20,25,28,24,30,32,28,35,38],backgroundColor:'rgba(198,40,40,.6)',borderColor:'#c62828',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:function(v){return'\u09F3'+v+'L'}}}}}}));}catch(e){}
+  var rCtx=document.getElementById('revChart');if(rCtx)try{var _bm={},_xm={};mockBookings.forEach(function(b){var d=String(b.date||'');var mo={'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'}[d.slice(0,3)];if(mo){var k=d.slice(-4)+'-'+mo;_bm[k]=(_bm[k]||0)+parseMoneyStr(b.price);}});mockTransactions.forEach(function(t){if(t.date&&t.type==='Outflow'){var k=String(t.date).slice(0,7);_xm[k]=(_xm[k]||0)+(t.amount||0);}});var _ml=Object.keys(_bm).sort(),_sD=_ml.map(function(k){return Math.round(_bm[k]/10000000*100)/100;}),_eD=_ml.map(function(k){return Math.round((_xm[k]||0)/10000000*100)/100;});window._dbCharts.push(new Chart(rCtx,{type:'bar',data:{labels:_ml,datasets:[{label:'Sales (Bookings)',data:_sD,backgroundColor:'rgba(46,125,50,.7)',borderColor:'#2e7d32',borderWidth:1,borderRadius:4},{label:'Expenses',data:_eD,backgroundColor:'rgba(198,40,40,.6)',borderColor:'#c62828',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:function(v){return'\u09F3'+v+'Cr'}}}}}}));}catch(e){}
   var eCtx=document.getElementById('expChart');if(eCtx)try{window._dbCharts.push(new Chart(eCtx,{type:'doughnut',data:{labels:['Construction','Materials','Marketing','Admin','Labor','Other'],datasets:[{data:[38,25,12,10,8,7],backgroundColor:['#1565c0','#e65100','#2e7d32','#7b1fa2','#00897b','#888'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
   var lCtx=document.getElementById('leadChart');if(lCtx)try{window._dbCharts.push(new Chart(lCtx,{type:'line',data:{labels:months.slice(0,9),datasets:[{label:'Inquiries',data:[8,12,9,15,11,18,14,20,16],borderColor:'#1565c0',backgroundColor:'rgba(21,101,192,.1)',fill:true,tension:.35,pointRadius:3},{label:'Conversions',data:[2,3,4,5,4,7,6,8,7],borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,.1)',fill:true,tension:.35,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}}));}catch(e){}
 }
@@ -2607,10 +2609,10 @@ function renderAnalytics(el){
   var recentPmts=mockPayments.slice().sort(function(a,b){return b.date.localeCompare(a.date)}).slice(0,5);
   el.innerHTML='<div class="module-container">'+
     '<div class="page-title">📊 Analytics Dashboard</div>'+
-    '<div class="page-subtitle">'+totalUnits+' units · '+mockProperties.length+' properties · ৳'+(totalRevenue/100000).toFixed(1)+'L revenue</div>'+
+    '<div class="page-subtitle">'+totalUnits+' units · '+mockProperties.length+' properties · ৳'+(totalRevenue/100000).toFixed(1)+'L cash inflow</div>'+
     '<div class="stats-row" style="margin-bottom:12px">'+
       function(){
-        var a=['Total Units',totalUnits+'','#2F80ED','Available',avail+'','#2e7d32','Sold',sold+'','#c62828','Booked',booked+'','#e65100','Reserved',reserved+'','#1565c0','Revenue','৳'+(totalRevenue/100000).toFixed(1)+'L','#00838f','Collection',collRate+'%','#7b1fa2'],h='';
+        var a=['Total Units',totalUnits+'','#2F80ED','Available',avail+'','#2e7d32','Sold',sold+'','#c62828','Booked',booked+'','#e65100','Reserved',reserved+'','#1565c0','Cash Inflow','৳'+(totalRevenue/100000).toFixed(1)+'L','#00838f','Collection',collRate+'%','#7b1fa2'],h='';
         for(var i=0;i<a.length;i+=3)h+='<div class="stat-card"><div class="label">'+a[i]+'</div><div class="value" style="color:'+a[i+2]+'">'+a[i+1]+'</div></div>';
         return h;
       }()+
@@ -2621,7 +2623,7 @@ function renderAnalytics(el){
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
       '<div class="card"><div class="card-header"><h3>💰 Payment Collection</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anPmtChart"></canvas></div></div>'+
-      '<div class="card"><div class="card-header"><h3>📊 Monthly Revenue Trend (2026)</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anRevChart"></canvas></div></div>'+
+      '<div class="card"><div class="card-header"><h3>📊 Monthly Cash Inflow (2026)</h3></div><div class="card-body" style="padding:8px;height:200px"><canvas id="anRevChart"></canvas></div></div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
       '<div class="card"><div class="card-header"><h3>🏆 Top Properties by Value</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Property</th><th>Location</th><th class="num">Units</th><th class="num">Total Value</th></tr></thead><tbody>'+
@@ -8706,7 +8708,7 @@ function renderFinance(el){
   const bankTotal=mockBankAccounts.reduce((s,b)=>{const n=parseInt(b.balance.replace(/[৳,]/g,''));return s+(isNaN(n)?0:n);},0);
 
   el.innerHTML=`<div class="fade-in">
-    <div class="page-title">Finance Dashboard</div><div class="page-subtitle">${mockTransactions.length} transactions \u00B7 \u09F3 ${fmtNum(netProfit)} net</div>
+    <div class="page-title">Finance Dashboard</div><div class="page-subtitle">${mockTransactions.length} transactions \u00B7 \u09F3 ${fmtNum(netProfit)} cash net</div>
     <div class="toolbar" style="margin-bottom:6px">
       <div class="tabs">${['dashboard','transactions','receive_payment','record_expense','invoices','payments','bank_accounts','transfers','journals','budgets','tax','reconcile','statements','credit_notes'].map(t=>`<div class="tab ${finT===t?'active':''}" onclick="financeTab='${t}';_PG={};renderModule()">${{'dashboard':'\uD83D\uDCCA Dashboard','transactions':'\uD83D\uDCCB Transactions','receive_payment':'\u2B07\uFE0F Receive','record_expense':'\u2B06\uFE0F Expense','invoices':'\uD83D\uDCC4 Invoices','payments':'\uD83D\uDCB0 Payments','bank_accounts':'\uD83C\uDFE6 Banks','transfers':'\uD83D\uDD01 Transfers','journals':'\uD83D\uDCD2 Journals','budgets':'\uD83D\uDCD0 Budgets','tax':'\uD83E\uDDFE Tax','reconcile':'\uD83D\uDD01 Reconcile','statements':'\uD83D\uDCCA Statements','credit_notes':'\uD83E\uDDFE Credit Notes'}[t]}</div>`).join('')}</div>
     </div>
@@ -17197,11 +17199,11 @@ function parseMoneyStr(v){
   if(typeof v==='number')return v;
   if(!v)return 0;
   var s=String(v).replace(/[৳,\s]/g,'').toLowerCase();
-  var m=/^([\d.]+)\s*(cr|lac|lakh|k)?$/.exec(s);
+  var m=/^([\d.]+)\s*(cr|lac|lakh|l|k)?$/.exec(s);
   if(!m)return 0;
   var n=parseFloat(m[1]);
   if(m[2]==='cr')n*=10000000;
-  else if(m[2]==='lac'||m[2]==='lakh')n*=100000;
+  else if(m[2]==='l'||m[2]==='lac'||m[2]==='lakh')n*=100000;
   else if(m[2]==='k')n*=1000;
   return isNaN(n)?0:n;
 }
