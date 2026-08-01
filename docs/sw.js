@@ -1,7 +1,7 @@
-/* REM ERP v8 — Service Worker */
-const CACHE = 'rem-erp-v8-v38';
+/* REM ERP v9 — Service Worker */
+const CACHE = 'rem-erp-v9-v1';
 const CORE = [
-  './design-prototype-v8.html',
+  './design-prototype-v9.html',
   './manifest.json',
   './pwa/icon-192.png',
   './pwa/icon-512.png',
@@ -38,7 +38,7 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put(req, clone));
         }
         return res;
-      }).catch(() => caches.match(req).then((m) => m || caches.match('./design-prototype-v8.html')))
+      }).catch(() => caches.match(req).then((m) => m || caches.match('./design-prototype-v9.html')))
     );
     return;
   }
