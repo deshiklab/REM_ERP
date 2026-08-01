@@ -67,6 +67,13 @@ CREATE TABLE IF NOT EXISTS license(
   id INTEGER PRIMARY KEY CHECK (id = 1), status TEXT DEFAULT 'Active',
   contract INTEGER DEFAULT 800000, installments TEXT, checklist TEXT
 );
+CREATE TABLE IF NOT EXISTS doc_store(
+  collection TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL,
+  updated_at TEXT, PRIMARY KEY(collection, id)
+);
+CREATE TABLE IF NOT EXISTS api_tokens(
+  token TEXT PRIMARY KEY, user_id INTEGER NOT NULL, created_at TEXT
+);
 """
 
 def get_db():

@@ -1104,11 +1104,123 @@ const DB = {
     } catch(e) { this._data[key] = JSON.parse(JSON.stringify(defaultData)); }
     return this._data[key];
   },
-  save(key) { try { localStorage.setItem('rem_'+key, JSON.stringify(this._data[key])); } catch(e) { console.warn('DB:', e); } },
+  save(key) { try { localStorage.setItem('rem_'+key, JSON.stringify(this._data[key])); API.queueSync(key); } catch(e) { console.warn('DB:', e); } },
   saveAll() { Object.keys(this._data).forEach(k => this.save(k)); },
   reset(key) { localStorage.removeItem('rem_'+key); delete this._data[key]; },
   resetAll() { Object.keys(this._data).forEach(k => { localStorage.removeItem('rem_'+k); delete this._data[k]; }); }
 };
+
+// ═══ SERVER SYNC — Phase 3 (Flask backend) ═══
+const API = {
+  url: localStorage.getItem('rem_api_url') || '',
+  token: localStorage.getItem('rem_api_token') || '',
+  connected: false, lastSync: localStorage.getItem('rem_last_sync') || null,
+  _queue: {}, _timer: null,
+  _base(){ return (this.url||'').replace(/\/+$/,''); },
+  _h(){ const h={'Content-Type':'application/json'}; if(this.token)h['Authorization']='Bearer '+this.token; return h; },
+  async _req(method, path, body, raw){
+    try{
+      const res = await fetch(this._base()+path, {method, headers:this._h(), body:body?JSON.stringify(body):undefined});
+      if(res.status===401){ this.connected=false; localStorage.removeItem('rem_api_token'); this.token=''; }
+      if(raw) return res;
+      const data = await res.json().catch(()=>({}));
+      return {status:res.status, data};
+    }catch(e){ return {status:0, data:{error:'Network error — is the server running at '+this._base()+'?'}}; }
+  },
+  async login(email, pass){
+    const r = await this._req('POST','/api/login',{email,password:pass});
+    if(r.status===200 && r.data.token){ this.token=r.data.token; this.connected=true; localStorage.setItem('rem_api_token',this.token); localStorage.setItem('rem_api_url',this.url); }
+    return r;
+  },
+  async logout(){
+    await this._req('POST','/api/logout',null);
+    this.token=''; this.connected=false; localStorage.removeItem('rem_api_token');
+  },
+  // Pull server snapshot into localStorage. Returns {changed, n}.
+  async bootstrap(){
+    const r = await this._req('GET','/api/bootstrap');
+    if(r.status!==200) return {status:r.status, changed:false, n:0, error:r.data.error};
+    const cols = r.data.collections||{};
+    let changed=false, n=0;
+    Object.keys(cols).forEach(function(k){
+      if(k==='_meta'||!Array.isArray(cols[k]))return;
+      const s=JSON.stringify(cols[k]);
+      if(localStorage.getItem('rem_'+k)!==s){ try{localStorage.setItem('rem_'+k,s);}catch(e){} changed=true; }
+      n+=cols[k].length;
+    });
+    this.connected=true; this.lastSync=r.data.meta.server_time;
+    localStorage.setItem('rem_last_sync', r.data.meta.server_time);
+    return {status:200, changed, n};
+  },
+  async pushAll(){
+    const cols={};
+    Object.keys(DB._data).forEach(function(k){ if(k!=='_meta') cols[k]=DB._data[k]; });
+    const r = await this._req('POST','/api/sync',{collections:cols});
+    if(r.status===200){ this.lastSync=new Date().toISOString(); localStorage.setItem('rem_last_sync',this.lastSync); }
+    return r;
+  },
+  queueSync(key){
+    if(!this.connected || !this._base())return;
+    const self=this;
+    this._queue[key]=JSON.parse(JSON.stringify(DB._data[key]||null));
+    if(this._timer)clearTimeout(this._timer);
+    this._timer=setTimeout(function(){
+      const cols=self._queue; self._queue={}; self._timer=null;
+      self._req('POST','/api/sync',{collections:cols}).then(function(r){
+        if(r.status===200){ self.lastSync=new Date().toISOString(); localStorage.setItem('rem_last_sync',self.lastSync); }
+      });
+    }, 800);
+  },
+  // Download a report with Bearer auth (fetch -> blob -> <a download>)
+  async download(path, filename){
+    if(!this.connected || !this._base()){ showToast('Connect to server first (Settings → Server Sync)','error'); return; }
+    try{
+      const res = await fetch(this._base()+path, {headers:{'Authorization':'Bearer '+this.token}});
+      if(!res.ok){ const d=await res.json().catch(()=>({})); showToast(d.error||('Download failed ('+res.status+')'),'error'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href=url; a.download=filename||'download'; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 500);
+      showToast('Downloaded '+filename,'success');
+    }catch(e){ showToast('Download failed','error'); }
+  }
+};
+// Auto-connect on boot if a token is stored (verify token; do NOT pull over local edits)
+setTimeout(function(){
+  if(!API.token || !API._base())return;
+  API._req('GET','/api/bootstrap').then(function(r){
+    if(r.status===200){ API.connected=true; API.lastSync=(r.data.meta||{}).server_time||null; localStorage.setItem('rem_last_sync',API.lastSync||''); }
+  });
+}, 900);
+
+function syncConnect(){
+  var url=(document.getElementById('syncUrl')||{}).value||'';
+  var em=(document.getElementById('syncEmail')||{}).value||'';
+  var pw=(document.getElementById('syncPass')||{}).value||'';
+  if(!url||!em||!pw){showToast('Enter server URL, email and password','error');return;}
+  API.url=url;
+  API.login(em,pw).then(function(r){
+    if(r.status===200){
+      showToast('Connected to server','success');
+      // First push local (rich seed) to the server so the server has full shapes
+      API.pushAll().then(function(pr){
+        if(pr.status===200)showToast('Pushed '+pr.data.rows+' rows to server','success');
+        renderModule();
+      });
+    }else showToast(r.data.error||'Login failed','error');
+  });
+}
+function syncPush(){
+  showToast('Pushing local data to server…','info');
+  API.pushAll().then(function(r){ showToast(r.status===200?('Pushed '+r.data.rows+' rows'):(r.data.error||'Push failed'),r.status===200?'success':'error'); renderModule(); });
+}
+function syncPull(){
+  showToast('Pulling server data…','info');
+  API.bootstrap().then(function(r){ if(r.status===200&&r.changed)location.reload(); else { showToast('Server data is up to date','info'); renderModule(); } });
+}
+
+
 
 window.mockLeads = DB.init('leads', [
   {id:1,name:'Tariqul Islam',territory:'Dhaka North',phone:'+880 1711 000000',email:'tariqul@example.com',property:'Muktodhara - 5 Katha',status:'Negotiation',priority:'High',type:'Local',source:'Bikroy.com',value:'৳1.5 Cr',lastContact:'2h ago',owner:'Hasanul Banna',nextFollowUp:'Today, 3:00 PM',paymentStatus:'Up to Date',facingDir:'South',floorPref:'Any',flatType:'Land',sizeSqFt:'1800 sqft',paymentPlan:'Construction Link',brokerId:null,
@@ -3936,7 +4048,7 @@ function openInvoice(id){
           return '<div class="installment-item"><div><div style="font-size:10px;font-weight:500">'+p.id+'</div><div style="font-size:9px;color:#888">'+p.date+' · '+p.method+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div><span style="font-size:8px;color:'+(p.status==='Cleared'?'#2e7d32':'#e65100')+'">'+p.status+'</span></div></div>';
         }).join(''):'')+
     '</div>',
-    actions+'<button class="action-btn primary" onclick="closeModal();crudCreditNote(null,\''+inv.id+'\')" style="padding:3px 8px;font-size:9px;background:#e65100;color:#fff;border:none;border-radius:4px;cursor:pointer">🧾 Credit Note</button> <button class="action-btn primary" onclick="closeModal();openClientCollect(\''+String(inv.client||'').replace(/'/g,"\\'")+'\')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">💳 Collect</button> <button class="action-btn secondary" onclick="openEntityHistory(\'invoice\',\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">🕓 History</button> <button class="action-btn secondary" onclick="printInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
+    actions+'<button class="action-btn primary" onclick="closeModal();crudCreditNote(null,\''+inv.id+'\')" style="padding:3px 8px;font-size:9px;background:#e65100;color:#fff;border:none;border-radius:4px;cursor:pointer">🧾 Credit Note</button> <button class="action-btn primary" onclick="closeModal();openClientCollect(\''+String(inv.client||'').replace(/'/g,"\\'")+'\')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">💳 Collect</button> <button class="action-btn secondary" onclick="openEntityHistory(\'invoice\',\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">🕓 History</button> <button class="action-btn secondary" onclick="API.download(\'/api/reports/invoice/\'+encodeURIComponent(\''+inv.id+'\')+\'.pdf\',\''+inv.id+'.pdf\')" style="padding:3px 8px;font-size:9px">⬇ PDF</button> <button class="action-btn secondary" onclick="printInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
   );
 }
 function markInvoicePaid(id){
@@ -10032,7 +10144,7 @@ function renderVatRegister(){
   if(!vatInvs.length)return '';
   var totalVat=vatInvs.reduce(function(s,i){return s+(i.vat||0);},0);
   var totalNet=vatInvs.reduce(function(s,i){return s+invNet(i);},0);
-  return '<div class="card" style="margin-top:8px"><div class="card-header"><h3>🧾 VAT Register (Sales Invoices — NBR)</h3><span class="badge-status badge-active" style="font-size:8px">Total VAT ৳'+(totalVat/100000).toFixed(1)+'L</span></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Invoice</th><th>Client</th><th class="num">Subtotal</th><th class="num">VAT %</th><th class="num">VAT</th><th class="num">TDS</th><th class="num">AIT</th><th class="num">Net</th><th>Challan Ref</th></tr></thead><tbody>'+
+  return '<div class="card" style="margin-top:8px"><div class="card-header"><h3>🧾 VAT Register (Sales Invoices — NBR)</h3><span style="display:flex;gap:4px;align-items:center"><span class="badge-status badge-active" style="font-size:8px">Total VAT ৳'+(totalVat/100000).toFixed(1)+'L</span><button class="action-btn secondary" onclick="API.download(\'/api/reports/vat-register.pdf\',\'vat-register.pdf\')" style="padding:2px 8px;font-size:8px" title="Server-side PDF">⬇ PDF</button></span></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Invoice</th><th>Client</th><th class="num">Subtotal</th><th class="num">VAT %</th><th class="num">VAT</th><th class="num">TDS</th><th class="num">AIT</th><th class="num">Net</th><th>Challan Ref</th></tr></thead><tbody>'+
     vatInvs.map(function(i){return '<tr><td style="font-weight:600;color:#2F80ED">'+i.id+'</td><td style="font-weight:500">'+i.client+'</td><td class="num">৳'+(i.amount/100000).toFixed(1)+'L</td><td class="num">'+(i.vatRate||0)+'%</td><td class="num" style="color:#e65100;font-weight:600">৳'+((i.vat||0)/100000).toFixed(1)+'L</td><td class="num">−৳'+((i.tds||0)/100000).toFixed(1)+'L</td><td class="num">−৳'+((i.ait||0)/100000).toFixed(1)+'L</td><td class="num" style="font-weight:700">৳'+((i.net||i.amount)/100000).toFixed(1)+'L</td><td style="font-size:9px;color:#888">'+(i.challan||'—')+'</td></tr>';}).join('')+
     '<tr><td colspan="8" style="text-align:right;font-weight:600;padding-top:6px">Register totals</td><td class="num" style="font-weight:700;color:#e65100;padding-top:6px">৳'+(totalVat/100000).toFixed(1)+'L VAT · Net ৳'+(totalNet/100000).toFixed(1)+'L</td></tr>'+
   '</tbody></table></div></div></div>';
@@ -11569,7 +11681,7 @@ function applyMenuConfig(){
   }catch(e){}
 }
 function renderSettings(el){
-  const si=[{id:'users',label:'Users & Roles',icon:'👤',desc:'Users, roles & permission matrix'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'fiscal',label:'Fiscal Year',icon:'📅',desc:'FY periods, open/close lock, opening balances'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'templates',label:'Templates',icon:'📄',desc:'Email, invoice & receipt templates'},{id:'themes',label:'Themes & Appearance',icon:'🎨',desc:'Presets, custom builder, font & density'},{id:'modules',label:'Modules',icon:'🧩',desc:'Enable / disable modules'},{id:'menu',label:'Menu Setup',icon:'🗂️',desc:'Show / hide & reorder groups'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
+  const si=[{id:'users',label:'Users & Roles',icon:'👤',desc:'Users, roles & permission matrix'},{id:'company',label:'Company & Branding',icon:'🏢',desc:'Company info, logo, theme colors'},{id:'finance',label:'Finance Config',icon:'💰',desc:'COA, banks, taxes, invoice templates'},{id:'fiscal',label:'Fiscal Year',icon:'📅',desc:'FY periods, open/close lock, opening balances'},{id:'project_config',label:'Project Config',icon:'📐',desc:'Defaults, units, master lists'},{id:'sync',label:'Server Sync',icon:'🔄',desc:'REM backend · push/pull · PDF/Excel'},{id:'integrations',label:'Integrations',icon:'🔗',desc:'API, webhooks, SMS, payment gateways'},{id:'automation',label:'Automation',icon:'⚡',desc:'Rule-based triggers & alerts'},{id:'templates',label:'Templates',icon:'📄',desc:'Email, invoice & receipt templates'},{id:'themes',label:'Themes & Appearance',icon:'🎨',desc:'Presets, custom builder, font & density'},{id:'modules',label:'Modules',icon:'🧩',desc:'Enable / disable modules'},{id:'menu',label:'Menu Setup',icon:'🗂️',desc:'Show / hide & reorder groups'},{id:'activity',label:'Activity Log',icon:'📋',desc:'Audit trail & system events'}];
   const sidebar=si.map(s=>'<div class="settings-nav-item'+(settingsTab===s.id?' on':'')+'" onclick="settingsTab=\''+s.id+'\';renderModule()" style="padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;transition:all .15s;background:'+(settingsTab===s.id?'#eef3ff':'transparent')+';'+(settingsTab===s.id?'font-weight:600;color:#2F80ED':'color:#555')+'"><span style="font-size:14px">'+s.icon+'</span><div><div style="font-size:11px;font-weight:'+(settingsTab===s.id?'600':'500')+'">'+s.label+'</div><div style="font-size:9px;color:#888">'+s.desc+'</div></div></div>').join('');
   var mc='';
   if(settingsTab==='users'){
@@ -11789,6 +11901,38 @@ function renderSettings(el){
     }).join('');
     mc='<div class="card"><div class="card-header"><h3>🗂️ Menu Setup</h3><div style="font-size:9px;color:#888">Show/hide sidebar groups & reorder them (sidebar, mobile nav & search follow this order)</div></div><div class="card-body" style="padding:8px;max-height:560px;overflow-y:auto">'+grpRows+'</div></div>'+
       '<div style="margin-top:6px;padding:8px 10px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:6px;font-size:9px;color:#2e7d32">💡 Hiding a group hides its sidebar icon and removes it from the mobile nav & search — module permissions are unchanged.</div>';
+  }else if(settingsTab==='sync'){
+    var _lastSync=API.lastSync?String(API.lastSync).slice(0,19).replace('T',' '):'—';
+    mc='<div class="card" style="margin-bottom:10px"><div class="card-header"><h3>🔄 Server Sync</h3><span class="badge-status '+(API.connected?'badge-active':'badge-closed')+'" style="margin-left:6px">'+(API.connected?'Connected':'Disconnected')+'</span></div><div class="card-body">'+
+      '<div style="font-size:10px;color:#666;line-height:1.6;margin-bottom:10px">Connect the prototype to the REM Flask backend (port 5001). While connected, every save is pushed to the server automatically and you can generate server-side PDF / Excel reports.</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
+        '<div class="form-group"><label class="form-label">Server URL</label><input class="form-input" id="syncUrl" value="'+API._base()+'" placeholder="http://localhost:5001"/></div>'+
+        '<div class="form-group"><label class="form-label">Status</label><div style="padding:6px 8px;font-size:10px;background:'+(API.connected?'#e8f5e9':'#f5f5f5')+';border:1px solid '+(API.connected?'#c8e6c9':'#e0e0e0')+';border-radius:6px;color:'+(API.connected?'#2e7d32':'#888')+'">'+(API.connected?'Connected · last sync '+_lastSync:'Not connected')+'</div></div>'+
+      '</div>'+
+      (API.connected?'':'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
+        '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="syncEmail" placeholder="admin@rembd.com"/></div>'+
+        '<div class="form-group"><label class="form-label">Password</label><input class="form-input" id="syncPass" type="password" placeholder="••••••••"/></div>'+
+      '</div>')+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        (API.connected?'':'<button class="action-btn primary" onclick="syncConnect()" style="padding:4px 12px;font-size:10px">🔌 Connect</button>')+
+        (API.connected?'<button class="action-btn secondary" onclick="syncPush()" style="padding:4px 12px;font-size:10px">⬆ Push local → server</button>':'')+
+        (API.connected?'<button class="action-btn secondary" onclick="syncPull()" style="padding:4px 12px;font-size:10px">⬇ Pull server → local</button>':'')+
+        (API.connected?'<button class="action-btn secondary" onclick="API.logout().then(function(){renderModule();showToast(\'Disconnected\',\'info\')})" style="padding:4px 12px;font-size:10px;color:#c62828">Disconnect</button>':'')+
+      '</div>'+
+    '</div></div>'+
+    '<div class="card"><div class="card-header"><h3>📄 Server Reports (PDF / CSV / Excel)</h3><span style="font-size:9px;color:#888">generated server-side from synced data</span></div><div class="card-body">'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">'+
+        [['invoice','🧾 Invoice PDF (INV-2026-0001)','API.download(\'/api/reports/invoice/INV-2026-0001.pdf\',\'INV-2026-0001.pdf\')'],
+         ['vat','📊 VAT Register PDF','API.download(\'/api/reports/vat-register.pdf\',\'vat-register.pdf\')'],
+         ['csv','📄 Leads CSV','API.download(\'/api/reports/csv/leads.csv\',\'leads.csv\')'],
+         ['xlsx','📗 Leads Excel','API.download(\'/api/reports/xlsx/leads.xlsx\',\'leads.xlsx\')'],
+         ['bcsv','📄 Bookings CSV','API.download(\'/api/reports/csv/bookings.csv\',\'bookings.csv\')'],
+         ['bxl','📗 Bookings Excel','API.download(\'/api/reports/xlsx/bookings.xlsx\',\'bookings.xlsx\')']].map(function(r){
+           return '<div class="card" style="cursor:pointer;margin:0" onclick="'+r[2]+'"><div class="card-body" style="padding:8px 10px"><div style="font-size:11px;font-weight:600">'+r[1]+'</div><div style="font-size:9px;color:#888;margin-top:2px">Server-side '+r[0]+' export</div></div></div>';
+         }).join('')+
+      '</div>'+
+      '<div style="margin-top:8px;font-size:9px;color:#999">⚠ Requires an active server connection. Data is pushed automatically on every save (debounced 800 ms).</div>'+
+    '</div></div>';
   }
   el.innerHTML='<div class="fade-in settings-wrap" style="display:flex;gap:8px;height:100%;flex:1"><div class="settings-nav" style="width:180px;min-width:180px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:6px;display:flex;flex-direction:column;overflow-y:auto"><div class="settings-nav-title" style="font-size:12px;font-weight:700;color:#222;margin-bottom:6px;padding:0 4px">Settings</div>'+sidebar+'<div class="settings-nav-actions" style="margin-top:auto;padding-top:6px;border-top:1px solid #f0f0f0"><button onclick="showToast(\'All settings saved!\',\'success\')" style="width:100%;padding:5px 0;background:#2F80ED;color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button><button onclick="resetAllAppData()" style="width:100%;padding:4px 0;background:transparent;color:#c62828;border:1px solid #f5c6cb;border-radius:6px;font-size:9px;font-weight:500;cursor:pointer;margin-top:3px">↺ Reset All Data</button></div></div><div class="settings-content" style="flex:1;overflow-y:auto">'+mc+'<div class="content-footer" style="margin-top:8px"><div class="breadcrumb">Settings <span>›</span> '+settingsTab+'</div></div></div></div>';
 }

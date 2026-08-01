@@ -1,13 +1,24 @@
 """REM ERP Backend — Flask app: auth (session + RBAC), REST APIs mirroring the V10 prototype."""
-import json, re
-from datetime import datetime
+import json, re, io, csv, uuid
+from datetime import datetime, date
 from functools import wraps
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, session, Response
 from werkzeug.security import check_password_hash
 from db import get_db, rows_to_dicts, row_to_dict, log_activity
 
 app = Flask(__name__)
 app.secret_key = 'rem-erp-dev-secret-change-in-prod'
+
+# ── CORS (prototype served from a different origin via tunnel) ────────
+@app.after_request
+def _cors(resp):
+    resp.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+    resp.headers['Access-Control-Allow-Credentials'] = 'true'
+    resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    if request.method == 'OPTIONS':
+        return resp
+    return resp
 
 # ── RBAC (mirrors prototype ROLE_MODULES) ─────────────────────────────
 ROLE_MODULES = {
@@ -17,10 +28,24 @@ ROLE_MODULES = {
     'Finance': ['invoices', 'payments', 'dues', 'customers', 'assets', 'license', 'dashboard'],
 }
 
+def _auth_user():
+    """Resolve user id from session cookie OR Authorization: Bearer <token>."""
+    if 'uid' in session:
+        return session['uid']
+    auth = request.headers.get('Authorization', '')
+    if auth.startswith('Bearer '):
+        tok = auth[7:].strip()
+        conn = get_db()
+        r = conn.execute("SELECT user_id FROM api_tokens WHERE token=?", (tok,)).fetchone()
+        conn.close()
+        if r:
+            return r['user_id']
+    return None
+
 def require_login(f):
     @wraps(f)
     def wrapper(*a, **kw):
-        if 'uid' not in session:
+        if _auth_user() is None:
             return jsonify({'error': 'Unauthorized — login required'}), 401
         return f(*a, **kw)
     return wrapper
@@ -29,9 +54,15 @@ def require_module(module):
     def deco(f):
         @wraps(f)
         def wrapper(*a, **kw):
-            if 'uid' not in session:
+            uid = _auth_user()
+            if uid is None:
                 return jsonify({'error': 'Unauthorized'}), 401
             role = session.get('role')
+            if role is None:
+                conn = get_db()
+                u = conn.execute("SELECT role FROM users WHERE id=?", (uid,)).fetchone()
+                conn.close()
+                role = u['role'] if u else None
             allowed = ROLE_MODULES.get(role, [])
             if allowed != 'all' and module not in allowed:
                 return jsonify({'error': f'Access denied — {module} not available for {role}'}), 403
@@ -39,9 +70,10 @@ def require_module(module):
         return wrapper
     return deco
 
-def _user():
+def _user(uid=None):
+    uid = uid or _auth_user()
     conn = get_db()
-    u = conn.execute("SELECT * FROM users WHERE id=?", (session['uid'],)).fetchone()
+    u = conn.execute("SELECT * FROM users WHERE id=?", (uid,)).fetchone()
     conn.close()
     return row_to_dict(u)
 
@@ -62,14 +94,12 @@ def login():
     session['uid'] = u['id']; session['name'] = u['name']; session['role'] = u['role']
     conn = get_db()
     conn.execute("UPDATE users SET last_login=? WHERE id=?", (datetime.utcnow().isoformat(), u['id']))
+    tok = uuid.uuid4().hex
+    conn.execute("INSERT INTO api_tokens(token,user_id,created_at) VALUES(?,?,?)",
+                 (tok, u['id'], datetime.utcnow().isoformat()))
     conn.commit(); conn.close()
     log_activity(u['name'], 'Login', 'System', 'auth', str(u['id']))
-    return jsonify({'ok': True, 'user': {'id': u['id'], 'name': u['name'], 'email': u['email'], 'role': u['role']}})
-
-@app.post('/api/logout')
-def logout():
-    session.clear()
-    return jsonify({'ok': True})
+    return jsonify({'ok': True, 'token': tok, 'user': {'id': u['id'], 'name': u['name'], 'email': u['email'], 'role': u['role']}})
 
 @app.get('/api/me')
 @require_login
@@ -320,6 +350,250 @@ def unpaid_invoices():
         out.append({**dict(r), 'paid': paid, 'outstanding': max(0, (r['net'] or r['amount']) - paid)})
     conn.close()
     return jsonify(out)
+
+# ── PHASE 3: DOC STORE SYNC (prototype <-> server) ────────────────────
+@app.get('/api/bootstrap')
+@require_login
+def bootstrap():
+    uid = _auth_user()
+    conn = get_db()
+    rows = conn.execute("SELECT collection, data FROM doc_store ORDER BY collection").fetchall()
+    collections = {}
+    for r in rows:
+        try:
+            collections.setdefault(r['collection'], []).append(json.loads(r['data']))
+        except Exception:
+            pass
+    # scalar (object) collections come back as arrays too; client merges by id
+    meta = {'server_time': datetime.utcnow().isoformat() + 'Z',
+            'collections': sorted(collections.keys()),
+            'counts': {k: len(v) for k, v in collections.items()}}
+    u = _user(uid)
+    return jsonify({'ok': True, 'meta': meta, 'collections': collections, 'user': u})
+
+@app.post('/api/sync')
+@require_login
+def sync():
+    data = request.get_json(force=True, silent=True) or {}
+    cols = data.get('collections') or {}
+    conn = get_db()
+    now = datetime.utcnow().isoformat() + 'Z'
+    n = 0
+    for name, rows in cols.items():
+        if isinstance(rows, dict):
+            rows = [rows]
+        if not isinstance(rows, list):
+            continue
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            rid = str(row.get('id') or row.get('code') or row.get('uid') or row.get('key') or f"r{n}")
+            conn.execute(
+                "INSERT INTO doc_store(collection,id,data,updated_at) VALUES(?,?,?,?) "
+                "ON CONFLICT(collection,id) DO UPDATE SET data=excluded.data, updated_at=excluded.updated_at",
+                (name, rid, json.dumps(row, ensure_ascii=False), now))
+            n += 1
+    conn.commit()
+    last = {'collection': '_meta', 'id': '_last_sync', 'data': json.dumps({'at': now, 'rows': n}),
+            'updated_at': now}
+    conn.execute("INSERT INTO doc_store(collection,id,data,updated_at) VALUES(?,?,?,?) "
+                 "ON CONFLICT(collection,id) DO UPDATE SET data=excluded.data, updated_at=excluded.updated_at",
+                 ('_meta', '_last_sync', last['data'], now))
+    conn.commit(); conn.close()
+    _audit('Sync', 'System', 'doc_store', str(n) + ' rows')
+    return jsonify({'ok': True, 'rows': n})
+
+@app.post('/api/logout')
+def logout():
+    auth = request.headers.get('Authorization', '')
+    if auth.startswith('Bearer '):
+        conn = get_db()
+        conn.execute("DELETE FROM api_tokens WHERE token=?", (auth[7:].strip(),))
+        conn.commit(); conn.close()
+    session.clear()
+    return jsonify({'ok': True})
+
+# ── PHASE 4: REPORTS (PDF / CSV / Excel) ──────────────────────────────
+def _doc_collection(name):
+    conn = get_db()
+    rows = conn.execute("SELECT data FROM doc_store WHERE collection=?", (name,)).fetchall()
+    conn.close()
+    out = []
+    for r in rows:
+        try:
+            d = json.loads(r['data'])
+            if isinstance(d, dict):
+                out.append(d)
+        except Exception:
+            pass
+    return out
+
+def _money(n):
+    try:
+        return f"Tk {int(n):,}"
+    except Exception:
+        return "Tk 0"
+
+def _doc_invoice(rid):
+    invs = _doc_collection('invoices')
+    for i in invs:
+        if str(i.get('id')) == rid:
+            return i
+    return None
+
+@app.get('/api/reports/invoice/<rid>.pdf')
+@require_login
+def invoice_pdf(rid):
+    inv = _doc_invoice(rid)
+    if not inv:
+        return jsonify({'error': 'Invoice not found in sync store'}), 404
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    except Exception:
+        return jsonify({'error': 'reportlab not installed on server'}), 500
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
+    styles = getSampleStyleSheet()
+    h1 = ParagraphStyle('h1', parent=styles['Title'], fontSize=16, spaceAfter=2)
+    sub = ParagraphStyle('sub', parent=styles['Normal'], fontSize=9, textColor=colors.grey, spaceAfter=10)
+    small = ParagraphStyle('small', parent=styles['Normal'], fontSize=9)
+    amount = int(inv.get('amount') or 0)
+    vat_r = int(inv.get('vat_rate') or 0); tds_r = int(inv.get('tds_rate') or 0); ait_r = int(inv.get('ait_rate') or 0)
+    vat = int(inv.get('vat') or 0); tds = int(inv.get('tds') or 0); ait = int(inv.get('ait') or 0)
+    net = int(inv.get('net') or 0)
+    if not vat and vat_r: vat = round(amount * vat_r / 100)
+    if not tds and tds_r: tds = round(amount * tds_r / 100)
+    if not ait and ait_r: ait = round(amount * ait_r / 100)
+    if not net: net = max(0, amount + vat - tds - ait)
+    story = []
+    story.append(Paragraph('REM ERP — Tax Invoice', h1))
+    story.append(Paragraph(f"Invoice {inv.get('id','')}  ·  Status: {inv.get('status','Draft')}  ·  Issued: {inv.get('issued_date','')}  ·  Due: {inv.get('due_date','')}", sub))
+    story.append(Paragraph(f"<b>Client:</b> {inv.get('client','')}", small))
+    story.append(Paragraph(f"<b>Project:</b> {inv.get('project','')}  ·  <b>Unit:</b> {inv.get('unit','')}", small))
+    if inv.get('challan'):
+        story.append(Paragraph(f"<b>VAT Challan Ref:</b> {inv.get('challan','')}", small))
+    story.append(Spacer(1, 14))
+    tdata = [
+        ['Description', 'Amount (Tk)'],
+        [inv.get('desc') or f'Sales — {inv.get("client","")}', f"{amount:,.0f}"],
+        [f'VAT @ {vat_r}%', f"{vat:,.0f}"],
+        [f'TDS @ {tds_r}%', f"-{tds:,.0f}"],
+        [f'AIT @ {ait_r}%', f"-{ait:,.0f}"],
+        ['Net Payable', f"{net:,.0f}"],
+    ]
+    tbl = Table(tdata, colWidths=[330, 110])
+    tbl.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2F80ED')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#eef3ff')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d0d8e8')),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(tbl)
+    story.append(Spacer(1, 12))
+    story.append(Paragraph('Payment terms: as per booking agreement. This is a computer-generated invoice.', sub))
+    doc.build(story)
+    return Response(buf.getvalue(), mimetype='application/pdf',
+                    headers={'Content-Disposition': f'attachment; filename={rid}.pdf'})
+
+@app.get('/api/reports/vat-register.pdf')
+@require_login
+def vat_register_pdf():
+    invs = _doc_collection('invoices')
+    try:
+        from reportlab.lib.pagesizes import A4, landscape
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    except Exception:
+        return jsonify({'error': 'reportlab not installed on server'}), 500
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=landscape(A4), leftMargin=30, rightMargin=30, topMargin=30, bottomMargin=30)
+    styles = getSampleStyleSheet()
+    h1 = ParagraphStyle('h1', parent=styles['Title'], fontSize=14, spaceAfter=2)
+    sub = ParagraphStyle('sub', parent=styles['Normal'], fontSize=8, textColor=colors.grey, spaceAfter=8)
+    rows = [['Invoice', 'Client', 'Subtotal', 'VAT%', 'VAT', 'TDS', 'AIT', 'Net', 'Challan', 'Status']]
+    tv = tt = ta = tn = 0
+    for i in invs:
+        amount = int(i.get('amount') or 0); vat = int(i.get('vat') or 0)
+        tds = int(i.get('tds') or 0); ait = int(i.get('ait') or 0)
+        net = int(i.get('net') or 0)
+        if not net: net = max(0, amount + vat - tds - ait)
+        rows.append([str(i.get('id','')), str(i.get('client',''))[:22], f"{amount:,.0f}",
+                     str(i.get('vat_rate') or 0), f"{vat:,.0f}", f"{tds:,.0f}", f"{ait:,.0f}",
+                     f"{net:,.0f}", str(i.get('challan','')), str(i.get('status',''))])
+        tv += vat; tt += tds; ta += ait; tn += net
+    rows.append(['TOTAL', f"{len(invs)} invoices", '', '', f"{tv:,.0f}", f"{tt:,.0f}", f"{ta:,.0f}", f"{tn:,.0f}", '', ''])
+    tbl = Table(rows, repeatRows=1)
+    tbl.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2F80ED')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#eef3ff')),
+        ('GRID', (0, 0), (-1, -1), 0.4, colors.HexColor('#d0d8e8')),
+        ('FONTSIZE', (0, 0), (-1, -1), 7),
+        ('ALIGN', (2, 0), (-1, -1), 'RIGHT'),
+    ]))
+    story = [Paragraph('REM ERP — VAT Register', h1),
+             Paragraph(f'{len(invs)} invoices · generated {datetime.utcnow().strftime("%d %b %Y %H:%M")} UTC · Net VAT {_money(tv)}', sub),
+             tbl]
+    doc.build(story)
+    return Response(buf.getvalue(), mimetype='application/pdf',
+                    headers={'Content-Disposition': 'attachment; filename=vat-register.pdf'})
+
+@app.get('/api/reports/csv/<collection>.csv')
+@require_login
+def collection_csv(collection):
+    rows = _doc_collection(collection)
+    headers = []
+    for r in rows:
+        for k in r.keys():
+            if k not in headers:
+                headers.append(k)
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(headers)
+    for r in rows:
+        w.writerow([r.get(h, '') if not isinstance(r.get(h), (dict, list)) else json.dumps(r.get(h), ensure_ascii=False) for h in headers])
+    return Response('\ufeff' + buf.getvalue(), mimetype='text/csv; charset=utf-8',
+                    headers={'Content-Disposition': f'attachment; filename={collection}.csv'})
+
+@app.get('/api/reports/xlsx/<collection>.xlsx')
+@require_login
+def collection_xlsx(collection):
+    rows = _doc_collection(collection)
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill
+    except Exception:
+        return jsonify({'error': 'openpyxl not installed on server'}), 500
+    headers = []
+    for r in rows:
+        for k in r.keys():
+            if k not in headers:
+                headers.append(k)
+    wb = Workbook()
+    ws = wb.active
+    ws.title = collection[:28] or 'data'
+    ws.append(headers)
+    for c in ws[1]:
+        c.font = Font(bold=True, color='FFFFFF')
+        c.fill = PatternFill('solid', fgColor='2F80ED')
+    for r in rows:
+        ws.append([r.get(h, '') if not isinstance(r.get(h), (dict, list)) else json.dumps(r.get(h), ensure_ascii=False) for h in headers])
+    buf = io.BytesIO()
+    wb.save(buf)
+    return Response(buf.getvalue(), mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    headers={'Content-Disposition': f'attachment; filename={collection}.xlsx'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
