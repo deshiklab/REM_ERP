@@ -979,7 +979,7 @@
         <div id="searchWrap">
           <div id="searchBar" tabindex="-1" onclick="openSearchDropdown()" title="Search anything (Ctrl+K)" style="cursor:pointer">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input id="gsInput" placeholder="Search anything..." oninput="doGlobalSearch()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
+            <input id="gsInput" placeholder="Search anything..." oninput="openSearchDropdown()" onkeydown="searchKeyNav(event)" autocomplete="off"/>
             <span class="kbd">⌘K</span>
           </div>
           <div id="searchDropdown">
@@ -11906,7 +11906,10 @@ function sdRemoveRecent(i){
   doGlobalSearch();
 }
 function doGlobalSearch(){
-  var q=(document.getElementById('sdInput').value||'').toLowerCase().trim();
+  var _ae=document.activeElement;
+  var q=((_ae&&(_ae.id==='sdInput'||_ae.id==='gsInput'))?_ae:document.getElementById('sdInput')).value||'';
+  q=String(q).toLowerCase().trim();
+  document.getElementById('sdInput').value=q;
   document.getElementById('gsInput').value=q;
   var c=document.getElementById('sdResults');
   var counter=document.getElementById('sdResultCount');
