@@ -1047,6 +1047,7 @@
     <div onclick="setRole('Sales Agent')" class="role-opt" data-role="Sales Agent" style="padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px">Sales Agent</div>
     <div onclick="setRole('Site Engineer')" class="role-opt" data-role="Site Engineer" style="padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px">Site Engineer</div>
     <div onclick="setRole('Finance')" class="role-opt" data-role="Finance" style="padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px">Finance</div>
+    <div style="margin-top:10px;border-top:1px solid #e8e8e8;padding-top:8px"><button onclick="resetDemoData()" style="width:100%;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;color:#c62828;background:#fff5f5;border:1px solid #ffcdd2">↺ Reset Demo Data</button></div>
   </div>
 </div></div>
 
@@ -2556,6 +2557,7 @@ function renderDashboard(el){
   const _saleVal=mockBookings.reduce((s,b)=>s+parseMoneyStr(b.price),0);
   const _sale26=mockBookings.filter(b=>String(b.date||'').indexOf('2026')>=0).reduce((s,b)=>s+parseMoneyStr(b.price),0);
   el.innerHTML=`<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: ${currentRole} · ${Object.keys(GROUPS).reduce(function(s,g){return s+GROUPS[g].mods.length},0)} Modules</div>
+    <div style="margin:8px 0"><button class="action-btn primary" onclick="printRoleReport()" style="padding:3px 12px;font-size:10px">🖨 Print Report</button></div>
     <div class="stats-row" style="margin-bottom:12px">${[
       ['Available Plots',a,'#4caf50','+2 this month'],['Sold Plots',s,'#e53935',''],['Reserved',r,'#1e88e5',''],
       ['Sales Value','৳'+(_saleVal/10000000).toFixed(1)+' Cr','#2e7d32','৳'+(_sale26/10000000).toFixed(1)+' Cr YTD'],['Active Bookings',mockBookings.filter(b=>b.status==='Confirmed').length,'',''],['Hot Leads',mockLeads.filter(l=>l.priority==='High').length,'','+3 this week']
@@ -2607,7 +2609,7 @@ function renderDashSales(el){
   var stages=LEAD_STAGES.slice();var maxC=0;stages.forEach(function(s){if((stCount[s]||0)>maxC)maxC=stCount[s];});
   var hotLeads=mockLeads.slice().sort(function(a,b){var p={High:0,Medium:1,Low:2};return (p[a.priority]||9)-(p[b.priority]||9)}).slice(0,6);
   var recentB=mockBookings.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))}).slice(0,6);
-  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Sales Agent · Pipeline &amp; Performance</div>'
+  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Sales Agent · Pipeline &amp; Performance</div><div style="margin:8px 0"><button class="action-btn primary" onclick="printRoleReport()" style="padding:3px 12px;font-size:10px">🖨 Print Report</button></div>'
     +dashStats([['Pipeline Value','৳'+(pipeVal/10000000).toFixed(1)+' Cr','#2e7d32',''],['Hot Leads',hot,'#c62828',''],['Open Deals',openDeals,'#1565c0',''],['Sales YTD 2026','৳'+(sale26/10000000).toFixed(1)+' Cr','#2F80ED',''],['Confirmed Bookings',booked,'#00838f',''],['Conversion',conv+'%','#7b1fa2','']])
     +dashQuick([['CRM & Leads',mockLeads.length+' leads','crm','#fff3e0','#e65100'],['Bookings',mockBookings.length+' active','bookings','#e3f2fd','#1565c0'],['Proposals',(window.mockProposals||[]).length+' total','proposals','#ede7f6','#5e35b1'],['Dues & Recovery',mockDues.length+' accts','dues_recovery','#fce4ec','#c62828'],['Customers',mockCustomers.length+' clients','customers','#e0f2f1','#00695c']])
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
@@ -2643,7 +2645,7 @@ function renderDashFinance(el){
   var overInvs=mockInvoices.filter(function(i){return i.status==='Overdue'}).slice(0,6);
   var topDues=mockDues.slice().sort(function(a,b){return (b.due||0)-(a.due||0)}).slice(0,6);
   var recentTx=mockTransactions.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))}).slice(0,6);
-  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Finance · Cash Position &amp; Receivables</div>'
+  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Finance · Cash Position &amp; Receivables</div><div style="margin:8px 0"><button class="action-btn primary" onclick="printRoleReport()" style="padding:3px 12px;font-size:10px">🖨 Print Report</button></div>'
     +dashStats([['Bank Balance','৳'+(bankTotal/10000000).toFixed(2)+' Cr','#1565c0',''],['Cash Inflow','৳'+(inflow/100000).toFixed(1)+' L','#2e7d32',''],['Cash Outflow','৳'+(outflow/100000).toFixed(1)+' L','#c62828',''],['Receivables','৳'+(receiv/100000).toFixed(1)+' L','#e65100',''],['Overdue Invoices',overInv,'#c62828',''],['Dues Accounts',duesActive+' active','#e65100','']])
     +dashQuick([['Finance',mockTransactions.length+' txns','finance','#fce4ec','#c62828'],['Bookings',mockBookings.length+' active','bookings','#e8f5e9','#2e7d32'],['Dues & Recovery',mockDues.length+' accts','dues_recovery','#fff3e0','#e65100'],['Investment & Loans','6 inv · 5 loans','investment_loans','#ede7f6','#5e35b1'],['Customers',mockCustomers.length+' clients','customers','#e0f7fa','#00838f']])
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
@@ -2676,7 +2678,7 @@ function renderDashEngineer(el){
   var pA=mockPlots.filter(function(p){return p.status==='available'}).length;
   var lowInv=mockInventory.filter(function(i){return i.status!=='Adequate'||(i.reorder&&i.qty<=i.reorder);});
   var unitsByProj=mockProperties.slice().sort(function(a,b){return (b.units||[]).length-(a.units||[]).length}).slice(0,5);
-  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Site Engineer · Projects &amp; Construction</div>'
+  el.innerHTML='<div class="fade-in"><div class="page-title">Dashboard</div><div class="page-subtitle">REM ERP v9 · Role: Site Engineer · Projects &amp; Construction</div><div style="margin:8px 0"><button class="action-btn primary" onclick="printRoleReport()" style="padding:3px 12px;font-size:10px">🖨 Print Report</button></div>'
     +dashStats([['Active Projects',actP,'#2e7d32',''],['Avg Progress',avgProg+'%','#2F80ED',''],['Units Sold',uS,'#c62828',''],['Units Available',uA,'#2e7d32',''],['Plots Available',pA,'#4caf50',''],['Stock Alerts',lowInv.length,'#e65100','']])
     +dashQuick([['Projects',mockProjects.length+' active','projects','#e0f2f1','#00695c'],['Flats & Units',mockProperties.length+' props','properties_units','#e3f2fd','#1565c0'],['Plots & Blocks',mockPlots.length+' plots','plots','#e8f5e9','#2e7d32'],['Stock & Procurement',mockInventory.length+' items','stock','#fff3e0','#e65100'],['Contractors',mockContractors.length+' vendors','contractors','#fce4ec','#c62828']])
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
@@ -2701,6 +2703,67 @@ function renderDashEngineerCharts(){
   if(pCtx)try{var pc={available:0,sold:0,reserved:0,not_acquired:0};mockPlots.forEach(function(p){pc[p.status]=(pc[p.status]||0)+1;});var pl=['available','sold','reserved','not_acquired'];window._dbCharts.push(new Chart(pCtx,{type:'doughnut',data:{labels:['Available','Sold','Reserved','Not Acquired'],datasets:[{data:pl.map(function(k){return pc[k]||0}),backgroundColor:['#4caf50','#e53935','#1e88e5','#bdbdbd'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
   var eCtx=document.getElementById('engEquipChart');
   if(eCtx)try{var ec={};mockEquipment.forEach(function(x){ec[x.status]=(ec[x.status]||0)+1;});var es=Object.keys(ec);window._dbCharts.push(new Chart(eCtx,{type:'doughnut',data:{labels:es,datasets:[{data:es.map(function(k){return ec[k]}),backgroundColor:['#2e7d32','#e65100','#c62828','#888'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}}));}catch(e){}
+}
+// ═══ ROLE REPORT PACKS (B1) — one-click printable per-role reports ═══
+function printRoleReport(){
+  var role=currentRole;
+  var title='REM ERP v9 — '+(role==='Super Admin'?'Executive':role)+' Report';
+  var when=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  function row(l,v){return '<tr><td style="padding:5px 10px;border-bottom:1px solid #eee;font-size:11px;color:#555">'+l+'</td><td style="padding:5px 10px;border-bottom:1px solid #eee;font-size:12px;font-weight:600;text-align:right">'+v+'</td></tr>';}
+  function sec(t){return '<div style="font-size:13px;font-weight:700;color:#2F80ED;margin:16px 0 6px">'+t+'</div>';}
+  function th(t,a){return '<th style="text-align:'+(a||'left')+';font-size:10px;padding:5px 10px;border-bottom:2px solid #ddd">'+t+'</th>';}
+  function td(t,a){return '<td style="padding:5px 10px;font-size:11px;'+(a?'text-align:'+a+';':'')+'border-bottom:1px solid #f0f0f0">'+t+'</td>';}
+  var body='';
+  if(role==='Sales Agent'){
+    var pv=mockLeads.reduce(function(s,l){return s+parsePriceStr(l.value)},0);
+    var hot=mockLeads.filter(function(l){return l.priority==='High'}).length;
+    var conf=mockBookings.filter(function(b){return b.status==='Confirmed'}).length;
+    var ytd=mockBookings.filter(function(b){return String(b.date||'').indexOf('2026')>=0}).reduce(function(s,b){return s+parsePriceStr(b.price)},0);
+    var conv=mockLeads.length?Math.round(mockBookings.length/mockLeads.length*100):0;
+    body+=sec('Pipeline Overview')+'<table style="width:100%;border-collapse:collapse">'+row('Pipeline Value','৳'+(pv/10000000).toFixed(1)+' Cr')+row('Total Leads',mockLeads.length)+row('Hot Leads',hot)+row('Sales YTD 2026','৳'+(ytd/10000000).toFixed(1)+' Cr')+row('Confirmed Bookings',conf)+row('Conversion Rate',conv+'%')+'</table>';
+    body+=sec('Recent Bookings')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('ID')+th('Client')+th('Amount','right')+th('Status')+'</tr>'+mockBookings.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))}).slice(0,8).map(function(b){return '<tr>'+td(b.id)+td(b.client)+td(b.price,'right')+td(b.status)+'</tr>';}).join('')+'</table>';
+    body+=sec('Hot Leads')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('Lead')+th('Property')+th('Stage')+'</tr>'+mockLeads.filter(function(l){return l.priority==='High'}).slice(0,6).map(function(l){return '<tr>'+td(l.name)+td(l.property)+td(l.status)+'</tr>';}).join('')+'</table>';
+  }
+  if(role==='Finance'){
+    var bank=mockBankAccounts.reduce(function(s,b){return s+parsePriceStr(b.balance)},0);
+    var inflow=mockTransactions.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
+    var outflow=mockTransactions.filter(function(t){return t.type==='Outflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
+    var receiv=mockDues.reduce(function(s,d){return s+(d.due||0)},0);
+    var overInv=mockInvoices.filter(function(i){return i.status==='Overdue'}).length;
+    body+=sec('Cash Position')+'<table style="width:100%;border-collapse:collapse">'+row('Bank Balance','৳'+(bank/10000000).toFixed(2)+' Cr')+row('Cash Inflow','৳'+(inflow/100000).toFixed(1)+' L')+row('Cash Outflow','৳'+(outflow/100000).toFixed(1)+' L')+row('Receivables','৳'+(receiv/100000).toFixed(1)+' L')+row('Overdue Invoices',overInv)+'</table>';
+    body+=sec('Overdue Invoices')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('Invoice')+th('Client')+th('Amount','right')+th('Due')+'</tr>'+mockInvoices.filter(function(i){return i.status==='Overdue'}).slice(0,6).map(function(i){return '<tr>'+td(i.id)+td(i.client)+td('৳'+(i.amount/100000).toFixed(1)+'L','right')+td(i.dueDate)+'</tr>';}).join('')+'</table>';
+    body+=sec('Top Dues')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('Customer')+th('Due','right')+th('Status')+'</tr>'+mockDues.slice().sort(function(a,b){return (b.due||0)-(a.due||0)}).slice(0,6).map(function(d){return '<tr>'+td(d.customer)+td('৳'+(d.due/100000).toFixed(1)+'L','right')+td(d.status)+'</tr>';}).join('')+'</table>';
+  }
+  if(role==='Site Engineer'){
+    var actP=mockProjects.filter(function(p){return p.status==='In Progress'||p.status==='Near Completion'}).length;
+    var avgProg=mockProjects.length?Math.round(mockProjects.reduce(function(s,p){return s+(p.progress||0)},0)/mockProjects.length):0;
+    var uA=0,uS=0;mockProperties.forEach(function(p){(p.units||[]).forEach(function(u){if(u.status==='Available')uA++;else if(u.status==='Sold')uS++;});});
+    var pA=mockPlots.filter(function(p){return p.status==='available'}).length;
+    var lowInv=mockInventory.filter(function(i){return i.status!=='Adequate'||(i.reorder&&i.qty<=i.reorder);});
+    body+=sec('Construction Overview')+'<table style="width:100%;border-collapse:collapse">'+row('Active Projects',actP)+row('Average Progress',avgProg+'%')+row('Units Sold',uS)+row('Units Available',uA)+row('Plots Available',pA)+row('Stock Alerts',lowInv.length)+'</table>';
+    body+=sec('Project Progress')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('Project')+th('Progress','right')+th('Status')+'</tr>'+mockProjects.slice().sort(function(a,b){return (b.progress||0)-(a.progress||0)}).map(function(p){return '<tr>'+td(p.name)+td(p.progress+'%','right')+td(p.status)+'</tr>';}).join('')+'</table>';
+    body+=sec('Inventory Alerts')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('Item')+th('Site')+th('Qty','right')+th('Status')+'</tr>'+lowInv.slice(0,8).map(function(i){return '<tr>'+td(i.item)+td(i.site)+td(i.qty+' '+i.unit,'right')+td(i.status)+'</tr>';}).join('')+'</table>';
+  }
+  if(role==='Super Admin'){
+    var port=mockProjects.reduce(function(s,p){return s+parsePriceStr(p.budget)},0);
+    var sales=mockBookings.reduce(function(s,b){return s+parsePriceStr(b.price)},0);
+    var inflow=mockTransactions.filter(function(t){return t.type==='Inflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
+    var outflow=mockTransactions.filter(function(t){return t.type==='Outflow'}).reduce(function(s,t){return s+(t.amount||0)},0);
+    var receiv=mockDues.reduce(function(s,d){return s+(d.due||0)},0);
+    body+=sec('Executive Overview')+'<table style="width:100%;border-collapse:collapse">'+row('Portfolio Value','৳'+(port/10000000).toFixed(1)+' Cr')+row('Total Sales (Bookings)','৳'+(sales/10000000).toFixed(1)+' Cr')+row('Cash Inflow','৳'+(inflow/100000).toFixed(1)+' L')+row('Cash Outflow','৳'+(outflow/100000).toFixed(1)+' L')+row('Receivables','৳'+(receiv/100000).toFixed(1)+' L')+row('Modules / Groups','50 / 11')+'</table>';
+    body+=sec('Project Progress')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('Project')+th('Progress','right')+th('Status')+'</tr>'+mockProjects.slice().sort(function(a,b){return (b.progress||0)-(a.progress||0)}).slice(0,10).map(function(p){return '<tr>'+td(p.name)+td(p.progress+'%','right')+td(p.status)+'</tr>';}).join('')+'</table>';
+    body+=sec('Recent Bookings')+'<table style="width:100%;border-collapse:collapse"><tr>'+th('ID')+th('Client')+th('Amount','right')+th('Status')+'</tr>'+mockBookings.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))}).slice(0,8).map(function(b){return '<tr>'+td(b.id)+td(b.client)+td(b.price,'right')+td(b.status)+'</tr>';}).join('')+'</table>';
+  }
+  var html='<div style="font-family:Inter,Arial,sans-serif;max-width:720px;margin:0 auto;padding:24px;color:#222">'
+    +'<div style="border-bottom:3px solid #2F80ED;padding-bottom:12px;margin-bottom:14px"><div style="font-size:18px;font-weight:800;color:#2F80ED">REM ERP v9</div><div style="font-size:14px;font-weight:600;margin-top:2px">'+title+'</div><div style="font-size:10px;color:#888;margin-top:3px">Generated '+when+' · Role: '+role+' · '+mockProjects.length+' projects · '+mockBookings.length+' bookings</div></div>'
+    +body
+    +'<div style="margin-top:18px;border-top:1px solid #ddd;padding-top:8px;font-size:9px;color:#999;text-align:center">REM Real Estate Management Ltd — 50 modules · 11 groups · Confidential demo data · MARS Construction proposal</div>'
+    +'</div>';
+  var pw=window.open('','_blank');
+  if(!pw){showToast('Pop-up blocked — allow pop-ups to print','error');return;}
+  pw.document.write('<html><head><title>'+title+'</title><style>body{background:#fff;margin:0}</style></head><body>'+html+'</body></html>');
+  pw.document.close();
+  setTimeout(function(){pw.print();pw.close();},500);
 }
 // ═══ ACTIVITY LOG HELPER ═══
 function logActivity(action, module, entity, entityId, details) {
@@ -4062,6 +4125,32 @@ function crudPayment(item){
     function(){
       var d={id:pymt.id,invoiceId:document.getElementById('f_payInv').value||null,leadId:pymt.leadId,client:g('f_payClient'),amount:parseInt(g('f_payAmt'))||0,date:g('f_payDate'),method:g('f_payMethod'),reference:g('f_payRef')||'',status:g('f_payStatus')||'Pending',notes:g('f_payNotes')||''};
       n?addItem(mockPayments,d,'payments'):updateItem(mockPayments,pymt.id,d,'payments');
+      // A2: on create, auto-adjust linked invoice + customer dues + cash-flow transaction
+      if(n){
+        var amt=d.amount||0;
+        if(d.invoiceId&&amt>0){
+          var inv=mockInvoices.find(function(x){return x.id===d.invoiceId;});
+          if(inv){
+            var paid=mockPayments.filter(function(p){return p.invoiceId===inv.id;}).reduce(function(s,p){return s+(p.amount||0);},0);
+            inv.status=(paid>=inv.amount)?'Paid':(inv.status==='Paid'?'Paid':'Partial');
+            DB.save('invoices');
+          }
+        }
+        if(d.client&&amt>0){
+          var due=mockDues.find(function(x){return String(x.customer)===String(d.client);});
+          if(due){
+            due.paid=(due.paid||0)+amt;
+            due.due=Math.max(0,(due.due||0)-amt);
+            if(due.due<=0){due.due=0;due.status='Paid';due.bucket='Cleared';due.daysOverdue=0;}
+            else{due.status='Upcoming';due.bucket='On Track';due.daysOverdue=0;}
+            DB.save('dues');
+          }
+        }
+        if(amt>0){
+          mockTransactions.unshift({id:'RCP-'+Math.floor(1000+Math.random()*9000),date:d.date||new Date().toISOString().slice(0,10),desc:'Payment - '+(d.client||''),client:d.client||'',project:'',type:'Inflow',category:'Payment Received',status:'Received',amount:amt,fmt:'+ \u09F3'+amt.toLocaleString('en-IN')});
+          DB.save('transactions');
+        }
+      }
     }
   );
 }
@@ -11274,6 +11363,7 @@ function printReport(){
   },200);
 }
 function toggleRoleMenu(){document.getElementById('roleMenuPanel').classList.toggle('active')}
+function resetDemoData(){if(!confirm('Reset ALL demo data to pristine seed state?'))return;localStorage.clear();location.reload();}
 function closeLeadPanel(){document.getElementById('leadSlideOut').classList.remove('active')}
 // ═══ ROLE-BASED ACCESS CONTROL ═══
 var _rolePerms = {};
@@ -12408,6 +12498,12 @@ function convertLeadToBooking(id){
       }
     });
   });
+  // A3: filter to the lead's project so the unit picker only lists matching units
+  var leadProj=String(l.property||'').split('-')[0].trim().toLowerCase();
+  if(leadProj){
+    var scoped=units.filter(function(u){return String(u.proj||'').toLowerCase().indexOf(leadProj)>=0;});
+    if(scoped.length){units=scoped;}
+  }
   if(!units.length){showToast('No available units to book','error');return;}
   window._convUnits=units;
   var priceGuess=parsePriceStr(l.value)||units[0].price||0;
@@ -12432,7 +12528,7 @@ function convertLeadToBooking(id){
       var price=V.num(g('f_price'));
       if(isNaN(price)||price<=0){showToast('Enter a valid price','error');return;}
       var adv=V.num(g('f_adv'))||0;
-      var nid=nextId(mockBookings);
+      var nid=nextId(mockBookings,'BKG-');
       var bk={id:nid,client:l.name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),property:u.proj,unit:'Unit '+u.number,price:'৳'+price.toLocaleString('en-IN'),advance:adv>0?'৳'+adv.toLocaleString('en-IN'):'—',status:adv>0?'Confirmed':'Pending Review',type:normType(u.type),terms:g('f_terms'),schedStart:g('f_schedStart')};
       mockBookings.push(bk);DB.save('bookings');
       (mockProperties||[]).forEach(function(p){
@@ -12800,7 +12896,7 @@ function outstandingDuesFor(client){
   var c=mockCustomers.find(function(x){return x.name===client;});
   return c?(c.duesNum||0):0;
 }
-function nextId(a){var m=0;a.forEach(function(i){var v=parseInt(i.id)||0;if(v>m)m=v;});var s=a.reduce(function(x,i){return x+String(i.id).replace(/[^0-9]/g,'')},'');if(s&&!m){var ex=0;a.forEach(function(i){var n=parseInt(String(i.id).replace(/[^0-9]/g,''),10)||0;if(n>ex)ex=n;});return ex+1;}return m+1;}
+function nextId(a,prefix){prefix=prefix||'';var ex=0;a.forEach(function(i){var n=parseInt(String(i.id).replace(/[^0-9]/g,''),10)||0;if(n>ex)ex=n;});return prefix?prefix+(ex+1):ex+1;}
 function addItem(a,i,k){a.push(i);if(k)DB.save(k);showToast('Created');logActivity('Created',k||'Unknown',k,i.id);renderModule()}
 function updateItem(a,id,u,k){const i=a.findIndex(function(x){return x.id===id});if(i>-1){a[i]=Object.assign({},a[i],u);if(k)DB.save(k);showToast('Updated','info');logActivity('Updated',k||'Unknown',k,id,JSON.stringify(u));renderModule()}}
 function deleteItem(a,id,l,k){if(!confirm('Delete '+l+'?'))return;const i=a.findIndex(function(x){return x.id===id});if(i>-1){const _item=JSON.parse(JSON.stringify(a[i]));a.splice(i,1);if(k)DB.save(k);showToast('Deleted','info',function(){a.splice(Math.min(i,a.length),0,_item);if(k)DB.save(k);renderModule();showToast('Restored','info');});logActivity('Deleted',k||'Unknown',k,id,l);renderModule()}}
@@ -12882,7 +12978,7 @@ function crudLead(item){
   );
   toggleLeadTypeFields();
 }
-function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;window._formRules=[
+function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects,'P-'),name:'',location:'',status:'Planning',progress:0,budget:'',manager:'',type:'land',plots:0,stats:{sold:0,reserved:0,available:0}}:item;window._formRules=[
     {id:'f_name',fn:function(v){return V.req(v,'Project name is required');}},
     {id:'f_loc',fn:function(v){return V.req(v,'Location is required');}},
     {id:'f_budget',fn:function(v){if(!String(v).trim())return null;return V.pos(parsePriceStr(v),'Budget must be greater than 0');}},
@@ -12890,12 +12986,12 @@ function crudProject(item){const n=!item;const p=n?{id:nextId(mockProjects),name
     {id:'f_total',fn:function(v){var t=(document.getElementById('f_type')||{}).value;var el=document.getElementById(t==='land'?'f_plots':'f_units');if(!el)return null;var n=V.num(el.value);return (isNaN(n)||Math.floor(n)!==n||n<0)?'Plots/units must be a non-negative whole number':null;}}
   ];
   openModal(n?'New Project':'Edit Project',formRow(inputField('Name','f_name',p.name,'',true),inputField('Location','f_loc',p.location,'',true))+formRow(selectField('Status','f_status',p.status,['Planning','In Progress','Near Completion','Completed']),selectField('Type','f_type',p.type,[{v:'',l:'-- Select type --'},{v:'land',l:'Land'},{v:'flat',l:'Flat'}],true,'toggleProjectTypeFields()'))+formRow(inputField('Budget','f_budget',p.budget),inputField('Manager','f_mgr',p.manager))+formRow(inputField('Progress (%)','f_progress',p.progress||''),'')+'<div id="f_plotsRow">'+inputField('Number of Plots','f_plots',p.plots||'')+'</div><div id="f_unitsRow" style="display:none">'+inputField('Number of Units','f_units',p.units||'')+'</div>',function(){const d=Object.assign({},p,{name:g('f_name'),location:g('f_loc'),status:g('f_status'),budget:g('f_budget'),manager:g('f_mgr'),type:g('f_type'),progress:Math.min(100,Math.max(0,parseInt(g('f_progress'))||0))});if(d.type==='land'){d.plots=parseInt(g('f_plots'))||0;d.units=0;}else{d.units=parseInt(g('f_units'))||0;d.plots=0;}n?addItem(mockProjects,d,'projects'):updateItem(mockProjects,p.id,d,'projects')});toggleProjectTypeFields();}
-function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;window._formRules=[
+function crudBooking(item){const n=!item;const b=n?{id:nextId(mockBookings,'BKG-'),client:'',property:'',unit:'',price:'',advance:'',status:'Pending Review',type:'Flat'}:item;window._formRules=[
     {id:'f_price',fn:function(v){return V.pos(V.num(v),'Price must be greater than 0');}},
     {id:'f_adv',fn:function(v){if(!String(v).trim())return null;var a=V.num(v);if(a<0)return 'Advance cannot be negative';var pr=V.num(document.getElementById('f_price').value);return (!isNaN(pr)&&a>pr)?'Advance cannot exceed price ('+pr.toLocaleString('en-IN')+')':null;}},
     {id:'f_unit',fn:function(v){return unitAvailabilityCheck(v,n?null:b.id);}}
   ];
-  openModal(n?'New Booking':'Edit Booking',formRow(selectField('Client','f_client',b.client,customerOpts(),true),selectField('Type','f_btype',normType(b.type||''),['','Land','Flat'],true,'toggleBookingTypeFields()'))+formRow(selectField('Project','f_prop',b.property,projectOptsByType(b.type||''),true),'<div id="f_bunitRow">'+inputField('Unit','f_unit',b.unit)+'</div>')+'<div id="f_bfloorRow">'+inputField('Floor','f_floor',b.floor||'')+'</div>'+formRow(inputField('Price','f_price',b.price,'',true),inputField('Advance','f_adv',b.advance))+formRow(selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),selectField('Payment Terms','f_terms',b.terms||'',BOOKING_TERMS))+formRow(inputField('Schedule Start','f_schedStart',b.schedStart||''),''),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),floor:g('f_floor'),price:g('f_price'),advance:g('f_adv'),status:g('f_status'),terms:g('f_terms'),schedStart:g('f_schedStart'),type:g('f_btype')||''};var _proj=mockProjects.find(function(x){return x.name===d.property;});d.type=normType(d.type||(_proj?(_proj.type==='land'?'Land':'Flat'):b.type));if(d.type==='Land')d.floor='';var nid;if(n){nid=nextId(mockBookings);addItem(mockBookings,Object.assign({id:nid,type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings');}else{nid=b.id;updateItem(mockBookings,b.id,d,'bookings');}var pr=parsePriceStr(g('f_price'));if(pr>0&&g('f_terms')){var old=bookingScheduleFor(nid);if(old)mockBookingSchedules=mockBookingSchedules.filter(function(x){return String(x.bookingId)!==String(nid);});generateBookingSchedule(nid,pr,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10));}else if(!bookingScheduleFor(nid)){showToast('No schedule — set terms & numeric price','info');}});toggleBookingTypeFields();}
+  openModal(n?'New Booking':'Edit Booking',formRow(selectField('Client','f_client',b.client,customerOpts(),true),selectField('Type','f_btype',normType(b.type||''),['','Land','Flat'],true,'toggleBookingTypeFields()'))+formRow(selectField('Project','f_prop',b.property,projectOptsByType(b.type||''),true),'<div id="f_bunitRow">'+inputField('Unit','f_unit',b.unit)+'</div>')+'<div id="f_bfloorRow">'+inputField('Floor','f_floor',b.floor||'')+'</div>'+formRow(inputField('Price','f_price',b.price,'',true),inputField('Advance','f_adv',b.advance))+formRow(selectField('Status','f_status',b.status,['Pending Review','Confirmed','Cancelled','Completed']),selectField('Payment Terms','f_terms',b.terms||'',BOOKING_TERMS))+formRow(inputField('Schedule Start','f_schedStart',b.schedStart||''),''),function(){const d={client:g('f_client'),property:g('f_prop'),unit:g('f_unit'),floor:g('f_floor'),price:g('f_price'),advance:g('f_adv'),status:g('f_status'),terms:g('f_terms'),schedStart:g('f_schedStart'),type:g('f_btype')||''};var _proj=mockProjects.find(function(x){return x.name===d.property;});d.type=normType(d.type||(_proj?(_proj.type==='land'?'Land':'Flat'):b.type));if(d.type==='Land')d.floor='';var nid;if(n){nid=nextId(mockBookings,'BKG-');addItem(mockBookings,Object.assign({id:nid,type:b.type,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})},d),'bookings');}else{nid=b.id;updateItem(mockBookings,b.id,d,'bookings');}var pr=parsePriceStr(g('f_price'));if(pr>0&&g('f_terms')){var old=bookingScheduleFor(nid);if(old)mockBookingSchedules=mockBookingSchedules.filter(function(x){return String(x.bookingId)!==String(nid);});generateBookingSchedule(nid,pr,g('f_terms'),g('f_schedStart')||new Date().toISOString().slice(0,10));}else if(!bookingScheduleFor(nid)){showToast('No schedule — set terms & numeric price','info');}});toggleBookingTypeFields();}
 function crudEmployee(item){
   var n=!item;
   var depts=['Construction','Sales','Finance','Management','HR','IT'];
