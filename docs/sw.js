@@ -1,5 +1,5 @@
 /* REM ERP v9 — Service Worker */
-const CACHE = 'rem-erp-v10-v1';
+const CACHE = 'rem-erp-v10-v2';
 const CORE = [
   './design-prototype-v10.html',
   './manifest.json',
