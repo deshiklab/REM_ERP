@@ -15,7 +15,7 @@
 2. Open in Chrome → `↺ Reset Demo Data` → reload lands Super Admin.
 3. Verify pristine counts (top-left quick stats): **25 leads · 12 invoices · 12 payments · 17 bookings · 12 projects · 12 employees · 30 txns**.
 4. Console clean (F12 → Console → no red).
-5. Check offline: DevTools → Network → Offline → reload → app still renders (SW `rem-erp-v9-v5`).
+5. Check offline: DevTools → Network → Offline → reload → app still renders (SW `rem-erp-v9-v6`).
 
 ---
 
@@ -24,7 +24,7 @@
 **What to do**
 1. Point out the header **📲** button: "installable on desktop and mobile, works without internet."
 2. Open DevTools (F12) → **Network** tab → toggle **Offline** → press **F5**.
-3. App reloads fully from the service worker (`rem-erp-v9-v5`) — dashboard, charts, data all render.
+3. App reloads fully from the service worker (`rem-erp-v9-v6`) — dashboard, charts, data all render.
 
 **Talk track**
 > "This is a progressive web app — the entire ERP runs in the browser, offline. Your field engineers in Purbachal, sales agents at fairs, and bankers visiting sites get the full system with zero connectivity. When they reconnect, it syncs."
@@ -194,6 +194,6 @@
 ## Rehearsal checklist (Phase D output)
 - [ ] Every step above executed against live build — pass/fail logged
 - [ ] Zero JS console errors across full walkthrough
-- [ ] Offline reload served by SW `rem-erp-v9-v5`
+- [ ] Offline reload served by SW `rem-erp-v9-v6`
 - [ ] Pristine counts before presenting (25 leads / 17 bookings / 12 payments / 12 projects / 20 entities)
 - [ ] `/tmp/REM-ERP-v9-latest.html` refreshed after push

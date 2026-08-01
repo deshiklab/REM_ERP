@@ -2759,11 +2759,7 @@ function printRoleReport(){
     +body
     +'<div style="margin-top:18px;border-top:1px solid #ddd;padding-top:8px;font-size:9px;color:#999;text-align:center">REM Real Estate Management Ltd — 50 modules · 11 groups · Confidential demo data · MARS Construction proposal</div>'
     +'</div>';
-  var pw=window.open('','_blank');
-  if(!pw){showToast('Pop-up blocked — allow pop-ups to print','error');return;}
-  pw.document.write('<html><head><title>'+title+'</title><style>body{background:#fff;margin:0}</style></head><body>'+html+'</body></html>');
-  pw.document.close();
-  setTimeout(function(){pw.print();pw.close();},500);
+  _printDoc('<html><head><title>'+title+'</title><style>body{background:#fff;margin:0}</style></head><body>'+html+'</body></html>',{w:800,h:900,autoprint:true});
 }
 // ═══ ACTIVITY LOG HELPER ═══
 function logActivity(action, module, entity, entityId, details) {
@@ -3885,13 +3881,13 @@ function openInvoice(id){
   var stCol={Draft:'#888',Sent:'#e65100',Paid:'#2e7d32',Overdue:'#c62828'}[inv.status]||'#888';
   var actions='';
   if(inv.status==='Draft'||inv.status==='Sent'){
-    actions='<button class="action-btn" onclick="markInvoicePaid('+inv.id+')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">✓ Mark Paid</button> ';
+    actions='<button class="action-btn" onclick="markInvoicePaid(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">✓ Mark Paid</button> ';
   }
   if(inv.status==='Sent'||inv.status==='Paid'){
-    actions+='<button class="action-btn secondary" onclick="markInvoiceOverdue('+inv.id+')" style="padding:3px 8px;font-size:9px">⚠ Overdue</button> ';
+    actions+='<button class="action-btn secondary" onclick="markInvoiceOverdue(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">⚠ Overdue</button> ';
   }
   if(inv.status==='Overdue'){
-    actions+='<button class="action-btn" onclick="markInvoicePaid('+inv.id+')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">✓ Mark Paid (overdue)</button> ';
+    actions+='<button class="action-btn" onclick="markInvoicePaid(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer">✓ Mark Paid (overdue)</button> ';
   }
   var statusHtml='<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:'+stCol+'">'+inv.status+'</span>';
   var invLead=mockLeads.find(function(l){return l.id===inv.leadId});
@@ -3915,7 +3911,7 @@ function openInvoice(id){
           return '<div class="installment-item"><div><div style="font-size:10px;font-weight:500">'+p.id+'</div><div style="font-size:9px;color:#888">'+p.date+' · '+p.method+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:600;color:#2e7d32">৳'+(p.amount/100000).toFixed(2)+'L</div><span style="font-size:8px;color:'+(p.status==='Cleared'?'#2e7d32':'#e65100')+'">'+p.status+'</span></div></div>';
         }).join(''):'')+
     '</div>',
-    actions+'<button class="action-btn secondary" onclick="printInvoice(id)" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(id)" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
+    actions+'<button class="action-btn secondary" onclick="printInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">🖨 Print</button> <button class="action-btn secondary" onclick="downloadInvoice(\''+inv.id+'\')" style="padding:3px 8px;font-size:9px">📥 Download</button> <button class="action-btn secondary" onclick="closeModal()" style="padding:3px 8px;font-size:9px">✕ Close</button>'
   );
 }
 function markInvoicePaid(id){
@@ -4199,11 +4195,38 @@ function _invDoc(inv,tpl){
   tpl=tpl||'classic';
   return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice '+inv.id+'</title><style>body{margin:0;padding:0;background:#f0f1f3}.print-bar{max-width:660px;margin:18px auto 0;text-align:center}.print-bar button{padding:9px 22px;background:#2F80ED;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}.inv-body .ivp{background:#fff;padding:28px;margin:18px auto;box-shadow:0 2px 16px rgba(0,0,0,.06);border-radius:4px}@media print{.print-bar{display:none}body{background:#fff}.inv-body .ivp{box-shadow:none;margin:0;padding:14px}}</style></head><body><div class="print-bar"><button onclick="window.print()">🖨 Print This Invoice</button></div>'+_invDocBody(inv,tpl)+'</body></html>';
 }
+function _printDoc(html,opts){
+  opts=opts||{};
+  var w=null;
+  try{w=window.open('','_blank',(opts.w||820)+','+(opts.h||760));}catch(e){}
+  if(w&&w.document){
+    try{
+      w.document.write(html);w.document.close();
+      if(opts.autoprint)setTimeout(function(){try{w.print();}catch(e){}},500);
+      return true;
+    }catch(e){w=null;}
+  }
+  var f=document.getElementById('_printFrame');
+  if(!f){
+    f=document.createElement('iframe');
+    f.id='_printFrame';
+    f.setAttribute('aria-hidden','true');
+    f.style.cssText='position:fixed;left:-10000px;top:0;width:820px;height:760px;border:0;';
+    document.body.appendChild(f);
+  }
+  try{
+    var d=f.contentDocument||f.contentWindow.document;
+    d.open();d.write(html);d.close();
+    setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print();}catch(e){if(typeof showToast==='function')showToast('Print failed — check browser print settings','error');}},500);
+    return true;
+  }catch(e){
+    if(typeof showToast==='function')showToast('Pop-up blocked — allow pop-ups for this site to print','error');
+    return false;
+  }
+}
 function printInvoice(id,tpl){
   var inv=mockInvoices.find(function(x){return x.id===id});if(!inv)return;
-  var w=window.open('','_blank','width=820,height=760');
-  w.document.write(_invDoc(inv,tpl||'classic'));
-  w.document.close();
+  _printDoc(_invDoc(inv,tpl||'classic'),{w:820,h:760});
 }
 function selectInvTpl(t){
   _invTplCur=t;
@@ -4251,8 +4274,7 @@ function downloadInvoice(id){
 function printPayment(id){
   var p=mockPayments.find(function(x){return x.id===id});if(!p)return;
   var inv=mockInvoices.find(function(i){return i.id===p.invoiceId});
-  var w=window.open('','_blank','width=700,height=600');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Payment Receipt '+p.id+'</title><style>'+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Payment Receipt '+p.id+'</title><style>'+
     'body{font-family:"Inter",Arial,sans-serif;max-width:600px;margin:30px auto;padding:20px;color:#222}'+
     '.header{display:flex;justify-content:space-between;align-items:start;padding-bottom:16px;border-bottom:2px solid #2e7d32;margin-bottom:16px}'+
     '.header .title{font-size:22px;font-weight:700;color:#2e7d32}.header .sub{font-size:11px;color:#666}'+
@@ -4272,8 +4294,8 @@ function printPayment(id){
     (inv?'<div style="padding:8px;background:#f0f4ff;border-radius:6px;font-size:11px"><strong>Linked Invoice:</strong> '+inv.id+' \u2014 '+inv.client+' (Tk '+inv.amount.toLocaleString('en-IN')+')</div>':'')+
     (p.notes?'<div style="margin-top:10px;padding:8px;background:#f8f9fa;border-radius:6px;font-size:11px;color:#555"><strong>Notes:</strong> '+p.notes+'</div>':'')+
     '<div class="footer">REM ERP \u2014 MARS Construction Ltd. \u00B7 Computer-generated receipt.</div>'+
-    '</body></html>');
-  w.document.close();
+    '</body></html>';
+  _printDoc(html,{w:700,h:600});
 }
 function downloadPayment(id){
   var p=mockPayments.find(function(x){return x.id===id});if(!p)return;
@@ -11948,14 +11970,13 @@ function printEmailTpl(id){
   var sample={client:'Kamrul Hasan',company:'MARS Construction Ltd.',project:'Jolshiri Abason',unit:'Apt 4B',booking:'BKG-101',invoice:'INV-1001',receipt:'PAY-2026-0184',amount:'৳2,50,000',method:'bKash',date:'15 Jun 2026',balance:'৳5,50,000'};
   var subj=t.subj.replace(/\{(\w+)\}/g,function(m,k){return sample[k]||m;});
   var bodyTxt=t.body.replace(/\{(\w+)\}/g,function(m,k){return sample[k]||m;}).replace(/\n/g,'<br/>');
-  var w=window.open('','_blank','width=760,height=680');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+t.name+'</title><style>body{font-family:"Inter",Arial,sans-serif;max-width:620px;margin:30px auto;padding:20px;color:#222}.no-print{text-align:center;margin-bottom:16px}.no-print button{padding:9px 22px;background:#2F80ED;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}.et-head{padding-bottom:14px;border-bottom:2px solid #2F80ED;margin-bottom:14px}.et-head .et-t{font-size:20px;font-weight:700;color:#2F80ED}.et-head .et-s{font-size:10px;color:#888;margin-top:2px}.et-subj{background:#eef3ff;border:1px solid #d0ddf0;border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;color:#1565c0;margin-bottom:12px}.et-body{font-size:12px;line-height:1.8}.et-foot{margin-top:24px;padding-top:10px;border-top:1px solid #ddd;font-size:9px;color:#999;text-align:center}@media print{.no-print{display:none}body{margin:0;padding:15px}}</style></head><body>'+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+t.name+'</title><style>body{font-family:"Inter",Arial,sans-serif;max-width:620px;margin:30px auto;padding:20px;color:#222}.no-print{text-align:center;margin-bottom:16px}.no-print button{padding:9px 22px;background:#2F80ED;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}.et-head{padding-bottom:14px;border-bottom:2px solid #2F80ED;margin-bottom:14px}.et-head .et-t{font-size:20px;font-weight:700;color:#2F80ED}.et-head .et-s{font-size:10px;color:#888;margin-top:2px}.et-subj{background:#eef3ff;border:1px solid #d0ddf0;border-radius:6px;padding:8px 12px;font-size:12px;font-weight:600;color:#1565c0;margin-bottom:12px}.et-body{font-size:12px;line-height:1.8}.et-foot{margin-top:24px;padding-top:10px;border-top:1px solid #ddd;font-size:9px;color:#999;text-align:center}@media print{.no-print{display:none}body{margin:0;padding:15px}}</style></head><body>'+
     '<div class="no-print"><button onclick="window.print()">🖨 Print Email Preview</button></div>'+
     '<div class="et-head"><div class="et-t">📧 '+t.name+'</div><div class="et-s">Category: '+t.cat+' · Preview with sample data</div></div>'+
     '<div class="et-subj">Subject: '+subj+'</div>'+
     '<div class="et-body">'+bodyTxt+'</div>'+
-    '<div class="et-foot">'+sample.company+' · Email template preview · Generated '+new Date().toLocaleString()+'</div></body></html>');
-  w.document.close();
+    '<div class="et-foot">'+sample.company+' · Email template preview · Generated '+new Date().toLocaleString()+'</div></body></html>';
+  _printDoc(html,{w:760,h:680});
 }
 function previewReceiptTpl(id){
   var r={money:{n:'Money Receipt',c:'Kamrul Hasan',a:'৳2,50,000',m:'bKash',d:'15 Jun 2026',r:'MR-2026-0012'},booking:{n:'Booking Money Receipt',c:'Dr. Rubina Ali',a:'৳12,00,000',m:'Bank Transfer',d:'15 Jun 2026',r:'BR-2026-0088'},handover:{n:'Handover Receipt',c:'Tariqul Islam',a:'Unit 4B · Jolshiri Abason',m:'On-site',d:'15 Jun 2026',r:'HR-2026-0034'},maintenance:{n:'Maintenance Fee Receipt',c:'Fatima Begum',a:'৳12,500',m:'Nagad',d:'15 Jun 2026',r:'MF-2026-0211'}}[id]||{n:'Receipt',c:'Client',a:'৳0',m:'—',d:'—',r:'—'};
@@ -11963,15 +11984,14 @@ function previewReceiptTpl(id){
 }
 function printReceiptTpl(id){
   var r={money:{n:'Money Receipt',c:'Kamrul Hasan',a:'Tk 2,50,000',m:'bKash',d:'15 Jun 2026',r:'MR-2026-0012'},booking:{n:'Booking Money Receipt',c:'Dr. Rubina Ali',a:'Tk 12,00,000',m:'Bank Transfer',d:'15 Jun 2026',r:'BR-2026-0088'},handover:{n:'Handover Receipt',c:'Tariqul Islam',a:'Unit 4B · Jolshiri Abason',m:'On-site',d:'15 Jun 2026',r:'HR-2026-0034'},maintenance:{n:'Maintenance Fee Receipt',c:'Fatima Begum',a:'Tk 12,500',m:'Nagad',d:'15 Jun 2026',r:'MF-2026-0211'}}[id]||{n:'Receipt',c:'Client',a:'Tk 0',m:'—',d:'—',r:'—'};
-  var w=window.open('','_blank','width=700,height=640');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+r.n+'</title><style>body{font-family:"Inter",Arial,sans-serif;max-width:560px;margin:30px auto;padding:20px;color:#222}.no-print{text-align:center;margin-bottom:16px}.no-print button{padding:9px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}.rh{padding-bottom:14px;border-bottom:2px solid #2e7d32;margin-bottom:14px}.rh .rt{font-size:22px;font-weight:700;color:#2e7d32}.rh .rs{font-size:10px;color:#888;margin-top:2px}.ra{font-size:26px;font-weight:700;color:#2e7d32;text-align:center;padding:16px;margin:12px 0;background:#f0faf0;border-radius:8px}.rr{display:flex;gap:12px;margin-bottom:10px}.box{flex:1;padding:8px 10px;background:#f8f9fa;border-radius:6px}.lbl{font-size:8px;color:#888;text-transform:uppercase}.val{font-size:12px;font-weight:600}.rf{margin-top:18px;padding-top:10px;border-top:1px dashed #ddd;font-size:9px;color:#999;text-align:center}@media print{.no-print{display:none}body{margin:0;padding:14px}}</style></head><body>'+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+r.n+'</title><style>body{font-family:"Inter",Arial,sans-serif;max-width:560px;margin:30px auto;padding:20px;color:#222}.no-print{text-align:center;margin-bottom:16px}.no-print button{padding:9px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}.rh{padding-bottom:14px;border-bottom:2px solid #2e7d32;margin-bottom:14px}.rh .rt{font-size:22px;font-weight:700;color:#2e7d32}.rh .rs{font-size:10px;color:#888;margin-top:2px}.ra{font-size:26px;font-weight:700;color:#2e7d32;text-align:center;padding:16px;margin:12px 0;background:#f0faf0;border-radius:8px}.rr{display:flex;gap:12px;margin-bottom:10px}.box{flex:1;padding:8px 10px;background:#f8f9fa;border-radius:6px}.lbl{font-size:8px;color:#888;text-transform:uppercase}.val{font-size:12px;font-weight:600}.rf{margin-top:18px;padding-top:10px;border-top:1px dashed #ddd;font-size:9px;color:#999;text-align:center}@media print{.no-print{display:none}body{margin:0;padding:14px}}</style></head><body>'+
     '<div class="no-print"><button onclick="window.print()">🖨 Print Receipt</button></div>'+
     '<div class="rh"><div style="display:flex;justify-content:space-between;align-items:start"><div><div class="rt">'+r.n+'</div><div class="rs">'+r.r+'</div></div><div><span style="display:inline-block;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:#2e7d32">CLEARED</span></div></div></div>'+
     '<div class="ra">'+r.a+'</div>'+
     '<div class="rr"><div class="box"><div class="lbl">Received From</div><div class="val">'+r.c+'</div></div><div class="box"><div class="lbl">Date</div><div class="val">'+r.d+'</div></div></div>'+
     '<div class="rr"><div class="box"><div class="lbl">Payment Method</div><div class="val">'+r.m+'</div></div><div class="box"><div class="lbl">Reference</div><div class="val">'+r.r+'</div></div></div>'+
-    '<div class="rf">MARS Construction Ltd. · Computer-generated receipt · '+new Date().toLocaleString()+'</div></body></html>');
-  w.document.close();
+    '<div class="rf">MARS Construction Ltd. · Computer-generated receipt · '+new Date().toLocaleString()+'</div></body></html>';
+  _printDoc(html,{w:700,h:640});
 }
 function toggleCompact(){
   var on=document.documentElement.classList.toggle('compact-mode');
