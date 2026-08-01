@@ -1067,7 +1067,7 @@ const GROUPS = {
   hr_admin:      { label:'Admin & Operations',icon:'💼',mods:[{id:'hr',label:'HR'},{id:'documents',label:'Documents Vault'},{id:'knowledge_base',label:'Knowledge Base'},{id:'stock',label:'Stock & Procurement'}] },
   legal_compliance:{label:'Legal & Compliance',icon:'⚖️',mods:[{id:'compliance',label:'Compliance',badge:true},{id:'legal_contracts',label:'Legal Contracts',badge:true},{id:'qc',label:'QC & Inspection'}] },
   collaboration: { label:'Collaboration', icon:'🤝', mods:[{id:'tasks',        label:'Tasks'},{id:'workspace',label:'Team Workspace',badge:true},{id:'calendar',label:'Calendar',badge:true},{id:'announcements',label:'Announcements',badge:true},{id:'notifications_page',label:'Notifications'},{id:'activity_log',label:'Activity Log'}] },
-  system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] },
+  system:        { label:'System',       icon:'⚙️', mods:[{id:'permissions',  label:'Permissions'},{id:'settings',     label:'Settings'},{id:'license',label:'License & SLA'},{id:'system_docs',     label:'System Manual',badge:true},{id:'backup_restore',label:'Backup & Restore'},{id:'csv_import',label:'CSV Import',badge:true}] },
   communication: { label:'Communication & AI', icon:'💬', mods:[{id:'whatsapp',label:'WhatsApp Engine'},{id:'chat',label:'Internal Chat'},{id:'ai_assistant',label:'AI Copilot'}] }
 };
 const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer','construction','finance_admin','hr_admin','legal_compliance','collaboration','system','communication'];
@@ -1075,7 +1075,7 @@ const GROUP_ORDER = ['executive','sales_crm','land_projects','bookings_customer'
 // ═══ DATA STORE (localStorage persistence) ═══
 const DB = {
   _v: 1, _data: {},
-  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:3, bookings:5, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:3, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1, ai_usage:1, reminder_log:1, investors:1, investments:1, loans:1, loan_contracts:1, portal_sessions:1, portal_chat:1, dues:2, payments:2, invoices:1, customers:1, fixed_assets:1},
+  _seedV: {projects:2, land_proposals:2, plots:2, properties:3, layouts:3, plot_pricing:2, leads:3, bookings:5, transactions:1, coa:1, bank_accounts:1, knowledge_base:1, master_lists:1, notifications:1, notif_templates:1, settings:1, module_config:1, menu_config:1, calendar_events:1, announcements:1, transfers:1, journals:2, recon_items:2, credit_notes:1, opening_balances:1, hr_attendance:1, hr_timesheets:1, leave:1, stock_receipts:1, entities:1, sales_config:1, booking_schedules:3, hr_shifts:1, employees:1, whatsapp_templates:1, whatsapp_log:1, whatsapp_broadcasts:1, chat_channels:1, chat_messages:1, ai_usage:1, reminder_log:1, investors:1, investments:1, loans:1, loan_contracts:1, portal_sessions:1, portal_chat:1, dues:2, payments:2, invoices:1, customers:1, fixed_assets:1, license:1},
   init(key, defaultData) {
     try {
       const wantV = this._seedV[key];
@@ -2500,6 +2500,7 @@ function switchModule(mod,skipSkel) {
       case 'investment_loans': renderInvestmentLoans(el); break;
       case 'csv_import': renderCsvImport(el); break;
       case 'permissions': renderPermissions(el); break;
+      case 'license': renderLicense(el); break;
       case 'settings': renderSettings(el); break;
       case 'system_docs': renderSystemDocs(el); break;
       case 'backup_restore': renderBackupRestore(el); break;
@@ -4439,6 +4440,7 @@ function renderPartyUnpaid(){
     ['Overdue',invs.filter(function(i){return i.status==='Overdue';}).length,'#c62828'],['Partial',invs.filter(function(i){return i.status==='Partial';}).length,'#1565c0']
   ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="font-size:14px;color:'+s[2]+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
   '<div class="toolbar" style="margin-bottom:6px"><span style="font-size:9px;color:#888">Tick invoices to batch-process into the approval queue, or open a client to collect directly.</span><div class="spacer"></div>'+
+  '<button class="action-btn secondary" onclick="batchPrintSelected()" style="padding:3px 8px;font-size:10px">🖨 Print Selected</button>'+
   '<button class="action-btn primary" onclick="batchQueueSelected()" style="padding:3px 8px;font-size:10px">📋 Batch to Approval</button></div>'+
   '<div class="card"><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th></th><th>Invoice</th><th>Client</th><th>Description</th><th class="num">Amount</th><th class="num">Outstanding</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>'+
   (invs.length?invs.map(function(inv){
@@ -4468,6 +4470,34 @@ function batchQueueSelected(){
   DB.save('payments');
   showToast(ids.length+' payment(s) queued for approval — approve in the Approvals tab','success');
   partyTab='approvals';renderModule();
+}
+function batchPrintSelected(){
+  var ids=[];
+  document.querySelectorAll('.un-inv:checked').forEach(function(cb){ids.push(cb.value);});
+  if(!ids.length){showToast('Select at least one invoice to print','error');return;}
+  bulkInvoicePrint(ids);
+}
+function bulkInvoicePrint(invIds){
+  var docs=invIds.map(function(id){
+    var inv=mockInvoices.find(function(x){return x.id===id;});if(!inv)return '';
+    return _invDocBody(inv,'classic');
+  }).filter(function(h){return h;}).join('<div style="page-break-after:always"></div>');
+  if(!docs){showToast('No invoices to print','error');return;}
+  _printDoc('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice Pack ('+invIds.length+')</title><style>body{background:#fff;margin:0;padding:20px;font-family:Inter,Arial,sans-serif}</style></head><body><div style="text-align:center;padding:8px;font-size:12px;font-weight:700;color:#2F80ED;border-bottom:2px solid #2F80ED;margin-bottom:14px">MARS CONSTRUCTION LIMITED — Invoice Pack · '+new Date().toLocaleDateString()+'</div>'+docs+'</body></html>',{w:820,h:760});
+  showToast('Invoice pack ('+invIds.length+') opened for print','success');
+}
+function exportTableCSV(tid){
+  var tbl=document.getElementById(tid);if(!tbl){showToast('Table not found','error');return;}
+  var rows=[];
+  tbl.querySelectorAll('tr').forEach(function(tr){
+    var cells=[];
+    tr.querySelectorAll('th,td').forEach(function(c){cells.push('"'+String(c.textContent||'').trim().replace(/"/g,'""')+'"');});
+    if(cells.length)rows.push(cells.join(','));
+  });
+  if(rows.length<2){showToast('Nothing to export','info');return;}
+  var blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rem-erp-export-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(a.href);
+  showToast('Exported '+(rows.length-1)+' rows','success');
 }
 
 // ═══ PAYMENT APPROVALS + RECONCILIATION ═══
@@ -4973,7 +5003,7 @@ function renderDuesList(){
     <select id="duesFStatus" onchange="_PG['dues']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Status</option>${['Upcoming','Due Today','Overdue','Critical'].map(s=>'<option value="'+s+'"'+(sf===s?' selected':'')+'>'+s+'</option>').join('')}</select>
     <select id="duesFBucket" onchange="_PG['dues']={page:1,perPage:_pgPerPage};renderModule()" style="padding:4px 6px;font-size:9px;border:1px solid #e0e0e0;border-radius:4px"><option value="">All Buckets</option>${['Future','Due Today','15 Days','30 Days','60+ Days'].map(s=>'<option value="'+s+'"'+(bf===s?' selected':'')+'>'+s+'</option>').join('')}</select>
     <button class="action-btn secondary" onclick="showToast('Export coming soon','info')" style="padding:3px 7px;font-size:9px">Export</button>
-    <button class="action-btn secondary" onclick="showToast('Sending reminders...','info')" style="padding:3px 7px;font-size:9px">Send Reminders</button>
+    <button class="action-btn secondary" onclick="sendDuesReminders()" style="padding:3px 7px;font-size:9px">📤 Send Reminders</button>
     <div class="spacer"></div>
     <button class="action-btn primary" onclick="recordDuesPayment()" style="padding:3px 8px;font-size:10px">+ Record Payment</button>
   </div>
@@ -4985,8 +5015,23 @@ function renderDuesList(){
   }</tbody></table>${_pgHtml('dues',pD.total,pD.page,pD.totalPages,pD.perPage)}</div></div></div>`;
 }
 
-function renderDuesPromises(){
-  const all=mockDues.filter(d=>{const p=d.promises||[];return p.length>0;});
+function sendDuesReminders(){
+  var targets=mockDues.filter(function(d){return d.status==='Due Today'||d.status==='Overdue'||d.status==='Critical';});
+  if(!targets.length){showToast('No Due Today / Overdue accounts to remind','info');return;}
+  var sent=0;
+  targets.forEach(function(d){
+    var overdue=d.status==='Overdue'||d.status==='Critical';
+    var tpl=overdue?(mockWhatsAppTemplates.find(function(t){return t.id==='WT-006';})||{}):(mockWhatsAppTemplates.find(function(t){return t.id==='WT-002';})||{});
+    var body=String(tpl.body||'').replace(/\{\{customer_name\}\}/g,d.customer).replace(/\{\{amount\}\}/g,'৳'+(d.due||0).toLocaleString('en-IN')).replace(/\{\{property\}\}/g,d.project||'your unit').replace(/\{\{due_date\}\}/g,d.dueDate||'');
+    mockWhatsAppLog.unshift({id:'WL-'+String(mockWhatsAppLog.length+1).padStart(3,'0'),contact:d.customer,phone:d.phone||'',template:tpl.id||'WT-002',templateName:tpl.name||(overdue?'Overdue Warning':'Installment Due Reminder'),status:'Delivered',channel:'WhatsApp',time:new Date().toISOString().slice(0,16).replace('T',' '),shortcodes:{customer_name:d.customer,property:d.project,amount:'৳'+(d.due||0).toLocaleString('en-IN'),due_date:d.dueDate||'',body:body}});
+    addNotification('🔔 '+(overdue?'Overdue':'Due')+' reminder sent',d.customer+' — ৳'+(d.due||0).toLocaleString('en-IN')+(overdue?' (overdue)':''),'warning');
+    sent++;
+  });
+  DB.save('whatsapp_log');
+  showToast(sent+' reminder(s) sent via WhatsApp — logged to WhatsApp Engine','success');
+  renderModule();
+}
+function renderDuesPromises(){  const all=mockDues.filter(d=>{const p=d.promises||[];return p.length>0;});
   const active=all.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===null);});
   const kept=all.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===true);});
   const broken=all.filter(d=>{const p=d.promises||[];return p.some(x=>x.kept===false);});
@@ -9196,6 +9241,73 @@ window.mockCreditNotes = DB.init('credit_notes', [
   {id:'CN-003',invoiceId:'INV-001',reason:'Registration fee refund — partial cancellation',amount:150000,date:'2026-07-25',status:'Draft'}
 ]);
 function _balNum(s){return parseInt(String(s||'').replace(/[^0-9]/g,''))||0;}
+window.mockLicense = DB.init('license', {
+  product:'REM ERP v10',client:'MARS CONSTECH LIMITED',licenseKey:'MMC-2026-REM10-4831',status:'Active',issued:'2026-07-01',expires:'2027-01-31',serverFee:12000,supportFee:10000,
+  contract:800000,
+  installments:[
+    {no:1,label:'Advance (15%)',amount:120000,due:'2026-07-15',status:'Paid',paidDate:'2026-07-14'},
+    {no:2,label:'Milestone 1 — Core CRM + Properties',amount:130000,due:'2026-08-15',status:'Paid',paidDate:'2026-08-10'},
+    {no:3,label:'Milestone 2 — Finance + Payments',amount:130000,due:'2026-09-15',status:'Due',paidDate:''},
+    {no:4,label:'Milestone 3 — HR + Procurement',amount:130000,due:'2026-10-15',status:'Upcoming',paidDate:''},
+    {no:5,label:'Milestone 4 — Reports + Compliance',amount:110000,due:'2026-11-15',status:'Upcoming',paidDate:''},
+    {no:6,label:'Milestone 5 — Portal + WhatsApp',amount:110000,due:'2026-12-15',status:'Upcoming',paidDate:''},
+    {no:7,label:'Final — Go-live + Handover',amount:70000,due:'2027-01-15',status:'Upcoming',paidDate:''}
+  ],
+  checklist:[
+    {id:1,title:'Server provisioning & hosting (Lightsail)',due:'2026-07-10',status:'Done',owner:'BITSCOL'},
+    {id:2,title:'Master data import (plots/units/customers)',due:'2026-08-20',status:'In Progress',owner:'BITSCOL'},
+    {id:3,title:'Role configuration & user training',due:'2026-09-05',status:'Pending',owner:'MARS'},
+    {id:4,title:'Finance go-live (invoices, payments, dues)',due:'2026-09-30',status:'Pending',owner:'MARS'},
+    {id:5,title:'Backup schedule + DR drill',due:'2026-10-10',status:'Pending',owner:'BITSCOL'},
+    {id:6,title:'Customer portal launch',due:'2026-12-01',status:'Pending',owner:'BITSCOL'},
+    {id:7,title:'Final acceptance & handover',due:'2027-01-15',status:'Pending',owner:'Both'}
+  ]
+});
+function renderLicense(el){
+  var L=window.mockLicense;
+  var paidAmt=L.installments.filter(function(i){return i.status==='Paid';}).reduce(function(s,i){return s+i.amount;},0);
+  var pct=Math.round(paidAmt/L.contract*100);
+  var doneCheck=L.checklist.filter(function(c){return c.status==='Done';}).length;
+  var stCol={Active:'#2e7d32',Grace:'#e65100',Suspended:'#c62828'}[L.status]||'#888';
+  var stBg={Active:'#e8f5e9',Grace:'#fff3e0',Suspended:'#ffebee'}[L.status]||'#f5f5f5';
+  el.innerHTML='<div class="fade-in"><div class="page-title">License & SLA</div><div class="page-subtitle">REM ERP v10 · '+L.client+' · Contract \u09F3'+L.contract.toLocaleString('en-IN')+' · '+pct+'% collected</div>'+
+    (L.status==='Suspended'?'<div style="margin-bottom:8px;padding:10px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;font-size:11px;color:#c62828;font-weight:600">⛔ LICENSE SUSPENDED — subscription payments overdue. System is in read-only mode until reconciliation. Contact BITSCOL support (server ৳'+L.serverFee.toLocaleString('en-IN')+'/mo · support ৳'+L.supportFee.toLocaleString('en-IN')+'/mo).</div>':'')+
+    (L.status==='Grace'?'<div style="margin-bottom:8px;padding:10px 14px;background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;font-size:11px;color:#e65100;font-weight:600">⚠ GRACE PERIOD — installment '+L.installments.filter(function(i){return i.status==='Due';}).map(function(i){return '#'+i.no;}).join(', ')+' is due. Pay within 15 days to avoid suspension.</div>':'')+
+    '<div class="stats-row" style="margin-bottom:8px">'+[
+      ['License Status',L.status,'',stCol],
+      ['Contract Value','\u09F3'+(L.contract/100000).toFixed(1)+'L','#1565c0',''],
+      ['Collected','\u09F3'+(paidAmt/100000).toFixed(1)+'L · '+pct+'%','#2e7d32',''],
+      ['Installments Paid',L.installments.filter(function(i){return i.status==='Paid';}).length+' / '+L.installments.length,'#2F80ED',''],
+      ['Milestones Done',doneCheck+' / '+L.checklist.length,'#7b1fa2',''],
+      ['Support SLA','\u09F3'+L.serverFee.toLocaleString('en-IN')+' server · \u09F3'+L.supportFee.toLocaleString('en-IN')+' support /mo','#00838f','']
+    ].map(function(s){return '<div class="stat-card"><div class="label">'+s[0]+'</div><div class="value" style="font-size:14px;color:'+(s[3]||s[2])+'">'+s[1]+'</div></div>';}).join('')+'</div>'+
+    '<div class="card" style="margin-bottom:8px"><div class="card-body" style="padding:10px;display:flex;justify-content:space-between;align-items:center;background:'+stBg+';border-radius:8px">'+
+      '<div><div style="font-size:11px;font-weight:700;color:'+stCol+'">License '+L.status+'</div><div style="font-size:9px;color:#888;margin-top:2px">'+L.product+' · Key '+L.licenseKey+' · Issued '+L.issued+' · Expires '+L.expires+'</div></div>'+
+      '<div style="display:flex;gap:6px"><button class="action-btn secondary" onclick="simLicense(\'Grace\')" style="padding:3px 8px;font-size:9px">⏳ Simulate Grace</button><button class="action-btn secondary" onclick="simLicense(\'Suspended\')" style="padding:3px 8px;font-size:9px;color:#c62828">⛔ Simulate Suspension</button><button class="action-btn primary" onclick="simLicense(\'Active\')" style="padding:3px 8px;font-size:9px">✓ Reactivate</button></div></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+    '<div class="card"><div class="card-header"><h3>💰 Work Order — 7 Installments</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>#</th><th>Milestone</th><th class="num">Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>'+
+    L.installments.map(function(i){
+      return '<tr><td style="font-weight:600">'+i.no+'</td><td style="font-size:9px">'+i.label+'</td><td class="num" style="font-weight:600">\u09F3'+(i.amount/1000).toFixed(0)+'K</td><td style="font-size:9px;color:#888">'+i.due+(i.paidDate?'<br><span style="color:#2e7d32">paid '+i.paidDate+'</span>':'')+'</td><td><span class="badge-status '+(i.status==='Paid'?'badge-active':i.status==='Due'?'badge-pending':'badge-closed')+'" style="font-size:8px">'+i.status+'</span></td><td>'+(i.status!=='Paid'?'<button class="action-btn primary" onclick="markInstallmentPaid('+i.no+')" style="padding:2px 7px;font-size:8px">✓ Paid</button>':'')+'</td></tr>';
+    }).join('')+'</tbody></table></div></div></div>'+
+    '<div class="card"><div class="card-header"><h3>📋 Implementation Checklist (SLA)</h3></div><div class="card-body" style="padding:0"><div class="table-wrap"><table style="font-size:10px"><thead><tr><th>Milestone</th><th>Owner</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>'+
+    L.checklist.map(function(c){
+      return '<tr><td style="font-size:9px">'+c.title+'</td><td style="font-size:9px;color:#555">'+c.owner+'</td><td style="font-size:9px;color:#888">'+c.due+'</td><td><span class="badge-status '+(c.status==='Done'?'badge-active':c.status==='In Progress'?'badge-pending':'badge-closed')+'" style="font-size:8px">'+c.status+'</span></td><td><button class="action-btn secondary" onclick="advanceChecklist('+c.id+')" style="padding:2px 7px;font-size:8px">'+({Done:'↺ Reset',Pending:'▶ Start','In Progress':'✓ Done'}[c.status])+'</button></td></tr>';
+    }).join('')+'</tbody></table></div></div></div>'+
+    '</div></div>';
+}
+function simLicense(status){window.mockLicense.status=status;DB.save('license');showToast('License set to '+status,'info');renderModule();}
+function markInstallmentPaid(no){
+  var i=window.mockLicense.installments.find(function(x){return x.no===no;});if(!i)return;
+  i.status='Paid';i.paidDate=new Date().toISOString().slice(0,10);
+  DB.save('license');
+  if(i.label.indexOf('Milestone')>=0){var n=parseInt(i.label.match(/\d+/)[0]);var c=window.mockLicense.checklist.find(function(x){return x.id===n;});if(c&&c.status==='Pending')c.status='In Progress';DB.save('license');}
+  showToast('Installment #'+no+' marked paid ✅','success');renderModule();
+}
+function advanceChecklist(id){
+  var c=window.mockLicense.checklist.find(function(x){return x.id===id;});if(!c)return;
+  c.status=c.status==='Done'?'Pending':c.status==='Pending'?'In Progress':'Done';
+  DB.save('license');showToast(c.title+' → '+c.status,'info');renderModule();
+}
 window.mockFixedAssets = DB.init('fixed_assets', [
   {id:'FA-001',code:'LND-01',name:'Jolshiri Abason Land',category:'Land & Building',purchaseDate:'2024-01-15',cost:250000000,salvage:0,usefulLife:0,accumDep:0,location:'Jolshiri',status:'In Use'},
   {id:'FA-002',code:'BLD-01',name:'Head Office Building',category:'Land & Building',purchaseDate:'2024-03-01',cost:80000000,salvage:8000000,usefulLife:40,accumDep:2000000,location:'Gulshan',status:'In Use'},
