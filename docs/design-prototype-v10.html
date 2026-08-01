@@ -2429,7 +2429,10 @@ function switchModule(mod,skipSkel) {
     var _mc=document.getElementById('mainContent');
     if(_mc){
       var _vals={};
-      _mc.querySelectorAll('.toolbar input[id],.toolbar select[id]').forEach(function(el){_vals[el.id]=el.value;});
+      _mc.querySelectorAll('input[id],select[id]').forEach(function(el){
+        if(el.type==='checkbox'||el.type==='radio'||el.classList.contains('ie-input'))return;
+        _vals[el.id]=el.value;
+      });
       var _act=document.activeElement;
       window._mobSnapshot={vals:_vals,focusId:(_act&&_act.id&&_mc.contains(_act)?_act.id:null)};
     }
@@ -16909,8 +16912,23 @@ function _wirePostRender(){
 // "Filters" dropdown. Desktop is untouched (controls stay inline).
 function _wireMobileFilters(){
   var root=document.getElementById('mainContent');if(!root)return;
+  // Restore toolbar filter values + focus captured by switchModule BEFORE the
+  // re-render — on ALL viewports. Without this, desktop search boxes wipe on
+  // every keystroke (inputs are rebuilt with no value attribute each render).
+  var snap=window._mobSnapshot||null;
+  if(snap&&snap.vals){
+    Object.keys(snap.vals).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el&&(el.tagName==='INPUT'||el.tagName==='SELECT'))el.value=snap.vals[id]||'';
+    });
+  }
   if(window.innerWidth>768){
     root.querySelectorAll('.mob-filter-panel,.mob-filter-btn').forEach(function(n){n.parentNode&&n.parentNode.removeChild(n);});
+    if(snap&&snap.focusId){
+      var fEl=document.getElementById(snap.focusId);
+      if(fEl&&fEl.tagName==='INPUT'){fEl.focus();try{fEl.setSelectionRange(fEl.value.length,fEl.value.length);}catch(e){}}
+    }
+    window._mobSnapshot=null;
     return;
   }
   // restore filter values + focus captured in switchModule before the re-render
