@@ -1112,7 +1112,7 @@ const DB = {
 
 // ═══ SERVER SYNC — Phase 3 (Flask backend) ═══
 const API = {
-  url: localStorage.getItem('rem_api_url') || '',
+  url: localStorage.getItem('rem_api_url') || 'https://rem.18.142.98.150.sslip.io',
   token: localStorage.getItem('rem_api_token') || '',
   connected: false, lastSync: localStorage.getItem('rem_last_sync') || null,
   _queue: {}, _timer: null,
