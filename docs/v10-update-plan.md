@@ -102,3 +102,15 @@ Two reasons: (a) the contracted scope's remaining items are mostly finance/compl
 - **Phase C** (`aebfa88`, SW v10-v4): new **License & SLA** module (7-installment Work Order tracker ৳8L, checklist w/ owners, Grace/Suspended simulation + read-only banner), automated dues reminders (WhatsApp templates → whatsapp_log + notifications), bulk invoice print pack + table CSV export, demo-script.md v2. Verified: license sim, reminders 7→15, fns; 0 errors.
 - **Phase D**: dry-run PASS — all new modules render, pristine 25/17/12/12/8, zero console errors; release SW v10-v5.
 - **Now 53 modules / 11 groups.** `docs/demo-script.md` updated for V10.
+
+---
+
+## Alternative B — Backend build (started 2026-08, auto per user)
+
+**Phases 0–2 delivered** (`backend/`): Flask 3 + SQLite app mirroring the prototype.
+- **Phase 0 — Foundation:** app skeleton, SQLite schema (users, leads, customers, projects, bookings, invoices, payments, dues, transactions, activity_log, fixed_assets, license), seed script (4 users / 15 leads / 10 customers / 6 projects / 12 bookings / 8 invoices / 12 payments / 8 dues / 15 txns / 6 assets / license).
+- **Phase 1 — Auth & RBAC:** session login (Werkzeug password hashes), `ROLE_MODULES` server-side guards (403 on cross-role access), activity audit log.
+- **Phase 2 — Core APIs:** REST CRUD for leads/customers/projects/dues/assets, bookings (BKG-XXX ids), invoices (NBR `INV-2026-XXXX` + VAT/TDS/AIT net computation), payments with the full ripple (Cleared → invoice status + dues ledger + cash-flow txn), license (7-installment tracker), unpaid-invoices report.
+- **Verified live:** admin/finance login, bad-password 401, Finance→leads 403 / Finance→invoices 200, VAT invoice INV-2026-0001 net ৳10.5M, payment PAY-013 → INV-002 Overdue→Partial + Rubina dues 10L→8L, license status toggle, report outstanding.
+- **Remaining:** Phase 3 UI rewiring (prototype `DB.init`/localStorage → `fetch()`), Phase 4 PDF/Excel reports, Phase 5 deploy (gunicorn + Lightsail + tunnel), Phase 6 portal + payment gateway.
+- Run: `cd backend && venv/bin/python seed.py && venv/bin/python app.py` (port 5001). README in `backend/`.
